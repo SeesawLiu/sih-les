@@ -152,7 +152,7 @@ BEGIN
 			if exists(select top 1 1 from #tempItem)
 			begin
 				insert into #tempBom(Item, Location, BomQty)
-				select bom.Item, bom.Location, bom.OrderQty
+				select bom.Item, bom.Location, SUM(bom.OrderQty)
 				from (select bom.Item, bom.Location, bom.OrderQty
 					from LE_OrderBomCPTimeSnapshot as bom 
 					inner join ORD_OrderMstr_4 as mstr on bom.OrderNo = mstr.OrderNo and bom.VanOp < mstr.CurtOp
@@ -167,12 +167,12 @@ BEGIN
 					where mstr.ProdLineType in (1, 2, 3, 4, 9) and mstr.Status in (3)
 					and not exists(select top 1 1 from LE_OrderBomCPTimeSnapshot as a where a.OrderNo = bom.OrderNo)
 					) as bom
-				group by bom.Item, bom.Location, bom.OrderQty
+				group by bom.Item, bom.Location
 			end
 			else
 			begin
 				insert into #tempBom(Item, Location, BomQty)
-				select bom.Item, bom.Location, bom.OrderQty
+				select bom.Item, bom.Location, SUM(bom.OrderQty)
 				from (select bom.Item, bom.Location, bom.OrderQty
 					from LE_OrderBomCPTimeSnapshot as bom 
 					inner join ORD_OrderMstr_4 as mstr on bom.OrderNo = mstr.OrderNo and bom.VanOp < mstr.CurtOp
@@ -185,7 +185,7 @@ BEGIN
 					where mstr.ProdLineType in (1, 2, 3, 4, 9) and mstr.Status in (3)
 					and not exists(select top 1 1 from LE_OrderBomCPTimeSnapshot as a where a.OrderNo = bom.OrderNo)
 					) as bom
-				group by bom.Item, bom.Location, bom.OrderQty
+				group by bom.Item, bom.Location
 			end
 			
 			if (@IsShowCSSupplier = 1)

@@ -1396,4 +1396,22 @@
   <data name="CodeDetail_TransactionType_LOC_INI_VOID" xml:space="preserve">
     <value>库存初始化冲销</value>
   </data>
+  <data name="CodeDetail_FlowStrategy_CKD" xml:space="preserve">
+    <value>CKD</value>
+  </data>
+  <data name="CodeDetail_FlowStrategy_REPAIR" xml:space="preserve">
+    <value>Repair</value>
+  </data>
+  <data name="CodeDetail_FlowStrategy_SEMI" xml:space="preserve">
+    <value>Semi-product</value>
+  </data>
+  <data name="CodeDetail_FlowStrategy_SPARTPART" xml:space="preserve">
+    <value>SpartPart</value>
+  </data>
+  <data name="CodeDetail_FlowStrategy_TRIAL" xml:space="preserve">
+    <value>Trail</value>
+  </data>
+  <data name="CodeDetail_ProdLineType_CKD" xml:space="preserve">
+    <value>CKD</value>
+  </data>
 </root>

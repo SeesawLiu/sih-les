@@ -2677,7 +2677,7 @@
                         if (Convert.ToDecimal(qtyArray[i]) > 0)
                         {
                             OrderDetail od = base.genericMgr.FindById<OrderDetail>(Convert.ToInt32(idArray[i]));
-                            if (od.ReceivedQty == 1)
+                            if (od.ReceiveLotSize == 1)
                             {
                                 throw new BusinessException(string.Format("单号{0}中物料{1}明细行已经关闭，不能收货。", od.OrderNo, od.Item));
                             }

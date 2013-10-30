@@ -297,10 +297,12 @@ BEGIN
 	det.OrderQty,
 	det.ShipQty,
 	det.RecQty
-	from ORD_OrderDet_1 as det inner join
-	ORD_OrderMstr_1 as mstr on det.OrderNo = mstr.OrderNo
+	from ORD_OrderDet_1 as det 
+	inner join ORD_OrderMstr_1 as mstr on det.OrderNo = mstr.OrderNo
+	left join CUST_ManualGenOrderTrace as trace on mstr.OrderNo = trace.OrderNo  --过滤掉为非整车拉动的订单
 	where mstr.SubType = 0  --只考虑普通订单的需求，不考虑退货单的
 	and mstr.Status in (1, 2) --只考虑状态为释放和进行中的
+	and trace.OrderNo is null
 	---------------------------↑采购-------------------------------------
 	union all
 	---------------------------↓移库-------------------------------------
@@ -320,10 +322,11 @@ BEGIN
 	det.OrderQty,
 	det.ShipQty,
 	det.RecQty
-	from ORD_OrderDet_2 as det inner join
-	ORD_OrderMstr_2 as mstr on det.OrderNo = mstr.OrderNo
+	from ORD_OrderDet_2 as det inner join ORD_OrderMstr_2 as mstr on det.OrderNo = mstr.OrderNo
+	left join CUST_ManualGenOrderTrace as trace on mstr.OrderNo = trace.OrderNo  --过滤掉为非整车拉动的订单
 	where mstr.SubType = 0  --只考虑普通订单的需求，不考虑退货单的
 	and mstr.Status in (1, 2) --只考虑状态为释放和进行中的
+	and trace.OrderNo is null
 	---------------------------↑移库-------------------------------------
 	union all
 	-----------------------------↓销售-------------------------------------

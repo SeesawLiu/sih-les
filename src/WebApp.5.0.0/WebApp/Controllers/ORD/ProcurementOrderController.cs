@@ -2677,10 +2677,9 @@
                         if (Convert.ToDecimal(qtyArray[i]) > 0)
                         {
                             OrderDetail od = base.genericMgr.FindById<OrderDetail>(Convert.ToInt32(idArray[i]));
-                            bool isColse = this.genericMgr.FindAllWithNativeSql<int>("select COUNT(*) as sumCount from LOG_SeqOrderChange where Status=4 and OrderDetId=?", od.Id)[0] > 0;
-                            if (isColse)
+                            if (od.ReceiveLotSize == 1)
                             {
-                                throw new BusinessException(string.Format("单号{0}中物料{1}明细行已经关闭，不能收货。",od.OrderNo,od.Item));
+                                throw new BusinessException(string.Format("单号{0}中物料{1}明细行已经关闭，不能收货。", od.OrderNo, od.Item));
                             }
                             OrderDetailInput input = new OrderDetailInput();
                             input.ReceiveQty = Convert.ToDecimal(qtyArray[i]);

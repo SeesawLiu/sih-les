@@ -77,21 +77,46 @@ namespace com.Sconit.Web.Controllers.INV
             #region
             if (command.SortDescriptors.Count != 0)
             {
-                if (command.SortDescriptors[0].Member == "IOTypeDescription")
+                if (command.SortDescriptors[0].Member == "TransactionTypeDescription")
+                {
+                    command.SortDescriptors[0].Member = "TransType";
+                }
+                else if (command.SortDescriptors[0].Member == "EffectiveDate")
+                {
+                    command.SortDescriptors[0].Member = "EffDate";
+                }
+                else if (command.SortDescriptors[0].Member == "ReceiptNo")
+                {
+                    command.SortDescriptors[0].Member = "RecNo";
+                }
+                else if (command.SortDescriptors[0].Member == "LocationFrom")
+                {
+                    command.SortDescriptors[0].Member = "LocFrom";
+                }
+                else if (command.SortDescriptors[0].Member == "LocationTo")
+                {
+                    command.SortDescriptors[0].Member = "LocTo";
+                }
+                else if (command.SortDescriptors[0].Member == "IOTypeDescription")
                 {
                     command.SortDescriptors[0].Member = "IOType";
                 }
                 else if (command.SortDescriptors[0].Member == "CreateUserName")
                 {
-                    command.SortDescriptors[0].Member = "CreateUser";
+                    command.SortDescriptors[0].Member = "CreateUserNm";
+                }
+                else if (command.SortDescriptors[0].Member == "SapOrderNo")
+                {
+                    command.SortDescriptors[0].Member = "ExtOrderNo";
                 }
                 sortingStatement = HqlStatementHelper.GetSortingStatement(command.SortDescriptors);
+                TempData["sortingStatement"] = sortingStatement;
             }
             #endregion
 
             if (string.IsNullOrWhiteSpace(sortingStatement))
             {
-                sortingStatement = " order by r1.Id asc";
+                sortingStatement = " order by EffDate desc";
             }
             sql = string.Format("select * from (select RowId=ROW_NUMBER()OVER({0}),r1.* from ({1}) as r1 ) as rt where rt.RowId between {2} and {3}", sortingStatement, sql, (command.Page - 1) * command.PageSize, command.PageSize*command.Page);
             IList<object[]> searchResult = this.genericMgr.FindAllWithNativeSql<object[]>(sql);
@@ -111,15 +136,17 @@ namespace com.Sconit.Web.Controllers.INV
                                                ReceiptNo = (string)tak[5],
                                                PartyFrom = (string)tak[6],
                                                PartyTo = (string)tak[7],
-                                               Item = (string)tak[8],
-                                               IOTypeDescription = systemMgr.GetCodeDetailDescription(Sconit.CodeMaster.CodeMaster.TransactionIOType, int.Parse((tak[9]).ToString())),
-                                               HuId = (string)tak[10],
-                                               LotNo = (string)tak[11],
-                                               Qty = (decimal)tak[12],
-                                               CreateUserName = (string)tak[13],
-                                               CreateDate = (DateTime)tak[14],
-                                               SapOrderNo = (string)tak[15],
-                                               Supplier = tak[16] != null ? (string)tak[16] : (tak[17] != null ? (string)tak[17] : string.Empty),
+                                               LocationFrom = (string)tak[8],
+                                               LocationTo = (string)tak[9],
+                                               Item = (string)tak[10],
+                                               IOTypeDescription = systemMgr.GetCodeDetailDescription(Sconit.CodeMaster.CodeMaster.TransactionIOType, int.Parse((tak[11]).ToString())),
+                                               HuId = (string)tak[12],
+                                               LotNo = (string)tak[13],
+                                               Qty = (decimal)tak[14],
+                                               CreateUserName = (string)tak[15],
+                                               CreateDate = (DateTime)tak[16],
+                                               SapOrderNo = (string)tak[17],
+                                               Supplier = tak[18] != null ? (string)tak[18] : (tak[19] != null ? (string)tak[19] : string.Empty),
                                            }).ToList();
                 #endregion
             }
@@ -131,88 +158,47 @@ namespace com.Sconit.Web.Controllers.INV
 
         public void ExportXLS(LocationTransactionSearchModel searchModel)
         {
-            string sql = @"select lt.TransType,lt.EffDate,lt.OrderNo,lt.IpNo,lt.RecNo,lt.PartyFrom,lt.PartyTo,lt.LocFrom,lt.LocTo,lt.Item,lt.IOType,lt.HuId,lt.LotNo,lt.Qty,(a.FirstName+a.LastName) as createUserName from VIEW_LocTrans as lt inner join ACC_User as a on lt.CreateUser=a.Id   where 1=1 ";
-            IList<object> param = new List<object>();
-            if (!string.IsNullOrEmpty(searchModel.CreateUserName))
+            string sql = PrepareSqlSearchStatement(searchModel);
+
+            string sortingStatement =TempData["sortingStatement"]!=null? TempData["sortingStatement"] as string:string.Empty; 
+            TempData["sortingStatement"] = sortingStatement;
+            if (string.IsNullOrWhiteSpace(sortingStatement))
             {
-                sql += "and  (a.FirstName+a.LastName) like ? ";
-                param.Add(searchModel.CreateUserName+"%");
+                sortingStatement = " order by lt.EffDate desc";
             }
-            if (!string.IsNullOrWhiteSpace(searchModel.PartyFrom))
+            IList<object[]> searchResult = this.genericMgr.FindAllWithNativeSql<object[]>(sql + sortingStatement);
+            IList<LocationTransaction> locationTransactionList = new List<LocationTransaction>();
+            if (searchResult != null && searchResult.Count > 0)
             {
-                sql += " and  lt.PartyFrom=?";
-                param.Add(searchModel.PartyFrom);
-            }
-            if (!string.IsNullOrWhiteSpace(searchModel.PartyTo))
-            {
-                sql += " and  lt.PartyTo = ?";
-                param.Add(searchModel.PartyTo);
-            } 
-            if (!string.IsNullOrWhiteSpace(searchModel.LocationFrom))
-            {
-                sql += " and  lt.LocFrom = ?";
-                param.Add(searchModel.LocationFrom);
-            } if (!string.IsNullOrWhiteSpace(searchModel.LocationTo))
-            {
-                sql += " and  lt.LocTo = ?";
-                param.Add(searchModel.LocationTo);
-            }
-            if (!string.IsNullOrWhiteSpace(searchModel.Item))
-            {
-                sql += " and  lt.Item = ?";
-                param.Add(searchModel.Item);
-            }
-            if (!string.IsNullOrWhiteSpace(searchModel.OrderNo))
-            {
-                sql += " and  lt.OrderNo = ?";
-                param.Add(searchModel.OrderNo);
-            }
-            if (!string.IsNullOrWhiteSpace(searchModel.TransactionType))
-            {
-                sql += " and  lt.TransType = ?";
-                param.Add(searchModel.TransactionType);
-            }
-            if (searchModel.StartDate != null & searchModel.EndDate != null)
-            {
-                sql += " and  lt.CreateDate between ? and  ?";
-                param.Add(searchModel.StartDate);
-                param.Add(searchModel.EndDate);
-            }
-            else if (searchModel.StartDate != null & searchModel.EndDate == null)
-            {
-                sql += " and  lt.CreateDate >=? ";
-                param.Add(searchModel.StartDate);
-            }
-            else if (searchModel.StartDate == null & searchModel.EndDate != null)
-            {
-                sql += " and  lt.CreateDate <=?";
-                param.Add(searchModel.EndDate);
+                #region
+                //lt.TransType,lt.EffDate,lt.OrderNo,lt.IpNo,lt.RecNo,lt.PartyFrom,lt.PartyTo,lt.Item,lt.IOType,lt.HuId,lt.LotNo,lt.Qty,au.CreateUserNm,
+                //lt.CreateDate,om.ExtOrderNo,bp.Party,ba.Party 
+                locationTransactionList = (from tak in searchResult
+                                           select new LocationTransaction
+                                           {
+                                               TransactionTypeDescription = systemMgr.GetCodeDetailDescription(Sconit.CodeMaster.CodeMaster.TransactionType, int.Parse((tak[0]).ToString())),
+                                               EffectiveDate = (DateTime)tak[1],
+                                               OrderNo = (string)tak[2],
+                                               IpNo = (string)tak[3],
+                                               ReceiptNo = (string)tak[4],
+                                               PartyFrom = (string)tak[5],
+                                               PartyTo = (string)tak[6],
+                                               LocationFrom = (string)tak[7],
+                                               LocationTo = (string)tak[8],
+                                               Item = (string)tak[9],
+                                               IOTypeDescription = systemMgr.GetCodeDetailDescription(Sconit.CodeMaster.CodeMaster.TransactionIOType, int.Parse((tak[10]).ToString())),
+                                               HuId = (string)tak[11],
+                                               LotNo = (string)tak[12],
+                                               Qty = (decimal)tak[13],
+                                               CreateUserName = (string)tak[14],
+                                               CreateDate = (DateTime)tak[15],
+                                               SapOrderNo = (string)tak[16],
+                                               Supplier = tak[17] != null ? (string)tak[17] : (tak[18] != null ? (string)tak[18] : string.Empty),
+                                           }).ToList();
+                #endregion
             }
 
-             sql+= " order by lt.Id desc";
-            IList<object[]> searchList = this.genericMgr.FindAllWithNativeSql<object[]>(sql, param.ToArray());
-            //lt.TransType,lt.EffDate,lt.OrderNo,lt.IpNo,lt.RecNo,lt.PartyFrom,lt.PartyTo,lt.LocFrom,lt.LocTo,
-            //lt.Item,lt.IOType,lt.HuId,lt.LotNo,lt.Qty,(a.FirstName+a.LastName) as createUserName
-            IList<LocationTransaction> exportList = (from tak in searchList
-                                                     select new LocationTransaction
-                                            {
-                                                TransactionTypeDescription = systemMgr.GetCodeDetailDescription(CodeMaster.CodeMaster.TransactionType, Convert.ToInt32(((object)tak[0]).ToString())),
-                                                EffectiveDate = (DateTime)tak[1],
-                                                OrderNo = (string)tak[2],
-                                                IpNo = (string)tak[3],
-                                                ReceiptNo = (string)tak[4],
-                                                PartyFrom = (string)tak[5],
-                                                PartyTo = (string)tak[6],
-                                                LocationFrom = (string)tak[7],
-                                                LocationTo = (string)tak[8],
-                                                Item = (string)tak[9],
-                                                IOTypeDescription = systemMgr.GetCodeDetailDescription(CodeMaster.CodeMaster.TransactionIOType, Convert.ToInt32(((object)tak[10]).ToString())),
-                                                HuId = (string)tak[11],
-                                                LotNo = (string)tak[12],
-                                                Qty = (decimal)tak[13],
-                                                CreateUserName = (string)tak[14],
-                                            }).ToList();
-            ExportToXLS<LocationTransaction>("ExportList", "xls", exportList);
+            ExportToXLS<LocationTransaction>("ExportList", "xls", locationTransactionList);
         }
 
         #endregion
@@ -274,13 +260,14 @@ namespace com.Sconit.Web.Controllers.INV
         }
         private string PrepareSqlSearchStatement(LocationTransactionSearchModel searchModel)
         {
-            string whereStatement = @"select lt.TransType,lt.EffDate,lt.OrderNo,lt.IpNo,lt.RecNo,lt.PartyFrom,lt.PartyTo,lt.Item,lt.IOType,lt.HuId,lt.LotNo,lt.Qty,au.CreateUserNm,lt.CreateDate,om.ExtOrderNo,bp.Party,ba.Party as p2 ,lt.Id
+            string whereStatement = @"select lt.TransType,lt.EffDate,lt.OrderNo,lt.IpNo,lt.RecNo,lt.PartyFrom,lt.PartyTo,lt.LocFrom,lt.LocTo,
+lt.Item,lt.IOType,lt.HuId,lt.LotNo,lt.Qty,au.CreateUserNm,lt.CreateDate,om.ExtOrderNo,bp.Party,ba.Party as p2 ,lt.Id
 from VIEW_LocTrans as lt with(nolock)
 left join BIL_PlanBill as bp with(nolock) on lt.PlanBill=bp.Id
 left join BIL_ActBill as ba with(nolock) on lt.ActBill=ba.Id
 left join ORD_OrderMstr_4 as om with(nolock) on lt.OrderNo=om.OrderNo
 left join ACC_User as au with(nolock) on lt.CreateUser=au.Id 
-where 1=1 ";
+where 1=1  ";
             if (!string.IsNullOrEmpty(searchModel.PartyFrom))
             {
                 whereStatement += " and lt.PartyFrom = '" + searchModel.PartyFrom + "'";

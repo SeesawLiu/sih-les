@@ -3474,39 +3474,39 @@ namespace com.Sconit.Service.Impl
             }
             else
             {
-                foreach (IpDetail ipDetail in nonZeroIpDetailList)
-                {
-                    decimal remainReceiveQty = ipDetail.ReceiveQtyInput;
+                //foreach (IpDetail ipDetail in nonZeroIpDetailList)
+                //{
+                //    decimal remainReceiveQty = ipDetail.ReceiveQtyInput;
 
-                    IList<OrderDetail> scheduleOrderDetailList = this.genericMgr.FindEntityWithNativeSql<OrderDetail>("select * from ORD_OrderDet_8 where ExtNo = ? and ExtSeq = ? and ScheduleType = ? and ShipQty > RecQty order by EndDate",
-                                                new object[] { ipDetail.ExternalOrderNo, ipDetail.ExternalSequence, CodeMaster.ScheduleType.Firm });
+                //    IList<OrderDetail> scheduleOrderDetailList = this.genericMgr.FindEntityWithNativeSql<OrderDetail>("select * from ORD_OrderDet_8 where ExtNo = ? and ExtSeq = ? and ScheduleType = ? and ShipQty > RecQty order by EndDate",
+                //                                new object[] { ipDetail.ExternalOrderNo, ipDetail.ExternalSequence, CodeMaster.ScheduleType.Firm });
 
-                    if (scheduleOrderDetailList != null && scheduleOrderDetailList.Count > 0)
-                    {
-                        foreach (OrderDetail scheduleOrderDetail in scheduleOrderDetailList)
-                        {
+                //    if (scheduleOrderDetailList != null && scheduleOrderDetailList.Count > 0)
+                //    {
+                //        foreach (OrderDetail scheduleOrderDetail in scheduleOrderDetailList)
+                //        {
 
-                            if (remainReceiveQty > (scheduleOrderDetail.ShippedQty - scheduleOrderDetail.ReceivedQty))
-                            {
-                                remainReceiveQty -= (scheduleOrderDetail.ShippedQty - scheduleOrderDetail.ReceivedQty);
-                                scheduleOrderDetail.ReceivedQty = scheduleOrderDetail.ShippedQty;
-                            }
-                            else
-                            {
-                                scheduleOrderDetail.ReceivedQty += remainReceiveQty;
-                                remainReceiveQty = 0;
-                                break;
-                            }
+                //            if (remainReceiveQty > (scheduleOrderDetail.ShippedQty - scheduleOrderDetail.ReceivedQty))
+                //            {
+                //                remainReceiveQty -= (scheduleOrderDetail.ShippedQty - scheduleOrderDetail.ReceivedQty);
+                //                scheduleOrderDetail.ReceivedQty = scheduleOrderDetail.ShippedQty;
+                //            }
+                //            else
+                //            {
+                //                scheduleOrderDetail.ReceivedQty += remainReceiveQty;
+                //                remainReceiveQty = 0;
+                //                break;
+                //            }
 
-                            this.genericMgr.Update(scheduleOrderDetail);
-                        }
-                    }
+                //            this.genericMgr.Update(scheduleOrderDetail);
+                //        }
+                //    }
 
-                    if (remainReceiveQty > 0)
-                    {
-                        throw new BusinessException(Resources.ORD.IpMaster.Errors_ReceiveQtyExcceedOrderQty, ipMaster.IpNo, ipDetail.Item);
-                    }
-                }
+                //    if (remainReceiveQty > 0)
+                //    {
+                //        throw new BusinessException(Resources.ORD.IpMaster.Errors_ReceiveQtyExcceedOrderQty, ipMaster.IpNo, ipDetail.Item);
+                //    }
+                //}
             }
             #endregion
 
@@ -6038,7 +6038,7 @@ namespace com.Sconit.Service.Impl
 
                     if (!isQuick && !isReturn)
                     {
-                        string hql = " select fd from FlowDetail as fd where Item=? and exists( select 1 from FlowMaster as fm where fm.Code=fd.Flow and fm.PartyFrom=? and fm.PartyTo=? as fm.Type=2 ) ";
+                        string hql = " select fd from FlowDetail as fd where Item=? and exists( select 1 from FlowMaster as fm where fm.Code=fd.Flow and fm.PartyFrom=? and fm.PartyTo=? and fm.Type=2 ) ";
                         var flowDetails = this.genericMgr.FindAll<FlowDetail>(hql, new object[] { od.Item, od.MastPartyFrom, od.MastPartyTo }, new IType[] { NHibernateUtil.String, NHibernateUtil.String, NHibernateUtil.String});
                         if (flowDetails != null && flowDetails.Count > 0)
                         {
@@ -8198,8 +8198,7 @@ namespace com.Sconit.Service.Impl
                 IList<OrderDetail> orderDetailList = new List<OrderDetail>();
                 OrderDetail orderDetail = this.genericMgr.FindById<OrderDetail>(Convert.ToInt32(wMSDatFile.WmsLine));
 
-                bool isColse = this.genericMgr.FindAllWithNativeSql<int>("select COUNT(*) as sumCount from LOG_SeqOrderChange where Status=4 and OrderDetId=?", orderDetail.Id)[0] > 0;
-                if (isColse)
+                if (orderDetail.ReceiveLotSize == 1)
                 {
                     throw new BusinessException(string.Format("单号{0}中物料{1}明细行已经关闭，不能收货。", orderDetail.OrderNo, orderDetail.Item));
                 }

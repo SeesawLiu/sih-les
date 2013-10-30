@@ -23,15 +23,17 @@ namespace com.Sconit.Entity.INV
         [Display(Name = "LocationTransaction_CreateUserName", ResourceType = typeof(Resources.INV.LocationTransaction))]
         public string CreateUserName { get; set; }
 
+        [Export(ExportName = "ExportList", ExportSeq = 135)]
         [Display(Name = "LocationTransaction_SapOrderNo", ResourceType = typeof(Resources.INV.LocationTransaction))]
         public string SapOrderNo { get; set; }
 
+        [Export(ExportName = "ExportList", ExportSeq = 136)]
         [Display(Name = "LocationTransaction_Supplier", ResourceType = typeof(Resources.INV.LocationTransaction))]
         public string Supplier { get; set; }
 
         #region ±®±Ì”√
 
-         [Display(Name = "LocationTransaction_Location", ResourceType = typeof(Resources.INV.LocationTransaction))]
+        [Display(Name = "LocationTransaction_Location", ResourceType = typeof(Resources.INV.LocationTransaction))]
         public string Location
         {
             get

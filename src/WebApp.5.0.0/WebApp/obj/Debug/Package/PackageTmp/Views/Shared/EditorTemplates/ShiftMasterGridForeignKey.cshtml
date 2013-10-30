@@ -1,5 +1,0 @@
-﻿@(Html.Telerik().ComboBox()
-      .Name(ViewData.TemplateInfo.GetFullHtmlFieldName(""))
-     .DataBinding(binding => binding.Ajax().Select("_ShiftMasterAjaxLoading", "Common", new { checkPermission = true }).Cache(true))
-     .AutoFill(true).HighlightFirstMatch(true)
-)

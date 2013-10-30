@@ -1,9 +1,0 @@
-﻿@{
-    ViewBag.Title = "Index";
-    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_KanbanCard_ItemDailyConsume2" });
-}
-@Html.Partial("_SearchItemDailyConsume2")
-@if (ViewBag.ReadOnly == false)
-{
-    @Html.Partial("_SearchResultItemDailyConsume2")
-}

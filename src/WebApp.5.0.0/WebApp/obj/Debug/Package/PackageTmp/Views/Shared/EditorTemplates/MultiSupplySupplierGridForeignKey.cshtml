@@ -1,6 +1,0 @@
-﻿@(Html.Telerik().ComboBox()
-      .Name(ViewData.TemplateInfo.GetFullHtmlFieldName(""))
-                  .DataBinding(binding => binding.Ajax().Select("_AjaxLoadingMultiSupplySupplier", "Common", new { checkPermission = true, groupNo = ViewBag.GroupNo }).Cache(true))
-      .AutoFill(true)
-      .HighlightFirstMatch(true)
-)

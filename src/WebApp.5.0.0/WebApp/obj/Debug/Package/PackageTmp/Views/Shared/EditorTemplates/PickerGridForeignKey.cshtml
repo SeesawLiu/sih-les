@@ -1,7 +1,0 @@
-﻿@(Html.Telerik().ComboBox().HtmlAttributes(new { style = "width: 100px" })
-      .Name(ViewData.TemplateInfo.GetFullHtmlFieldName(""))
-          .DataBinding(binding => binding.Ajax().Select("_AjaxLoadingPickerWithBlank", "Common").Cache(true))
-      .AutoFill(true)
-      .HighlightFirstMatch(true)
-          .ClientEvents(events => events.OnDataBinding("onPickerDataBinding"))
-)

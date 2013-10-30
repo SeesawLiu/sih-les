@@ -1,5 +1,0 @@
-G:\Project\sih-les\src\Core.5.0.0\CodeMaster\bin\Release\com.Sconit.CodeMaster.dll
-G:\Project\sih-les\src\Core.5.0.0\CodeMaster\bin\Release\com.Sconit.CodeMaster.pdb
-G:\Project\sih-les\src\Core.5.0.0\CodeMaster\obj\Release\ResolveAssemblyReference.cache
-G:\Project\sih-les\src\Core.5.0.0\CodeMaster\obj\Release\com.Sconit.CodeMaster.dll
-G:\Project\sih-les\src\Core.5.0.0\CodeMaster\obj\Release\com.Sconit.CodeMaster.pdb

@@ -77,21 +77,46 @@ namespace com.Sconit.Web.Controllers.INV
             #region
             if (command.SortDescriptors.Count != 0)
             {
-                if (command.SortDescriptors[0].Member == "IOTypeDescription")
+                if (command.SortDescriptors[0].Member == "TransactionTypeDescription")
+                {
+                    command.SortDescriptors[0].Member = "TransType";
+                }
+                else if (command.SortDescriptors[0].Member == "EffectiveDate")
+                {
+                    command.SortDescriptors[0].Member = "EffDate";
+                }
+                else if (command.SortDescriptors[0].Member == "ReceiptNo")
+                {
+                    command.SortDescriptors[0].Member = "RecNo";
+                }
+                else if (command.SortDescriptors[0].Member == "LocationFrom")
+                {
+                    command.SortDescriptors[0].Member = "LocFrom";
+                }
+                else if (command.SortDescriptors[0].Member == "LocationTo")
+                {
+                    command.SortDescriptors[0].Member = "LocTo";
+                }
+                else if (command.SortDescriptors[0].Member == "IOTypeDescription")
                 {
                     command.SortDescriptors[0].Member = "IOType";
                 }
                 else if (command.SortDescriptors[0].Member == "CreateUserName")
                 {
-                    command.SortDescriptors[0].Member = "CreateUser";
+                    command.SortDescriptors[0].Member = "CreateUserNm";
+                }
+                else if (command.SortDescriptors[0].Member == "SapOrderNo")
+                {
+                    command.SortDescriptors[0].Member = "ExtOrderNo";
                 }
                 sortingStatement = HqlStatementHelper.GetSortingStatement(command.SortDescriptors);
+                TempData["sortingStatement"] = sortingStatement;
             }
             #endregion
 
             if (string.IsNullOrWhiteSpace(sortingStatement))
             {
-                sortingStatement = " order by r1.Id asc";
+                sortingStatement = " order by EffDate desc";
             }
             sql = string.Format("select * from (select RowId=ROW_NUMBER()OVER({0}),r1.* from ({1}) as r1 ) as rt where rt.RowId between {2} and {3}", sortingStatement, sql, (command.Page - 1) * command.PageSize, command.PageSize*command.Page);
             IList<object[]> searchResult = this.genericMgr.FindAllWithNativeSql<object[]>(sql);
@@ -134,7 +159,13 @@ namespace com.Sconit.Web.Controllers.INV
         public void ExportXLS(LocationTransactionSearchModel searchModel)
         {
             string sql = PrepareSqlSearchStatement(searchModel);
-            string sortingStatement = " order by lt.Id asc";
+
+            string sortingStatement =TempData["sortingStatement"]!=null? TempData["sortingStatement"] as string:string.Empty; 
+            TempData["sortingStatement"] = sortingStatement;
+            if (string.IsNullOrWhiteSpace(sortingStatement))
+            {
+                sortingStatement = " order by lt.EffDate desc";
+            }
             IList<object[]> searchResult = this.genericMgr.FindAllWithNativeSql<object[]>(sql + sortingStatement);
             IList<LocationTransaction> locationTransactionList = new List<LocationTransaction>();
             if (searchResult != null && searchResult.Count > 0)

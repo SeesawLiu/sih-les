@@ -1173,7 +1173,7 @@ namespace com.Sconit.Service.Impl
                 }
                 else
                 {
-                    if (this.genericMgr.FindAllWithNativeSql<int>("select COUNT(*) from ORD_OrderMstr_4  where ExtOrderNo=? ", referenceNo.PadLeft(12, '0'))[0] == 0)
+                    if (this.genericMgr.FindAllWithNativeSql<int>("select count(*) from SAP_ProdBomDet where AUFNR=? ", referenceNo.PadLeft(12, '0'))[0] == 0)
                     {
                         businessException.AddMessage(string.Format("第{0}行:Sap订单号不存在ORD_OrderMstr_4表中。", rowCount));
                     }

@@ -550,7 +550,7 @@ namespace com.Sconit.Web.Controllers.INV
                 }
             }
             GridModel<LocationDetailView> gridModel = new GridModel<LocationDetailView>();
-            gridModel.Total = string.IsNullOrWhiteSpace(parameters[8].Value.ToString()) ? 0 : Convert.ToInt32(parameters[8].Value);
+            gridModel.Total = string.IsNullOrWhiteSpace(parameters[9].Value.ToString()) ? 0 : Convert.ToInt32(parameters[9].Value);
             gridModel.Data = locationDetailView;
             return PartialView(gridModel);
         }

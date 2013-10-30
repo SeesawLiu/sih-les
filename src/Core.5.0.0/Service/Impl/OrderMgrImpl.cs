@@ -6038,7 +6038,7 @@ namespace com.Sconit.Service.Impl
 
                     if (!isQuick && !isReturn)
                     {
-                        string hql = " select fd from FlowDetail as fd where Item=? and exists( select 1 from FlowMaster as fm where fm.Code=fd.Flow and fm.PartyFrom=? and fm.PartyTo=? as fm.Type=2 ) ";
+                        string hql = " select fd from FlowDetail as fd where Item=? and exists( select 1 from FlowMaster as fm where fm.Code=fd.Flow and fm.PartyFrom=? and fm.PartyTo=? and fm.Type=2 ) ";
                         var flowDetails = this.genericMgr.FindAll<FlowDetail>(hql, new object[] { od.Item, od.MastPartyFrom, od.MastPartyTo }, new IType[] { NHibernateUtil.String, NHibernateUtil.String, NHibernateUtil.String});
                         if (flowDetails != null && flowDetails.Count > 0)
                         {
@@ -8198,8 +8198,7 @@ namespace com.Sconit.Service.Impl
                 IList<OrderDetail> orderDetailList = new List<OrderDetail>();
                 OrderDetail orderDetail = this.genericMgr.FindById<OrderDetail>(Convert.ToInt32(wMSDatFile.WmsLine));
 
-                bool isColse = this.genericMgr.FindAllWithNativeSql<int>("select COUNT(*) as sumCount from LOG_SeqOrderChange where Status=4 and OrderDetId=?", orderDetail.Id)[0] > 0;
-                if (isColse)
+                if (orderDetail.ReceivedQty == 1)
                 {
                     throw new BusinessException(string.Format("单号{0}中物料{1}明细行已经关闭，不能收货。", orderDetail.OrderNo, orderDetail.Item));
                 }

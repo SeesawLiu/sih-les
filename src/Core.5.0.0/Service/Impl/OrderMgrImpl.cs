@@ -3474,39 +3474,39 @@ namespace com.Sconit.Service.Impl
             }
             else
             {
-                foreach (IpDetail ipDetail in nonZeroIpDetailList)
-                {
-                    decimal remainReceiveQty = ipDetail.ReceiveQtyInput;
+                //foreach (IpDetail ipDetail in nonZeroIpDetailList)
+                //{
+                //    decimal remainReceiveQty = ipDetail.ReceiveQtyInput;
 
-                    IList<OrderDetail> scheduleOrderDetailList = this.genericMgr.FindEntityWithNativeSql<OrderDetail>("select * from ORD_OrderDet_8 where ExtNo = ? and ExtSeq = ? and ScheduleType = ? and ShipQty > RecQty order by EndDate",
-                                                new object[] { ipDetail.ExternalOrderNo, ipDetail.ExternalSequence, CodeMaster.ScheduleType.Firm });
+                //    IList<OrderDetail> scheduleOrderDetailList = this.genericMgr.FindEntityWithNativeSql<OrderDetail>("select * from ORD_OrderDet_8 where ExtNo = ? and ExtSeq = ? and ScheduleType = ? and ShipQty > RecQty order by EndDate",
+                //                                new object[] { ipDetail.ExternalOrderNo, ipDetail.ExternalSequence, CodeMaster.ScheduleType.Firm });
 
-                    if (scheduleOrderDetailList != null && scheduleOrderDetailList.Count > 0)
-                    {
-                        foreach (OrderDetail scheduleOrderDetail in scheduleOrderDetailList)
-                        {
+                //    if (scheduleOrderDetailList != null && scheduleOrderDetailList.Count > 0)
+                //    {
+                //        foreach (OrderDetail scheduleOrderDetail in scheduleOrderDetailList)
+                //        {
 
-                            if (remainReceiveQty > (scheduleOrderDetail.ShippedQty - scheduleOrderDetail.ReceivedQty))
-                            {
-                                remainReceiveQty -= (scheduleOrderDetail.ShippedQty - scheduleOrderDetail.ReceivedQty);
-                                scheduleOrderDetail.ReceivedQty = scheduleOrderDetail.ShippedQty;
-                            }
-                            else
-                            {
-                                scheduleOrderDetail.ReceivedQty += remainReceiveQty;
-                                remainReceiveQty = 0;
-                                break;
-                            }
+                //            if (remainReceiveQty > (scheduleOrderDetail.ShippedQty - scheduleOrderDetail.ReceivedQty))
+                //            {
+                //                remainReceiveQty -= (scheduleOrderDetail.ShippedQty - scheduleOrderDetail.ReceivedQty);
+                //                scheduleOrderDetail.ReceivedQty = scheduleOrderDetail.ShippedQty;
+                //            }
+                //            else
+                //            {
+                //                scheduleOrderDetail.ReceivedQty += remainReceiveQty;
+                //                remainReceiveQty = 0;
+                //                break;
+                //            }
 
-                            this.genericMgr.Update(scheduleOrderDetail);
-                        }
-                    }
+                //            this.genericMgr.Update(scheduleOrderDetail);
+                //        }
+                //    }
 
-                    if (remainReceiveQty > 0)
-                    {
-                        throw new BusinessException(Resources.ORD.IpMaster.Errors_ReceiveQtyExcceedOrderQty, ipMaster.IpNo, ipDetail.Item);
-                    }
-                }
+                //    if (remainReceiveQty > 0)
+                //    {
+                //        throw new BusinessException(Resources.ORD.IpMaster.Errors_ReceiveQtyExcceedOrderQty, ipMaster.IpNo, ipDetail.Item);
+                //    }
+                //}
             }
             #endregion
 

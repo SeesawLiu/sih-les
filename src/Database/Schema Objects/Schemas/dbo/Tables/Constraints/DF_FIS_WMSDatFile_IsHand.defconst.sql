@@ -1,3 +1,0 @@
-﻿ALTER TABLE [dbo].[FIS_WMSDatFile]
-    ADD CONSTRAINT [DF_FIS_WMSDatFile_IsHand] DEFAULT ((0)) FOR [IsHand];
-

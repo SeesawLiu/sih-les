@@ -1,3 +1,0 @@
-﻿ALTER TABLE [dbo].[ORD_RecLocationDet_8]
-    ADD CONSTRAINT [FK_ORD_RecLocationDet8_ActBill_REFERENCE_BIL_ActBill_Id] FOREIGN KEY ([ActBill]) REFERENCES [dbo].[BIL_ActBill] ([Id]) ON DELETE NO ACTION ON UPDATE NO ACTION;
-

@@ -1,3 +1,0 @@
-﻿ALTER TABLE [dbo].[ORD_IpDet_7]
-    ADD CONSTRAINT [FK_ORD_IpDet7_BillAddr_REFERENCE_MD_Address_Code] FOREIGN KEY ([BillAddr]) REFERENCES [dbo].[MD_Address] ([Code]) ON DELETE NO ACTION ON UPDATE NO ACTION;
-

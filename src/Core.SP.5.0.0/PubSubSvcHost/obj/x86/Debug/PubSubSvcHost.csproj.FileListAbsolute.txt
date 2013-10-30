@@ -1,1 +1,0 @@
-G:\Project\sih-les\src\Core.SP.5.0.0\PubSubSvcHost\bin\Debug\PubSubSvcHost.exe.config

@@ -1,9 +1,0 @@
-G:\Project\sih-les\src\Core.FIS.5.0.0\Entity.FIS\bin\Debug\com.Sconit.Entity.FIS.dll
-G:\Project\sih-les\src\Core.FIS.5.0.0\Entity.FIS\bin\Debug\com.Sconit.Entity.FIS.pdb
-G:\Project\sih-les\src\Core.FIS.5.0.0\Entity.FIS\bin\Debug\com.Sconit.Globalization.dll
-G:\Project\sih-les\src\Core.FIS.5.0.0\Entity.FIS\bin\Debug\com.Sconit.Globalization.pdb
-G:\Project\sih-les\src\Core.FIS.5.0.0\Entity.FIS\bin\Debug\en-US\com.Sconit.Globalization.resources.dll
-G:\Project\sih-les\src\Core.FIS.5.0.0\Entity.FIS\bin\Debug\zh-CN\com.Sconit.Globalization.resources.dll
-G:\Project\sih-les\src\Core.FIS.5.0.0\Entity.FIS\obj\Debug\ResolveAssemblyReference.cache
-G:\Project\sih-les\src\Core.FIS.5.0.0\Entity.FIS\obj\Debug\com.Sconit.Entity.FIS.dll
-G:\Project\sih-les\src\Core.FIS.5.0.0\Entity.FIS\obj\Debug\com.Sconit.Entity.FIS.pdb

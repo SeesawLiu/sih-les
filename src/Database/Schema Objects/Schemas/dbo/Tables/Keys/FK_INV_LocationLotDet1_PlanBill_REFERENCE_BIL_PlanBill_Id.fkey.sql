@@ -1,3 +1,0 @@
-﻿ALTER TABLE [dbo].[INV_LocationLotDet_1]
-    ADD CONSTRAINT [FK_INV_LocationLotDet1_PlanBill_REFERENCE_BIL_PlanBill_Id] FOREIGN KEY ([PlanBill]) REFERENCES [dbo].[BIL_PlanBill] ([Id]) ON DELETE NO ACTION ON UPDATE NO ACTION;
-

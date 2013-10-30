@@ -1,3 +1,0 @@
-﻿ALTER TABLE [dbo].[ORD_OrderMstr_8]
-    ADD CONSTRAINT [FK_ORD_OrderMstr8_Flow_REFERENCE_SCM_FlowMstr_Code] FOREIGN KEY ([Flow]) REFERENCES [dbo].[SCM_FlowMstr] ([Code]) ON DELETE NO ACTION ON UPDATE NO ACTION;
-

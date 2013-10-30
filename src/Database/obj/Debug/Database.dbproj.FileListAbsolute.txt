@@ -1,8 +1,0 @@
-G:\Project\sih-les\src\Database\sql\debug\Database_Script.PreDeployment.sql
-G:\Project\sih-les\src\Database\sql\debug\Database_Script.PostDeployment.sql
-G:\Project\sih-les\src\Database\sql\debug\Database_Database.sqlsettings
-G:\Project\sih-les\src\Database\sql\debug\Database_Database.sqldeployment
-G:\Project\sih-les\src\Database\sql\debug\Database_Database.sqlcmdvars
-G:\Project\sih-les\src\Database\sql\debug\Database.deploymanifest
-G:\Project\sih-les\src\Database\sql\debug\Database.dbschema
-G:\Project\sih-les\src\Database\obj\Debug\Database.dbschema

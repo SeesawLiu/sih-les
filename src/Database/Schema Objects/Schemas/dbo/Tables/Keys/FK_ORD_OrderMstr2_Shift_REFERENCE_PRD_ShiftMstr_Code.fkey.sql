@@ -1,3 +1,0 @@
-﻿ALTER TABLE [dbo].[ORD_OrderMstr_2]
-    ADD CONSTRAINT [FK_ORD_OrderMstr2_Shift_REFERENCE_PRD_ShiftMstr_Code] FOREIGN KEY ([Shift]) REFERENCES [dbo].[PRD_ShiftMstr] ([Code]) ON DELETE NO ACTION ON UPDATE NO ACTION;
-

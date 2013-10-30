@@ -1,0 +1,74 @@
+﻿   @model IEnumerable<com.Sconit.Entity.INP.InspectResult>
+
+        @(Html.Telerik().Grid(Model)
+        .Name("InspectResult")
+        .DataKeys(keys => { keys.Add(p => p.InspectNo); })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Id).Hidden();
+            columns.Bound(o => o.InspectNo);
+            columns.Bound(o => o.Item);
+            columns.Bound(o => o.ReferenceItemCode);
+            columns.Bound(o => o.ItemDescription);
+            columns.Bound(o => o.Uom);
+            columns.Bound(o => o.UnitCount);
+            columns.Bound(o => o.HuId).Hidden(ViewBag.InspectType == (int)com.Sconit.CodeMaster.InspectType.Quantity);
+            columns.Bound(o => o.LotNo).Hidden(ViewBag.InspectType == (int)com.Sconit.CodeMaster.InspectType.Quantity);
+            columns.Bound(o => o.ManufactureParty);
+            columns.Bound(o => o.IpNo);
+            columns.Bound(o => o.ReceiptNo);
+            columns.Bound(o => o.WMSNo);
+            columns.Bound(o => o.CurrentLocation);
+            columns.Bound(o => o.CreateUserName);
+            columns.Bound(o => o.CreateDate);
+            columns.Bound(o => o.FailCode);
+            columns.Bound(o => o.JudgeQty);
+            columns.Bound(o => o.HandleQty);
+            columns.Bound(o => o.CurrentHandleQty).ClientTemplate("<input type='text' id='CurrentHandleQty' onblur='OnQtyBlur(this)' name='CurrentHandleQty' style='width:70px' value='<#= CurrentHandleQty #>'/>").Hidden(ViewBag.InspectType == (int)com.Sconit.CodeMaster.InspectType.Barcode);
+          //  columns.Bound(o => o.CurrentHandleQty).Hidden(ViewBag.InspectType == (int)com.Sconit.CodeMaster.InspectType.Quantity);
+            if (ViewBag.ReserveNo)
+            {
+                columns.Bound(o => o.ReserveNo).ClientTemplate("<input type='text' id='ReserveNo'  name='ReserveNo' style='width:70px' />");
+            }
+            if (ViewBag.ReserveLine)
+            {
+                columns.Bound(o => o.ReserveLine).ClientTemplate("<input type='text' id='ReserveLine'  name='ReserveLine' style='width:70px'/>");
+            }
+            if (ViewBag.EBELP)
+            {
+                columns.Bound(o => o.EBELP).ClientTemplate("<input type='text' id='EBELP'  name='EBELP' style='width:70px' />");
+            }
+        })
+        .Scrollable(c => c.Enabled(false))
+        .EnableCustomBinding(true)
+        .DataBinding(dataBinding => dataBinding.Ajax()
+        .Select("_AjaxInspectResultNewList", "InspectionOrder"))
+        .ClientEvents(events => events.OnDataBinding("InspectResultGrid_OnDataBinding"))
+        .Sortable()
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(200);
+        })
+            .Resizable(resizing => resizing.Columns(true)))
+            <input type="hidden" id="MoveTypeBy" value="@ViewBag.MoveType" />
+             <input type="hidden" id="ManufacturePartyBy" value="@ViewBag.ManufactureParty" />
+        <script type="text/javascript">
+            function OnQtyBlur(e) {
+                if (e.value != "") {
+                    if (parseInt(e.value) < 0 || isNaN(e.value)) {
+
+                        $(e).val('');
+                        $message.error("本次处理数只能为大于0的数字。");
+                    }
+                }
+            }
+         
+            function InspectResultGrid_OnDataBinding(e) {
+                e.data = {
+                MoveType:$("#MoveTypeBy").val(),
+                "ManufactureParty": $("#ManufacturePartyBy").val()
+                };
+            }
+        </script>
+  

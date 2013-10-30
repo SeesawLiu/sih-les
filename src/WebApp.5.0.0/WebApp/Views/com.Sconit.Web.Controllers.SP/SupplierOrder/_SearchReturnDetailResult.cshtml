@@ -1,0 +1,39 @@
+﻿@model IEnumerable<com.Sconit.Entity.ORD.OrderDetail>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("OrderDetailGrid")
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.OrderNo).Width(100);
+            columns.Bound(o => o.WMSSeq);
+            columns.Bound(o => o.Item).Width(100)
+               .Aggregate(aggregates => aggregates.Count())
+                .GroupFooterTemplate(@<text>Count: @item.Count</text>)
+                .GroupHeaderTemplate(@<text>@item.Title: @item.Key (Count: @item.Count)</text>);
+
+            columns.Bound(o => o.Sequence);
+            columns.Bound(o => o.ReferenceItemCode);
+            columns.Bound(o => o.ItemDescription);
+            columns.Bound(o => o.MinUnitCount);
+            columns.Bound(o => o.UnitCountDescription);
+            columns.Bound(o => o.Container).ReadOnly();
+            columns.Bound(o => o.ContainerDescription);
+
+            columns.Bound(o => o.LotNo);
+            columns.Bound(o => o.Uom);
+            columns.Bound(o => o.LocationTo);
+            columns.Bound(o => o.ShippedQty).Width(100)
+              .Aggregate(aggreages => aggreages.Sum())
+              .GroupFooterTemplate(@<text>Sum: @item.Sum.Format("{0:N}")</text>);
+
+            columns.Bound(o => o.OrderedQty).Width(100).Title(@Resources.ORD.OrderDetail.OrderDetail_OrderedQtyReturn)
+            .Aggregate(aggreages => aggreages.Sum())
+              .GroupFooterTemplate(@<text>Sum: @item.Sum.Format("{0:N}")</text>);
+        })
+        .Scrollable()
+         .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+         .Groupable(settings => settings.Groups(groups => groups.Add(o => o.Item)).Visible(true))
+         .Footer(false)
+    )
+</fieldset>

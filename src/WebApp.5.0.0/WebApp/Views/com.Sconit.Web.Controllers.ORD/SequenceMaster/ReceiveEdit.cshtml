@@ -1,0 +1,85 @@
+﻿@model com.Sconit.Entity.ORD.OrderMaster
+<script type="text/javascript">
+    function onReceive() {
+        var checkedOrders = $("#CheckedOrders").val();
+        var grid = $("#OrderDetail").data("tGrid");
+        var rows = grid.$tbody.children("tr:not(.t-no-data)");
+        var idStr = "";
+        var qtyStr = "";
+        var errorMessage = "";
+        for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+            var row = $(rows[rowIndex]);
+            var id = row.find("#Id").val();
+            var qty = row.find("#CurrentReceiveQty").val();
+            if (qty != "" && !isNaN(qty) && parseFloat(qty) > 0) {
+                if (idStr == "") {
+                    idStr = id;
+                    qtyStr = qty;
+                } else {
+                    idStr += "," + id;
+                    qtyStr += "," + qty;
+                }
+            }
+        }
+        if (idStr == "") {
+            $message.error("有效的收货行为0，请确认。");
+            return;
+        }
+        var data = {
+            "idStr": idStr,
+            "qtyStr": qtyStr,
+            "checkedOrders": checkedOrders
+        }
+        $.ajax({
+            type: "Post",
+            dataType: "Json",
+            data: data,
+            url: "/SequenceMaster/ReceiveOrder/",
+            cache: false,
+            success: function (data, textStatus) {
+                DisplayJsonMessages(data);
+                if (data != "") {
+                    $.ajax({
+                        type: "Get",
+                        dataType: "html",
+                        data: { checkedOrders: data.Data.SuccessData },
+                        url: "/SequenceMaster/_ReceiveOrderDetailList/",
+                        cache: false,
+                        success: function (data, textStatus) {
+                            var $tDiv = $("#divRecOrderDetail");
+                            $($tDiv).html(data);
+                        }
+                    });
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+
+</script>
+@{
+    ViewBag.Title = "List";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_SequenceOrder_Receive" });
+}
+@using (Html.BeginForm())
+{
+    <div class="editor-footer">
+    @Html.Hidden("CheckedOrders", (string)ViewBag.CheckedOrders);
+        @Html.Button(Resources.Global.Button_Receive, "Url_SequenceOrder_Receive", new Dictionary<string, string>()
+	    {
+	        {"type", "button"},
+	        {"id", "btnReceive"},
+            {"needconfirm","true"},
+            {"onclick","onReceive()"}
+	    })
+        <button type="button" id="btnBack" onclick="location.href='@Url.Content("~/SequenceMaster/ReceiveIndex")'">
+            @Resources.Global.Button_Back</button>
+    </div>
+}
+<div id="divRecOrderDetail">
+    @{
+        Html.RenderAction("_ReceiveOrderDetailList", "SequenceMaster");
+    }
+</div>

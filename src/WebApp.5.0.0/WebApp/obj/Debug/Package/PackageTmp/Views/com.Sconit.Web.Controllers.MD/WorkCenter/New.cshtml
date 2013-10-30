@@ -1,0 +1,34 @@
+﻿@model com.Sconit.Entity.MD.WorkCenter
+@{
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_WorkCenter_View" });
+}
+@using (Html.BeginForm())
+{
+    <fieldset>
+        <legend>@Resources.MD.WorkCenter.WorkCenter_New_Title</legend>
+        <div class="editor">
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.Code)
+            </div>
+            <div class="editor-field-2">
+                @Html.EditorFor(model => model.Code)
+                @Html.ValidationMessageFor(model => model.Code)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.Location)
+            </div>
+            <div class="editor-field-2">
+                @{
+    Html.RenderAction("_LocationComboBox", "Common", new { controlName = "Location", selectedValue = Model != null ? Model.Location : null });
+                }
+                @Html.ValidationMessageFor(model => model.Location)
+            </div>
+        </div>
+        <div class="editor-footer">
+            <button type="submit" id="btnNew">
+                @Resources.Global.Button_New</button>
+            <button type="button" id="btnBack" onclick="location.href='@Url.Content("~/WorkCenter/List")'">
+                @Resources.Global.Button_Back</button>
+        </div>
+    </fieldset>
+}

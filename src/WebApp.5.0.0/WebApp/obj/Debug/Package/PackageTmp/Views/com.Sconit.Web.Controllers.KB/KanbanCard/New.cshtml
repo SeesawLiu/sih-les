@@ -1,0 +1,100 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_KanbanCard_New" });
+}
+<script type="text/javascript">
+
+    function doSearchClick() {
+        $("#errorsul").html('');
+        $("#warningsul").html('');
+        $("#successesul").html('');
+        var data = {
+            "flow": $("#Flow").val(),
+            "item": $("#SearchItem").val()
+        };
+        if (data.flow == "") {
+            $message.error("路线代码为必填。");
+            //         $("#errorsul").html("路线代码为必填。");
+            return;
+        }
+        $.ajax({
+            type: "post",
+            dataType: "html",
+            url: "/KanbanCard/_KanbanDetailList/",
+            data: data,
+            cache: false,
+            success: function (data, textStatus) {
+                $("#fdOrderDetail").html(data);
+                $("#fdOrderDetail").show();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayJsonMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+    function Flow_Change() {
+
+    }
+</script>
+<fieldset>
+    <div class="editor-label-2">
+        <label>
+            @Resources.KB.KanbanCard.KanbanCard_Flow
+        </label>
+    </div>
+    <div class="editor-field-2">
+        @{
+            Html.RenderAction("_FlowComboBox", "Common", new { controlName = "Flow", isChange = true, flowstrategy = (int)com.Sconit.CodeMaster.FlowStrategy.ANDON });
+        }
+    </div>
+    <div class="search-label">
+        <label for="FlowMaster_FirstName">
+            @Resources.KB.KanbanCard.KanbanCard_Item
+        </label>
+    </div>
+    <div class="search-field">
+        @{
+            Html.RenderAction("_ItemComboBox", "Common", new
+            {
+                controlName = "SearchItem",
+                isChange = false
+
+            });
+        }
+    </div>
+    <div class="search-label">
+        <label>
+            批量创建看板卡
+            @*<a href='/Resource/Templates/UploadTemplate/KanBanFlow.xls'>模板下载</a>*@
+        </label>
+    </div>
+    <div class="search-field">
+        @(Html.Telerik().Upload()
+        .Name("flowattachments")
+            .Multiple(false)
+            .Async(async => async
+    .Save("Import", "KanbanCard")
+            .AutoUpload(true))
+            .ClientEvents(e => e.OnSuccess("TelerikonUpload_OnSuccess")))
+    </div>
+    <div class="editor-footer">
+        <button type="submit" id="btnSearch" onclick="doSearchClick()">
+            @Resources.Global.Button_Search</button>
+        @Html.Button(Resources.Global.Button_New, "Url_KanbanCard_New", new Dictionary<string, string>()
+	        {
+	            {"type", "button"},
+	            {"id", "btnNew"},
+                {"needconfirm","true"},
+                {"onclick","onSaveFlowDetail()"}
+	        })
+        @Html.Button(Resources.Global.Button_Delete, "Url_KanbanCard_New", new Dictionary<string, string>()
+	        {
+	            {"type", "button"},
+	            {"id", "btnDelete"},
+                {"needconfirm","true"},
+                {"onclick","onDeleteFlowDetail()"}
+	        })
+    </div>
+</fieldset>
+<div id="fdOrderDetail" style="display: none;">
+</div>

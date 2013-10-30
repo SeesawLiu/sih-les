@@ -1,0 +1,6 @@
+@model string
+@(Html.Telerik().TimePicker().Format("HH:mm")
+        .Name(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))
+        .HtmlAttributes(new { id = ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty) + "_wrapper" })
+        .Value("")
+)

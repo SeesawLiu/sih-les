@@ -1,0 +1,3 @@
+﻿ALTER TABLE [dbo].[ORD_IpDet_5]
+    ADD CONSTRAINT [FK_ORD_IpDet5_Container_REFERENCE_MD_Container_Code] FOREIGN KEY ([Container]) REFERENCES [dbo].[MD_Container] ([Code]) ON DELETE NO ACTION ON UPDATE NO ACTION;
+

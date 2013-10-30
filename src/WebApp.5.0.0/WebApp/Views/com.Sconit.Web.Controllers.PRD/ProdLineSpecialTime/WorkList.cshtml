@@ -1,0 +1,6 @@
+﻿@{
+    ViewBag.Title = "List";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_ProdLineSpecialTime_WorkView" });
+}
+@Html.Partial("_WorkSearch")
+@Html.Partial("_WorkSearchResult")

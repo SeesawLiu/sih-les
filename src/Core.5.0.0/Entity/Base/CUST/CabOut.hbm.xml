@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="com.Sconit.Entity.CUST.CabOut, com.Sconit.Entity" table="CUST_CabOut" lazy="false">
+    <id name="OrderNo" column="OrderNo" type="String" unsaved-value="null" >
+      <generator class="assigned" />
+    </id>
+    <property name="ProdLine" column="ProdLine" type="String" length="50"/>
+    <property name="CabType" column="CabType" type="Int16"/>
+    <property name="CabItem" column="CabItem" type="String" length="50"/>
+    <property name="QulityBarcode" column="QulityBarcode" type="String" length="50"/>
+    <property name="Status" column="Status" type="Int16"/>
+    <property name="CreateUserId" column="CreateUser" type="Int32" update="false"/>
+    <property name="CreateUserName" column="CreateUserNm" type="String" length="100" update="false"/>
+    <property name="CreateDate" column="CreateDate" type="DateTime" update="false"/>
+    <property name="LastModifyUserId" column="LastModifyUser" type="Int32"/>
+    <property name="LastModifyUserName" column="LastModifyUserNm" type="String" length="100"/>
+    <property name="LastModifyDate" column="LastModifyDate" type="DateTime"/>
+    <property name="OutUser" column="OutUser" type="Int32"/>
+    <property name="OutUserName" column="OutUserNm" type="String" length="100"/>
+    <property name="OutDate" column="OutDate" type="DateTime"/>
+    <property name="TransferUser" column="TransferUser" type="Int32"/>
+    <property name="TransferUserName" column="TransferUserNm" type="String" length="100"/>
+    <property name="TransferDate" column="TransferDate" type="DateTime"/>
+  </class>
+</hibernate-mapping>

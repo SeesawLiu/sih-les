@@ -1,0 +1,40 @@
+﻿@model IEnumerable<com.Sconit.Entity.MD.Item>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("ShortItemGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Code);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Code);
+            columns.Bound(o => o.ShortCode);
+            columns.Bound(o => o.ReferenceCode);
+            columns.Bound(o => o.Description);
+            columns.Bound(o => o.Uom);
+            columns.Bound(o => o.UnitCount);
+            columns.Bound(o => o.SpecifiedModel);
+        })
+                .Scrollable(c => c.Enabled(false))
+                .EnableCustomBinding(true)
+                .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxShortList", "Item"))
+                        .ClientEvents(events => events.OnDataBinding("ShortItemGrid_OnDataBinding"))
+                .Pageable(settings =>
+                {
+                    settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+                    settings.PageSize(50);
+                })
+                .Sortable()
+                .Resizable(resizing => resizing.Columns(true))
+            )
+    <script type="text/javascript">
+        function ShortItemGrid_OnDataBinding(e) {
+            e.data = {
+                Code: $('#Code').val(),
+                Flow: $('#Flow').val(),
+                ReferenceCode: $('#ReferenceCode').val()
+            };
+        } 
+    </script>
+</fieldset>

@@ -1,0 +1,108 @@
+﻿
+@model IEnumerable<com.Sconit.Entity.ORD.OrderDetail>
+<script type="text/javascript">
+    $(function () {
+        $("#checkAll").click(function () {
+            $('input[name="checkedRecords"]').attr("checked", this.checked);
+            var $checkRecords = $("input[name='checkedRecords']");
+            var showButton = false;
+            for (var i = 0; i < $checkRecords.length; i++) {
+                if ($checkRecords[i].checked) {
+                    showButton = true;
+                    break;
+                }
+            }
+            if (showButton) {
+                $("#btnCreate").removeAttr("disabled");
+            } else {
+                $("#btnCreate").attr("disabled", "disabled");
+            }
+        });
+    });
+
+        function showButtons() {
+            var $checkRecords = $("input[name='checkedRecords']");
+            var showButton = false;
+            for (var i = 0; i < $checkRecords.length; i++) {
+                if ($checkRecords[i].checked) {
+                    showButton = true;
+                    break;
+                }
+            }
+            $("#checkAll").attr("checked", $checkRecords.length == $("input[name='checkedRecords']:checked").length ? true : false);
+            if (showButton) {
+                $("#btnCreate").removeAttr("disabled");
+            } else {
+                $("#btnCreate").attr("disabled", "disabled");
+            }
+        }
+
+        function ajaxCreate() {
+            var $checkRecords = $("input[name='checkedRecords']");
+            var idStr = "";
+            for (var i = 0; i < $checkRecords.length; i++) {
+                if ($checkRecords[i].checked) {
+                    var id = $checkRecords[i].value;
+                    if (idStr == "") {
+                        idStr = id;
+                    } else {
+                        idStr += "," + id;
+                    }
+                }
+            }
+
+            var data = {
+                OrderNo: $('#OrderNo').val(),
+                ChosenIds: idStr
+            };
+
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                url: '/PickTask/CreateTask/',
+                data: data,
+                cache: false,
+                success: function (data, textStatus) {
+                    DisplayJsonMessages(data);
+                    $("#btnCreate").attr("disabled", "disabled");
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    DisplayTextMessages(XMLHttpRequest.responseText);
+                }
+            });
+        }
+</script>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("OrderDetailGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Id).ReadOnly(true)
+                .ClientTemplate("<input type='checkbox' id='checkedRecords' name='checkedRecords' value='<#= Id #>' onClick='showButtons()'   />")
+                .HeaderTemplate("<input type='checkbox' id='checkAll' name='checkAll' />")
+                .Width(36).HtmlAttributes(new { style = "text-align:center" });
+            columns.Bound(o => o.Item);
+            columns.Bound(o => o.ItemDescription);
+            columns.Bound(o => o.OrderedQty);
+            columns.Bound(o => o.Uom);
+            columns.Bound(o => o.UnitCount);
+       })
+        .Scrollable(c => c.Enabled(false))
+                .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxListOrderDetail", "PickTask"))
+                        .ClientEvents(events => events.OnDataBinding("OrderDetailGrid_OnDataBinding"))
+                .EnableCustomBinding(true)
+                .Sortable()
+                .Resizable(resizing => resizing.Columns(true))
+        )
+             <script type="text/javascript">
+                 function OrderDetailGrid_OnDataBinding(e) {
+                     e.data = {
+                         OrderNo: $('#OrderNo').val()
+                     }
+                 }
+    </script>
+</fieldset>

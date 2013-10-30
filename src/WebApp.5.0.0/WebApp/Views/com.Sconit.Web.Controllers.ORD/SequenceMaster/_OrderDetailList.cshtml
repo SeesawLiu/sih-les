@@ -1,0 +1,98 @@
+﻿@using com.Sconit.Entity.MD;
+@model IEnumerable<com.Sconit.Entity.ORD.OrderDetail>
+<script type="text/javascript">
+    function onSaveDetail(e) {
+        var grid = $("#OrderDetail").data("tGrid");
+        if (grid == null) {
+            alert("明细不能为空");
+            return;
+        }
+        var orderData = {
+                        "orderNo": $("#OrderNo").val()
+                    };
+        var inserted = grid.changeLog.inserted;
+        var updated = $.grep(grid.changeLog.updated, function (value) { return value != undefined });
+        var deleted = $.grep(grid.changeLog.deleted, function (value) { return value != undefined });
+
+        var oderDetails = grid.changeLog.serialize(inserted, updated, deleted);
+        grid._convert(oderDetails);
+        $.ajax({
+            type: "post",
+            dataType: "html",
+            url: "/SequenceMaster/_SaveBatchEditing/",
+            data: $.extend(oderDetails, orderData),
+            success: function (data, orderData) {
+                $("#content").html(data);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+
+    function onManufacturePartyDataBinding(e) {
+        e.data = {
+            "item": $(e.target).parent().parent().parent().children().eq(3).text()
+        }
+    }
+
+
+    function onManufacturePartyChange(e) {
+        if (e.value != null) {
+            var combobox = $(this).data("tComboBox");
+            if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                combobox.value("");
+                combobox.reload();
+            }
+        }
+    }
+</script>
+<fieldset>
+    <legend>@Resources.ORD.OrderDetail.OrderDetail_Title</legend>
+    @(Html.Telerik().Grid(Model)
+        .Name("OrderDetail")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+       
+        .Editable(editing => editing.Mode(GridEditMode.InCell))
+        .ToolBar(commands =>
+        {
+            if ((bool)ViewBag.IsAllowUpdate)
+        {
+                commands.Custom().Text(@Resources.Global.Button_SaveDetail).HtmlAttributes(new { onClick = "onSaveDetail()", href = "#" });
+        }
+        })
+        .DataBinding(dataBinding =>
+        dataBinding.Ajax()
+        .Select("_SelectBatchEditing", "SequenceMaster", new {  orderNo = ViewBag.orderNo })
+        )
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Id).Hidden();
+            columns.Bound(o => o.OrderNo).ReadOnly(true);
+            columns.Bound(o => o.ReserveNo).ReadOnly(true);
+            columns.Bound(o => o.Item).ReadOnly(true);
+            columns.Bound(o => o.ReferenceItemCode).ReadOnly(true);
+            columns.Bound(o => o.ItemDescription).ReadOnly(true);
+            columns.Bound(o => o.Uom).ReadOnly(true);
+            columns.Bound(o => o.UnitCount).Format("{0:N}").ReadOnly(true);
+            columns.Bound(o => o.OrderedQty).Format("{0:N}").ReadOnly(true);
+            columns.Bound(o => o.ManufactureParty).ReadOnly(true);
+            columns.Bound(o => o.ICHARG).EditorTemplateName("ManufacturePartyGridComboBox").Width(200);
+            columns.Bound(o => o.Container).ReadOnly(true);
+            columns.Bound(o => o.ContainerDescription).ReadOnly(true);
+            columns.Bound(o => o.LocationToName).ReadOnly(true);
+        })
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(400);
+        })
+        .EnableCustomBinding(true)
+        .Scrollable(c => c.Enabled(false))
+        .Footer(true)
+    )
+
+</fieldset>

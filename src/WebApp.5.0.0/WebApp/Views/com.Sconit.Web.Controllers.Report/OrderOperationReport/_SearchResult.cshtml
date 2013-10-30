@@ -1,0 +1,55 @@
+﻿@model IEnumerable<com.Sconit.Entity.ORD.OrderOperationReport>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+                .Name("OrderOperationReportGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Flow);
+            columns.Bound(o => o.WorkCenter);
+            columns.Bound(o => o.ReportQty);
+        })
+                 .DetailView(details => details.ClientTemplate(
+                            Html.Telerik().Grid<com.Sconit.Entity.ORD.OrderOperationReport>()
+                            .Name("OrderDetail_<#= WorkCenter #>_<#= Flow #>")
+                    .Columns(columns =>
+                    {
+                        columns.Bound(o => o.Flow);
+                        columns.Bound(o => o.VanNo);
+                        columns.Bound(o => o.WorkCenter);
+                        columns.Bound(o => o.ReportQty);
+                        columns.Bound(o => o.EffectiveDate);
+                    })
+                    .DataBinding(dataBinding => dataBinding.Ajax()
+                    .Select("_AjaxDetailList", "OrderOperationReport", new { flow = "<#=Flow #>", workCenter = "<#=WorkCenter #>", dateFrom = ViewBag.DateFrom, dateTo = ViewBag.DateTo }))
+                    .Footer(false)
+                    .Resizable(resizing => resizing.Columns(true))
+                    .ToHtmlString()
+                    ))
+        .EnableCustomBinding(true)
+        .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxList", "OrderOperationReport"))
+        .ClientEvents(events => events.OnDataBinding("OrderOperationReportGrid_OnDataBinding"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+            settings.PageSize(ViewBag.PageSize);
+        })
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+    )
+    <script type="text/javascript">
+        function OrderOperationReportGrid_OnDataBinding(e) {
+            e.data = {
+                Flow: $('#Flow').val(),
+                WorkCenter: $('#WorkCenter').val(),
+                DateFrom: $('#DateFrom').val(),
+                DateTo: $('#DateTo').val()
+            };
+        }
+      
+
+    </script>
+</fieldset>

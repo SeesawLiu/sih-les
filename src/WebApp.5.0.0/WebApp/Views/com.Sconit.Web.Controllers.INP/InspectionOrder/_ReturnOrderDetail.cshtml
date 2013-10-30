@@ -1,0 +1,216 @@
+﻿@model IEnumerable<com.Sconit.Entity.ORD.MiscOrderDetail>
+<fieldset>
+    <script type="text/javascript">
+        function onItemComboBoxChange(e) {
+            if (e.value != null && e.value != "") {
+                var combobox = $(this).data("tComboBox");
+                if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                    combobox.value("");
+                    $(e.target).parent().parent().next().html("");
+                    $(e.target).parent().parent().next().next().html("");
+                    $(e.target).parent().parent().next().next().next().html("");
+                    $(e.target).parent().parent().next().next().next().next().html("");
+                    combobox.reload();
+                }
+                else {
+                    var data = {
+                        "Code": e.value
+                    };
+                    $.ajax({
+                        type: "post",
+                        dataType: "json",
+                        url: "/InspectionOrder/_WebOrderDetail/",
+                        data: data,
+                        success: function (data, textStatus) {
+                            var $tGrid = $("#ReturnOrderDetail").data("tGrid");
+                            var oldData = $tGrid.dataItem($(e.target).parent().parent().parent());
+                            if (data.Sequence > 0) {
+                                $(e.target).parent().parent().prev().html('<span class="t-dirty"></span>' + data.Sequence);
+                            }
+                            $(e.target).parent().parent().next().html(data.ItemDescription);
+                            $(e.target).parent().parent().next().next().html(data.ReferenceItemCode);
+                            $(e.target).parent().parent().next().next().next().html('<span class="t-dirty"></span>' + data.Uom);
+                            $(e.target).parent().parent().next().next().next().next().html('<span class="t-dirty"></span>' + data.UnitCount);
+                            if (oldData != undefined) {
+                                oldData.Sequence = data.Sequence;
+                                oldData.ItemDescription = data.ItemDescription;
+                                oldData.Uom = data.Uom;
+                                oldData.UnitCount = data.UnitCount;
+                                oldData.ReferenceItemCode = data.ReferenceItemCode;
+                            }
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            DisplayTextMessages(XMLHttpRequest.responseText);
+                        }
+                    });
+                }
+            }
+        }
+
+        function onLocationComboBoxChange(e) {
+            var combobox = $(this).data("tComboBox");
+            if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                combobox.value("");
+                combobox.reload();
+            }
+        }
+
+        function onLocationDataBinding(e) {
+            e.data = {
+                "Region": $("#Region").val(),
+                "checkRegion": true
+            };
+        }
+
+        function onSubmit(e) {
+            var grid = $("#ReturnOrderDetail").data("tGrid");
+            if (grid == null) {
+                $message.error("明细不能为空");
+                return;
+            }
+            var inserted = grid.changeLog.inserted;
+            var updated = $.grep(grid.changeLog.updated, function (value) { return value != undefined });
+            var deleted = $.grep(grid.changeLog.deleted, function (value) { return value != undefined });
+
+            var oderDetails = grid.changeLog.serialize(inserted, updated, deleted);
+            var ordermstr = {
+
+                "MiscOrderNo": $("#MiscOrderNo").val(),
+                "moveType": $("#MoveType").val()
+            };
+            grid._convert(oderDetails);
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                url: "/InspectionOrder/_SaveBatchEditing/",
+                data: $.extend(oderDetails, ordermstr),
+                success: function (data, ordermstr) {
+                    ClearMessage();
+                    DisplayJsonMessages(data);
+                    if (data != "") {
+                        var orderData = {
+                            "id": data.Data.MiscOrderNo
+                        };
+                        $.ajax({
+                            type: "get",
+                            dataType: "html",
+                            url: "/InspectionOrder/ReturnEdit/",
+                            data: orderData,
+                            cache: false,
+                            success: function (data, textStatus) {
+                                var $tGrid = $("#content");
+                                $($tGrid).html(data);
+                            }
+                        });
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    DisplayTextMessages(XMLHttpRequest.responseText);
+                }
+            });
+        }
+    </script>
+    <legend>@Resources.ORD.OrderDetail.OrderDetail_Title</legend>
+    @(Html.Telerik().Grid(Model)
+                .Name("ReturnOrderDetail")
+                 .Editable(editing => editing.Mode(GridEditMode.InCell))
+         .ToolBar(commands =>
+         {
+             if (ViewBag.Status == com.Sconit.CodeMaster.MiscOrderStatus.Create.ToString())
+             {
+
+                 //   commands.Template("<button type='button' id='btnNoScanHu' onclick='onSubmit()'>"+ @Resources.Global.Button_SaveDetail+"</button>");
+
+                 commands.Insert();
+                 commands.Custom().Text(@Resources.Global.Button_SaveDetail).HtmlAttributes(new { onClick = "onSubmit()", href = "#" });
+
+
+             }
+         })
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .DataBinding(dataBinding => dataBinding.Ajax()
+                         .Select("_SelectReturnOrderDetail", "InspectionOrder")
+                         )
+        .Columns(columns =>
+        {
+            if (ViewBag.Status == com.Sconit.CodeMaster.MiscOrderStatus.Create.ToString())
+            {
+                columns.Bound(o => o.Sequence);
+
+                columns.Bound(o => o.Item).EditorTemplateName("ItemGridForeignKey").Width(130);
+            }
+            else
+            {
+                columns.Bound(o => o.Sequence).ReadOnly(true);
+                columns.Bound(o => o.Item).ReadOnly(true);
+            }
+            columns.Bound(o => o.ItemDescription).ReadOnly(true).Width(150);
+            columns.Bound(o => o.ReferenceItemCode).ReadOnly(true);
+            columns.Bound(o => o.Uom).ReadOnly(true);
+            columns.Bound(o => o.UnitCount).ReadOnly(true);
+            if (ViewBag.Status == com.Sconit.CodeMaster.MiscOrderStatus.Create.ToString())
+            {
+                columns.Bound(o => o.Location).EditorTemplateName("LocationGridForeignKey").Width(100);
+                // columns.ForeignKey(o => o.Location, (IEnumerable<com.Sconit.Entity.MD.Location>)ViewData["locations"], "Code", "Name");
+                if (ViewBag.ReserveLine)
+                {
+                    columns.Bound(o => o.ReserveNo);
+                }
+                if (ViewBag.ReserveLine)
+                {
+                    columns.Bound(o => o.ReserveLine);
+                }
+                if (ViewBag.EBELN)
+                {
+                    columns.Bound(o => o.EBELN);
+                }
+                if (ViewBag.EBELP)
+                {
+                    columns.Bound(o => o.EBELP);
+                }
+                //if (ViewBag.CheckConsignment != 0)
+                //{
+                //    columns.Bound(o => o.ManufactureParty).EditorTemplateName("SupplierGridForeignKey").Width(100);;
+                //}
+
+                columns.Bound(o => o.Qty);
+                columns.Bound(o => o.WMSSeq);
+
+                columns.Command(commands => commands.Delete()).Width(100);
+            }
+            else
+            {
+                columns.Bound(o => o.Location).ReadOnly(true);
+                if (ViewBag.ReserveNo)
+                {
+                    columns.Bound(o => o.ReserveNo).ReadOnly(true);
+                }
+                if (ViewBag.ReserveLine)
+                {
+                    columns.Bound(o => o.ReserveLine).ReadOnly(true);
+                }
+                if (ViewBag.EBELN)
+                {
+                    columns.Bound(o => o.EBELN).ReadOnly(true);
+                }
+                if (ViewBag.EBELP)
+                {
+                    columns.Bound(o => o.EBELP).ReadOnly(true);
+                }
+                //if (ViewBag.CheckConsignment!=0)
+                //{
+                //    columns.Bound(o => o.ManufactureParty).ReadOnly(true);
+                //}
+                columns.Bound(o => o.Qty).ReadOnly(true);
+                //暂时存手工退货单号
+                columns.Bound(o => o.WMSSeq).ReadOnly(true);
+            }
+        })
+        .Scrollable()
+                 .Resizable(resizing => resizing.Columns(true))
+        .Footer(false)
+            )
+</fieldset>

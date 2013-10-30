@@ -1,0 +1,42 @@
+﻿@model IEnumerable<com.Sconit.Entity.PRD.MultiSupplySupplier>
+<script type="text/javascript">
+    function onSupplierComboBoxChange() { }
+</script>
+<fieldset>
+    <legend>@Resources.PRD.MultiSupplySupplier.MultiSupplySupplier_Supplier</legend>
+    @(Html.Telerik().Grid(Model)
+          .Name("MultiSupplySupplier")
+          .DataKeys(keys =>
+                        {
+                            keys.Add(p => p.Id);
+                        })
+          .ToolBar(command =>
+                       {
+                           command.Insert();
+                       })
+          .DataBinding(dataBinding =>
+                       dataBinding.Ajax()
+                           .Select("_SelectSupplierList", "MultiSupplyGroup")
+                           .Insert("_SupplierInsert", "MultiSupplyGroup", new RouteValueDictionary() { { "GroupNo", ViewBag.GroupNo }, })
+                           .Update("_SupplierUpdate", "MultiSupplyGroup", new RouteValueDictionary() { { "GroupNo", ViewBag.GroupNo }, })
+                           .Delete("_SupplierDelete", "MultiSupplyGroup", new RouteValueDictionary() { { "GroupNo", ViewBag.GroupNo }, })
+          )
+          .Columns(columns =>
+                       {
+                           columns.Bound(o => o.Id).Hidden();
+                           columns.Bound(o => o.Supplier).EditorTemplateName("SupplierGridForeignKey").Width(200);
+                           columns.Bound(o => o.CycleQty).Width(120);
+                           columns.Bound(o => o.Proportion).Width(120);
+                           columns.Bound(o => o.SpillQty).Width(120);
+                           columns.Bound(o => o.IsActive).Width(80).ClientTemplate("<input type='checkbox' disabled='disabled' name='IsActive' <#= (IsActive) ? checked='checked' : '' #>  />");
+
+                           columns.Command(commands =>
+                                               {
+                                                   commands.Edit();
+                                                   //commands.Delete();
+                                               }).Width(180);
+                       })
+          .Scrollable(c => c.Enabled(false))
+          .Resizable(resizing => resizing.Columns(true))
+          .Footer(false))
+</fieldset>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="com.Sconit.Entity.SAP.ORD.ProcOrder, com.Sconit.Entity.SAP" table="SAP_ProcOrder" lazy="false">
+    <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      <generator class="identity" />
+    </id>
+    <property name="EBELN" column="EBELN" type="String" length="50"/>
+    <property name="EBELP" column="EBELP" type="String" length="50"/>
+    <property name="BSART" column="BSART" type="String" length="50"/>
+    <property name="LIFNR" column="LIFNR" type="String" length="50"/>
+    <property name="RESWK" column="RESWK" type="String" length="50"/>
+    <property name="WERKS" column="WERKS" type="String" length="50"/>
+    <property name="MATNR" column="MATNR" type="String" length="50"/>
+    <property name="BISMT" column="BISMT" type="String" length="50"/>
+    <property name="TXZ01" column="TXZ01" type="String" length="100"/>
+    <property name="LGFSB" column="LGFSB" type="String" length="50"/>
+    <property name="MEINS" column="MEINS" type="String" length="5"/>
+    <property name="LMEIN" column="LMEIN" type="String" length="50"/>
+    <property name="UMREZ" column="UMREZ" type="Decimal"/>
+    <property name="UMREN" column="UMREN" type="Decimal"/>
+    <property name="PSTYP" column="PSTYP" type="String" length="50"/>
+    <property name="ETFZ1" column="ETFZ1" type="String" length="50"/>
+    <property name="LOEKZ" column="LOEKZ" type="String" length="50"/>
+    <property name="NOTQC" column="NOTQC" type="String" length="50"/>
+    <property name="Status" column="Status" type="Int16"/>
+    <property name="CreateDate" column="CreateDate" type="DateTime" update="false"/>
+    <property name="LastModifyDate" column="LastModifyDate" type="DateTime"/>
+    <property name="ErrorCount" column="ErrorCount" type="Int32"/>
+  </class>
+</hibernate-mapping>

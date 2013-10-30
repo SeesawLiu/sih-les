@@ -1,0 +1,52 @@
+﻿@using com.Sconit.Web.Models.SearchModels.PRD
+<fieldset>
+    @using (Html.BeginForm("List", "WorkingCalendarReport"))
+    {   
+        <div class="search">
+            <div class="search-label">
+                <label for="WorkingCalendar_Region">
+                    @Resources.PRD.WorkingCalendar.WorkingCalendar_Region
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_RegionComboBox", "Common", new
+                                                           {
+                                                               controlName = "SearchRegion",
+                                                               selectedValue = TempData["WorkingCalendarSearchModel"] != null ? ((WorkingCalendarSearchModel)TempData["WorkingCalendarSearchModel"]).SearchRegion : string.Empty
+                                                           });
+                }
+            </div>
+            <div class="search-label">
+            </div>
+            <div class="search-field">
+            </div>
+            <div class="search-label">
+                <label for="WorkingCalendar_WorkingDate">
+                    @Resources.PRD.WorkingCalendar.WorkingCalendar_StartWorkingDate
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DatePicker().Format(com.Sconit.Entity.BusinessConstants.SHORT_DATE_FORMAT).Value(TempData["WorkingCalendarSearchModel"] != null ? ((WorkingCalendarSearchModel)TempData["WorkingCalendarSearchModel"]).StartWorkingDate : System.DateTime.Now)
+                .Name("StartWorkingDate").HtmlAttributes(new { style = "margin-bottom: 1.3em;width:172px", }))
+            </div>
+            <div class="search-label">
+                <label for="WorkingCalendar_WorkingDate">
+                    @Resources.PRD.WorkingCalendar.WorkingCalendar_EndWorkingDate
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DatePicker().Format(com.Sconit.Entity.BusinessConstants.SHORT_DATE_FORMAT).Value(TempData["WorkingCalendarSearchModel"] != null ? ((WorkingCalendarSearchModel)TempData["WorkingCalendarSearchModel"]).EndWorkingDate : DateTime.Now.AddDays(7))
+                .Name("EndWorkingDate").HtmlAttributes(new { style = "margin-bottom: 1.3em;width:172px", }))
+            </div>
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            @Html.Button(Resources.Global.Button_Search, "Url_WorkingCalendarReport_View", new Dictionary<string, string>
+                                                                                                 {
+                                                                                                     {"type", "submit"},
+                                                                                                     {"id", "btnSearch"}
+                                                                                                 })
+        </div>
+    }
+</fieldset>

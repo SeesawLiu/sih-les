@@ -1,0 +1,199 @@
+﻿@model IEnumerable<com.Sconit.Entity.ORD.IpDetail>
+<fieldset>
+    <legend>@Resources.ORD.IpDetail.IpDetail_Title</legend>
+    @(Html.Telerik().Grid(Model)
+        .Name("IpDetail")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .ToolBar(commands =>
+        {
+            if ((bool)ViewBag.IsHassUpdate)
+            {
+                commands.Custom().Text(@Resources.Global.Button_SaveDetail).HtmlAttributes(new { onClick = "onSaveIpDetail()", href = "#" });
+            }
+        })
+        .Editable(editing => editing.Mode(GridEditMode.InCell))
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Id).ReadOnly(true);
+            columns.Bound(o => o.Sequence).ReadOnly(true);
+            columns.Bound(o => o.IpNo).Width(100).ReadOnly(true);
+            columns.Bound(o => o.OrderNo).Width(100).ReadOnly(true);
+            columns.Bound(o => o.ExternalOrderNo).Width(100).ReadOnly(true);
+            columns.Bound(o => o.ExternalSequence).Width(100).ReadOnly(true);
+            columns.Bound(o => o.Flow).Title(Resources.ORD.IpMaster.IpMaster_Flow).ReadOnly(true);
+            if ((bool)ViewBag.IsHassUpdate)
+            {
+                columns.Bound(o => o.LocationTo).EditorTemplateName("LocationToGridForeignKey").Width(200);
+            }
+            else
+            {
+                columns.Bound(o => o.LocationTo).ReadOnly(true);
+            }
+            columns.Bound(o => o.SAPLocationTo).Title("SAP库位").ReadOnly(true);
+            columns.Bound(o => o.Item).Width(100).ReadOnly(true);
+            columns.Bound(o => o.ReferenceItemCode).ReadOnly(true);
+            columns.Bound(o => o.ItemDescription).ReadOnly(true);
+            columns.Bound(o => o.Qty).Width(100).ReadOnly(true);
+            columns.Bound(o => o.ReceivedQty).Width(100).ReadOnly(true);
+            columns.Bound(o => o.IsClose).ClientTemplate("<input type='checkbox' disabled='disabled' name='IsClose' <#= IsClose? checked='checked' : '' #> />").ReadOnly(true);
+            columns.Bound(o => o.Uom).ReadOnly(true);
+            columns.Bound(o => o.ManufactureParty).ReadOnly(true);
+            columns.Bound(o => o.IsInspect).ClientTemplate("<input type='checkbox' disabled='disabled' name='IsInspect' <#= IsInspect? '' : checked='checked' #> />").Title("是否免检").ReadOnly(true);
+            columns.Bound(o => o.UnitCountDescription).ReadOnly(true);
+            columns.Bound(o => o.Container).ReadOnly().ReadOnly(true);
+            columns.Bound(o => o.ContainerDescription).ReadOnly(true);
+            columns.Bound(o => o.IsClose).Hidden().ReadOnly(true);
+            if (ViewBag.IsCancel)
+            {
+                columns.Command(commands => commands.Custom("Cancel")
+               .Text("关闭")
+                 .HtmlAttributes(new { onClick = "CancelDetailClick(this)", id = "CancelId", href = "#" })
+                 );
+            }
+        })
+                .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxIpDetailList", "ProcurementIpMaster"))
+                                .ClientEvents(events => events.OnDataBinding("IpDetailGrid_OnDataBinding").OnRowDataBound("IpDetailGrid_OnRowDataBound"))
+            // .ClientEvents(c => c.OnRowDataBound("RecDetailGrid_OnRowDataBound"))
+                .Pageable(settings =>
+                {
+                    settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+                    settings.PageSize(ViewBag.PageSize);
+                })
+
+        .Sortable()
+                .Resizable(resizing => resizing.Columns(true))
+
+    )
+    <script type="text/javascript">
+        function onSaveIpDetail(e) {
+            var grid = $("#IpDetail").data("tGrid");
+            if (grid == null) {
+                alert("明细不能为空");
+                return;
+            }
+            var orderData = {
+                "ipNo": $("#IpNo").val()
+            };
+            var inserted = grid.changeLog.inserted;
+            var updated = $.grep(grid.changeLog.updated, function (value) { return value != undefined });
+            var deleted = $.grep(grid.changeLog.deleted, function (value) { return value != undefined });
+
+            var oderDetails = grid.changeLog.serialize(inserted, updated, deleted);
+            grid._convert(oderDetails);
+            $.ajax({
+                type: "post",
+                dataType: "html",
+                url: "/ProcurementIpMaster/_SaveBatchEditing/",
+                data: $.extend(oderDetails, orderData),
+                success: function (data, orderData) {
+                    $("#content").html(data);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    DisplayTextMessages(XMLHttpRequest.responseText);
+                }
+            });
+        }
+
+
+        function onLocationToComboBoxChange(e) {
+            if (e.value != null) {
+                var combobox = $(this).data("tComboBox");
+                if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                    combobox.value("");
+                    combobox.reload();
+                }
+            }
+        }
+
+        function onLocationToDataBinding(e) {
+            e.data = {
+                "checkRegion": false
+            };
+        }
+
+
+        function IpDetailGrid_OnDataBinding(e) {
+            i = 0;
+            e.data = {
+            };
+        }
+
+        var i = 0;
+        function IpDetailGrid_OnRowDataBound(e) {
+            if (i != 0) {
+                return;
+            }
+            var rows = $("tbody").children("tr:not(.t-no-data)");
+            // var rows = grid.$tbody.children("tr:not(.t-no-data)");
+            for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+                var row = $(rows[rowIndex]);
+                var IsClose = row.children().eq(21).text();
+                var ReceivedQty = row.children().eq(13).text();
+                if (IsClose == "true" && parseFloat(ReceivedQty) == 0) {
+                    row.children().eq(22).children().replaceWith("<button style='width:60px;height:22px;border:1px solid gray;' onClick = 'RecoveryDetailClick(this)' id='idRecovery'>恢复</button>");
+                }
+                else if (IsClose == "false" && parseFloat(ReceivedQty) == 0) {
+                    row.children().eq(22).children().replaceWith("<button style='width:60px;height:22px;border:1px solid gray;' onClick = 'CancelDetailClick(this)' id='idRecovery'>关闭</button>");
+                }
+                else {
+                    row.children().eq(22).children().hide();
+                }
+            }
+            i = rows.length;
+
+        }
+
+        function CancelDetailClick(e) {
+            $(e).attr("href", "#");
+            if (confirm("确定此行关闭吗？")) {
+                var data = {
+                    Id: $(e).parent().parent().children().eq(0).text()
+                }
+                $.ajax({
+                    type: "post",
+                    dataType: "json",
+                    url: "/ProcurementIpMaster/CancelIpDetail/",
+                    data: data,
+                    success: function (data, ordermstr) {
+                        DisplayJsonMessages(data);
+                        $(e).parent().parent().children().eq(14).html("<input type='checkbox' disabled='disabled' name='IsClose'  checked='checked' />");
+                        $(e).replaceWith("<button style='width:60px;height:22px;border:1px solid gray;' onClick = 'RecoveryDetailClick(this)' id='CancelId'>恢复</button>");
+
+
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        DisplayTextMessages(XMLHttpRequest.responseText);
+                    }
+                });
+            }
+        }
+
+
+        function RecoveryDetailClick(e) {
+            $(e).attr("href", "#");
+            if (confirm("确定恢复此行吗？")) {
+                var data = {
+                    Id: $(e).parent().parent().children().eq(0).text()
+                }
+                $.ajax({
+                    type: "post",
+                    dataType: "json",
+                    url: "/ProcurementIpMaster/ResumeIpDetail/",
+                    data: data,
+                    success: function (data, ordermstr) {
+                        DisplayJsonMessages(data);
+                        $(e).parent().parent().children().eq(14).html("<input type='checkbox' disabled='disabled' name='IsClose'   />");
+                        $(e).replaceWith("<button style='width:60px;height:22px;border:1px solid gray;' onClick = 'CancelDetailClick(this)' id='idRecovery'>关闭</button>");
+
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        DisplayTextMessages(XMLHttpRequest.responseText);
+                    }
+                });
+            }
+        }
+    </script>
+</fieldset>

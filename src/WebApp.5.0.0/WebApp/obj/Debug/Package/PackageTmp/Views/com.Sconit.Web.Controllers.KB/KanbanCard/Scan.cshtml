@@ -1,0 +1,128 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_KanbanCard_Scan" });
+}
+
+@using com.Sconit.Web.Models.SearchModels.KB
+@model IEnumerable<com.Sconit.Entity.KB.KanbanCard>
+<fieldset>
+    <script type="text/javascript">
+        var scanGridDs = new Array();
+        var rowIndex = 0;
+
+        function ajaxDoscan() {
+            var indata = {
+                "CardNo": $("#CardNo").val()
+            };
+
+            $("#CardNo").attr("value", "");
+
+            $.ajax({
+                type: "get",
+                dataType: "Json",
+                url: "/KanbanCard/Doscan/",
+                data: indata,
+                cache: false,
+                success: function (data, indata) {
+                    if (data && scanGridDs) {
+                        if (scanGridDs.length == 50) {
+                            scanGridDs.pop();
+                        }
+                        scanGridDs.unshift(data);
+                        //alert(data.Msg);
+
+                        var kanbanScanGrid = $('#KanbanScanGrid').data('tGrid');
+                        rowIndex = 0;
+                        kanbanScanGrid.dataBind(scanGridDs);
+
+                       
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    DisplayTextMessages(XMLHttpRequest.responseText);
+                }
+            });
+
+            //return false; // prevent further bubbling of event
+        }
+
+        function onRowDataBound(e) {
+            if (e.dataItem.Ret != 0) {
+                e.row.style.backgroundColor = "red";
+            }
+            //需要同步看板
+            if (e.dataItem.Ret == 18 && rowIndex == 0) {
+                var buttonId = "b" + (new Date()).valueOf();
+                e.row.cells[7].innerHTML = e.dataItem.Msg + "<button id='"+ buttonId + "' onclick='SyncKanban(\"" + buttonId + "\",\"" + e.dataItem.CardNo + "\")'" + " type ='button'>" + "同步" + "</button>";
+            }
+
+            rowIndex++;
+        }
+
+        function SyncKanban(buttonId, cardNo) {
+            var data = {
+                "CardNo": cardNo
+            }
+            $.ajax({
+                type: "post",
+                dataType: "Json",
+                url: "/KanbanCard/SyncKanban/",
+                data: data,
+                cache: false,
+                success: function (data, textStatus) {
+                    if (data != "") {
+                        DisplayJsonMessages(data);
+                        $("#" + buttonId).attr("disabled", "disabled");
+                        $("#CardNo").focus();
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    DisplayTextMessages(XMLHttpRequest.responseText);
+                }
+            });
+
+        }
+    </script>
+
+    <legend>@Resources.KB.KanbanCard.KanbanCard_Scan</legend>
+    <form action="javascript:ajaxDoscan()">
+        <div class="search">
+            <div class="search-label">
+                <label for="KanbanScan_CardNo">
+                    @Resources.KB.KanbanScan.KanbanScan_CardNo
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("CardNo", string.Empty)
+            </div>
+        </div>
+    </form>
+</fieldset>
+
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("KanbanScanGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.CardNo);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.OpTime);
+            columns.Bound(o => o.CardNo);
+            columns.Bound(o => o.Item);
+            columns.Bound(o => o.ItemDescription);
+            
+            columns.Bound(o => o.Qty);
+            columns.Bound(o => o.Supplier);
+            columns.Bound(o => o.SupplierName);
+           
+            columns.Bound(o => o.Msg);
+        })
+        .ClientEvents(e => e.OnRowDataBound("onRowDataBound"))
+                .Scrollable(c => c.Enabled(false))
+                .EnableCustomBinding(true)
+                .Resizable(resizing => resizing.Columns(true))
+        )
+</fieldset>
+

@@ -1,0 +1,201 @@
+﻿@using com.Sconit.Entity.MD;
+@using com.Sconit.Entity.PRD;
+@model IEnumerable<com.Sconit.Entity.ORD.OrderDetail>
+<script type="text/javascript">
+    function onLocationDataBinding(e) {
+        e.data = {
+            "Region": $("#Region").val(),
+            "checkRegion": true
+        };
+    }
+    function onSaveDetail(e) {
+        var grid = $("#OrderDetail").data("tGrid");
+        if (grid == null) {
+            alert("明细不能为空");
+            return;
+        }
+        var inserted = grid.changeLog.inserted;
+        var updated = $.grep(grid.changeLog.updated, function (value) { return value != undefined });
+        var deleted = $.grep(grid.changeLog.deleted, function (value) { return value != undefined });
+
+        var oderDetails = grid.changeLog.serialize(inserted, updated, deleted);
+        var ordermstr = {
+
+            "orderNo": $("#OrderNo").val()
+        };
+        grid._convert(oderDetails);
+        $.ajax({
+            type: "post",
+            dataType: "Json",
+            url: "/ProductionOrder/_SaveBatchEditing/",
+            data: $.extend(oderDetails, ordermstr),
+            success: function (data, ordermstr) {
+                $("#successesul").html('<li>' + data.SuccessMessage + '</li>');
+                $("#errorsul").html('');
+                if (data != "") {
+                    var orderData = {
+                        "orderNo": $("#OrderNo").val()
+                    };
+                    $.ajax({
+                        type: "get",
+                        dataType: "html",
+                        url: "/ProductionOrder/_Edit/",
+                        data: orderData,
+                        cache: false,
+                        success: function (data, textStatus) {
+                            var tabStrip = $("#TabStrip");
+                            var tabStripContent1 = tabStrip.data("tTabStrip").getContentElement(0);
+                            $(tabStripContent1).html(data);
+                        }
+                    });
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                var errorMessages = "<li>" + XMLHttpRequest.responseText + "</li>";
+                $("#successesul").html('');
+                $("#errorsul").html(errorMessages);
+            }
+        });
+    }
+</script>
+<fieldset>
+    <legend>@Resources.ORD.OrderDetail.OrderDetail_Title</legend>
+    @(Html.Telerik().Grid(Model)
+        .Name("OrderDetail")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .Editable(editing => editing.Mode(GridEditMode.InCell))
+                  .ToolBar(commands =>
+                  {
+                      if (ViewBag.Status == com.Sconit.CodeMaster.OrderStatus.Create && !string.IsNullOrEmpty(ViewBag.orderNo))
+                      {
+                          commands.Custom().Text(@Resources.Global.Button_SaveDetail).HtmlAttributes(new { onClick = "onSaveDetail()", href = "#" });
+
+                      }
+                  })
+        .DataBinding(dataBinding =>
+            dataBinding.Ajax()
+                        .Select("_SelectBatchEditing", "ProductionOrder", new { flow = ViewBag.flow, orderNo = ViewBag.orderNo })
+        )
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Id).Hidden();
+            columns.Bound(o => o.Sequence).ReadOnly(true).Width(30);
+            columns.Bound(o => o.Item).ReadOnly(true).Width(80);
+            columns.Bound(o => o.ItemDescription).ReadOnly().Width(100);
+
+            if (ViewBag.Status != com.Sconit.CodeMaster.OrderStatus.Create)
+            {
+                columns.Bound(o => o.Bom).ReadOnly(true).Width(100);
+            }
+            else
+            {
+                columns.ForeignKey(o => o.Bom, (IEnumerable<BomMaster>)ViewData["boms"], "Code", "Description").Width(100);
+            }
+            if (ViewBag.Status != com.Sconit.CodeMaster.OrderStatus.Create)
+            {
+
+                columns.Bound(o => o.Routing).ReadOnly(true).Width(100);
+            }
+            else
+            {
+                columns.ForeignKey(o => o.Routing, (IEnumerable<RoutingMaster>)ViewData["routings"], "Code", "Name").Width(100);
+            }
+            if (ViewBag.Status != com.Sconit.CodeMaster.OrderStatus.Create)
+            {
+                columns.Bound(o => o.Uom).ReadOnly(true).Width(50);
+            }
+            else
+            {
+                columns.ForeignKey(o => o.Uom, (IEnumerable<Uom>)ViewData["uoms"], "Code", "Description").Width(50);
+            }
+            columns.Bound(o => o.UnitCount).ReadOnly(ViewBag.Status != com.Sconit.CodeMaster.OrderStatus.Create).Width(50).Format("{0:N}");
+            if (ViewBag.Status != com.Sconit.CodeMaster.OrderStatus.Create)
+            {
+                columns.Bound(o => o.LocationFrom).ReadOnly(true).Width(80);
+            }
+            else
+            {
+                columns.Bound(o => o.LocationFrom).EditorTemplateName("LocationGridComboBox");
+            }
+            if (ViewBag.Status != com.Sconit.CodeMaster.OrderStatus.Create)
+            {
+                columns.Bound(o => o.LocationTo).ReadOnly(true).Width(80);
+            }
+            else
+            {
+                columns.Bound(o => o.LocationTo).EditorTemplateName("LocationGridComboBox");
+            }
+            columns.Bound(o => o.OrderedQty).ReadOnly(ViewBag.Status != com.Sconit.CodeMaster.OrderStatus.Create).Width(50).Format("{0:N}");
+
+            //columns.Bound(o => o.ShippedQty).ReadOnly().Width(50).Format("{0:N}");
+            columns.Bound(o => o.ReceivedQty).ReadOnly().Width(50).Format("{0:N}");
+            columns.Bound(o => o.ScrapQty).ReadOnly().Width(50).Format("{0:N}");
+
+            columns.Command(commands => commands.Custom(Resources.Global.Button_BomDetail)
+                .Text(Resources.Global.Button_BomDetail)
+                  .HtmlAttributes(new { onClick = "OrderBomDetailClick(this)", id = "BomId", href = "#" })
+                  );
+            columns.Command(commands => commands.Custom(Resources.Global.Button_Routing)
+               .Text(Resources.Global.Button_Routing)
+                 .HtmlAttributes(new { onClick = "OrderRoutingClick(this)", id = "RoutingId", href = "#" })
+                 );
+            if (ViewBag.Status == com.Sconit.CodeMaster.OrderStatus.Create)
+            {
+                columns.Command(commands => commands.Delete()).Width(100);
+            }
+        })
+        .Resizable(resizing => resizing.Columns(true))
+        .Scrollable(c => c.Enabled(false))
+        .Footer(false)
+    )
+    @Html.Hidden("Region", (string)ViewBag.Region)
+    @Html.Hidden("Status", ViewBag.Status != null ? (int)ViewBag.Status : -1)
+    @{Html.Telerik().Window()
+        .Name("OrderBomDetailWindow")
+        .Title(Resources.ORD.OrderDetail.OrderDetail_BomDetail_Title_View)
+        .Draggable(true)
+        .Scrollable(true)
+        .Resizable()
+        .Width(900)
+       .Height(400)
+        .Visible(false)
+           .Modal(true)
+
+       .Render();
+    }
+    @{Html.Telerik().Window()
+        .Name("RoutingWindow")
+        .Title(@Resources.ORD.OrderDetail.OrderDetail_Operation_Title_View)
+        .Draggable(true)
+        .Scrollable(true)
+        .Resizable()
+        .Width(900)
+       .Height(400)
+        .Visible(false)
+           .Modal(true)
+
+       .Render();
+    }
+</fieldset>
+<script type="text/javascript">
+    function OrderBomDetailClick(e) {
+        $(e).attr("href", "#");
+        var Id = $(e).parent().parent().children().eq(0).text();
+        var detailWindow = $("#OrderBomDetailWindow").data("tWindow");
+        detailWindow.ajaxRequest("/ProductionOrder/_OrderBomDetail/", { id: Id, orderStatus: $("#Status").val(), region: $("#Region").val() })
+        detailWindow.center().open();
+
+    }
+
+    function OrderRoutingClick(e) {
+        $(e).attr("href", "#");
+        var Id = $(e).parent().parent().children().eq(0).text();
+        var detailWindow = $("#RoutingWindow").data("tWindow");
+        detailWindow.ajaxRequest("/ProductionOrder/_OrderOperationList/", { id: Id })
+        detailWindow.center().open();
+
+    }
+</script>

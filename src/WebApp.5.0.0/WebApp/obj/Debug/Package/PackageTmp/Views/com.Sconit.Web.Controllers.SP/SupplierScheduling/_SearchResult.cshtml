@@ -1,0 +1,66 @@
+﻿@model IEnumerable<com.Sconit.Web.Models.ORD.ScheduleBody>
+<script type="text/javascript">
+    function showButton() {
+        var $checkRecords = $("input[name='checkedRecords']");
+        var showButton = false ;
+        for (var i = 0; i < $checkRecords.length; i++) {
+            if ($checkRecords[i].checked) {
+                showButton = true;
+                break;
+            }
+        }
+        $("#btnShip").attr("style", showButton ? "display:inline" : "display:none");
+    }
+
+    function onScheduleShip() {
+        var $checkRecords = $("input[name='checkedRecords']");
+        var dateStr = "";
+        for (var i = 0; i < $checkRecords.length; i++) {
+            if ($checkRecords[i].checked) {
+                var date = $checkRecords[i].value;
+                if (dateStr == "") {
+                    dateStr = date;
+                } else {
+                    dateStr += "," + date;
+                }
+            }
+        }
+        var data = {
+            "dateStr": dateStr,
+            "flow": $("#Flow").val()
+        };
+        $.ajax({
+            type: "post",
+            dataType: "html",
+            url: "/SupplierScheduling/ShipEdit/",
+            data: data,
+            cache: false,
+            success: function (data, textStatus) {
+                var $tGrid = $("#content");
+                $($tGrid).html(data);
+            }
+        });
+    }
+    $(function () {
+        j = 1;
+        if (j > 1) { return; }
+        j++;
+        var rows = $("tbody").children("tr:not(.t-no-data)");
+        for (var i = 0; i < rows.length; i++) {
+            var cells = $(rows[i]).children();
+            cells.eq(8).html("<td><input style='width:40px;' type='text' name='CurrentShipQty' id='CurrentShipQty'   /></td>");
+        } 
+    });
+
+    var j = 1;
+
+</script>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("ScheduleDetail")
+                .Columns(columns => columns.LoadSettings((IEnumerable<GridColumnSettings>)ViewData["Columns"]))
+                .Scrollable(c => c.Enabled(false))
+                               // .ClientEvents(events => events.OnComplete("ScheduleDetailGrid_OnRowDataBound"))
+                .Footer(false)
+            )
+</fieldset>

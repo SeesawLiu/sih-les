@@ -1,0 +1,94 @@
+﻿@{
+    ViewBag.Title = Resources.KB.KanbanCard.Search;
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_KanbanCard_UpdateSupplier" });
+}
+
+@model com.Sconit.Entity.MD.Supplier  
+@using(Html.BeginForm()){
+<fieldset>
+    <div class="editor">
+        <div class="editor-label-2">
+            @Html.LabelFor(model => model.Code)
+        </div>
+        <div class="editor-field-2">
+            @Html.HiddenFor(model => model.Code)
+            @Html.DisplayFor(model => model.Code)
+        </div>
+        <div class="editor-label-2">
+            @Html.LabelFor(model => model.Name)
+        </div>
+        <div class="editor-field-2">
+            @Html.DisplayFor(model => model.Name)
+           @* @Html.ValidationMessageFor(model => model.Name)*@
+        </div>
+         <div class="editor-label-2">
+            @Html.LabelFor(model => model.LogisticsCentre)
+        </div>
+        <div class="editor-field-2">
+            @Html.EditorFor(model => model.LogisticsCentre)
+        </div>
+        <div class="editor-label-2">
+            @Html.LabelFor(model => model.LogisticsCentreName)
+        </div>
+        <div class="editor-field-2">
+            @Html.EditorFor(model => model.LogisticsCentreName)
+        </div>
+        <div class="editor-label-2">
+        <label>
+            简称
+            </label>
+        </div>
+        <div class="editor-field-2">
+            @Html.EditorFor(model => model.ShortCode)
+           @* @Html.ValidationMessageFor(model => model.Name)*@
+        </div>
+    </div>
+    <div class="editor-footer">
+        @Html.Button(Resources.Global.Button_Save, "Url_KanbanCard_UpdateSupplier", new Dictionary<string, string>()
+	{
+	    {"type", "submit"},
+	    {"id", "btnSave_Supplier"},
+        {"needconfirm","true"}
+        
+	})
+        <button type="button" id="btnBack_Supplier" onclick="location.href='@Url.Content("~/KanbanCard/UpdateSupplierList")'">
+            @Resources.Global.Button_Back</button>
+    </div>
+</fieldset>
+    }
+<script type="text/javascript">
+    function btnSave_Supplier_Click() {
+        var myreg = /^[a-zA-Z0-9._-]+@@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+        var mailAddresses = $("#MailAddress").val();
+        if (mailAddresses != "") {
+            var mailArr = mailAddresses.split(';');
+            for (var i = 0; i < mailArr.length; i++) {
+                if (mailArr[i] != "" && !myreg.test(mailArr[i])) {
+                    alert('请输入有效的E_mail！');
+                    return false;
+                }
+            }
+        }
+        var data = {
+            "Code": $("#Supplier_Code").val(),
+            "Name": $("#Name").val(),
+            "ShortCode": $("#ShortCode").val(),
+            "IsActive": $("#IsActive").is(':checked'),
+            "LogisticsCentre": $("#LogisticsCentre").val(),
+            "MailAddress": $("#MailAddress").val()
+        };
+        $.ajax({
+            type: "post",
+            dataType: "html",
+            url: "/Supplier/_Edit/",
+            data: data,
+            success: function (data, textStatus) {
+                var tabStrip = $("#TabStrip");
+                var tabStripContent0 = tabStrip.data("tTabStrip").getContentElement(0);
+                $(tabStripContent0).html(data);
+            }
+        });
+    }
+
+
+</script>

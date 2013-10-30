@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/com.Sconit.SDEntity" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/com.Sconit.SDEntity" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="ArrayOfOrderDetail">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="OrderDetail" nillable="true" type="tns:OrderDetail" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfOrderDetail" nillable="true" type="tns:ArrayOfOrderDetail" />
+  <xs:complexType name="OrderDetail">
+    <xs:sequence>
+      <xs:element name="_x003C_CurrentReceiveQty_x003E_k__BackingField" type="xs:decimal" />
+      <xs:element name="_x003C_CurrentShipQty_x003E_k__BackingField" type="xs:decimal" />
+      <xs:element name="_x003C_Id_x003E_k__BackingField" type="xs:int" />
+      <xs:element name="_x003C_ItemDescription_x003E_k__BackingField" nillable="true" type="xs:string" />
+      <xs:element name="_x003C_Item_x003E_k__BackingField" nillable="true" type="xs:string" />
+      <xs:element name="_x003C_OrderNo_x003E_k__BackingField" nillable="true" type="xs:string" />
+      <xs:element name="_x003C_ReferenceItemCode_x003E_k__BackingField" nillable="true" type="xs:string" />
+      <xs:element name="_x003C_RemainReceivedQty_x003E_k__BackingField" type="xs:decimal" />
+      <xs:element name="_x003C_RemainShippedQty_x003E_k__BackingField" type="xs:decimal" />
+      <xs:element name="_x003C_Sequence_x003E_k__BackingField" type="xs:int" />
+      <xs:element name="_x003C_UnitCount_x003E_k__BackingField" type="xs:decimal" />
+      <xs:element name="_x003C_Uom_x003E_k__BackingField" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="OrderDetail" nillable="true" type="tns:OrderDetail" />
+  <xs:complexType name="Hu">
+    <xs:sequence>
+      <xs:element name="_x003C_CurrentQty_x003E_k__BackingField" type="xs:decimal" />
+      <xs:element name="_x003C_DetailId_x003E_k__BackingField" type="xs:int" />
+      <xs:element name="_x003C_HuId_x003E_k__BackingField" nillable="true" type="xs:string" />
+      <xs:element name="_x003C_HuTemplate_x003E_k__BackingField" nillable="true" type="xs:string" />
+      <xs:element name="_x003C_ItemDescription_x003E_k__BackingField" nillable="true" type="xs:string" />
+      <xs:element name="_x003C_Item_x003E_k__BackingField" nillable="true" type="xs:string" />
+      <xs:element name="_x003C_LocationBin_x003E_k__BackingField" nillable="true" type="xs:string" />
+      <xs:element name="_x003C_Location_x003E_k__BackingField" nillable="true" type="xs:string" />
+      <xs:element name="_x003C_LotNo_x003E_k__BackingField" nillable="true" type="xs:string" />
+      <xs:element name="_x003C_ManufactureDate_x003E_k__BackingField" type="xs:dateTime" />
+      <xs:element name="_x003C_ManufactureParty_x003E_k__BackingField" nillable="true" type="xs:string" />
+      <xs:element name="_x003C_PrintCount_x003E_k__BackingField" type="xs:short" />
+      <xs:element name="_x003C_Qty_x003E_k__BackingField" type="xs:decimal" />
+      <xs:element name="_x003C_Status_x003E_k__BackingField" nillable="true" type="xs:string" />
+      <xs:element name="_x003C_UnitQty_x003E_k__BackingField" type="xs:decimal" />
+      <xs:element name="_x003C_Uom_x003E_k__BackingField" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Hu" nillable="true" type="tns:Hu" />
+</xs:schema>

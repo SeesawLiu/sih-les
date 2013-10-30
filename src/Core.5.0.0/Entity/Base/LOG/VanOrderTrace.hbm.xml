@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.LOG.VanOrderTrace, com.Sconit.Entity" table="LOG_VanOrderTrace" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="assigned" />
+        </id>
+		<property name="UUID" column="UUID" type="String" length="50"/>	
+		<property name="Flow" column="Flow" type="String" length="50"/>	
+		<property name="OrderNo" column="OrderNo" type="String" length="50"/>
+    <property name="Priority" column="Priority"/>
+    <property name="OrderDetId" column="OrderDetId" type="Int32"/>	
+		<property name="OrderDetSeq" column="OrderDetSeq" type="Int32"/>
+    <property name="StartTime" column="StartTime" type="DateTime"/>
+    <property name="WindowTime" column="WindowTime" type="DateTime"/>
+    <property name="EMWindowTime" column="EMWindowTime" type="DateTime"/>
+    <property name="ReqTimeFrom" column="ReqTimeFrom" type="DateTime"/>
+    <property name="ReqTimeTo" column="ReqTimeTo" type="DateTime"/>
+    <property name="Item" column="Item" type="String" length="50"/>
+    <property name="RefItemCode" column="RefItemCode" type="String" length="50"/>
+    <property name="ItemDesc" column="ItemDesc" type="String" length="50"/>
+    <property name="Uom" column="Uom" type="String" length="50"/>
+    <property name="UnitCount" column="UC" type="Decimal"/>
+    <property name="ManufactureParty" column="ManufactureParty" type="String" length="50" />
+    <property name="Location" column="Location" type="String" length="50" />	
+		<property name="OpReference" column="OpRef" type="String" length="50"/>	
+		<property name="NetOrderQty" column="NetOrderQty" type="Decimal"/>	
+		<property name="OrgOpRefQty" column="OrgOpRefQty" type="Decimal"/>	
+		<property name="GrossOrderQty" column="GrossOrderQty" type="Decimal"/>	
+		<property name="OpRefQty" column="OpRefQty" type="Decimal"/>	
+		<property name="CreateDate" column="CreateDate" type="DateTime" update="false"/>	
+        
+    </class>
+</hibernate-mapping>

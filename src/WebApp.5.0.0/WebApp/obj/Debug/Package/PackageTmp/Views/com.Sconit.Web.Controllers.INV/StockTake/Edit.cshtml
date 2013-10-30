@@ -1,0 +1,46 @@
+﻿@model com.Sconit.Entity.INV.StockTakeMaster
+@{
+    ViewBag.Title = Resources.INV.StockTake.StockTakeMaster_Edit_Title;
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_Inventory_StockTake_View" });
+}
+
+@{ Html.Telerik().TabStrip()
+        .Name("TabStrip")
+        .Items(tabstrip =>
+        {
+            tabstrip.Add()
+               .Text(Resources.INV.StockTake.StockTakeMaster_Edit_Title)
+                .LoadContentFrom("_StockTakeMasterEdit", "StockTake", new { id = Model.StNo})
+                 .HtmlAttributes(new { onclick = "CleanTabMessage()" });
+            if (Model.Status == com.Sconit.CodeMaster.StockTakeStatus.InProcess || Model.Status == com.Sconit.CodeMaster.StockTakeStatus.Complete|| Model.Status == com.Sconit.CodeMaster.StockTakeStatus.Close)
+       {
+         tabstrip.Add()
+                .Text(Resources.INV.StockTake.StockTakeDetail_Tab_Title)
+                .LoadContentFrom("_StockTakeDetailSearch", "StockTake", new { id = Model.StNo, Status = Model.Status, IsScanHu = Model.IsScanHu })
+                 .HtmlAttributes(new { onclick = "CleanTabMessage()" });
+       //}
+
+       //     if (Model.Status == com.Sconit.CodeMaster.StockTakeStatus.Complete || Model.Status == com.Sconit.CodeMaster.StockTakeStatus.Close)
+       //  {
+            tabstrip.Add()
+                .Text(Resources.INV.StockTake.StockTakeResult_Tab_Title)
+                .LoadContentFrom("_StockTakeResultSearch", "StockTake", new { id = Model.StNo, Status = Model.Status, IsScanHu=Model.IsScanHu })
+                 .HtmlAttributes(new { onclick = "CleanTabMessage()" });
+         }
+        
+
+        })
+        .Render();
+}
+
+@{
+    Html.Telerik().ScriptRegistrar()
+        .OnDocumentReady(
+            @<text>
+                var tabIndex = "@TempData["TabIndex"]";
+                var tabstrip = $("#TabStrip").data("tTabStrip");
+                var item = $("li", tabstrip.element)[tabIndex != "" ? tabIndex : 0];
+                tabstrip.select(item);
+            </text>
+        );
+}

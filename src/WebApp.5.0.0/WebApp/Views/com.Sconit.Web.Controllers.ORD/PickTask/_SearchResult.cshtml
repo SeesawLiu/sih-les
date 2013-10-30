@@ -1,0 +1,56 @@
+﻿
+@model IEnumerable<com.Sconit.Entity.ORD.PickTask>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("PickTaskGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.PickId);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.PickId);
+            columns.Bound(o => o.OrderNo);
+            columns.Bound(o => o.Flow);
+            columns.Bound(o => o.Item);
+            columns.Bound(o => o.ItemDesc);
+            columns.Bound(o => o.IsHold).ClientTemplate("<input type='checkbox' disabled='disabled' name='IsHold' <#= IsHold? checked='checked' : '' #> />");
+            //columns.Bound(o => o.LocationFromName);
+            columns.Bound(o => o.LocationToName);
+            columns.Bound(o => o.ReleaseDate);
+            columns.Bound(o => o.WindowTime);
+            columns.Bound(o => o.OrderedQty);
+            columns.Bound(o => o.PickedQty);
+            columns.Bound(o => o.Picker);
+            columns.Bound(o => o.Supplier);
+            columns.Bound(o => o.PrintCount);
+       })
+        .Scrollable(c => c.Enabled(false))
+                .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxList", "PickTask"))
+                        .ClientEvents(events => events.OnDataBinding("PickTaskGrid_OnDataBinding"))
+                .Pageable(settings =>
+                {
+                    settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+                    settings.PageSize(ViewBag.PageSize != null ? ViewBag.PageSize : 10);
+                })
+                .EnableCustomBinding(true)
+                .Sortable()
+                .Resizable(resizing => resizing.Columns(true))
+        )
+             <script type="text/javascript">
+                 function PickTaskGrid_OnDataBinding(e) {
+                     e.data = {
+                         LocationFrom: $('#LocationFrom').val(),
+                         Picker: $('#Picker').val(),
+                         OrderNo: $('#OrderNo').val(),
+                         Item: $('#Item').val(),
+                         Flow:$("#Flow").val(),
+                         ReleaseStart: $('#ReleaseStart').val(),
+                         ReleaseEnd: $("#ReleaseEnd").val(),
+                         WindowStart: $('#WindowStart').val(),
+                         WindowEnd: $("#WindowEnd").val(),
+                         IncludeFinished: $("#IncludeFinished").is(':checked')
+                     }
+                 }
+    </script>
+</fieldset>

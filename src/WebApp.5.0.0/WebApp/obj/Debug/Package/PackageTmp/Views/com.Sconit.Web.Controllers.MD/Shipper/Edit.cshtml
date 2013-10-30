@@ -1,0 +1,87 @@
+﻿@model com.Sconit.Entity.MD.Shipper
+@{
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_Shipper_View" });
+}
+@using (Html.BeginForm())
+{
+    <fieldset>
+        <legend>@Resources.MD.Shipper.Shipper_Edit_Title</legend>
+        <div class="editor">
+            @Html.HiddenFor(model => model.CreateUserId)
+            @Html.HiddenFor(model => model.CreateUserName)
+            @Html.HiddenFor(model => model.CreateDate)
+            @Html.HiddenFor(model => model.LastModifyUserId)
+            @Html.HiddenFor(model => model.LastModifyUserName)
+            @Html.HiddenFor(model => model.LastModifyDate)
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.Code)
+            </div>
+            <div class="editor-field-2">
+                @Html.DisplayFor(model => model.Code)
+                @Html.HiddenFor(model => model.Code)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.Description)
+            </div>
+            <div class="editor-field-2">
+                @Html.EditorFor(model => model.Description)
+                @Html.ValidationMessageFor(model => model.Description)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.Location)
+            </div>
+            <div class="editor-field-2">
+                @{
+    Html.RenderAction("_LocationComboBox", "Common", new { controlName = "Location", selectedValue = Model != null ? Model.Location : string.Empty });
+                }
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.Address)
+            </div>
+            <div class="editor-field-2">
+                @Html.EditorFor(model => model.Address)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.Contact)
+            </div>
+            <div class="editor-field-2">
+                @Html.EditorFor(model => model.Contact)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.Tel)
+            </div>
+            <div class="editor-field-2">
+                @Html.EditorFor(model => model.Tel)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.Email)
+            </div>
+            <div class="editor-field-2">
+                @Html.EditorFor(model => model.Email)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.IsActive)
+            </div>
+            <div class="editor-field-2">
+                @Html.EditorFor(model => model.IsActive)
+            </div>
+        </div>
+        <div class="editor-footer">
+            @Html.Button(Resources.Global.Button_Save, "Url_Shipper_View", new Dictionary<string, string>()
+	{
+	    {"type", "submit"},
+	    {"id", "btnSave"},
+        {"needconfirm","true"}
+	})
+            @Html.Button(Resources.Global.Button_Delete, "Url_Shipper_View", new Dictionary<string, string>()
+	{
+	    {"type", "button"},
+	    {"id", "btnDelete"},
+        {"needconfirm","true"},
+        {"onclick","location.href='"+@Url.Content("~/Shipper/Delete/"+@Model.Code)+"'"}
+    })
+            <button type="button" id="btnBack" onclick="location.href='@Url.Content("~/Shipper/List")'">
+                @Resources.Global.Button_Back</button>
+        </div>
+    </fieldset>
+}

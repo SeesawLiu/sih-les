@@ -1,0 +1,121 @@
+﻿@model IEnumerable<com.Sconit.Entity.PRD.ItemConsume>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+                .Name("ItemConsumeGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .ToolBar(commands =>
+        {
+            commands.Insert();
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Item).EditorTemplateName("ItemGridForeignKey").Width(200);
+            columns.Bound(o => o.ItemDesc).ReadOnly();
+            columns.Bound(o => o.RefItemCode).ReadOnly();
+            columns.Bound(o => o.Qty);
+            columns.Bound(o => o.ConsumedQty).ReadOnly();
+            columns.Bound(o => o.IsClose).ClientTemplate("<input type='checkbox' disabled='disabled' name='IsClose' <#= ConsumedQty>=Qty? checked='checked' : '' #> />").ReadOnly();
+            columns.Bound(o => o.CreateUserName).ReadOnly();
+            columns.Bound(o => o.CreateDate).ReadOnly();
+            columns.Bound(o => o.LastModifyUserName).ReadOnly();
+            columns.Bound(o => o.LastModifyDate).ReadOnly();
+            columns.Command(commands =>
+            {
+                commands.Edit();
+                commands.Delete();
+
+            });
+        })
+        .EnableCustomBinding(true)
+        .DataBinding(dataBinding => dataBinding.Ajax()
+                .Select("_AjaxList", "ItemConsume")
+                .Insert("_Insert", "ItemConsume")
+                .Update("_Update", "ItemConsume")
+                .Delete("_Delete", "ItemConsume"))
+                        .ClientEvents(events => events.OnDataBinding("ItemConsumeGrid_OnDataBinding").OnRowDataBound("ItemConsumeGrid_OnRowDataBound").OnComplete("TelerikGridView_OnComplete"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(20);
+        })
+         .EnableCustomBinding(true)
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(20);
+        })
+        .Scrollable()
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+    )
+    <script type="text/javascript">
+        function ItemConsumeGrid_OnDataBinding(e) {
+            j = 1;
+            e.data = {
+                ItemCode: $('#ItemCode').val(),
+                IsClose: $('#IsClose').is(':checked'),
+                EffFrom: $('#DateFrom').val(),
+                EffTo: $('#DateTo').val()
+            };
+        }
+
+        function onItemComboBoxChange(e) {
+            if (e.value != "" && e.value != undefined) {
+                var combobox = $(this).data("tComboBox");
+                if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                    combobox.value("");
+                    $itemCell.next().html("");
+                    $itemCell.next().html("");
+                    combobox.reload();
+                } else {
+                    var data = {
+                        "itemCode": e.value
+                    };
+                    $.ajax({
+                        type: "post",
+                        dataType: "json",
+                        url: "/SequenceMaster/_WebOrderDetail/",
+                        data: data,
+                        success: function (data, textStatus) {
+                            var $tGrid = $("#LocationDetailPrefGrid").data("tGrid");
+                            var $itemCell = $(e.target).parent().parent();
+                            $itemCell.next().html(data.Description);
+                            $itemCell.next().next().html(data.ReferenceCode);
+
+//                            var oldData = $tGrid.dataItem($itemCell.parent());
+//                            if (oldData != undefined) {
+//                                oldData.ReferenceItemCode = data.ReferenceCode;
+//                                oldData.ItemDesc = data.Description;
+//                            }
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            alert(errorThrown);
+                        }
+                    });
+                }
+            }
+        }
+        var j = 1;
+        function ItemConsumeGrid_OnRowDataBound(e) {
+            if (j > 1) { return; }
+            var rows = $("tbody").children("tr:not(.t-no-data)");
+            for (var i = 0; i < rows.length; i++) {
+                var cells = $(rows[i]).children();
+                var qty = cells.eq(3).text();
+                var consumeQty = cells.eq(4).text();
+                if (parseFloat(consumeQty)>0) {
+                    cells.last().html("<td></td>");
+//                    cells.eq(3).attr("readonly", true);
+                }
+                //                cells.first().replaceWith("<td align='left' disabled='disabled' >" + cells.eq(0).text() + "</td>");
+                //                cells.first().css("ReadOnly", true);
+                //                cells.first().css("ReadOnly", true);
+            }
+            j++;
+        }
+    </script>
+</fieldset>
+

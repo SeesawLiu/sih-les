@@ -1,0 +1,50 @@
+﻿@model IEnumerable<com.Sconit.Entity.PRD.StandardWorkingCalendar>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+                .Name("ProdLineStandardWorkingCalendar")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.ProdLine).ClientTemplate(Html.ActionLink("<#= ProdLine #>", "Edit", "ProdLineStandardWorkingCalendar", new { ID = "<#= Id #>" }, null).ToString()).ReadOnly();
+            columns.Bound(o => o.Shift).EditorTemplateName("ShiftMasterGridForeignKey").Width(240);
+            columns.Bound(o => o.DayOfWeekDescription).ReadOnly();
+            // columns.Bound(o => o.TypeDescription).ReadOnly();
+            columns.ForeignKey(o => o.Type, (SelectList)ViewData["WorkingCalendarType"]).Width(240);
+
+            if (ViewBag.NoEditPermission != null && !ViewBag.NoEditPermission)
+            {
+                columns.Command(commands =>
+                                    {
+                                        commands.Edit();
+                                    });
+            }
+        })
+                         .DataBinding(dataBinding =>
+                                                    dataBinding.Ajax().Select("_AjaxList", "ProdLineStandardWorkingCalendar")
+                                                                                                     .Update("_Update", "ProdLineStandardWorkingCalendar", new { SearchShift = ViewBag.SearchShift, SearchRegion = ViewBag.SearchRegion }))
+
+                        .ClientEvents(events => events.OnDataBinding("ProdLineStandardWorkingCalendarGrid_OnDataBinding")
+                                               )
+                .Pageable(settings =>
+                {
+                    settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+                    settings.PageSize(ViewBag.PageSize);
+                })
+                .Scrollable(c => c.Enabled(false))
+                .EnableCustomBinding(true)
+                .Sortable()
+                .Resizable(resizing => resizing.Columns(true))
+            )
+    <script type="text/javascript">
+        function ProdLineStandardWorkingCalendarGrid_OnDataBinding(e) {
+            e.data = {
+                SearchRegion: $('#SearchRegion').val(),
+                SearchShift: $('#SearchShift').val()
+            };
+        }
+    </script>
+</fieldset>

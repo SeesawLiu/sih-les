@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.LOG.OrderTraceDetail, com.Sconit.Entity" table="LOG_OrderTraceDet" lazy="false">
+		<id name="Id" column="Id" type="Int64" unsaved-value="0" >
+      		<generator class="assigned" />
+        </id>
+		<property name="UUID" column="UUID" type="String" length="50"/>	
+		<property name="Type" column="Type" type="String" length="50"/>
+    <property name="Item" column="Item" type="String" length="50"/>
+    <property name="RefItemCode" column="RefItemCode" type="String" length="50"/>
+    <property name="ItemDesc" column="ItemDesc" type="String" length="100"/>
+    <property name="ManufactureParty" column="ManufactureParty" type="String" length="50" />
+    <property name="Location" column="Location" type="String" length="50"/>
+    <property name="OrderNo" column="OrderNo" type="String" length="50"/>
+    <property name="RequestTime" column="ReqTime" type="DateTime"/>
+    <property name="OrderQty" column="OrderQty" type="Decimal"/>
+    <property name="FinishQty" column="FinishQty" type="Decimal"/>
+		<property name="CreateDate" column="CreateDate" type="DateTime" update="false"/>	
+  	</class>
+</hibernate-mapping>

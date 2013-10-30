@@ -1,0 +1,21 @@
+﻿@model System.Web.Mvc.SelectList
+@{
+    string name = ViewBag.ControlName;
+    string id = string.IsNullOrWhiteSpace(ViewBag.ControlId) ? name : ViewBag.ControlId;
+    bool enable = ViewBag.Enable != null ? ViewBag.Enable : true;
+    int? orderType = ViewBag.OrderType;
+    bool isSupplier = ViewBag.IsSupplier != null ? ViewBag.IsSupplier : false;
+    bool isChange = ViewBag.IsChange != null ? ViewBag.IsChange : false;
+    string onChangeName = isChange ? "OrderMasterPartyFrom" : "EmptyChange";
+    bool isTransfer = ViewBag.IsTransfer != null ? ViewBag.IsTransfer : false;
+    bool isWmsParty = ViewBag.IsWmsParty != null ? ViewBag.IsWmsParty : false;
+}
+@(Html.Telerik().ComboBox()
+        .Name(name)
+        .HiddenInputHtmlAttributes(new { id = id })
+                    .DataBinding(binding => binding.Ajax().Select("_AjaxLoadingOrderMasterPartyFrom", "Common", new { orderType = orderType, isSupplier = isSupplier, isTransfer = isTransfer, isWmsParty = isWmsParty }))
+        .ClientEvents(events => events.OnChange(onChangeName))
+        .BindTo(Model)
+        .Enable(enable)
+             .AutoFill(true)
+        )

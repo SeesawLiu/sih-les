@@ -1,0 +1,17 @@
+﻿@using com.Sconit.Entity.SYS
+@{
+    string name = ViewBag.ControlName;
+    string id = string.IsNullOrWhiteSpace(ViewBag.ControlId) ? name : ViewBag.ControlId;
+    IList<CodeDetail> codeDetails = ViewBag.CodeDetails;
+}
+<select id="@id" name="@name" multiple="multiple">
+    @{
+        if (codeDetails != null)
+        {
+            foreach (CodeDetail r in codeDetails)
+            {
+        <option value="@r.Value">@r.Value@r.ChineDescription</option>
+            }
+        }
+    }
+</select>

@@ -1,0 +1,447 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="EndDate" xml:space="preserve">
+    <value>End date</value>
+  </data>
+  <data name="FlowDetail_Title" xml:space="preserve">
+    <value>FlowDetail_Title</value>
+  </data>
+  <data name="KanbanCard_Bin" xml:space="preserve">
+    <value>Bin</value>
+  </data>
+  <data name="KanbanCard_CalcCard" xml:space="preserve">
+    <value>Calculate cards</value>
+  </data>
+  <data name="KanbanCard_CardNo" xml:space="preserve">
+    <value>Card No.</value>
+  </data>
+  <data name="KanbanCard_Container" xml:space="preserve">
+    <value>Container</value>
+  </data>
+  <data name="KanbanCard_Create" xml:space="preserve">
+    <value>Create Kanban card</value>
+  </data>
+  <data name="KanbanCard_EffectiveDate" xml:space="preserve">
+    <value>Effective date</value>
+  </data>
+  <data name="KanbanCard_EffectiveDate_Flow" xml:space="preserve">
+    <value>EffectiveDate_Flow</value>
+  </data>
+  <data name="KanbanCard_Flow" xml:space="preserve">
+    <value>Flow</value>
+  </data>
+  <data name="KanbanCard_Freeze" xml:space="preserve">
+    <value>Freeze Kanban card</value>
+  </data>
+  <data name="KanbanCard_IsFrozen" xml:space="preserve">
+    <value>Frozen</value>
+  </data>
+  <data name="KanbanCard_MultiSupplyGroup" xml:space="preserve">
+    <value>Multi supply group</value>
+  </data>
+  <data name="KanbanCard_Item" xml:space="preserve">
+    <value>Item</value>
+  </data>
+  <data name="KanbanCard_ItemConsume_View" xml:space="preserve">
+    <value>Item daily consume</value>
+  </data>
+  <data name="KanbanCard_ItemDescription" xml:space="preserve">
+    <value>Item description</value>
+  </data>
+  <data name="KanbanCard_LastModifyDate" xml:space="preserve">
+    <value>Last modify date</value>
+  </data>
+  <data name="KanbanCard_LastUseDate" xml:space="preserve">
+    <value>Last use date</value>
+  </data>
+  <data name="KanbanCard_Location" xml:space="preserve">
+    <value>Location</value>
+  </data>
+  <data name="KanbanCard_LocBin" xml:space="preserve">
+    <value>Location bin</value>
+  </data>
+  <data name="KanbanCard_LogisticCenterCode" xml:space="preserve">
+    <value>Logistic center code</value>
+  </data>
+  <data name="KanbanCard_NeedReprint" xml:space="preserve">
+    <value>Need reprint</value>
+  </data>
+  <data name="KanbanCard_Order" xml:space="preserve">
+    <value>Order Kanban card</value>
+  </data>
+  <data name="KanbanCard_POLineNo" xml:space="preserve">
+    <value>POLineNo</value>
+  </data>
+  <data name="KanbanCard_PONo" xml:space="preserve">
+    <value>PO No</value>
+  </data>
+  <data name="KanbanCard_QiTiaoBian" xml:space="preserve">
+    <value>Qi tiao bian</value>
+  </data>
+  <data name="KanbanCard_Qty" xml:space="preserve">
+    <value>Qty</value>
+  </data>
+  <data name="KanbanCard_Region" xml:space="preserve">
+    <value>Region</value>
+  </data>
+  <data name="KanbanCard_RegionName" xml:space="preserve">
+    <value>Region name</value>
+  </data>
+  <data name="KanbanCard_Scan" xml:space="preserve">
+    <value>Scan Kanban card</value>
+  </data>
+  <data name="KanbanCard_Sequence" xml:space="preserve">
+    <value>Seq</value>
+  </data>
+  <data name="KanbanCard_Shelf" xml:space="preserve">
+    <value>Shelf</value>
+  </data>
+  <data name="KanbanCard_Supplier" xml:space="preserve">
+    <value>Supplier</value>
+  </data>
+  <data name="KanbanCard_SupplierName" xml:space="preserve">
+    <value>Supplier name</value>
+  </data>
+  <data name="KanbanCard_Title_View" xml:space="preserve">
+    <value>KanbanCard_Title_View</value>
+  </data>
+  <data name="KanbanCard_UnitCount" xml:space="preserve">
+    <value>UnitCount</value>
+  </data>
+  <data name="KanbanCard_UnitCountDescription" xml:space="preserve">
+    <value>UnitCountDescription</value>
+  </data>
+  <data name="KanbanCard_Unscan" xml:space="preserve">
+    <value>Unscan Kanban card</value>
+  </data>
+  <data name="KanbanCard_Uom" xml:space="preserve">
+    <value>Uom</value>
+  </data>
+  <data name="KanbanNum" xml:space="preserve">
+    <value>No. of Kanban</value>
+  </data>
+  <data name="Msg" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="OpTime" xml:space="preserve">
+    <value>Operation Time</value>
+  </data>
+  <data name="Process_AlreadyScanned" xml:space="preserve">
+    <value>Already scanned</value>
+  </data>
+  <data name="Process_DeleteScanFail" xml:space="preserve">
+    <value>Delete last Kanban scan record failed</value>
+  </data>
+  <data name="Process_ExceedCycleAmount" xml:space="preserve">
+    <value>Exceed cycle amout, try another supplier</value>
+  </data>
+  <data name="Process_Frozen" xml:space="preserve">
+    <value>Frozen</value>
+  </data>
+  <data name="Process_NoFlowDetail" xml:space="preserve">
+    <value>No flow detail</value>
+  </data>
+  <data name="Process_NoFlowMaster" xml:space="preserve">
+    <value>No flow master</value>
+  </data>
+  <data name="Process_NoFlowStrategy" xml:space="preserve">
+    <value>No flow strategy</value>
+  </data>
+  <data name="Process_NonExistingCard" xml:space="preserve">
+    <value>Non-existing card</value>
+  </data>
+  <data name="Process_NotEffective" xml:space="preserve">
+    <value>Not effective</value>
+  </data>
+  <data name="Process_NotInScannedStatus" xml:space="preserve">
+    <value>Not in scanned status</value>
+  </data>
+  <data name="Process_Ok" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="Process_OverOneFlowDetail" xml:space="preserve">
+    <value>Find more than one flow detail</value>
+  </data>
+  <data name="Process_PassOrderTime" xml:space="preserve">
+    <value>Order time passed</value>
+  </data>
+  <data name="StartDate" xml:space="preserve">
+    <value>Start date</value>
+  </data>
+  <data name="CalcNeedAdd" xml:space="preserve">
+    <value>Need add</value>
+  </data>
+  <data name="CalcNeedChangeEff" xml:space="preserve">
+    <value>Need change effective date</value>
+  </data>
+  <data name="CalcNeedChangeEffAndFreeze" xml:space="preserve">
+    <value>Need change effective and freeze date</value>
+  </data>
+  <data name="CalcNeedChangeFreeze" xml:space="preserve">
+    <value>Need change freeze date</value>
+  </data>
+  <data name="CalcNeedFreeze" xml:space="preserve">
+    <value>Need freeze</value>
+  </data>
+  <data name="CalcNonWorkableNeedChangeFreeze" xml:space="preserve">
+    <value>Nonworkable need change freeze</value>
+  </data>
+  <data name="CalcNonWorkableNeedFreeze" xml:space="preserve">
+    <value>Nonworkable need freeze</value>
+  </data>
+  <data name="KanbanCardList_Title" xml:space="preserve">
+    <value>KanbanCardList_Title</value>
+  </data>
+  <data name="Button_Calculate" xml:space="preserve">
+    <value>Calculate</value>
+  </data>
+  <data name="Button_Execute" xml:space="preserve">
+    <value>Execute</value>
+  </data>
+  <data name="Button_Export" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="CalcNotInPlanNeedFreeze" xml:space="preserve">
+    <value>NotInPlan need freeze</value>
+  </data>
+  <data name="Process_OrderTransferError" xml:space="preserve">
+    <value>Transfer flow to order error</value>
+  </data>
+  <data name="Process_NoWorkingCalendar" xml:space="preserve">
+    <value>No working calendar</value>
+  </data>
+  <data name="Process_CreateOrderFailed" xml:space="preserve">
+    <value>Failed to create order</value>
+  </data>
+  <data name="Process_NoFlowShiftDetail" xml:space="preserve">
+    <value>No flow shift detail</value>
+  </data>
+  <data name="KanbanCard_OrderTime" xml:space="preserve">
+    <value>Order time</value>
+  </data>
+  <data name="KanbanCard_FreezeDate" xml:space="preserve">
+    <value>Freeze date</value>
+  </data>
+  <data name="CalcedOrderTime" xml:space="preserve">
+    <value>Calculated order time</value>
+  </data>
+  <data name="Process_NoStartOrEndWorkingCalendar" xml:space="preserve">
+    <value>No start or end workcalendar</value>
+  </data>
+  <data name="IsNotOrdered" xml:space="preserve">
+    <value>Not ordered</value>
+  </data>
+  <data name="KanbanCard_MaxConsumeQty" xml:space="preserve">
+    <value>Max consume qty</value>
+  </data>
+  <data name="KanbanCard_NewMaxConsumeQty" xml:space="preserve">
+    <value>New max consume qty</value>
+  </data>
+  <data name="KanbanCard_MultiRegion" xml:space="preserve">
+    <value>Multi region</value>
+  </data>
+  <data name="Process_InvalidFields" xml:space="preserve">
+    <value>Invalid fields</value>
+  </data>
+  <data name="Button_Rotate" xml:space="preserve">
+    <value>Rotate</value>
+  </data>
+  <data name="Process_RegionKBCodeNotSet" xml:space="preserve">
+    <value>KB Code on Region is not set</value>
+  </data>
+  <data name="Button_SyncKanban" xml:space="preserve">
+    <value>SyncKanban</value>
+  </data>
+  <data name="KanbanCard_ChildItemCount" xml:space="preserve">
+    <value>ChildItemCount</value>
+  </data>
+  <data name="Process_FlowDetailUnitCountNotSet" xml:space="preserve">
+    <value>FlowDetail UnitCount Not Set</value>
+  </data>
+  <data name="KanbanCard_IsKit" xml:space="preserve">
+    <value>Is kit</value>
+  </data>
+  <data name="KanbanCard_TotalCount" xml:space="preserve">
+    <value>TotalCount</value>
+  </data>
+  <data name="KanbanCard_GroupDesc" xml:space="preserve">
+    <value>GroupDesc</value>
+  </data>
+  <data name="KanbanCard_GroupNo" xml:space="preserve">
+    <value>GroupNo</value>
+  </data>
+  <data name="KanbanCard_IsTrace" xml:space="preserve">
+    <value>IsTrace</value>
+  </data>
+  <data name="KanbanCard_LogisticCenterName" xml:space="preserve">
+    <value>LogisticCenterName</value>
+  </data>
+  <data name="KanbanCard_KBCalc" xml:space="preserve">
+    <value>KBCalc</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="KanbanCard_WindowTime" xml:space="preserve">
+    <value>WindowTime</value>
+  </data>
+  <data name="KanbanCard_LastUseDate1" xml:space="preserve">
+    <value>LastUseDate</value>
+  </data>
+  <data name="KanbanCard_LogisticCenterCode1" xml:space="preserve">
+    <value>LogisticCenterCode1</value>
+  </data>
+  <data name="KanbanCard_OpRef" xml:space="preserve">
+    <value>OpReference</value>
+  </data>
+  <data name="KanbanCard_SequenceNo" xml:space="preserve">
+    <value>SequenceNo</value>
+  </data>
+  <data name="KanbanCard_Type" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="KanbanCard_KitCount" xml:space="preserve">
+    <value>KitCount</value>
+  </data>
+  <data name="KanbanCard_IsLost" xml:space="preserve">
+    <value>IsLost</value>
+  </data>
+  <data name="KanbanCard_IgnoreTimeNumber" xml:space="preserve">
+    <value>IgnoreTimeNumber</value>
+  </data>
+  <data name="KanbanCard_ReferenceItemCode" xml:space="preserve">
+    <value>ReferenceItemCode</value>
+  </data>
+  <data name="KanbanCard_MultiStation" xml:space="preserve">
+    <value>MultiStation</value>
+  </data>
+  <data name="KanbanCard_ItemType" xml:space="preserve">
+    <value>ItemType</value>
+  </data>
+  <data name="KanbanCard_OpRefSequence" xml:space="preserve">
+    <value>OpRefSequence</value>
+  </data>
+  <data name="KanbanCard_Memo" xml:space="preserve">
+    <value>Memo</value>
+  </data>
+  <data name="KanbanCard_BinTo" xml:space="preserve">
+    <value>BinTo</value>
+  </data>
+</root>

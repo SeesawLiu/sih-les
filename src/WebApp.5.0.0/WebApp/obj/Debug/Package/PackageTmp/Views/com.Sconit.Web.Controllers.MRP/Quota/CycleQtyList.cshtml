@@ -1,0 +1,8 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_QuotaCycleQty_View" });
+}
+
+@Html.Partial("_CycleQtySearch")
+
+@Html.Partial("_CycleQtySearchResult")

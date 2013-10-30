@@ -1,0 +1,81 @@
+﻿@model IEnumerable<com.Sconit.Entity.ORD.CabProductionView>
+<script type="text/javascript">
+
+    function HomeMadeOutGrid2_OnDataBinding(e) {
+        e.data = {
+            Flow: $('#Flow').val()
+        };
+    }
+
+    function CabOutClick(e) {
+        $(e).attr('href', 'javascript:void(0);');
+        if (confirm('确认要出库吗？')) {
+            var orderNo = $(e).parent().prev().html();
+            var flow = $('#Flow').val();
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                url: "/CabGuide/CabOut/",
+                cache: false,
+                data: { orderNo: orderNo },
+                success: function (data, textStatus) {
+                    DisplayJsonMessages(data);
+                    //                if (data != "") {
+                    //                    PrintOrder(data.Data.PrintUrl);
+                    //                }
+                    $.ajax({
+                        type: "get",
+                        dataType: "html",
+                        url: "/CabGuide/HomeMadeList/",
+                        data: { Flow: flow, isFromList: true },
+                        cache: false,
+                        success: function (data, textStatus) {
+                            $('#content').html(data);
+                        }
+                    });
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    DisplayTextMessages(XMLHttpRequest.responseText);
+                }
+            });
+        }
+    }
+
+</script>
+@(Html.Telerik().Grid(Model)
+              .Name("HomeMadeGrid2")
+              .DataKeys(keys =>
+                            {
+                                keys.Add(p => p.OrderDetailId);
+                            })
+              .Columns(columns =>
+              {
+                  columns.Bound(o => o.Sequence);
+                  columns.Bound(o => o.SubSequence);
+                  columns.Bound(o => o.TraceCode);
+                  columns.Bound(o => o.Model);
+                  columns.Bound(o => o.ModelDescription);
+                  columns.Bound(o => o.Item);
+                  columns.Bound(o => o.ItemDesc);
+                  columns.Bound(o => o.StartTime);
+                  columns.Bound(o => o.Flow);
+                  columns.Bound(o => o.OrderNo).Hidden();
+                  columns.Command(
+                      commands =>
+                      {
+                          commands.Custom("CabOut").Text("出库").HtmlAttributes(new { onClick = "CabOutClick(this)", id = "CabOutOrder" });
+                      }
+                      );
+              })
+              .Scrollable(c => c.Enabled(false))
+                              .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxHomeMadeViewList", "CabGuide", new RouteValueDictionary { { "Type", (int)com.Sconit.CodeMaster.CabType.SelfMade }, { "IsOut", "false" } }))
+                                              .ClientEvents(events => events.OnDataBinding("HomeMadeOutGrid2_OnDataBinding"))
+              .Pageable(settings =>
+                            {
+                                settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+                                settings.PageSize(ViewBag.PageSize);
+                            })
+              .EnableCustomBinding(true)
+              .Sortable()
+              .Resizable(resizing => resizing.Columns(true))
+              )

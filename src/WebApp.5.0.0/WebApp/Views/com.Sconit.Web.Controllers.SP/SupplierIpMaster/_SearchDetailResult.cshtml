@@ -1,0 +1,59 @@
+﻿@model IEnumerable<com.Sconit.Entity.ORD.IpDetail>
+<fieldset>
+     @(Html.Telerik().Grid(Model)
+        .Name("OrderDetailGrid")
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.IpNo).Width(100);
+            columns.Bound(o => o.OrderNo).Width(100);
+            columns.Bound(o => o.ExternalOrderNo).Width(100);
+            columns.Bound(o => o.ExternalSequence).Width(100);
+            columns.Bound(o => o.Item).Width(100);
+            columns.Bound(o => o.ReferenceItemCode);
+            columns.Bound(o => o.ItemDescription);
+            columns.Bound(o => o.Uom);
+            columns.Bound(o => o.Qty).Width(100);
+            columns.Bound(o => o.ReceivedQty).Width(100);
+            columns.Bound(o => o.LocationTo);
+            columns.Bound(o => o.SAPLocation).Title("SAP库位");
+            columns.Bound(o => o.Flow).Title(Resources.ORD.IpMaster.IpMaster_Flow);
+            columns.Bound(o => o.IsClose).ClientTemplate("<input type='checkbox' disabled='disabled' name='IsClose' <#= IsClose? checked='checked' : '' #> />");
+            columns.Bound(o => o.IsInspect).ClientTemplate("<input type='checkbox' disabled='disabled' name='IsInspect' <#= IsInspect? '' : checked='checked' #> />").Title("是否免检");
+            columns.Bound(o => o.MastPartyFrom);
+            columns.Bound(o => o.MastPartyTo).ReadOnly();
+            columns.Bound(o => o.MastType);
+            columns.Bound(o => o.MastStatus);
+            columns.Bound(o => o.MastCreateDate);
+        })
+
+                                    .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxIpDetList", "SupplierIpMaster"))
+                                    .ClientEvents(events => events.OnDataBinding("SupplierIpMasterGrid_OnDataBinding"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(ViewBag.PageSize);
+        })
+        .Scrollable(c => c.Enabled(false))
+         .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+    )
+
+    <script type="text/javascript">
+        function SupplierIpMasterGrid_OnDataBinding(e) {
+            e.data = {
+                IpNo: $('#IpNo').val(),
+                Item: $('#Item').val(),
+                PartyFrom: $('#PartyFrom').val(),
+                PartyTo: $('#PartyTo').val(),
+                OrderNo: $('#OrderNo').val(),
+                WMSNo: $('#WMSNo').val(),
+                StartDate: $('#StartDate').val(),
+                EndDate: $('#EndDate').val(),
+                Status: $('#Status').val(),
+                ExternalOrderNo: $('#ExternalOrderNo').val(),
+                ExternalSequence: $('#ExternalSequence').val(),
+                IsShowGap: $('#IsShowGap').is(':checked')
+            };
+        }
+    </script>
+</fieldset>

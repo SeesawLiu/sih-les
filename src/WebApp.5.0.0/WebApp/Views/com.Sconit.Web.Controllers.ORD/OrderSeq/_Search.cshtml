@@ -1,0 +1,50 @@
+﻿@using com.Sconit.Web.Models.SearchModels.ORD
+<script type="text/javascript">
+
+    function ExportClick() {
+        if ($('#ProdLine').val() == "") {
+            $message.error("生产线不能为空。");
+            return;
+        }
+        location.href = '/OrderSeq/ExportXLS/?ProdLine=' + $('#ProdLine').val() + "&TraceCode=" + $('#TraceCode').val();
+    }
+</script>
+<fieldset>
+    @using (Html.BeginForm("List", "OrderSeq"))
+    {   
+        <div class="search">
+            <div class="search-label">
+                <label for="OrderSeq_ProdLine">
+                    @Resources.ORD.OrderMaster.OrderMaster_Flow
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_FlowComboBox", "Common", new
+                                                         {
+                                                             controlName = "ProdLine",
+                                                             type = (int)com.Sconit.CodeMaster.OrderType.Production,
+                                                             isVanOrder = true,
+                                                             selectedValue = TempData["OrderSeqSearchModel"] != null ? ((OrderSeqSearchModel)TempData["OrderSeqSearchModel"]).ProdLine : null
+                                                         });
+                }
+            </div>
+            <div class="search-label">
+                <label for="OrderSeq_TraceCode">
+                    @Resources.ORD.OrderSeq.OrderSeq_TraceCode
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("TraceCode", TempData["OrderSeqSearchModel"] != null ? ((OrderSeqSearchModel)TempData["OrderSeqSearchModel"]).TraceCode : string.Empty)
+            </div>
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            <button type="submit" id="btnSearch">
+                @Resources.Global.Button_Search</button>
+            <button type="button" id="btnExport" onclick="ExportClick()">
+                @Resources.Global.Button_Export</button>
+        </div>
+
+    }
+</fieldset>

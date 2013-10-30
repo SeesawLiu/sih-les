@@ -1,0 +1,8 @@
+﻿@{
+    ViewBag.Title = "List";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_ShortCode_View" });
+}
+
+@Html.Partial("_ShortSearch")
+
+@Html.Partial("_ShortSearchResult")

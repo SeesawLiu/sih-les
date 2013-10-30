@@ -1,0 +1,13 @@
+G:\Project\sih-les\src\BatchJob.5.0.0\Entity.BatchJob\bin\Release\com.Sconit.Entity.BatchJob.dll
+G:\Project\sih-les\src\BatchJob.5.0.0\Entity.BatchJob\bin\Release\com.Sconit.Entity.BatchJob.pdb
+G:\Project\sih-les\src\BatchJob.5.0.0\Entity.BatchJob\bin\Release\com.Sconit.CodeMaster.dll
+G:\Project\sih-les\src\BatchJob.5.0.0\Entity.BatchJob\bin\Release\com.Sconit.Entity.dll
+G:\Project\sih-les\src\BatchJob.5.0.0\Entity.BatchJob\bin\Release\com.Sconit.Globalization.dll
+G:\Project\sih-les\src\BatchJob.5.0.0\Entity.BatchJob\bin\Release\com.Sconit.CodeMaster.pdb
+G:\Project\sih-les\src\BatchJob.5.0.0\Entity.BatchJob\bin\Release\com.Sconit.Entity.pdb
+G:\Project\sih-les\src\BatchJob.5.0.0\Entity.BatchJob\bin\Release\com.Sconit.Globalization.pdb
+G:\Project\sih-les\src\BatchJob.5.0.0\Entity.BatchJob\bin\Release\en-US\com.Sconit.Globalization.resources.dll
+G:\Project\sih-les\src\BatchJob.5.0.0\Entity.BatchJob\bin\Release\zh-CN\com.Sconit.Globalization.resources.dll
+G:\Project\sih-les\src\BatchJob.5.0.0\Entity.BatchJob\obj\Release\ResolveAssemblyReference.cache
+G:\Project\sih-les\src\BatchJob.5.0.0\Entity.BatchJob\obj\Release\com.Sconit.Entity.BatchJob.dll
+G:\Project\sih-les\src\BatchJob.5.0.0\Entity.BatchJob\obj\Release\com.Sconit.Entity.BatchJob.pdb

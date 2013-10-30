@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.VIEW.KanBanCalcResult, com.Sconit.Entity" table="VIEW_KanBanCalcResult" lazy="false">
+    <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      <generator class="identity" />
+    </id>
+		<property name="FlowDetId" column="FlowDetId" type="Int32"/>	
+		<property name="Item" column="Item" type="String" length="50"/>	
+		<property name="ItemDesc" column="ItemDesc" type="String" length="100"/>	
+		<property name="QiTiaoBian" column="QiTiaoBian" type="String" length="50"/>	
+		<property name="UnitCount" column="UC" type="Decimal"/>	
+		<property name="UCDesc" column="UCDesc" type="String" length="50"/>	
+		<property name="Region" column="Region" type="String" length="50"/>
+    <property name="Location" column="Location" type="String" length="50"/>
+    <property name="OpRef" column="OpRef" type="String" length="50"/>	
+		<property name="LocBin" column="LocBin" type="String" length="50"/>	
+		<property name="Shelf" column="Shelf" type="String" length="50"/>	
+		<property name="BarCode" column="BarCode" type="String" length="50"/>
+    <property name="BianHao" column="BianHao" type="String" length="50"/>
+    <property name="Lot" column="Lot" type="String" length="50"/>	
+		<property name="Supplier" column="Supplier" type="String" length="50"/>	
+		<property name="SupplierName" column="SupplierName" type="String" length="100"/>	
+		<property name="EffFreDate" column="EffFreDate" type="DateTime"/>	
+		<property name="LCCode" column="LCCode" type="String" length="50"/>	
+		<property name="MaxQty" column="MaxQty" type="Decimal"/>	
+		<property name="Type" column="Type" type="Int32"/>	
+		<property name="TravelTimes" column="TravelTimes" type="String" length="50"/>	
+		<property name="LeadTime" column="LeadTime" type="Decimal"/>	
+		<property name="SafeTime" column="SafeTime" type="Decimal"/>	
+		<property name="CalcResult" column="CalcResult" type="Decimal"/>	
+		<property name="Qty" column="Qty" type="Decimal"/>	
+		<property name="CodeType" column="CodeType" type="String" length="50"/>	
+		<property name="KanbanNum" column="KanbanNum" type="Int32"/>	
+		<property name="KanbanDeltaNum" column="KanbanDeltaNum" type="Int32"/>	
+		<property name="NewNo" column="NewNo" type="String" length="50"/>	
+		<property name="FreezeNo" column="FreezeNo" type="String" length="50"/>	
+		<property name="BatchNo" column="BatchNo" type="String" length="200"/>	
+  	</class>
+</hibernate-mapping>

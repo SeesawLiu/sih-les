@@ -1,0 +1,70 @@
+﻿@using com.Sconit.Web.Models.SearchModels.PRD
+@model IEnumerable<com.Sconit.Entity.PRD.WorkingCalendar>
+<script type="text/javascript">
+
+    function onShiftMasterComboBoxChange() {
+
+    }
+
+    function onCodeMasterComboBoxChange(e) {
+
+    }
+
+    function onCodeMasterDataBinding(e) {
+        e.data = {
+            "code": '@com.Sconit.CodeMaster.CodeMaster.WorkingCalendarType'
+        };
+    }
+</script>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("WorkingCalendar")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .DataBinding(dataBinding => dataBinding.Ajax()
+                                                .Select("_AjaxList", "ProdLineWorkingCalendar")
+                                                .Update("_Update", "ProdLineWorkingCalendar", new RouteValueDictionary()
+                                                                                    {
+                                                                                        { "SearchRegion", (WorkingCalendarSearchModel)TempData["WorkingCalendarSearchModel"] != null ? ((WorkingCalendarSearchModel)TempData["WorkingCalendarSearchModel"]).SearchRegion : string.Empty },
+                                                                                        { "SearchShift", (WorkingCalendarSearchModel)TempData["WorkingCalendarSearchModel"] != null ? ((WorkingCalendarSearchModel)TempData["WorkingCalendarSearchModel"]).SearchShift : string.Empty },
+                                                                                        { "StartWorkingDate", (WorkingCalendarSearchModel)TempData["WorkingCalendarSearchModel"] != null ? ((WorkingCalendarSearchModel)TempData["WorkingCalendarSearchModel"]).StartWorkingDate : null },
+                                                                                        { "EndWorkingDate", (WorkingCalendarSearchModel)TempData["WorkingCalendarSearchModel"] != null ? ((WorkingCalendarSearchModel)TempData["WorkingCalendarSearchModel"]).EndWorkingDate : null },
+                                                                                    }))
+                .Columns(columns =>
+                {
+                    columns.Bound(o => o.ProdLine).ReadOnly().Width(160);
+                    columns.Bound(o => o.Shift).EditorTemplateName("ShiftMasterGridForeignKey").Width(240);
+                    columns.Bound(o => o.WorkingDate).ReadOnly().Format(com.Sconit.Entity.BusinessConstants.TELERIK_SHORT_DATE_FORMAT).Width(160);
+                    columns.ForeignKey(o => o.Type, (SelectList)ViewData["WorkingCalendarType"]).Width(240);
+                    columns.Bound(o => o.DayOfWeekDescription).ReadOnly();
+                    if (ViewBag.NoEditPermission != null && !ViewBag.NoEditPermission)
+                    {
+                        columns.Command(commands =>
+                        {
+                            commands.Edit();
+                        });
+                    }
+                })
+                .Scrollable(c => c.Enabled(false))
+                        .ClientEvents(events => events.OnDataBinding("WorkingCalendarGrid_OnDataBinding").OnComplete("TelerikGridView_OnComplete"))
+                .Pageable(settings =>
+                {
+                    settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+                    settings.PageSize(ViewBag.PageSize);
+                })
+                .EnableCustomBinding(true)
+                .Sortable()
+                  )
+    <script type="text/javascript">
+        function WorkingCalendarGrid_OnDataBinding(e) {
+            e.data = {
+                SearchRegion: $('#SearchRegion').val(),
+                SearchShift: $('#SearchShift').val(),
+                StartWorkingDate: $('#StartWorkingDate').val(),
+                EndWorkingDate: $('#EndWorkingDate').val()
+            };
+        }
+    </script>
+</fieldset>

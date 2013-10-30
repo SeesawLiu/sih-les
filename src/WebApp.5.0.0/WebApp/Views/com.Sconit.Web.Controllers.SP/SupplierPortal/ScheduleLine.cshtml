@@ -1,0 +1,16 @@
+﻿@model com.Sconit.Entity.ORD.OrderMaster
+<script type="text/javascript">
+    function onLoad() { $("#Window").data("tWindow").maximize(); }
+             
+</script>
+@{ Html.Telerik().Window()
+        .Name("Window")
+         .ClientEvents(events => events.OnLoad("onLoad"))
+        .Title("需求计划")
+        .Icon(Url.Content("~/Content/Common/Icons/favicon.png"), "favicon")
+        .LoadContentFrom("http://www.sih.cq.cn/portal/les/Delivery/ScheduleLine.aspx?userName=" + ViewBag.SupplierCode)
+        .Scrollable(false)
+        .Width(800)
+        .Height(600)
+        .Render();
+}

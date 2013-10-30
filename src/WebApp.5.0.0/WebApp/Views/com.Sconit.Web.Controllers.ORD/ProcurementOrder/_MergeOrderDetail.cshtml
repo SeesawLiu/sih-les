@@ -1,0 +1,89 @@
+﻿@model IEnumerable<com.Sconit.Entity.ORD.OrderDetail>
+<script type="text/javascript">
+    $(function () {
+        $("#checkAll").click(function () {
+            $('input[name="checkedRecords"]').attr("checked", this.checked);
+            showButtons();
+        });
+    });
+    function showButtons() {
+        var $checkRecords = $("input[name='checkedRecords']");
+        var showButton = false;
+        for (var i = 0; i < $checkRecords.length; i++) {
+            if ($checkRecords[i].checked) {
+                showButton = true;
+                break;
+            }
+        }
+        $("#checkAll").attr("checked", $checkRecords.length == $("input[name='checkedRecords']:checked").length ? true : false);
+        $("#btnReceive").attr("style", showButton ? "display:inline" : "display:none");
+    }
+
+    function ReceiveOrderGrid_OnDataBinding(e) {
+        e.data = {
+            orderNo: $('#OrderNoHidden').val()
+        };
+    }
+
+    function onManufacturePartyDataBinding(e) {
+        e.data = {
+            "item": $(e.target).parent().parent().parent().children().eq(2).text()
+        }
+    }
+
+
+    function onManufacturePartyChange(e) {
+        if (e.value != null) {
+            var combobox = $(this).data("tComboBox");
+            if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                combobox.value("");
+                combobox.reload();
+            }
+        }
+    }
+
+</script>
+<fieldset>
+    <legend>@Resources.ORD.OrderDetail.OrderDetail_Title</legend>
+    @using (Html.BeginForm())
+    { 
+        @(Html.Telerik().Grid(Model)
+            .Name("ReceiveOrderGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+            .Editable(editing => editing.Mode(GridEditMode.InCell))
+            .Columns(columns =>
+        {
+            //columns.Bound(o => o.Id).Hidden();
+            columns.Bound(o => o.Id).ReadOnly()
+             .ClientTemplate("<input type='checkbox' id='Id' name='checkedRecords' value='<#= Id #>' onClick='showButtons()'  />")
+             .HeaderTemplate("<input type='checkbox' id='checkAll' name='checkAll' />")
+             .Width(36).HtmlAttributes(new { style = "text-align:center" });
+            columns.Bound(o => o.OrderNo).ReadOnly();
+            columns.Bound(o => o.Item).ReadOnly();
+            columns.Bound(o => o.ReferenceItemCode).ReadOnly();
+            columns.Bound(o => o.ItemDescription).ReadOnly();
+            columns.Bound(o => o.AllowRecQty).ClientTemplate("<Div> <#=OrderedQty - ShippedQty-PickedQty #></div>").Format("{0:N}").Title("可收货数").ReadOnly();
+            columns.Bound(o => o.CurrentReceiveQty).ClientTemplate("<input type='text' id='CurrentReceiveQty' name='CurrentReceiveQty' style='width:70px' value='<#=OrderedQty - ShippedQty-PickedQty #>'/>").Format("{0:N}").ReadOnly();
+            columns.Bound(o => o.ICHARG).EditorTemplateName("ManufacturePartyGridComboBox").Width(200).Hidden((bool)ViewBag.IsProcurement);
+            columns.Bound(o => o.ExternalOrderNo).ReadOnly().Hidden((bool)ViewBag.IsTransfer).ClientTemplate("<div><#=(ExternalOrderNo==''||ExternalOrderNo==null) ?BillAddressDescription:ExternalOrderNo #></div>").Title("计划协议号");
+            columns.Bound(o => o.ExternalSequence).ReadOnly().Hidden((bool)ViewBag.IsTransfer).Title("计划协议行号");
+            columns.Bound(o => o.LocationTo).ReadOnly();
+        })
+            .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxMergeOrderDetailList", "ProcurementOrder"))
+            .ClientEvents(events => events.OnComplete("TelerikGridView_OnComplete").OnDataBinding("ReceiveOrderGrid_OnDataBinding"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(50);
+        })
+        .Scrollable(c => c.Enabled(false))
+                .Resizable(resizing => resizing.Columns(true))
+        .Footer(true)
+    )
+      
+    }
+</fieldset>
+

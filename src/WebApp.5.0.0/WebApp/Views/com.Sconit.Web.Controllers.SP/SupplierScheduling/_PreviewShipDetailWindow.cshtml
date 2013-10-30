@@ -1,0 +1,44 @@
+﻿@model IEnumerable<com.Sconit.Web.Models.ORD.ScheduleBody>
+
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("WmsIpDetail")
+       // .DataKeys(keys =>
+      //  {
+       //     keys.Add(p => p.Id);
+      //  })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.OrderNo);
+            columns.Bound(o => o.Sequence);
+            columns.Bound(o => o.Item);
+            columns.Bound(o => o.ItemDescription);
+            columns.Bound(o => o.ReferenceItemCode);
+            columns.Bound(o => o.Uom);
+            columns.Bound(o => o.UnitCount);
+            columns.Bound(o => o.LocationTo);
+            columns.Bound(o => o.CurrentShipQty).Format("{0:N}");
+          //  columns.Bound(o => o.ShipQty).Format("{0:N}");
+          //  columns.Bound(o => o.ShippedQty).Format("{0:N}");
+            //columns.Bound(o => o.ReceivedQty).Format("{0:N}");
+           // columns.Bound(o => o.OrderQty).Format("{0:N}");
+           // columns.Bound(o => o.BackOrderQty).Format("{0:N}");
+           // columns.Bound(o => o.ForecastQty).Format("{0:N}");
+               // .ClientTemplate(string.Format("<input type='text' id='CurrentReceiveQty' name='CurrentReceiveQty' style='width:70px' value='<#=Qty #>'/>"));
+            
+        })
+            //.CellAction(cell =>
+            //{
+            //    if (cell.Column.Member == "CurrentShipQty")
+            //    {
+            //        cell.Text = string.Format("<input type='text' id='CurrentShipQtys' name='CurrentShipQtys' style='display:none' value='" + cell.DataItem.CurrentShipQty + "'/>");
+            //    }
+            //})
+            // .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxLocationBinList", "Location"))
+                      //  .ClientEvents(events => events.OnDataBinding("LocationBinGrid_OnDataBinding"))
+        .Scrollable(c => c.Enabled(false))
+                .Sortable()
+                .Resizable(resizing => resizing.Columns(true))
+                .Footer(false)
+    )
+</fieldset>

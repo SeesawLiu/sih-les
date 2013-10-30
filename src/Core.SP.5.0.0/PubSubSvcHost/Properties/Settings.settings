@@ -1,0 +1,15 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="PubSubSvcHost.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="ServiceDisplayName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Sconit PubSubService Host</Value>
+    </Setting>
+    <Setting Name="ServiceDisplayDescription" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Publish/subscribe sconit order printing service</Value>
+    </Setting>
+    <Setting Name="ServiceName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">PubSubSvcHost</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

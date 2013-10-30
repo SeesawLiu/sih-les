@@ -1,0 +1,47 @@
+﻿@{
+    ViewBag.Title = Resources.SCM.FlowMaster.FlowMaster_KanbanFlow;
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_KanbanFlow_View" });
+}
+@Html.Partial("_AjaxMessage") 
+<input type="hidden" name="flow" id="flow" value="@Model" />
+<input type="hidden" name="IsReturn" id="IsReturn" value="@TempData["IsReturn"]" />
+
+@{ Html.Telerik().TabStrip()
+        .Name("TabStrip")
+        .Items(tabstrip =>
+        {
+            tabstrip.Add()
+               .Text(Resources.SCM.FlowMaster.FlowMaster_KanbanFlow)
+                .LoadContentFrom("_Edit", "KanbanFlow", new { id = Model });
+               // .HtmlAttributes(new { onclick = "CleanTabMessage()" }); 
+
+            tabstrip.Add()
+                .Text(Resources.SCM.FlowMaster.FlowMaster_TabStrategy)
+                .LoadContentFrom("_Strategy", "KanbanFlow", new { id = Model });
+               // .HtmlAttributes(new { onclick = "CleanTabMessage()" });
+
+            tabstrip.Add()
+                .Text(Resources.SCM.FlowMaster.FlowMaster_TabDetail)
+                .LoadContentFrom("_DetailSearch", "KanbanFlow", new { id = Model });
+               // .HtmlAttributes(new { onclick = "CleanTabMessage()" });
+
+            tabstrip.Add()
+             .Text(Resources.SCM.FlowShiftDetail.FlowShiftDetail_TabDetail)
+             .LoadContentFrom("_FlowShiftDetailSearch", "KanbanFlow", new { id = Model });
+            // .HtmlAttributes(new { onclick = "CleanTabMessage()" });
+            
+
+        })
+        .Render();
+}
+
+@{ Html.Telerik().ScriptRegistrar()
+        .OnDocumentReady(
+            @<text>
+                var tabIndex = "@TempData["TabIndex"]";
+                var tabstrip = $("#TabStrip").data("tTabStrip");
+                var item = $("li", tabstrip.element)[tabIndex != "" ? tabIndex : 0];
+                tabstrip.select(item);
+            </text>
+        );
+}

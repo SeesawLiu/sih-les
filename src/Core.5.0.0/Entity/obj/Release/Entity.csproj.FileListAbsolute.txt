@@ -1,0 +1,11 @@
+G:\Project\sih-les\src\Core.5.0.0\Entity\bin\Release\com.Sconit.Entity.dll
+G:\Project\sih-les\src\Core.5.0.0\Entity\bin\Release\com.Sconit.Entity.pdb
+G:\Project\sih-les\src\Core.5.0.0\Entity\bin\Release\com.Sconit.CodeMaster.dll
+G:\Project\sih-les\src\Core.5.0.0\Entity\bin\Release\com.Sconit.Globalization.dll
+G:\Project\sih-les\src\Core.5.0.0\Entity\bin\Release\com.Sconit.Globalization.pdb
+G:\Project\sih-les\src\Core.5.0.0\Entity\bin\Release\com.Sconit.CodeMaster.pdb
+G:\Project\sih-les\src\Core.5.0.0\Entity\bin\Release\en-US\com.Sconit.Globalization.resources.dll
+G:\Project\sih-les\src\Core.5.0.0\Entity\bin\Release\zh-CN\com.Sconit.Globalization.resources.dll
+G:\Project\sih-les\src\Core.5.0.0\Entity\obj\Release\ResolveAssemblyReference.cache
+G:\Project\sih-les\src\Core.5.0.0\Entity\obj\Release\com.Sconit.Entity.dll
+G:\Project\sih-les\src\Core.5.0.0\Entity\obj\Release\com.Sconit.Entity.pdb

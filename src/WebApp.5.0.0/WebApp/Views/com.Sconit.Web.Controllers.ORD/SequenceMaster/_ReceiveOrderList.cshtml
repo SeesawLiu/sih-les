@@ -1,0 +1,80 @@
+﻿@model IEnumerable<com.Sconit.Entity.ORD.OrderMaster>
+<script type="text/javascript">
+    $(function () {
+        $("#checkAll").click(function () {
+            $('input[name="checkedRecords"]').attr("checked", this.checked);
+            $("#btnEdit").attr("style", this.checked ? "display:inline" : "display:none");
+        });
+    });
+
+
+
+    function showButtons() {
+        var $checkRecords = $("input[name='checkedRecords']");
+        var showButton = false;
+        for (var i = 0; i < $checkRecords.length; i++) {
+            if ($checkRecords[i].checked) {
+                showButton = true;
+                break;
+            }
+        }
+        $("#checkAll").attr("checked", $checkRecords.length == $("input[name='checkedRecords']:checked").length ? true : false);
+        $("#btnEdit").attr("style", showButton ? "display:inline" : "display:none");
+    }
+
+    function OrderMasterGrid_OnDataBinding(e) {
+        e.data = {
+            OrderNo: $('#OrderNo').val(),
+            Flow: $('#Flow').val(),
+            PartyFrom: $('#PartyFrom').val(),
+            PartyTo: $('#PartyTo').val()
+        };
+    }
+</script>
+<fieldset>
+    <legend>@Resources.ORD.OrderMaster.OrderMaster_Receive_Title</legend>
+    @(
+       
+ Html.Telerik().Grid(Model)
+          .Name("OrderMasterGrid")
+          .DataKeys(keys =>
+          {
+              keys.Add(p => p.OrderNo);
+          })
+          .Columns(columns =>
+          {
+              columns.Bound(o => o.OrderNo)
+                 .ClientTemplate("<input type='checkbox' id='checkedRecords' name='checkedRecords' value='<#= OrderNo #>' onClick='showButtons()'  />")
+                 .HeaderTemplate("<input type='checkbox' id='checkAll' name='checkAll' />")
+                 .Width(36).HtmlAttributes(new { style = "text-align:center" });
+              columns.Bound(o => o.OrderNo);
+              columns.Bound(o => o.Flow);
+              columns.Bound(o => o.FlowDescription);
+              columns.Bound(o => o.SequenceGroup);
+              columns.Bound(o => o.TraceCode).Title("拨次");
+              columns.Bound(o => o.ReferenceOrderNo).Title("上趟最后Van号");
+              columns.Bound(o => o.ExternalOrderNo).Title("本趟最后Van号");
+              columns.Bound(o => o.OrderTypeDescription);
+              columns.Bound(o => o.OrderPriorityDescription);
+              columns.Bound(o => o.PartyFromName);
+              columns.Bound(o => o.PartyToName);
+              columns.Bound(o => o.WindowTime);
+              columns.Bound(o => o.Dock);
+              columns.Bound(o => o.OrderStatusDescription);
+              columns.Bound(o => o.CreateDate);
+              columns.Bound(o => o.SeqOrderStrategyDescription);
+          })
+
+          .Scrollable(c => c.Enabled(false))
+        .EnableCustomBinding(true)
+                .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxReceiveOrderList", "SequenceMaster"))
+                          .ClientEvents(events => events.OnDataBinding("OrderMasterGrid_OnDataBinding"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(ViewBag.PageSize);
+        })
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+    )
+</fieldset>

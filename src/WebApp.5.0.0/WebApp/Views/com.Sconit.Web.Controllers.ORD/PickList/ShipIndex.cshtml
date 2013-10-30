@@ -1,0 +1,138 @@
+﻿@using com.Sconit.Entity.ORD
+@using com.Sconit.Entity.SYS
+@using com.Sconit.Web.Models.SearchModels.ORD
+@{
+    ViewBag.Title = "Index";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_PickList_Ship" });
+}
+
+
+    <script type="text/javascript">
+        function doSearch() {
+            if ($("#PickListNo").val() == "") {
+                $message.error("请输入拣货单进行查询。");
+                return;
+            }
+            var data = {
+                "pickListNo": $("#PickListNo").val()
+            }
+            $.ajax({
+                type: "post",
+                dataType: "html",
+                data: data,
+                url: "/PickList/_PickDetailList/",
+                cache: false,
+                success: function (data, textStatus) {
+//                    DisplayTextMessages(data);
+                    $("#PickDetailListDiv").html(data);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    DisplayTextMessages(data);
+                }
+            });
+        }
+        $(function () {
+            $("#PickListNo").focus().keydown(function () {
+                if (event.keyCode == 13) {
+                    doSearch();
+                }
+            });
+        });
+
+        function onSubmit(e) {
+            var grid = $("#PickDetailList").data("tGrid");
+            if (grid == undefined || grid == null) {
+                $message.error("没有发货明细，请先查询。");
+                return;
+            }
+            var rows = grid.$tbody.children("tr:not(.t-no-data)");
+            var idStr = "";
+            var qtyStr = "";
+            var errorStr = "";
+            for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+
+                var row = $(rows[rowIndex]);
+                var id = row.find("#Id").val();
+                var qty = row.children().eq(8).text();
+                var CurrentPickQty = row.find("#CurrentPickQty").val();
+//                if (parseFloat(CurrentPickQty) <= 0 || isNaN(CurrentPickQty)) {
+//                    errorStr += "<li>第" + (rowIndex + 1) + "行数量不正确。</li>";
+//                    continue;
+//                }
+                if (row.find("#Id").is(":checked")) {
+                    if (parseFloat(CurrentPickQty) > 0) {
+                        if (idStr == "") {
+                            idStr = id;
+                            qtyStr = CurrentPickQty;
+                        } else {
+                            idStr += "," + id;
+                            qtyStr += "," + CurrentPickQty;
+                        }
+                    }
+                }
+            }
+            if (errorStr!="") {
+                $message.error(errorStr);
+                return;
+            }
+            if (idStr == "") {
+                $message.error("没有发货明细。");
+                return;
+            }
+            var data = {
+                "pickListNo": $("#PickListNo").val(),
+                "idStr": idStr,
+                "qtyStr": qtyStr
+            }
+            $.ajax({
+                type: "Post",
+                dataType: "html",
+                data: data,
+                url: "/PickList/PickListship/",
+                cache: false,
+                success: function (data, textStatus) {
+                    $("#content").html(data);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    $message.error(XMLHttpRequest.responseText);
+
+                }
+            });
+        }
+
+
+       
+    </script>
+<fieldset>
+
+        <div class="search">
+            <div class="search-label">
+                <label for="PickListMaster_PickListNo">
+                    @Resources.ORD.PickListMaster.PickListMaster_PickListNo
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("PickListNo", ViewBag.PickListNo!=null?(string)ViewBag.PickListNo : string.Empty)
+            </div>
+              
+        </div>
+        <div class="search-footer">
+         @Html.Hidden("isFromList", true)
+            <button type="button" id="btnSearch" onclick="doSearch()">
+                @Resources.Global.Button_Search</button>
+            @Html.Button(Resources.Global.Button_Ship, "Url_PickList_Ship", new Dictionary<string, string>()
+	        {
+	            {"type", "button"},
+	            {"id", "btnShip"},
+                {"needconfirm","true"},
+                {"style","display:none"},
+                {"onclick","onSubmit()"}
+	        })
+        </div>
+</fieldset>
+    <div id="PickDetailListDiv">
+    </div>
+
+
+
+

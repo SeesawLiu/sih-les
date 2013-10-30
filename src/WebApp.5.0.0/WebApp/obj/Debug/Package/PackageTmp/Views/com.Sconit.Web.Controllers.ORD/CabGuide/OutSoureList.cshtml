@@ -1,0 +1,28 @@
+﻿@{
+    ViewBag.Title = "List";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_CabGuideOutSoureView_View" });
+}
+@Html.Partial("OutSoureSearch")
+@{ Html.Telerik().TabStrip()
+        .Name("OutSoureViewTabStrip")
+        .Items(tabstrip =>
+        {
+            tabstrip.Add()
+                .Text("未出库")
+                .LoadContentFrom("_OutSoureView2", "CabGuide")
+                .HtmlAttributes(new { onclick = "CleanTabMessage()" });
+
+            tabstrip.Add()
+               .Text("已出库")
+                .LoadContentFrom("_OutSoureView", "CabGuide")
+                .HtmlAttributes(new { onclick = "CleanTabMessage()" });
+        })
+        .Render();
+}
+@{ Html.Telerik().ScriptRegistrar()
+        .OnDocumentReady(
+    @<text> var tabIndex = "@TempData["TabIndex"]"; var tabstrip = $("#OutSoureViewTabStrip").data("tTabStrip");
+    var item = $("li", tabstrip.element)[tabIndex != "" ? tabIndex : 0]; tabstrip.select(item);
+    </text>
+        );
+}

@@ -1,0 +1,447 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="EndDate" xml:space="preserve">
+    <value>结束日期</value>
+  </data>
+  <data name="FlowDetail_Title" xml:space="preserve">
+    <value>路线明细</value>
+  </data>
+  <data name="KanbanCard_Bin" xml:space="preserve">
+    <value>库格</value>
+  </data>
+  <data name="KanbanCard_CalcCard" xml:space="preserve">
+    <value>看板核算</value>
+  </data>
+  <data name="KanbanCard_CardNo" xml:space="preserve">
+    <value>看板卡号</value>
+  </data>
+  <data name="KanbanCard_Container" xml:space="preserve">
+    <value>包装</value>
+  </data>
+  <data name="KanbanCard_Create" xml:space="preserve">
+    <value>创建看板卡</value>
+  </data>
+  <data name="KanbanCard_EffectiveDate" xml:space="preserve">
+    <value>生效日期</value>
+  </data>
+  <data name="KanbanCard_EffectiveDate_Flow" xml:space="preserve">
+    <value>生效日期</value>
+  </data>
+  <data name="KanbanCard_Flow" xml:space="preserve">
+    <value>路线</value>
+  </data>
+  <data name="KanbanCard_Freeze" xml:space="preserve">
+    <value>冻结看板卡</value>
+  </data>
+  <data name="KanbanCard_IsFrozen" xml:space="preserve">
+    <value>是否冻结</value>
+  </data>
+  <data name="KanbanCard_MultiSupplyGroup" xml:space="preserve">
+    <value>多轨组号</value>
+  </data>
+  <data name="KanbanCard_Item" xml:space="preserve">
+    <value>零件</value>
+  </data>
+  <data name="KanbanCard_ItemConsume_View" xml:space="preserve">
+    <value>零件日用量</value>
+  </data>
+  <data name="KanbanCard_ItemDescription" xml:space="preserve">
+    <value>零件描述</value>
+  </data>
+  <data name="KanbanCard_LastModifyDate" xml:space="preserve">
+    <value>最新修改日期</value>
+  </data>
+  <data name="KanbanCard_LastUseDate" xml:space="preserve">
+    <value>最新扫描时间</value>
+  </data>
+  <data name="KanbanCard_Location" xml:space="preserve">
+    <value>库位</value>
+  </data>
+  <data name="KanbanCard_LocBin" xml:space="preserve">
+    <value>配送路径</value>
+  </data>
+  <data name="KanbanCard_LogisticCenterCode" xml:space="preserve">
+    <value>物流中心</value>
+  </data>
+  <data name="KanbanCard_NeedReprint" xml:space="preserve">
+    <value>未打印</value>
+  </data>
+  <data name="KanbanCard_Order" xml:space="preserve">
+    <value>创建看板订单</value>
+  </data>
+  <data name="KanbanCard_POLineNo" xml:space="preserve">
+    <value>请购单行号</value>
+  </data>
+  <data name="KanbanCard_PONo" xml:space="preserve">
+    <value>请购单号</value>
+  </data>
+  <data name="KanbanCard_QiTiaoBian" xml:space="preserve">
+    <value>起跳便</value>
+  </data>
+  <data name="KanbanCard_Qty" xml:space="preserve">
+    <value>上线包装</value>
+  </data>
+  <data name="KanbanCard_Region" xml:space="preserve">
+    <value>目的区域</value>
+  </data>
+  <data name="KanbanCard_RegionName" xml:space="preserve">
+    <value>区域名</value>
+  </data>
+  <data name="KanbanCard_Scan" xml:space="preserve">
+    <value>扫描看板卡</value>
+  </data>
+  <data name="KanbanCard_Sequence" xml:space="preserve">
+    <value>编号</value>
+  </data>
+  <data name="KanbanCard_Shelf" xml:space="preserve">
+    <value>架位</value>
+  </data>
+  <data name="KanbanCard_Supplier" xml:space="preserve">
+    <value>来源区域</value>
+  </data>
+  <data name="KanbanCard_SupplierName" xml:space="preserve">
+    <value>供应商名称</value>
+  </data>
+  <data name="KanbanCard_Title_View" xml:space="preserve">
+    <value>看板卡基本信息</value>
+  </data>
+  <data name="KanbanCard_UnitCount" xml:space="preserve">
+    <value>包装量</value>
+  </data>
+  <data name="KanbanCard_UnitCountDescription" xml:space="preserve">
+    <value>包装规格</value>
+  </data>
+  <data name="KanbanCard_Unscan" xml:space="preserve">
+    <value>删除最近一次扫描记录</value>
+  </data>
+  <data name="KanbanCard_Uom" xml:space="preserve">
+    <value>单位</value>
+  </data>
+  <data name="KanbanNum" xml:space="preserve">
+    <value>看板张数</value>
+  </data>
+  <data name="Msg" xml:space="preserve">
+    <value>消息</value>
+  </data>
+  <data name="OpTime" xml:space="preserve">
+    <value>操作时间</value>
+  </data>
+  <data name="Process_AlreadyScanned" xml:space="preserve">
+    <value>已扫描</value>
+  </data>
+  <data name="Process_DeleteScanFail" xml:space="preserve">
+    <value>删除扫描记录失败</value>
+  </data>
+  <data name="Process_ExceedCycleAmount" xml:space="preserve">
+    <value>超过循环量,尝试另一个供应商</value>
+  </data>
+  <data name="Process_Frozen" xml:space="preserve">
+    <value>已冻结</value>
+  </data>
+  <data name="Process_NoFlowDetail" xml:space="preserve">
+    <value>找不到路线明细</value>
+  </data>
+  <data name="Process_NoFlowMaster" xml:space="preserve">
+    <value>找不到看板路线</value>
+  </data>
+  <data name="Process_NoFlowStrategy" xml:space="preserve">
+    <value>找不到看板策略</value>
+  </data>
+  <data name="Process_NonExistingCard" xml:space="preserve">
+    <value>看板卡不存在</value>
+  </data>
+  <data name="Process_NotEffective" xml:space="preserve">
+    <value>未到有效期</value>
+  </data>
+  <data name="Process_NotInScannedStatus" xml:space="preserve">
+    <value>不在已扫描状态</value>
+  </data>
+  <data name="Process_Ok" xml:space="preserve">
+    <value>成功</value>
+  </data>
+  <data name="Process_OverOneFlowDetail" xml:space="preserve">
+    <value>找到多于1条明细</value>
+  </data>
+  <data name="Process_PassOrderTime" xml:space="preserve">
+    <value>结转时间已过</value>
+  </data>
+  <data name="StartDate" xml:space="preserve">
+    <value>开始日期</value>
+  </data>
+  <data name="CalcNeedAdd" xml:space="preserve">
+    <value>需要新增</value>
+  </data>
+  <data name="CalcNeedChangeEff" xml:space="preserve">
+    <value>N需要更改投出时间</value>
+  </data>
+  <data name="CalcNeedChangeEffAndFreeze" xml:space="preserve">
+    <value>N需要更改投出和冻结时间</value>
+  </data>
+  <data name="CalcNeedChangeFreeze" xml:space="preserve">
+    <value>需要更改冻结时间</value>
+  </data>
+  <data name="CalcNeedFreeze" xml:space="preserve">
+    <value>需要冻结</value>
+  </data>
+  <data name="CalcNonWorkableNeedChangeFreeze" xml:space="preserve">
+    <value>Nonworkable需要更改冻结时间</value>
+  </data>
+  <data name="CalcNonWorkableNeedFreeze" xml:space="preserve">
+    <value>Nonworkable需要冻结</value>
+  </data>
+  <data name="KanbanCardList_Title" xml:space="preserve">
+    <value>看板列表</value>
+  </data>
+  <data name="Button_Calculate" xml:space="preserve">
+    <value>计算</value>
+  </data>
+  <data name="Button_Execute" xml:space="preserve">
+    <value>执行</value>
+  </data>
+  <data name="Button_Export" xml:space="preserve">
+    <value>导出</value>
+  </data>
+  <data name="CalcNotInPlanNeedFreeze" xml:space="preserve">
+    <value>不在下周计划中,需要冻结</value>
+  </data>
+  <data name="Process_OrderTransferError" xml:space="preserve">
+    <value>路线转订单失败</value>
+  </data>
+  <data name="Process_NoWorkingCalendar" xml:space="preserve">
+    <value>找不到工作日历</value>
+  </data>
+  <data name="Process_CreateOrderFailed" xml:space="preserve">
+    <value>创建订单失败</value>
+  </data>
+  <data name="Process_NoFlowShiftDetail" xml:space="preserve">
+    <value>找不到交货时段</value>
+  </data>
+  <data name="KanbanCard_OrderTime" xml:space="preserve">
+    <value>结转时间</value>
+  </data>
+  <data name="KanbanCard_FreezeDate" xml:space="preserve">
+    <value>冻结日期</value>
+  </data>
+  <data name="CalcedOrderTime" xml:space="preserve">
+    <value>推算结转时间</value>
+  </data>
+  <data name="Process_NoStartOrEndWorkingCalendar" xml:space="preserve">
+    <value>找不到开始或结束工作日对应的工作日历</value>
+  </data>
+  <data name="IsNotOrdered" xml:space="preserve">
+    <value>未产生订单</value>
+  </data>
+  <data name="KanbanCard_MaxConsumeQty" xml:space="preserve">
+    <value>最大日用量</value>
+  </data>
+  <data name="KanbanCard_NewMaxConsumeQty" xml:space="preserve">
+    <value>新最大日用量</value>
+  </data>
+  <data name="KanbanCard_MultiRegion" xml:space="preserve">
+    <value>多区域</value>
+  </data>
+  <data name="Process_InvalidFields" xml:space="preserve">
+    <value>字段已失效</value>
+  </data>
+  <data name="Button_Rotate" xml:space="preserve">
+    <value>补做</value>
+  </data>
+  <data name="Process_RegionKBCodeNotSet" xml:space="preserve">
+    <value>区域KB标准或异常代码没有设置</value>
+  </data>
+  <data name="Button_SyncKanban" xml:space="preserve">
+    <value>同步</value>
+  </data>
+  <data name="KanbanCard_ChildItemCount" xml:space="preserve">
+    <value>套件个数</value>
+  </data>
+  <data name="Process_FlowDetailUnitCountNotSet" xml:space="preserve">
+    <value>路线明细上包装没有设置</value>
+  </data>
+  <data name="KanbanCard_IsKit" xml:space="preserve">
+    <value>是否套件</value>
+  </data>
+  <data name="KanbanCard_TotalCount" xml:space="preserve">
+    <value>总张数</value>
+  </data>
+  <data name="KanbanCard_GroupDesc" xml:space="preserve">
+    <value>工位描述</value>
+  </data>
+  <data name="KanbanCard_GroupNo" xml:space="preserve">
+    <value>种别</value>
+  </data>
+  <data name="KanbanCard_IsTrace" xml:space="preserve">
+    <value>批号管理</value>
+  </data>
+  <data name="KanbanCard_LogisticCenterName" xml:space="preserve">
+    <value>物流中心名称</value>
+  </data>
+  <data name="KanbanCard_KBCalc" xml:space="preserve">
+    <value>看板类型</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>看板卡查询</value>
+  </data>
+  <data name="KanbanCard_WindowTime" xml:space="preserve">
+    <value>窗口时间</value>
+  </data>
+  <data name="KanbanCard_LastUseDate1" xml:space="preserve">
+    <value>最新扫描时间</value>
+  </data>
+  <data name="KanbanCard_LogisticCenterCode1" xml:space="preserve">
+    <value>中间仓</value>
+  </data>
+  <data name="KanbanCard_OpRef" xml:space="preserve">
+    <value>工位</value>
+  </data>
+  <data name="KanbanCard_SequenceNo" xml:space="preserve">
+    <value>编号</value>
+  </data>
+  <data name="KanbanCard_Type" xml:space="preserve">
+    <value>类型</value>
+  </data>
+  <data name="KanbanCard_KitCount" xml:space="preserve">
+    <value>套件张数</value>
+  </data>
+  <data name="KanbanCard_IsLost" xml:space="preserve">
+    <value>遗失</value>
+  </data>
+  <data name="KanbanCard_IgnoreTimeNumber" xml:space="preserve">
+    <value>遗失忽略次数</value>
+  </data>
+  <data name="KanbanCard_ReferenceItemCode" xml:space="preserve">
+    <value>旧图号</value>
+  </data>
+  <data name="KanbanCard_MultiStation" xml:space="preserve">
+    <value>多工位</value>
+  </data>
+  <data name="KanbanCard_ItemType" xml:space="preserve">
+    <value>零件类型</value>
+  </data>
+  <data name="KanbanCard_OpRefSequence" xml:space="preserve">
+    <value>看板号</value>
+  </data>
+  <data name="KanbanCard_Memo" xml:space="preserve">
+    <value>备注</value>
+  </data>
+  <data name="KanbanCard_BinTo" xml:space="preserve">
+    <value>工位</value>
+  </data>
+</root>

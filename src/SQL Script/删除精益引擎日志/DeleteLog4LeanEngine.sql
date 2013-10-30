@@ -1,0 +1,12 @@
+truncate table LOG_GenJITOrder
+truncate table LOG_GenKBOrder
+truncate table LOG_GenOrder4VanProdLine
+truncate table LOG_GenProductOrder
+truncate table LOG_GenSequenceOrder
+truncate table LOG_GenVanProdOrder
+truncate table LOG_OrderTrace
+truncate table LOG_OrderTraceDet
+truncate table LOG_RunLeanEngine
+truncate table LOG_SnapshotFlowDet4LeanEngine
+truncate table LOG_VanOrderTrace
+truncate table LOG_VanOrderBomTrace

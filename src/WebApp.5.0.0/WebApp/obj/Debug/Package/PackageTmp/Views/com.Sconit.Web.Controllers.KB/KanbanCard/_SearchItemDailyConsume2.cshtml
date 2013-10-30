@@ -1,0 +1,253 @@
+﻿@using com.Sconit.Web.Models.SearchModels.KB
+
+    <script src="@Url.Content("~/Scripts/jquery.ui.core.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery.ui.widget.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery.multiselect.js")" type="text/javascript"></script>
+<script type="text/javascript">
+    $(function () { 
+    $('#MultiRegion').multiselect({
+        noneSelectedText: "选择区域...",
+        selectedText: "已选#个区域",
+        checkAllText: "全选",
+        uncheckAllText: "取消全选",
+        selectedList: 3,
+        click: function (event, ui) {
+            $('#Region').attr("value", getMultiRegions());
+        },
+        checkAll: function () {
+            $('#Region').attr("value", getMultiRegions());
+        },
+        uncheckAll: function () {
+            $('#Region').attr("value", getMultiRegions());
+        }
+    });
+    });
+    
+
+
+    function getMultiRegions() {
+        var m = "";
+        var array_of_checked_values = $("#MultiRegion").multiselect("getChecked").map(function () {
+            return this.value;
+        }).get();
+        if (array_of_checked_values != null) {
+            if (array_of_checked_values.length > 0) {
+                m = array_of_checked_values[0];
+                for (var i = 1; i < array_of_checked_values.length; i++) {
+                    m = m + "," + array_of_checked_values[i];
+                };
+            }
+        }
+        return m;
+    }
+
+    function Region_Change(e) {
+        var combobox = $(this).data("tComboBox");
+        if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+            combobox.value("");
+            combobox.reload();
+        }
+        $('#Location').data('tComboBox').value('');
+        $('#Location').data('tComboBox').text('');
+        $("#Location").data("tComboBox").reload();
+    }
+
+    function Location_DataBinding(e) {
+        e.data = {
+            region: $("#Region").val()
+        };
+    }
+
+    function onBtnSaveMaxQty() {
+        $("#successesul").html('');
+        $("#errorsul").html('');
+        var dateStr = "";
+        var errorStr = "";
+        var bb = false;
+        var itemStr = "";
+        var locationStr = "";
+        var multiStr = "";
+        var NewMaxConsumeQtyStr = "";
+        var startDate = $("#StartDate").val();
+        var endDate = $("#EndDate").val();
+        var rows = $("tbody").children("tr:not(.t-no-data)");
+        for (var i = 0; i < rows.length; i++) {
+            var cells = $(rows[i]).children();
+            var NewMaxConsumeQty = cells.find("#NewMaxConsumeQty").val();
+            if (NewMaxConsumeQty != "" && NewMaxConsumeQty != undefined) {
+                if (isNaN(NewMaxConsumeQty) || !(parseFloat(NewMaxConsumeQty) >= 0)) {
+                    errorStr += "<li>第" + (i + 1) + "行最大日用量填写不正确。</li>";
+                    bb = true;
+                }
+                else {
+                    if (itemStr == "") {
+                        itemStr = cells.eq(0).text();
+                        locationStr = cells.eq(1).text();
+                        multiStr = cells.eq(2).text();
+                        NewMaxConsumeQtyStr = NewMaxConsumeQty;
+                    } else {
+                        itemStr += "," + cells.eq(0).text();
+                        locationStr += "," + cells.eq(1).text();
+                        multiStr += "," + cells.eq(2).text();
+                        NewMaxConsumeQtyStr += "," + NewMaxConsumeQty;
+                    }
+                }
+            }
+        }
+        if (bb) {
+            $("#errorsul").html(errorStr);
+            return;
+        }
+        if (itemStr == "") {
+            $("#errorsul").html('新最大日用量不能为空，请填写数量。');
+            return;
+        }
+
+        var data = {
+            "itemStr": itemStr,
+            "locationStr": locationStr,
+            "multiStr": multiStr,
+            "newMaxConsumeQtyStr": NewMaxConsumeQtyStr,
+            "startDate": startDate,
+            "endDate" : endDate
+        }
+        $.ajax({
+            type: "post",
+            // dataType: "html",
+            url: "/KanbanCard/ModifyMaxItemDailyConsumeQty/",
+            data: data,
+            cache: false,
+            success: function (data, textStatus) {
+                DisplayJsonMessages(data);
+                if (data != "") {
+                    var orderData = {
+                        "startDate": startDate,
+                        "endDate": endDate,
+                        "region": $("#Region").val()
+                    };
+                    $.ajax({
+                        type: "post",
+                        dataType: "html",
+                        url: "/KanbanCard/ListItemDailyConsume2/",
+                        data: orderData,
+                        cache: false,
+                        success: function (data, textStatus) {
+                            var $tGrid = $("#content");
+                            $($tGrid).html(data);
+                        }
+                    });
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+</script>
+<link href="@Url.Content("~/Content/jqueryui/jquery-ui.min.css")" rel="stylesheet" type="text/css" />
+<link href="@Url.Content("~/Content/jqueryui/jquery.multiselect.css")" rel="stylesheet" type="text/css" />
+<fieldset>
+    @using (Html.BeginForm("ListItemDailyConsume2", "KanbanCard"))
+    {   
+        <div class="search">
+            <div class="search-label">
+                <label >
+                    @Resources.KB.KanbanCard.KanbanCard_Region
+                </label>
+            </div>
+            <div class="search-field">
+               @*  @{
+           Html.RenderAction("_RegionComboBox", "Common",
+               new
+               {
+                   controlName = "Region",
+                   isChange = true,
+                   checkPermission = true,
+                   selectedValue = TempData["ItemDailyConsumeSearchModel"] != null ? ((ItemDailyConsumeSearchModel)TempData["ItemDailyConsumeSearchModel"]).Region : string.Empty
+               });
+                }*@
+                @{
+                    Html.RenderAction("_RegionMultiSelectBox", "Common", new
+                    {
+                        controlName = "MultiRegion",
+                        controlId = "MultiRegion",
+                        checkPermission = true
+                    });
+                    }
+                    @Html.Hidden("Region")
+            </div>
+       
+            <div class="search-label">
+                <label>
+                    @Resources.KB.KanbanCard.KanbanCard_Location
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+                    Html.RenderAction("_LocationComboBox", "Common",
+                        new
+                        {
+                            controlName = "Location",
+                            checkRegion = true,
+                            selectedValue = TempData["ItemDailyConsumeSearchModel"] != null ? ((ItemDailyConsumeSearchModel)TempData["ItemDailyConsumeSearchModel"]).Location : string.Empty
+                        });
+                }
+            </div>
+           
+           <div class="search-label">
+                <label for="StartDate">
+                    @Resources.KB.KanbanCard.StartDate
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DatePicker().Format(com.Sconit.Entity.BusinessConstants.SHORT_DATE_FORMAT).Name("StartDate")
+.Value(TempData["ItemDailyConsumeSearchModel"] != null ? ((ItemDailyConsumeSearchModel)TempData["ItemDailyConsumeSearchModel"]).StartDate : (System.DateTime.Today.DayOfWeek == DayOfWeek.Sunday ? System.DateTime.Today.AddDays(1) : System.DateTime.Today.AddDays(DayOfWeek.Saturday - System.DateTime.Today.DayOfWeek + 2)))
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+            </div>
+            <div class="search-label">
+                <label for="EndDate">
+                    @Resources.KB.KanbanCard.EndDate
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DatePicker().Format(com.Sconit.Entity.BusinessConstants.SHORT_DATE_FORMAT).Name("EndDate")
+.Value(TempData["ItemDailyConsumeSearchModel"] != null ? ((ItemDailyConsumeSearchModel)TempData["ItemDailyConsumeSearchModel"]).EndDate : (System.DateTime.Today.DayOfWeek == DayOfWeek.Sunday ? System.DateTime.Today.AddDays(5 + 2) : System.DateTime.Today.AddDays(DayOfWeek.Saturday - System.DateTime.Today.DayOfWeek + 6 + 2)))
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+            </div>
+            <div class="search-label">
+                <label for="FlowMaster_FirstName">
+                    @Resources.KB.KanbanCard.KanbanCard_Item
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_ItemComboBox", "Common", new
+        {
+            controlName = "Item",
+            selectedValue = TempData["ItemDailyConsumeSearchModel"] != null ? ((ItemDailyConsumeSearchModel)TempData["ItemDailyConsumeSearchModel"]).Item : string.Empty
+        });
+                }
+            </div>
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            <button type="submit" id="btnSearch">
+                @Resources.Global.Button_Search</button>
+            @Html.Button(Resources.Global.Button_Save, "Url_KanbanCard_ItemDailyConsume2", new Dictionary<string, string>()
+	        {
+	            {"type", "button"},
+	            {"id", "btnSaveMaxQty"},
+                {"needconfirm","true"},
+                {"onclick","onBtnSaveMaxQty()"}
+	        })
+            <button type="button" id="btnExport" onclick="ExportClick()">
+                @Resources.Global.Button_Export</button>
+        </div>
+
+    }
+</fieldset>
+<script type="text/javascript">
+    function ExportClick() {
+        location.href = "/KanbanCard/ExportListItemDailyConsume2/";
+    }
+</script>

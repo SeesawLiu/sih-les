@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:p1="http://www.sih.cq.cn/sap/pp/07" xmlns:rfc="urn:sap-com:document:sap:rfc:functions" name="MI_POFIX_LES" targetNamespace="http://www.sih.cq.cn/sap/pp/07" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema xmlns="urn:sap-com:document:sap:rfc:functions" targetNamespace="urn:sap-com:document:sap:rfc:functions" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <xsd:element name="ZSIH_PRODUCTIONORDERFIXED">
+        <xsd:complexType>
+          <xsd:all>
+            <xsd:element name="AUFNR">
+              <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                  <xsd:maxLength value="12" />
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="GSTRI" type="rfc:date" />
+          </xsd:all>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ZSIH_PRODUCTIONORDERFIXED.Response">
+        <xsd:complexType>
+          <xsd:all>
+            <xsd:element minOccurs="0" name="OUT">
+              <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                  <xsd:maxLength value="1" />
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:element>
+          </xsd:all>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:simpleType name="genericDate">
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="....-..-.." />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="date">
+        <xsd:union xmlns="urn:sap-com:document:sap:rfc:functions" memberTypes="xsd:date rfc:genericDate" />
+      </xsd:simpleType>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="rfc.ZSIH_PRODUCTIONORDERFIXED.Input">
+    <wsdl:part name="parameters" element="rfc:ZSIH_PRODUCTIONORDERFIXED" />
+  </wsdl:message>
+  <wsdl:message name="rfc.ZSIH_PRODUCTIONORDERFIXED.Output">
+    <wsdl:part name="parameters" element="rfc:ZSIH_PRODUCTIONORDERFIXED.Response" />
+  </wsdl:message>
+  <wsdl:portType name="MI_POFIX_LES">
+    <wsdl:operation name="MI_POFIX_LES">
+      <wsdl:input message="p1:rfc.ZSIH_PRODUCTIONORDERFIXED.Input" />
+      <wsdl:output message="p1:rfc.ZSIH_PRODUCTIONORDERFIXED.Output" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="MI_POFIX_LESBinding" type="p1:MI_POFIX_LES">
+    <binding transport="http://schemas.xmlsoap.org/soap/http" xmlns="http://schemas.xmlsoap.org/wsdl/soap/" />
+    <wsdl:operation name="MI_POFIX_LES">
+      <operation soapAction="http://sap.com/xi/WebService/soap1.1" xmlns="http://schemas.xmlsoap.org/wsdl/soap/" />
+      <wsdl:input>
+        <body use="literal" xmlns="http://schemas.xmlsoap.org/wsdl/soap/" />
+      </wsdl:input>
+      <wsdl:output>
+        <body use="literal" xmlns="http://schemas.xmlsoap.org/wsdl/soap/" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="MI_POFIX_LESService">
+    <wsdl:port name="MI_POFIX_LESPort" binding="p1:MI_POFIX_LESBinding">
+      <address location="http://10.86.128.31:8000/XISOAPAdapter/MessageServlet?channel=:LES01:CC_SOAPP7&amp;version=3.0&amp;Sender.Service=LES01&amp;Interface=http%3A%2F%2Fwww.sih.cq.cn%2Fsap%2Fpp%2F07%5EMI_POFIX_LES" xmlns="http://schemas.xmlsoap.org/wsdl/soap/" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

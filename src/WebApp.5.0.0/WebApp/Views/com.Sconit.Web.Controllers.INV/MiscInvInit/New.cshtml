@@ -1,0 +1,132 @@
+﻿@model com.Sconit.Entity.ORD.MiscOrderMaster
+@using com.Sconit.Entity.CUST
+@{
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_MiscInvInit_New" });
+}
+<script type="text/javascript">
+
+    function Region_Change(e) {
+        if (e.value != "") {
+            var combobox = $(this).data("tComboBox");
+            if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                combobox.value("");
+                combobox.reload();
+            }
+
+        }
+        $('#MLocation').data('tComboBox').value('');
+        $('#MLocation').data('tComboBox').text('');
+        $("#MLocation").data("tComboBox").reload();
+    }
+    function Location_DataBinding(e) {
+        e.data = {
+            region: $("#Region").val()
+        };
+    }
+
+    function onCreate() {
+        var grid = $("#MiscOrderDetailGrid").data("tGrid");
+      
+        if ($("#EffectiveDate").val() == "") {
+            $message.error("生效日期不能为空。");
+            return;
+        }
+        if ($("#Region").val() == "") {
+            $message.error("区域不能为空。");
+            return;
+        }
+        if ($("#MLocation").val() == "") {
+            $message.error("库位不能为空。");
+            return;
+        }
+        var miscmstr = {
+            "EffectiveDate": $("#EffectiveDate").val(),
+            "Region": $("#Region").val(),
+            "Location": $("#MLocation").val()
+        }
+       
+        var inserted = grid.changeLog.inserted;
+        var updated = $.grep(grid.changeLog.updated, function (value) { return value != undefined });
+        var deleted = $.grep(grid.changeLog.deleted, function (value) { return value != undefined });
+
+        var oderDetails = grid.changeLog.serialize(inserted, updated, deleted);
+        
+        grid._convert(oderDetails);
+        $.ajax({
+            type: "post",
+            dataType: "html",
+            url: "/MiscInvInit/CreateMiscOrder/",
+            data: $.extend(oderDetails, miscmstr),
+            cache: false,
+            success: function (data) {
+                $("#content").html(data);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+</script>
+
+    <fieldset>
+        <legend>基本信息</legend>
+        <div class="editor">
+           
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.EffectiveDate)
+            </div>
+            <div class="editor-field-2">
+                <div class="editor-field-2">
+                    @Html.Telerik().DateTimePicker().Format("yyyy-MM-dd HH:mm").Name("EffectiveDate")
+                    @Html.ValidationMessageFor(model => model.EffectiveDate)
+                </div>
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.Region)
+            </div>
+            <div class="editor-field-2">
+                @{
+    Html.RenderAction("_RegionComboBox", "Common",
+    new
+    {
+        ControlId = "Region",
+        controlName = "Region",
+        isChange = true,
+        selectedValue = Model != null ? Model.Region : string.Empty
+    });
+                }
+                @Html.ValidationMessageFor(model => model.Region)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.Location)
+            </div>
+            <div class="editor-field-2">
+                @{
+    Html.RenderAction("_LocationComboBox", "Common",
+    new
+    {
+        controlName = "MLocation",
+        includeBlank = true,
+        checkRegion = true,
+        selectedValue = Model != null ? Model.Location : string.Empty
+    });
+                }
+                @Html.ValidationMessageFor(model => model.Location)
+            </div>
+        </div>
+
+        <div class="editor-footer">
+             @Html.Button(Resources.Global.Button_New, "Url_MiscInvInit_New", new Dictionary<string, string>()
+	        {
+	            {"type", "button"},
+	            {"id", "btnNew"},
+                {"needconfirm","true"},
+                {"onclick","onCreate()"}
+	        })
+        </div>
+    </fieldset>
+        @{
+            Html.RenderAction("_MiscOrderDetail", "MiscInvInit", new { miscOrderNo = string.Empty });
+        }
+
+

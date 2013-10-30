@@ -1,0 +1,10 @@
+﻿@(Html.Telerik().ComboBox()
+              .Name("WorkCenter")
+              .HiddenInputHtmlAttributes(new { id = "WorkCenter" })
+                      .DataBinding(binding => binding.Ajax().Select("_WorkCenterAjaxLoading", "Common").Cache(true))
+      .AutoFill(true)
+      .HighlightFirstMatch(true)
+                               .ClientEvents(events => events.OnDataBinding("onWorkCenterDataBinding").OnChange("onWorkCenterChange"))
+      )
+
+

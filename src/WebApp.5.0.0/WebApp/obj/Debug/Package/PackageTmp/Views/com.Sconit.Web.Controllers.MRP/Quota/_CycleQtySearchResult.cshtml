@@ -1,0 +1,90 @@
+﻿@model IEnumerable<com.Sconit.Entity.SCM.QuotaCycleQty>
+<fieldset>
+        @(Html.Telerik().Grid(Model)
+                .Name("QuotaCycleQtyGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .ToolBar(commands =>
+        {
+            if(ViewBag.HaveCycleEditPermission){
+                commands.Insert();
+            }
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Id).Hidden(true);//.ClientTemplate("<input type='text' id='Id' name='Id'  style='display:none' value='<#= Id #>'/>");
+            columns.Bound(o => o.Item).EditorTemplateName("ItemGridForeignKey").Width(200);
+            columns.Bound(o => o.RefItemCode).ReadOnly();
+            columns.Bound(o => o.ItemDesc).ReadOnly();
+            columns.Bound(o => o.CycleQty);
+            columns.Bound(o => o.LastModifyDate).ReadOnly();
+            columns.Bound(o => o.LastModifyUserName).ReadOnly();
+            if( ViewBag.HaveCycleEditPermission){
+            columns.Command(commands =>
+            {
+                commands.Edit();
+                commands.Delete();
+            });
+            }
+        })
+        .Scrollable(c => c.Enabled(false))
+        .Sortable()
+        .EnableCustomBinding(true)
+
+        .DataBinding(dataBinding => dataBinding.Ajax()
+            .Select("_AjaxCycleQtyList", "Quota")
+            .Update("_CycleQtyUpdate", "Quota", new { ItemCode=ViewBag.ItemCode})
+            .Insert("_CycleQtyInsert", "Quota", new { ItemCode=ViewBag.ItemCode })
+            .Delete("_CycleQtyDelete", "Quota", new { ItemCode=ViewBag.ItemCode }))
+        .ClientEvents(events => events.OnDataBinding("QuotaCycleQtyGrid_OnDataBinding").OnComplete("TelerikGridView_OnComplete"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(20);
+        })
+        .Resizable(resizing => resizing.Columns(true))
+        .Footer(true)
+    )
+
+</fieldset>
+<script type="text/javascript">
+    function QuotaCycleQtyGrid_OnDataBinding(e) {
+        e.data = {
+            ItemCode: $('#ItemCode').val()
+        };
+    }
+
+
+    function onItemComboBoxChange(e) {
+        if (e.value != null) {
+            var combobox = $(this).data("tComboBox");
+            if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                combobox.value("");
+                combobox.reload();
+            } else {
+                var data = {
+                    "itemCode": e.value
+                };
+                $.ajax({
+                    type: "post",
+                    dataType: "json",
+                    url: "/SequenceMaster/_WebOrderDetail/",
+                    data: data,
+                    success: function (data, textStatus) {
+
+                        var $tGrid = $("#EditSequenceDetail").data("tGrid");
+                        var $itemCell = $(e.target).parent().parent();
+                        $itemCell.next().html(data.ReferenceCode);
+                        $itemCell.next().next().html(data.Description);
+
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert(errorThrown);
+                    }
+                });
+            }
+        }
+    }
+</script>

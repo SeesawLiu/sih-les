@@ -1,0 +1,73 @@
+﻿@model IEnumerable<com.Sconit.Entity.ORD.OrderMaster>
+          
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("OrderMasterGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.OrderNo);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Sequence).Hidden();
+            columns.Bound(o => o.SequenceGroup);
+            columns.Bound(o => o.TraceCode).Title("拨次");
+            columns.Bound(o => o.StartTime);
+            columns.Bound(o => o.WindowTime);
+            columns.Bound(o => o.CreateDate);
+
+
+        })
+            .DetailView(details => details.ClientTemplate(
+            Html.Telerik().Grid<com.Sconit.Entity.ORD.OrderDetail>()
+                    .Name("OrderDetail_<#= Sequence #>")
+            .Columns(columns =>
+            {
+                columns.Bound(o => o.OrderNo);
+                columns.Bound(o => o.Sequence);
+                columns.Bound(o => o.ReserveNo).Title("Van号");
+                columns.Bound(o => o.Item);
+                columns.Bound(o => o.PartyFromName);
+                columns.Bound(o => o.ReferenceItemCode);
+                columns.Bound(o => o.BinTo).Title("工位");
+                columns.Bound(o => o.OrderedQty);
+                columns.Bound(o => o.ItemDescription);
+                columns.Bound(o => o.ReserveLine).Title("车辆流水号");
+                columns.Bound(o => o.StartDateFormat).Title("预计消耗时间");
+                columns.Bound(o => o.ManufactureParty);
+            })
+            .DataBinding(dataBinding => dataBinding.Ajax()
+                                    .Select("_AjaxGroupOrderDetail", "SequenceMaster", new { sequence = "<#= Sequence #>"}))
+                    .ClientEvents(events => events.OnDataBinding("OrderDetailGrid_OnDataBinding"))
+            .Footer(false)
+            .Resizable(resizing => resizing.Columns(true))
+            .ToHtmlString()
+            ))
+        .Scrollable(c => c.Enabled(false))
+        .EnableCustomBinding(true)
+                .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxGroupList", "SequenceMaster"))
+                .ClientEvents(events => events.OnDataBinding("OrderMasterGrid_OnDataBinding"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(ViewBag.PageSize);
+        })
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+    )
+    <script type="text/javascript">
+
+        function OrderDetailGrid_OnDataBinding(e) {
+            $(e.target).find("tbody").find("tr").children().html("正在查询,请稍等…");
+        }
+
+        function OrderMasterGrid_OnDataBinding(e) {
+            e.data = {
+                DateFrom: $('#DateFrom').val(),
+                DateTo: $('#DateTo').val(),
+                SequenceGroup: $('#SequenceGroup').val(),
+                TraceCode: $('#TraceCode').val()
+            };
+        } 
+    </script>
+</fieldset>

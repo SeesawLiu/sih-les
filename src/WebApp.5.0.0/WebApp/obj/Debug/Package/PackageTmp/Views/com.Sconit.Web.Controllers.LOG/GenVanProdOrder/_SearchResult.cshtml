@@ -1,0 +1,37 @@
+﻿@model IEnumerable<com.Sconit.Entity.LOG.GenVanProdOrder>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+                .Name("GenVanProdOrderGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.AUFNR);
+            columns.Bound(o => o.ZLINE);
+            columns.Bound(o => o.ProdLine);
+            columns.Bound(o => o.BatchNo);
+            columns.Bound(o => o.Msg);
+            columns.Bound(o => o.CreateDate);
+        })
+                .Scrollable(c => c.Enabled(false))
+                        .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxList", "GenVanProdOrder"))
+                        .ClientEvents(events => events.OnDataBinding("GenVanProdOrderGrid_OnDataBinding"))
+                .Pageable(settings =>
+                {
+                    settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+                    settings.PageSize(ViewBag.PageSize);
+                })
+                .EnableCustomBinding(true)
+                .Sortable()
+                .Resizable(resizing => resizing.Columns(true))
+            )
+    <script type="text/javascript">
+        function GenVanProdOrderGrid_OnDataBinding(e) {
+            e.data = {
+                SearchZLINE: $('#SearchZLINE').val()
+            };
+        }
+    </script>
+</fieldset>

@@ -1,0 +1,105 @@
+﻿@model IEnumerable<com.Sconit.Entity.ORD.IpMaster>
+           
+<fieldset>
+   <script type="text/javascript">
+       function IpMasterGrid_OnDataBinding(e) {
+           e.data = {
+               IpNo: $('#IpNo').val(),
+               Dock: $('#Dock').val(),
+               PartyFrom: $('#PartyFrom').val(),
+               PartyTo: $('#PartyTo').val(),
+               ShipFrom: $('#ShipFrom').val(),
+               ShipTo: $('#ShipTo').val(),
+               StartDate: $('#StartDate').val(),
+               EndDate: $('#EndDate').val(),
+               Status: $('#Status').val(),
+               // WMSNo: $('#WMSNo').val(),
+               Flow: $("#Flow").val(),
+               Item: $("#Item").val(),
+               IsPrintAsn: $('#IsPrintAsn').is(":checked")
+
+           };
+       }
+
+       $(function () {
+           $("#checkAll").click(function () {
+               $('input[name="checkedRecords"]').attr("checked", this.checked);
+               showButtons();
+           });
+       });
+
+       function showButtons() {
+           var $checkRecords = $("input[name='checkedRecords']");
+           $("#checkAll").attr("checked", $checkRecords.length == $("input[name='checkedRecords']:checked").length ? true : false);
+           $("#btnPrint").attr("style", $("input[name='checkedRecords']:checked").length > 0 ? "display:inline" : "display:none");
+       } 
+</script>
+    @(Html.Telerik().Grid(Model)
+                .Name("IpMasterGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.IpNo);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.IpNo)
+                 .ClientTemplate("<input type='checkbox' id='checkedRecords' name='checkedRecords' value='<#= IpNo #>' onClick='showButtons()'  />")
+                 .HeaderTemplate("<input type='checkbox' id='checkAll' name='checkAll' />")
+                 .Width(36).HtmlAttributes(new { style = "text-align:center" });
+            columns.Bound(o => o.IpNo).ClientTemplate(Html.ActionLink("<#= IpNo #>", "_Edit", "SupplierIpMaster", new { IpNo = "<#= IpNo #>" },null).ToString());
+           // columns.Bound(o => o.WMSNo);
+            columns.Bound(o => o.Flow);
+            columns.Bound(o => o.PartyToName);
+            columns.Bound(o => o.ShipToAddress);
+            columns.Bound(o => o.Dock);
+            columns.Bound(o => o.IpMasterStatusDescription);
+            columns.Bound(o => o.IsAsnPrinted).Title("是否已打印").ClientTemplate("<input type='checkbox' disabled='disabled' name='IsAsnPrinted' <#= IsAsnPrinted? checked='checked' : '' #> />");
+            columns.Bound(o => o.CreateUserName);
+            columns.Bound(o => o.CreateDate);
+                 })
+                .DetailView(details => details.ClientTemplate(
+                Html.Telerik().Grid<com.Sconit.Entity.ORD.IpDetail>()
+                .Name("IpDetail_<#= IpNo #>")
+                .Columns(columns =>
+                {
+                    columns.Bound(o => o.Sequence);
+                    columns.Bound(o => o.IpNo).Width(100);
+                    columns.Bound(o => o.OrderNo).Width(100);
+                    columns.Bound(o => o.ExternalOrderNo).Width(100);
+                    columns.Bound(o => o.ExternalSequence).Width(100);
+                    columns.Bound(o => o.Flow).Title(Resources.ORD.IpMaster.IpMaster_Flow);
+                    columns.Bound(o => o.LocationTo);
+                    columns.Bound(o => o.SAPLocationTo).Title("SAP库位");
+                    columns.Bound(o => o.Item).Width(100);
+                    columns.Bound(o => o.ReferenceItemCode);
+                    columns.Bound(o => o.ItemDescription);
+                    columns.Bound(o => o.Qty).Width(100);
+                    columns.Bound(o => o.ReceivedQty).Width(100);
+                    columns.Bound(o => o.IsClose).ClientTemplate("<input type='checkbox' disabled='disabled' name='IsClose' <#= IsClose? checked='checked' : '' #> />");
+                    columns.Bound(o => o.Uom);
+                    columns.Bound(o => o.ManufactureParty);
+                    columns.Bound(o => o.IsInspect).ClientTemplate("<input type='checkbox' disabled='disabled' name='IsInspect' <#= IsInspect? '' : checked='checked' #> />").Title("是否免检");
+                    columns.Bound(o => o.UnitCountDescription);
+                    columns.Bound(o => o.Container).ReadOnly();
+                    columns.Bound(o => o.ContainerDescription);
+                })
+                .DataBinding(dataBinding => dataBinding.Ajax()
+                .Select("_AjaxIpDetail", "SupplierIpMaster", new { ipNo = "<#= IpNo #>" }))
+                .Footer(false)
+                .Resizable(resizing => resizing.Columns(true))
+                .ToHtmlString()
+                ))
+                .Scrollable(c => c.Enabled(false))
+                        .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxList", "SupplierIpMaster"))
+                .ClientEvents(events => events.OnDataBinding("IpMasterGrid_OnDataBinding"))
+                .Pageable(settings =>
+                {
+                    settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+                    settings.PageSize(ViewBag.PageSize ); 
+                })
+                .EnableCustomBinding(true)
+                .Sortable()
+                .Resizable(resizing => resizing.Columns(true))
+            )
+ 
+</fieldset>

@@ -1,0 +1,80 @@
+﻿@using com.Sconit.Entity.SYS
+@using com.Sconit.Web.Models.SearchModels.ORD
+<script type="text/javascript">
+   
+    function getSpeedDate(oldDate) {
+        var newDate = new Date();
+        var date = newDate - oldDate;
+        var minutess = parseInt(date / 1000);
+
+        var showTime = "00:" + (parseInt(minutess / 60) < 10 ? ("0" + parseInt(minutess / 60)) : parseInt(minutess / 60)) + ":" + (parseInt(minutess % 60) < 10 ? ("0" + parseInt(minutess % 60)) : parseInt(minutess % 60));
+        $("#SpeedDiv").text("正在为您查询,请稍等!已用时: " + showTime).show();
+        return oldDate;
+    }
+
+    function stopSearch(timer) {
+        clearInterval(timer);
+    }
+
+    function onSearch() {
+        if ($("#Flow").val() == "") {
+            alert("路线为必填项。");
+            return;
+        }
+        $("#hFlow").val($("#Flow").val());
+        var oldDate = new Date();
+        var timer = setInterval(function () { oldDate = getSpeedDate(oldDate) }, 1000);
+        var data = {
+            "Flow": $("#Flow").val(),
+            "Item": $("#Item").val(),
+            "ListDays": $("#ListDays").val(),
+            "NotIncludeZeroShipQty": $("#cbZeroQty").is(':checked')
+        }
+        $.ajax({
+            type: "post",
+            dataType: "html",
+            url: "/SupplierScheduling/_ScheduleLineList/",
+            data: data,
+            cache: false,
+            success: function (data, textStatus) {
+                stopSearch(timer);
+                $("#SpeedDiv").hide();
+                $("#fdOrderDetail").html(data);
+                $("#fdOrderDetail").show();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                stopSearch(timer);
+                $("#SpeedDiv").hide();
+                DisplayTextMessages(XMLHttpRequest.responseText);
+                $("#btnShipByQty").hide();
+                $("#btnPreview").hide();
+            }
+        });
+    }
+</script>
+@using (Html.BeginForm("DemandPlanList", "SupplierScheduling"))
+{   
+    <fieldset>
+        <div class="search">
+            <div class="search-label">
+                <label>
+                    @Resources.ORD.OrderDetail.OrderDetail_Item
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+    Html.RenderAction("_ItemComboBox", "Common", new
+    {
+        controlName = "Item",
+        selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).Item : string.Empty
+    });
+                }
+            </div>
+            </div>
+        <div class="search-footer">
+            <button type="submit" id="btnSearch" >
+                @Resources.Global.Button_Search</button>
+        </div>
+    </fieldset>
+}
+

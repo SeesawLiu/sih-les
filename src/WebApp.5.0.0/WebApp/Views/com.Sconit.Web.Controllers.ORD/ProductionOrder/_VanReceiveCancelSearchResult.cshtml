@@ -1,0 +1,108 @@
+﻿@using com.Sconit.Entity.ORD
+@model IEnumerable<com.Sconit.Entity.ORD.OrderOperation>
+<script type="text/javascript">
+
+    function OrderOperationGrid_OnDataBinding(e) {
+        e.data = {
+            orderNo: $('#OrderNo').val(),
+            TraceCode: $('#TraceCode').val(),
+        };
+    }
+
+    function OrderOperationReportGrid_onRowDataBound(e) {
+        var grid = $(this).data('tGrid');
+        grid.expandRow(e.row);
+    }
+
+    function OrderOperationReport_OnRowDataBound(e) {
+        if (e.dataItem.Status == 1) {
+            $(e.row.cells).find('#Cancel').hide();
+        }
+    }
+
+    function CancelClick(e) {
+        $(e).attr('href', 'javascript:void(0);');
+        if (confirm("确定要取消吗")) {
+            var data = {
+                "orderOpReportId": $(e).parent().parent().children().eq(0).text()
+            };
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                url: "/ProductionOrder/_VanReportCancel/",
+                data: data,
+                cache: false,
+                success: function (data, textStatus) {
+                    DisplayJsonMessages(data);
+                    $.ajax({
+                        type: "get",
+                        dataType: "html",
+                        url: "/ProductionOrder/VanReceiveCancelList/",                        
+                        data: { OrderNo: $("#OrderNo").val(), ExternalOrderNo: $("#ExternalOrderNo").val(),Flow: $('#Flow').val(), isFromList: true },
+                        cache: false,
+                        success: function (data, textStatus) {
+                            $('#content').html(data);
+                        }
+                    });
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    DisplayTextMessages(XMLHttpRequest.responseText);
+                }
+            });
+        }
+
+    }
+</script>
+<fieldset>
+    <legend>@Resources.ORD.OrderOperation.OrderOperation_Operation</legend>
+    @(Html.Telerik().Grid(Model)
+                        .Name("OrderOperation")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+                .Columns(columns =>
+                {
+                    columns.Bound(o => o.Id).Hidden();
+                    columns.Bound(o => o.Operation).Width(100);
+                    columns.Bound(o => o.WorkCenter).Width(120);
+                    columns.Bound(o => o.AUFPL).Width(100);
+                    columns.Bound(o => o.PLNFL).Width(120);
+                    columns.Bound(o => o.VORNR).Width(100);
+                    columns.Bound(o => o.WorkCenter).Width(120);
+                    columns.Bound(o => o.ReportQty).Format("{0:N}").Width(140);
+                    columns.Bound(o => o.ScrapQty).Format("{0:N}").Width(160);
+                    columns.Bound(o => o.IsReceiveFinishGoods).ClientTemplate("<input type='checkbox' disabled='disabled' name='IsReceiveFinishGoods' <#= IsReceiveFinishGoods? checked='checked' : '' #> />").Width(100);
+                })
+                        .DataBinding(dataBinding => dataBinding.Ajax().Select("_VanReceiveOrderOperationCancelAjaxList", "ProductionOrder"))
+                .ClientEvents(events => events.OnDataBinding("OrderOperationGrid_OnDataBinding").OnRowDataBound("OrderOperationReportGrid_onRowDataBound"))
+                .DetailView(details => details.ClientTemplate(
+                        Html.Telerik().Grid<OrderOperationReport>()
+                            .Name("OrderOperationReport<#= Id #>")
+                            .Columns(columns =>
+                            {
+                                columns.Bound(o => o.Id).Hidden();
+                                columns.Bound(o => o.ReportQty);
+                                columns.Bound(o => o.ScrapQty);
+                                columns.Bound(o => o.CreateUserName);
+                                columns.Bound(o => o.CreateDate);
+                                columns.Bound(o => o.CancelUserName);
+                                columns.Bound(o => o.CancelDate);
+                                columns.Command(commands =>
+                                {
+                                    commands.Custom("Cancel").Text(Resources.Global.Button_Cancel)
+                                            .HtmlAttributes(new { onClick = "CancelClick(this)", id = "Cancel", href = "#" });
+                                });
+                            })
+                            .DataBinding(dataBinding => dataBinding.Ajax()
+                                                            .Select("_AjaxOrderOperationReportList", "ProductionOrder", new { orderOpId = "<#= Id #>" }))
+                                                                                    .ClientEvents(events => events.OnRowDataBound("OrderOperationReport_OnRowDataBound"))
+                            .Footer(false)
+                            .Resizable(resizing => resizing.Columns(true))
+                            .ToHtmlString()
+                            ))
+                .Scrollable(c => c.Enabled(false))
+                        .Resizable(resizing => resizing.Columns(true))
+                .Footer(false)
+    )
+</fieldset>

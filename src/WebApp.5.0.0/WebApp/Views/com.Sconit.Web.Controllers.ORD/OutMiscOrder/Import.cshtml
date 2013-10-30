@@ -1,0 +1,26 @@
+﻿@model com.Sconit.Entity.ORD.OrderMaster
+@{
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_MiscOrder_261And262Import" });
+}
+@using (Html.BeginForm())
+{
+    <fieldset>
+        <div class="editor">
+           
+            <div class="search-label">
+                <label>
+                    <a href='/Resource/Templates/UploadTemplate/Import261262MiscOrder.xls'>模板下载</a>
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().Upload()
+                    .Name("attachments")
+                    .Multiple(false)
+                    .Async(async => async
+            .Save("Import261262MiscOrder", "OutMiscOrder")
+                    .AutoUpload(true))
+                    .ClientEvents(e => e.OnSuccess("TelerikonUpload_OnSuccess")))
+            </div>
+        </div>
+    </fieldset>
+}

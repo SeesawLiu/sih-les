@@ -1,0 +1,35 @@
+﻿@model IEnumerable<com.Sconit.Web.Models.CUST.ProdBomDetForecastChargView>
+  <script type="text/javascript">
+      function ProdBomDetForecastChargGrid_OnDataBinding(e) {
+          e.data = {
+              charg: $("#CHARG").val()
+          };
+      } 
+    </script>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("ProdBomDetForecastChargGrid")
+        .DataBinding(dataBinding => dataBinding.Ajax()
+        .Select("_AjaxListForCHARG", "ProdBomDetForecast"))
+        .ClientEvents(events => events.OnDataBinding("ProdBomDetForecastChargGrid_OnDataBinding"))
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.SEQNR);
+            columns.Bound(o => o.CHARG);
+            columns.Bound(o => o.MATNR);
+            columns.Bound(o => o.REFCODE);
+            columns.Bound(o => o.DESC);
+            columns.Bound(o => o.BDMNG);
+            columns.Bound(o => o.MEINS);
+            columns.Bound(o => o.WERKS);
+            columns.Bound(o => o.BDTER).Format("{0:d}");
+        })
+        .EnableCustomBinding(true)
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(15);
+        })
+        .Resizable(resizing => resizing.Columns(true))
+    )
+</fieldset>

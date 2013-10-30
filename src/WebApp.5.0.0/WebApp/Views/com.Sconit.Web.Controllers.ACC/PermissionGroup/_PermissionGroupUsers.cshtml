@@ -1,0 +1,89 @@
+﻿<script src="@Url.Content("~/Scripts/jquery.dualListBox-1.3.min.js")" type="text/javascript"></script>
+<script type="text/javascript">
+    $(function () {
+        $.configureBoxes(
+        {
+            box1View: 'boxView_UnAssignedUsers',
+            box1Storage: 'boxStorage_UnAssignedUsers',
+            box2View: 'boxView_AssignedUsers',
+            box2Storage: 'boxStorage_AssignedUsers',
+            to1: 'to_UnAssignedUsers',
+            allTo1: 'allTo_UnAssignedUsers',
+            to2: 'to_AssignedUsers',
+            allTo2: 'allTo_AssignedUsers',
+            transferMode: 'move',
+            useFilters: false,
+            useCounters: false,
+            useSorting: false,
+            selectOnSubmit: true
+        }
+        );
+    });
+
+    $(document).ready(function () {
+        $("#btnSubmit_AssignedUsers").click(function () {
+            $("#boxView_AssignedUsers").each(function () {
+                $(this).find("option").each(function () {
+                    $(this).attr("selected", "selected");
+                });
+            });
+        });
+    });
+</script>
+<h2>
+    @Resources.ACC.PermissionGroup.PermissionGroup_Tab_PermissionGroupUsers</h2>
+@using (Html.BeginForm("_PermissionGroupUsers", "PermissionGroup"))
+{
+    <div>
+        <table>
+            <tr>
+                <td>
+                   @Resources.ACC.PermissionGroup.PermissionGroup_UnAssignedUsers
+                    <select id="boxView_UnAssignedUsers" multiple="multiple" style="height: 300px; width: 200px;">
+                        @if (ViewBag.UnAssignedUser != null)
+                        {
+                            foreach (com.Sconit.Entity.ACC.User item in ViewBag.UnAssignedUser)
+                            {
+                            <option value="@item.Id">@item.Code</option>  
+                            }
+                        }
+                    </select><br />
+                    <select id="boxStorage_UnAssignedUsers">
+                    </select>
+                </td>
+                <td>
+                    <button id="to_AssignedUsers" type="button">
+                        &nbsp;>&nbsp;</button>
+                    <button id="allTo_AssignedUsers" type="button">
+                        &nbsp;>>&nbsp;</button>
+                    <br />
+                    <button id="allTo_UnAssignedUsers" type="button">
+                        &nbsp;<<&nbsp;</button>
+                    <button id="to_UnAssignedUsers" type="button">
+                        &nbsp;<&nbsp;</button>
+                </td>
+                <td>
+                    @Resources.ACC.PermissionGroup.PermissionGroup_AssignedUsers
+                    <select id="boxView_AssignedUsers" name="assignedUserIds" multiple="multiple" style="height: 300px;
+                        width: 200px;">
+                        @if (ViewBag.AssignedUser != null)
+                        {
+                            foreach (com.Sconit.Entity.ACC.User item in ViewBag.AssignedUser)
+                            {
+                            <option value="@item.Id">@item.Code </option>  
+                            }
+                        }
+                    </select><br />
+                    <select id="boxStorage_AssignedUsers">
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <div class="editor-footer">
+            <button type="submit" id="btnSubmit_AssignedUsers">
+                @Resources.Global.Button_Save</button>
+            <button type="button" id="btnBack" onclick="location.href='@Url.Content("~/PermissionGroup/List")'">
+                @Resources.Global.Button_Back</button>
+        </div>
+    </div> 
+}

@@ -1,0 +1,158 @@
+﻿@model IEnumerable<com.Sconit.Entity.SCM.FlowMaster>
+<script type="text/javascript">
+    $(function () {
+        $("#checkAll").click(function () {
+            $('input[name="checkedRecords"]').attr("checked", this.checked);
+            $("#btnPause").attr("style", this.checked ? "display:inline" : "display:none");
+
+        });
+        var $checkedRecords = $("input[name='checkedRecords']");
+        $checkedRecords.click(function () {
+            $("#checkAll").attr("checked", $checkedRecords.length == $("input[name='checkedRecords']:checked").length ? true : false);
+        });
+
+    });
+
+    function PauseClick(e) {
+        $(e).attr('href', 'javascript:void(0);');
+        if (confirm("确定要暂停吗")) {
+            var data = {
+                "flowStr": $(e).parent().parent().children().eq(0).text(),
+                "isPause": true,
+                "flow": $("#Flow").val()
+            }
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                url: "/ProductionOrder/BatchPause/",
+                data: data,
+                cache: false,
+                success: function (data, textStatus) {
+                    DisplayJsonMessages(data);
+                    ReturnView();
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    DisplayTextMessages(XMLHttpRequest.responseText);
+                }
+            });
+        }
+
+    }
+
+
+    function ResumeClick(e) {
+        $(e).attr('href', 'javascript:void(0);');
+        if (confirm("确定要恢复吗")) {
+            var data = {
+                "flowStr": $(e).parent().parent().children().eq(0).text(),
+                "isPause": false,
+                "flow": $("#Flow").val()
+            };
+
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                url: "/ProductionOrder/BatchPause/",
+                data: data,
+                cache: false,
+                success: function (data, textStatus) {
+                    DisplayJsonMessages(data);
+                    ReturnView();
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    DisplayTextMessages(XMLHttpRequest.responseText);
+                }
+            });
+        }
+    }
+
+    function ReturnView() {
+        $.ajax({
+            type: "get",
+            dataType: "html",
+            url: "/ProductionOrder/ProductLinePauseList/",
+            data: { Flow: $("#Flow").val(), isFromList: true },
+            cache: false,
+            success: function (data, textStatus) {
+                $('#content').html(data);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+
+    function showButtons() {
+        var $checkRecords = $("input[name='checkedRecords']");
+        $("#checkAll").attr("checked", $checkRecords.length == $("input[name='checkedRecords']:checked").length ? true : false);
+
+        var statusArr = new Array();
+        for (var i = 0; i < $checkRecords.length; i++) {
+            if ($checkRecords[i].checked) {
+                var isPause = $checkRecords[i].attributes["isPause"].value;
+                if ($.inArray(isPause, statusArr) == -1) {
+                    statusArr.push(isPause);
+                }
+            }
+        }
+        $("#btnPause").attr("style", statusArr.length > 0 && statusArr.toString() == "false" ? "display:inline" : "display:none");
+        $("#btnResume").attr("style", statusArr.length > 0 && statusArr.toString() == "true" ? "display:inline" : "display:none");
+
+    }
+
+    function FlowMasterGrid_OnRowDataBound(e) {
+        if (e.dataItem.IsPause == true) {
+            $(e.row.cells).find('#PauseProductLine').hide();
+        }
+        else {
+            $(e.row.cells).find('#ResumeProductLine').hide();
+        }
+    }
+
+    function FlowMasterGrid_OnDataBinding(e) {
+        e.data = {
+            flow: $('#Flow').val()
+        };
+    }
+</script>
+<fieldset>
+    <legend>整车生产线</legend>
+    @(
+ Html.Telerik().Grid(Model)
+          .Name("FlowMasterGrid")
+          .DataKeys(keys =>
+          {
+              keys.Add(p => p.Code);
+          })
+          .Columns(columns =>
+          {
+              //columns.Bound(o => o.CheckFlowCode)
+              // .ClientTemplate("<input type='checkbox' id='checkedRecords' name='checkedRecords' value='<#= Code #>' onClick='showButtons()' isPause='<#= IsPause #>'  />")
+              //  .HeaderTemplate("<input type='checkbox' id='checkAll' name='checkAll' />")
+              //  .Width(36).HtmlAttributes(new { style = "text-align:center" });
+              columns.Bound(o => o.Code);
+              columns.Bound(o => o.Description).Title("名称");
+              columns.Bound(o => o.IsPause).ClientTemplate("<input type='checkbox' Id='IsPause' disabled='disabled' name='IsPause' <#= IsPause? checked='checked' : '' #> />");
+              columns.Command(
+                commands =>
+                {
+
+                    commands.Custom("Pause").Text("暂停")
+                        .HtmlAttributes(new { onClick = "PauseClick(this)", id = "PauseProductLine", href = "#" });
+                    commands.Custom("Resume")
+                    .Text("恢复")
+                     .HtmlAttributes(new { onClick = "ResumeClick(this)", id = "ResumeProductLine", href = "#" });
+
+                });
+          })
+        .Scrollable(c => c.Enabled(false))
+        .EnableCustomBinding(true)
+        .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxPauseFlowList", "ProductionOrder"))
+                        .ClientEvents(events => events
+                                            .OnDataBinding("FlowMasterGrid_OnDataBinding")
+                            .OnRowDataBound("FlowMasterGrid_OnRowDataBound"))
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+        .Footer(false)
+    )
+</fieldset>

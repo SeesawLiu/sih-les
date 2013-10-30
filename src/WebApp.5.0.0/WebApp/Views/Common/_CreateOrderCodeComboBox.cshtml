@@ -1,0 +1,20 @@
+﻿@model System.Web.Mvc.SelectList
+@{
+    string name = ViewBag.ControlName;
+    string id = string.IsNullOrWhiteSpace(ViewBag.ControlId) ? name : ViewBag.ControlId;
+    bool isChange = ViewBag.IsChange != null ? ViewBag.IsChange : false;
+    string onChangeName = isChange ? "CreateOrderCode_Change" : "EmptyChange";
+    bool enable = ViewBag.Enable != null ? ViewBag.Enable : true;
+
+}
+@(Html.Telerik().ComboBox()
+                .Name(name)
+                .AutoFill(true)
+                .DataBinding(binding => binding.Ajax()
+                                .Select("_AjaxLoadingCreateOrderCode", "Common"))
+                .ClientEvents(events => events.OnChange(onChangeName))
+                .HighlightFirstMatch(true)
+                .BindTo(Model)
+                .Enable(enable)
+                           
+             )

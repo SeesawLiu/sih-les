@@ -1,0 +1,28 @@
+﻿@{
+    ViewBag.Title = "List";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_AliquotStartTask_View" });
+}
+@Html.Partial("_Search")
+@{ Html.Telerik().TabStrip()
+        .Name("AliquotStartTaskTabStrip")
+        .Items(tabstrip =>
+        {
+            tabstrip.Add()
+                .Text("等待上线")
+                .LoadContentFrom("_SearchResult", "AliquotStartTask")
+                .HtmlAttributes(new { onclick = "CleanTabMessage()" });
+
+            tabstrip.Add()
+               .Text("已上线")
+                .LoadContentFrom("_StartSearchResult", "AliquotStartTask")
+                .HtmlAttributes(new { onclick = "CleanTabMessage()" });
+        })
+        .Render();
+}
+@{ Html.Telerik().ScriptRegistrar()
+        .OnDocumentReady(
+    @<text> var tabIndex = "@TempData["TabIndex"]"; var tabstrip = $("#AliquotStartTaskTabStrip").data("tTabStrip");
+    var item = $("li", tabstrip.element)[tabIndex != "" ? tabIndex : 0]; tabstrip.select(item);
+    </text>
+        );
+}

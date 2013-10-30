@@ -1,0 +1,44 @@
+﻿@model IEnumerable<com.Sconit.Entity.ORD.OrderDetail>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+                        .Name("PreviewSeqOrderDetGrid")
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Id).Hidden();
+            columns.Bound(o => o.IsChangeDetail).Hidden();
+            columns.Bound(o => o.Sequence);
+            columns.Bound(o => o.ReserveNo).Title("Van号");
+            columns.Bound(o => o.Item);
+            columns.Bound(o => o.ReferenceItemCode);
+
+            columns.Bound(o => o.BinTo).Title("工位");
+            columns.Bound(o => o.OrderedQty);
+            columns.Bound(o => o.ItemDescription);
+            columns.Bound(o => o.ReserveLine).Title("车辆流水号");
+            columns.Bound(o => o.StartDateFormat).Title("预计消耗时间");
+            columns.Bound(o => o.ManufactureParty);
+        })
+        .Scrollable(c => c.Enabled(false))
+        .EnableCustomBinding(true)
+                .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxPreviewList", "SupplierSortMaster"))
+                .ClientEvents(events => events.OnDataBinding("PreviewSeqOrderDetGrid_OnDataBinding"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(ViewBag.PageSize);
+        })
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+    )
+</fieldset>
+<script language="javascript" type="text/javascript">
+    function PreviewSeqOrderDetGrid_OnDataBinding(e) {
+        e.data = {
+            "flow": $('#Flow').val(),
+            "traceCode": $('#TraceCode').val(),
+            "cpTimeFrom": $('#CPTimeFrom').val(),
+            "cpTimeTo": $('#CPTimeTo').val(),
+            "item":$('#Item').val()
+        };
+    }
+</script>

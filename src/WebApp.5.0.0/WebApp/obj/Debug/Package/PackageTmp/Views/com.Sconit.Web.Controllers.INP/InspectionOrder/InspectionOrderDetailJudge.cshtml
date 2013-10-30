@@ -1,0 +1,36 @@
+﻿@using com.Sconit.Entity.MD;
+@using com.Sconit.Entity.INV;
+@using com.Sconit.Entity.SYS;
+@model IEnumerable<com.Sconit.Entity.INP.InspectDetail>
+<fieldset>
+    <legend>@Resources.INP.InspectDetail.InspectDetail_Title_View</legend>
+    @(Html.Telerik().Grid(Model)
+        .Name("InspectDetail")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .Editable(editing => editing.Mode(GridEditMode.InCell))
+        .DataBinding(dataBinding =>
+            dataBinding.Ajax()
+                    .Select("_SelectJudgeBatchEditing", "InspectionOrder", new { inspectNo = ViewBag.inspectNo })
+        )
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Item).ReadOnly();
+            columns.Bound(o => o.ItemDescription).ReadOnly();
+            columns.Bound(o => o.Uom).ReadOnly();
+            columns.Bound(o => o.UnitCount).Format("{0:N}").ReadOnly();
+            columns.Bound(o => o.CurrentInspectQty).Format("{0:N}").ReadOnly();
+            columns.Bound(o => o.CurrentQualifyQty).Format("{0:N}");
+            columns.Bound(o => o.CurrentRejectQty).Format("{0:N}");
+            columns.Bound(o => o.JudgeFailCode).EditorTemplateName("FailCodeGridComboBox");
+            columns.Bound(o => o.CurrentInspectResultNote);
+            columns.Bound(o => o.FailCode).ReadOnly();
+            columns.Bound(o => o.Note).ReadOnly();
+           // columns.Bound(o => o.Defect).EditorTemplateName("DefectGridComboBox");
+        })
+        .Scrollable(c => c.Enabled(false))
+        .Footer(false)
+     )
+</fieldset>

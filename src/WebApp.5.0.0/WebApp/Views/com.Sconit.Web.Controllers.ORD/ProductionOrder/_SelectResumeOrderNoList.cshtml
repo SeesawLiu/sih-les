@@ -1,0 +1,76 @@
+﻿@model IEnumerable<com.Sconit.Entity.ORD.OrderMaster>
+<fieldset>
+  <script type="text/javascript">
+      function SelectResumeGrid_OnDataBinding(e) {
+          e.data = {
+              OrderNo: $('#ResumeOrderNo').val(),
+              currentOrderNo: $('#CurrentOrderNo').val(),
+              TraceCode: $('#ResumeTraceCode').val(),
+              Flow: $('#ResumeFlow').val(),
+              IsForceResume: $('#IsForceResume').is(":checked")
+          };
+      }
+
+      function popSelectResume(e) {
+          var data = {
+              "orderNo": $("#CurrentOrderNo").val(),
+              "sequence": $(e).parent().parent().children().eq(0).text(),
+              "IsForceResume": $('#IsForceResume').is(":checked")
+          };
+          $.ajax({
+              type: "post",
+              dataType: "json",
+              url: "/ProductionOrder/Resume/",
+              data: data,
+              cache: false,
+              success: function (data) {
+                  //                DisplayJsonMessages(data);
+                  var successMesage = "";
+                  if (data != "") {
+                      if (data.SuccessMessages != null) {
+                          for (var i = 0; i < data.SuccessMessages.length; i++) {
+                              successMesage += data.SuccessMessages[i];
+                          }
+                      }
+                      $('#ResumeOrder').data('tWindow').close();
+                      location.href = "/ProductionOrder/ResumeList/?OrderNo=" + $('#OrderNo').val() + "&TraceCode=" + $('#TraceCode').val()
+                                    + "&Flow=" + $('#Flow').val() + "&DateFrom=" + $('#DateFrom').val() + "&DateTo=" + $('#DateTo').val()
+                                    + "&successMesage=" + successMesage;
+                  }
+              },
+              error: function (XMLHttpRequest, textStatus, errorThrown) {
+                  DisplayTextMessages(XMLHttpRequest.responseText);
+                  $('#ResumeOrder').data('tWindow').close();
+              }
+          });
+      }
+    </script>
+    @(Html.Telerik().Grid(Model)
+        .Name("SelectResumeGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.OrderNo);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.OrderNo).Title("恢复至");
+            columns.Bound(o => o.Flow).Title(@Resources.ORD.OrderMaster.OrderMaster_Flow_Production);
+            columns.Bound(o => o.FlowDescription).Title(@Resources.ORD.OrderMaster.OrderMaster_FlowDescription_Production);
+            columns.Bound(o => o.TraceCode);
+            columns.Bound(o => o.OrderStatusDescription);
+            columns.Bound(o => o.OrderNo).ClientTemplate("<input type='button' value='选择' onclick='popSelectResume(this)' />");
+        })
+        .Scrollable(c => c.Enabled(true))
+        .EnableCustomBinding(true)
+        .DataBinding(dataBinding => dataBinding.Ajax().Select("_SelectResumeOrderAjaxList", "ProductionOrder"))
+        .ClientEvents(events => events.OnDataBinding("SelectResumeGrid_OnDataBinding"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(50);
+        })
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+    )
+  
+</fieldset>

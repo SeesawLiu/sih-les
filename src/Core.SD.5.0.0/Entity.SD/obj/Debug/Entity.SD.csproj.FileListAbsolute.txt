@@ -1,0 +1,7 @@
+G:\Project\sih-les\src\Core.SD.5.0.0\Entity.SD\bin\Debug\com.Sconit.Entity.SD.dll
+G:\Project\sih-les\src\Core.SD.5.0.0\Entity.SD\bin\Debug\com.Sconit.Entity.SD.pdb
+G:\Project\sih-les\src\Core.SD.5.0.0\Entity.SD\bin\Debug\com.Sconit.CodeMaster.dll
+G:\Project\sih-les\src\Core.SD.5.0.0\Entity.SD\bin\Debug\com.Sconit.CodeMaster.pdb
+G:\Project\sih-les\src\Core.SD.5.0.0\Entity.SD\obj\Debug\ResolveAssemblyReference.cache
+G:\Project\sih-les\src\Core.SD.5.0.0\Entity.SD\obj\Debug\com.Sconit.Entity.SD.dll
+G:\Project\sih-les\src\Core.SD.5.0.0\Entity.SD\obj\Debug\com.Sconit.Entity.SD.pdb

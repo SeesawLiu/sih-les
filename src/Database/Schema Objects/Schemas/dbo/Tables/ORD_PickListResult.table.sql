@@ -1,0 +1,28 @@
+﻿CREATE TABLE [dbo].[ORD_PickListResult] (
+    [Id]               INT             IDENTITY (1, 1) NOT FOR REPLICATION NOT NULL,
+    [PLNo]             VARCHAR (50)    NOT NULL,
+    [PLDetId]          INT             NOT NULL,
+    [OrderDetId]       INT             NULL,
+    [Item]             VARCHAR (50)    NOT NULL,
+    [ItemDesc]         VARCHAR (100)   NOT NULL,
+    [RefItemCode]      VARCHAR (50)    NULL,
+    [HuId]             VARCHAR (50)    NULL,
+    [LotNo]            VARCHAR (50)    NULL,
+    [Uom]              VARCHAR (5)     NOT NULL,
+    [BaseUom]          VARCHAR (5)     NOT NULL,
+    [UnitQty]          DECIMAL (18, 8) NOT NULL,
+    [UC]               DECIMAL (18, 8) NOT NULL,
+    [IsCS]             BIT             NOT NULL,
+    [PlanBill]         INT             NULL,
+    [QualityType]      TINYINT         NOT NULL,
+    [IsFreeze]         BIT             NOT NULL,
+    [IsATP]            BIT             NOT NULL,
+    [Qty]              DECIMAL (18, 8) NOT NULL,
+    [CreateUser]       INT             NOT NULL,
+    [CreateUserNm]     VARCHAR (100)   NOT NULL,
+    [CreateDate]       DATETIME        NOT NULL,
+    [LastModifyUser]   INT             NOT NULL,
+    [LastModifyUserNm] VARCHAR (100)   NOT NULL,
+    [LastModifyDate]   DATETIME        NOT NULL
+);
+

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.FIS.CreateIpDAT, com.Sconit.Entity.FIS" table="FIS_CreateIpDAT" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+    <property name="ASN_NO" column="ASN_NO" type="String" length="50"/>
+    <property name="ASN_ITEM" column="ASN_ITEM" type="String" length="50"/>
+    <property name="WH_CODE" column="WH_CODE" type="String" length="50"/>
+    <property name="WH_DOCK" column="WH_DOCK" type="String" length="50"/>
+    <property name="WH_LOCATION" column="WH_LOCATION" type="String" length="50"/>
+    <property name="ITEM_CODE" column="ITEM_CODE" type="String" length="50"/>
+    <property name="SUPPLIER_CODE" column="SUPPLIER_CODE" type="String" length="50"/>
+    <property name="QTY" column="QTY" type="String" length="50"/>
+
+    <property name="UOM" column="UOM" type="String" length="50"/>
+    <property name="BASE_UNIT_QTY" column="BASE_UNIT_QTY" type="String" length="50"/>
+    <property name="BASE_UNIT_UOM" column="BASE_UNIT_UOM" type="String" length="50"/>
+    <property name="QC_FLAG" column="QC_FLAG" type="String" length="50"/>
+    <property name="DELIVERY_DATE" column="DELIVERY_DATE" type="DateTime" />
+    <property name="TIME_WINDOW" column="TIME_WINDOW" type="String" length="50"/>
+    <property name="PO" column="PO" type="String" length="50"/>
+    <property name="FINANCE_FLAG" column="FINANCE_FLAG" type="String" length="50"/>
+
+    <property name="COMPONENT_FLAG" column="COMPONENT_FLAG" type="String" length="50"/>
+    <property name="TRACKID" column="TRACKID" type="String" length="50"/>
+    <property name="PO_LINE" column="PO_LINE" type="String" length="50"/>
+    <property name="F80XBJ" column="F80XBJ" type="String" length="50"/>
+    <property name="F80X_LOCATION" column="F80X_LOCATION" type="String" length="50"/>
+    <property name="FactoryInfo" column="FactoryInfo" type="String" length="50"/>
+    <property name="IsCreateDat" column="IsCreateDat" type="Boolean"/>
+    <property name="ErrorCount" column="ErrorCount" type="Int32" /> 
+
+    <property name="CreateUserName" column="CreateUserNm" type="String" length="50"/>
+
+    <property name="TIME_STAMP1" column="TIME_STAMP1" type="DateTime" />
+
+    <property name="FileName" column="FileName" type="String" length="100"/>
+  </class>
+</hibernate-mapping>

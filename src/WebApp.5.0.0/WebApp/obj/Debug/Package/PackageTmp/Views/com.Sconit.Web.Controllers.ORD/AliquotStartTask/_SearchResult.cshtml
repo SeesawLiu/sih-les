@@ -1,0 +1,111 @@
+﻿@model IEnumerable<com.Sconit.Entity.VIEW.AliquotStartTaskView>
+<script type="text/javascript">
+    $(function () {
+        $("#checkAll").click(function () {
+            var thisCheck = this.checked;
+            var subCheckd = false;
+            $('input[name="checkedRecords"]').each(function (index, domEle) {
+                if ($(domEle).attr("disabled") == undefined) {
+                    $(domEle).attr("checked", thisCheck);
+                    subCheckd = thisCheck;
+                }
+            });
+            if (thisCheck && subCheckd) {
+                $("#btnOnLine").removeAttr('disabled');
+            }
+            else {
+                $("#btnOnLine").attr("disabled", true);
+            }
+        });
+    });
+
+    function showButtons() {
+        var $checkRecords = $("input[name='checkedRecords']");
+        var showButton = false;
+        for (var i = 0; i < $checkRecords.length; i++) {
+            if ($checkRecords[i].checked) {
+                showButton = true;
+                break;
+            }
+        }
+        $("#checkAll").attr("checked", $checkRecords.length == $("input[name='checkedRecords']:checked").length ? true : false);
+        if (showButton) {
+            $("#btnOnLine").removeAttr('disabled');
+        }
+        else {
+            $("#btnOnLine").attr("disabled", true);
+        }
+    }
+
+    function AliquotStartTaskGrid_OnDataBinding(e) {
+        e.data = {
+            SearchFlow: $('#SearchFlow').val(),
+            SearchVanFlow: $('#SearchVanFlow').val(),
+            SearchIsStart: "false"
+        };
+    }
+
+    function btnOnLine_Click() {
+        var $checkRecords = $("input[name='checkedRecords']:checked");
+
+        var checkedIds = "";
+        for (var i = 0; i < $checkRecords.length; i++) {
+            if (checkedIds == "") {
+                checkedIds = $checkRecords[i].value;
+            } else {
+                checkedIds += "," + $checkRecords[i].value;
+            }
+        }
+
+        location.href = "/AliquotStartTask/Start/?orderNos=" + checkedIds + "&flow=" + $('#SearchFlow').val();
+    }
+    
+    function ExportClick() {
+        location.href = '/AliquotStartTask/ExportXLS/?SearchFlow=' + $('#SearchFlow').val() + "&SearchIsStart=false";
+    }
+</script>
+<fieldset>
+    <div class="search-footer">
+        @Html.Button(Resources.Global.Button_online, "Url_AliquotStartTask_View", new Dictionary<string, string>()
+	{
+	    {"type", "button"},
+	    {"id", "btnOnLine"},
+        {"disabled","disabled"},
+        {"onclick","btnOnLine_Click()"}
+	})
+        <button type="button" id="btnExport" onclick="ExportClick()">
+            @Resources.Global.Button_Export</button>
+    </div>
+</fieldset>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+                .Name("AliquotStartTaskGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.RowId);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.RowId)
+                    .ClientTemplate("<input type='checkbox' id='checkedRecords' name='checkedRecords' value='<#= OrderNo #>|<#= TraceCode #>' onClick='showButtons()' />")
+                    .HeaderTemplate("<input type='checkbox' id='checkAll' name='checkAll' />")
+                    .Width(36).HtmlAttributes(new { style = "text-align:center" });
+            columns.Bound(o => o.Flow);
+            columns.Bound(o => o.TraceCode);
+            columns.Bound(o => o.Item);
+            columns.Bound(o => o.ItemDesc);
+            columns.Bound(o => o.StartTime).Format("{0:yyyy-MM-dd HH:mm:ss}");
+        })
+                .Scrollable(c => c.Enabled(false))
+                        .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxList", "AliquotStartTask"))
+                            .ClientEvents(events => events.OnDataBinding("AliquotStartTaskGrid_OnDataBinding"))
+                .Pageable(settings =>
+                {
+                    settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+                    settings.PageSize(ViewBag.PageSize);
+                })
+                .EnableCustomBinding(true)
+                .Sortable(c => c.Enabled(false))
+                .Resizable(resizing => resizing.Columns(true))
+            )
+</fieldset>

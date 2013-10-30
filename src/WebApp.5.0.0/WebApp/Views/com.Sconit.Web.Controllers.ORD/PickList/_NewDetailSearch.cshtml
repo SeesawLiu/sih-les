@@ -1,0 +1,362 @@
+﻿@using com.Sconit.Entity.ORD
+@using com.Sconit.Web.Models.SearchModels.ORD
+<fieldset>
+    @*@using (Html.BeginForm("DetailNew", "PickList"))
+    {  *@ 
+        <div class="search">
+            <div class="search-label">
+                <label for="PickRule_Picker">
+                @Resources.MD.Picker.PickRule_Picker
+                </label>
+            </div>
+            <div class="editor-field-2">
+                @{
+           Html.RenderAction("_PickerComboBox", "Common", new
+           {
+               controlName = "Picker",
+               selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).Picker : string.Empty
+           });
+                }
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_OrderNo">
+                    @Resources.ORD.OrderMaster.OrderMaster_OrderNo
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("OrderNo", TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).OrderNo : string.Empty)
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_Flow">
+                    @Resources.ORD.OrderMaster.OrderMaster_Flow
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+               Html.RenderAction("_FlowComboBox", "Common",
+                   new
+                   {
+                       controlName = "Flow",
+                       //type = (int)com.Sconit.CodeMaster.OrderType.Distribution,
+                       selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).Flow : string.Empty
+                   });
+                }
+            </div>
+           @* <div class="search-label">
+                <label for="OrderMaster_PartyFrom">
+                    @Resources.ORD.OrderMaster.OrderMaster_PartyFrom
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+               Html.RenderAction("_OrderMasterPartyFromComboBox", "Common",
+                   new
+                   {
+
+                       controlName = "PartyFrom",
+                       orderType = (int)com.Sconit.CodeMaster.OrderType.Procurement,
+                       selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).PartyFrom : string.Empty
+                   });
+                }
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_PartyTo">
+                    @Resources.ORD.OrderMaster.OrderMaster_PartyTo
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+               Html.RenderAction("_OrderMasterPartyToComboBox", "Common",
+                               new
+                               {
+                                   controlName = "PartyTo",
+                                   orderType = (int)com.Sconit.CodeMaster.OrderType.Procurement,
+                                   selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).PartyTo : string.Empty
+                               });
+                }
+            </div>
+            <div class="editor-label-2">
+                <label>@Resources.ORD.OrderMaster.OrderMaster_OrderStrategy</label>
+            </div>
+            <div class="editor-field-2">
+                 @{
+                  Html.RenderAction("_CodeMasterDropDownList", "Common", new
+                  {
+                      code = com.Sconit.CodeMaster.CodeMaster.FlowStrategy,
+                      controlName = "OrderStrategy",
+                      includeBlankOption = true,
+                      selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).OrderStrategy : null
+                  });
+                }
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_Status">
+                    @Resources.ORD.OrderMaster.OrderMaster_Status
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+               Html.RenderAction("_CodeMasterDropDownList", "Common", new
+               {
+                   code = com.Sconit.CodeMaster.CodeMaster.OrderStatus,
+                   controlName = "Status",
+                   includeBlankOption = true,
+                   selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).Status : null
+               });
+                }
+            </div>*@
+            <div class="search-label">
+                <label for="OrderMaster_OrderNo">
+                    @Resources.ORD.OrderMaster.OrderMaster_Item
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+               Html.RenderAction("_ItemComboBox", "Common",
+                   new
+                   {
+                       controlName = "Item",
+                       selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).Item : string.Empty
+                   });
+                    
+                }
+            </div>
+            
+            <div class="search-label">
+                <label for="OrderMaster_DateFrom">
+                    @*@Resources.ORD.OrderMaster.OrderMaster_DateFrom*@
+                    订单创建日期 从
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DatePicker()
+                .Format(com.Sconit.Entity.BusinessConstants.SHORT_DATE_FORMAT)
+                .Name("DateFrom")
+                .Value(TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).DateFrom : null)
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_DateTo">
+                    @*@Resources.ORD.OrderMaster.OrderMaster_DateTo*@
+                    至
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DatePicker()
+                .Format(com.Sconit.Entity.BusinessConstants.SHORT_DATE_FORMAT)
+                .Name("DateTo").Value(TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).DateTo : null)
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_DateTo">
+                    刷新间隔时间
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.Telerik().NumericTextBox().Name("Refresh").DecimalDigits(0).MinValue(3).Value(3).EmptyMessage("为空时默认3分钟。")
+
+                分钟
+            </div>
+            
+            
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+           @* <button type="submit" id="btnSearch">
+                @Resources.Global.Button_Search</button>*@
+                <button type="button" id="btnSearch" onclick="doSearchClick()">
+                @Resources.Global.Button_Search</button>
+             @Html.Button(Resources.Global.Button_Pick, "Url_PickList_New_button", new Dictionary<string, string>()
+	    {
+	        {"type", "button"},
+	        {"id", "btnShip"},
+            {"needconfirm","true"},
+            {"style","display:none"},
+            {"onclick","onPickNew()"}
+	    })
+        </div>
+   @* //}*@
+    <script type="text/javascript">
+        var timer = null;
+        function onPickNew() {
+            try {
+                clearInterval(timer);
+            } catch (e) {
+
+            }
+            var $checkRecords = $("input[name='checkedRecords']");
+            var idStr = "";
+            var qtyStr = "";
+            var deliveryGroup = "";
+            for (var i = 0; i < $checkRecords.length; i++) {
+                if ($checkRecords[i].checked) {
+                    if (idStr == "") {
+                        idStr = $checkRecords[i].value;
+                        qtyStr = $($checkRecords[i]).parent().parent().find("#CurrentShipQty").val();
+                        deliveryGroup = $($checkRecords[i]).parent().parent().find("#DeliveryGroup").val();
+                    } else {
+                        idStr += "," + $checkRecords[i].value;
+                        qtyStr += "," + $($checkRecords[i]).parent().parent().find("#CurrentShipQty").val();
+                        if (deliveryGroup != $($checkRecords[i]).parent().parent().find("#DeliveryGroup").val()) {
+                            $message.error("不同配送组不能一起拣货。");
+                            return;
+                        }
+                    }
+                }
+            }
+            var data = {
+                "idStr": idStr,
+                "qtyStr": qtyStr,
+                "deliveryGroup": deliveryGroup
+            }
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                data: data,
+                url: "/PickList/PickShipOrder/",
+                cache: false,
+                success: function (data, textStatus) {
+                    //                    var $tGrid = $("#content");
+                //                    $($tGrid).html(data);
+                    var isRight = data.Data.id != "" && data.Data.id != undefined;
+                    var searchData = {
+                        "Picker": $("#Picker").val(),
+                        "OrderNo": $("#OrderNo").val(),
+                        "Flow": $("#Flow").val(),
+                        "Item": $("#Item").val(),
+                        "DateFrom": $("#DateFrom").val(),
+                        "DateTo": $("#DateTo").val(),
+                        "id": data.Data.id,
+                        "UrlId": data.Data.UrlId,
+                        "isFromList": true
+                    }
+                    DisplayJsonMessages(data);
+                    $.ajax({
+                        type: "Get",
+                        dataType: "html",
+                        data: searchData,
+                        url: data.Data.url,
+                        cache: false,
+                        success: function (data, textStatus) {
+                            //                    var $tGrid = $("#content");
+                            //                    $($tGrid).html(data);
+                            if (isRight) {
+                                var $tGrid = $("#content");
+                                $($tGrid).html(data);
+                            } else {
+                                $("#resultDiv").html(data);
+                                var refresh = $("#Refresh").val();
+                                if (refresh == "" || Refresh == undefined) {
+                                    refresh = 3;
+                                }
+                                timer = setInterval(function () { search() }, parseInt(refresh) * 60 * 1000);
+                            }
+                        }
+                    });
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    DisplayTextMessages(XMLHttpRequest.responseText);
+                }
+            });
+        }
+
+        function stopSearch(timer) {
+            clearInterval(timer);
+        }
+        function doSearchClick() {
+            try {
+                clearInterval(timer);
+            } catch (e) {
+
+            }
+            var refresh = $("#Refresh").val();
+            if (refresh == "" || Refresh == undefined) {
+                refresh = 3;
+            }
+            timer = setInterval(function () { search() }, parseInt(refresh)*60*1000);
+            search();
+        }
+        function search() {
+            var data = {
+                "Picker": $("#Picker").val(),
+                "OrderNo": $("#OrderNo").val(),
+                "Flow": $("#Flow").val(),
+                "Item": $("#Item").val(),
+                "DateFrom": $("#DateFrom").val(),
+                "DateTo": $("#DateTo").val(),
+                "isFromList":true
+            }
+            $.ajax({
+                type: "post",
+                dataType: "html",
+                data: data,
+                url: "/PickList/_NewDetailSearchResult/",
+                cache: false,
+                success: function (data, textStatus) {
+                    $("#endDiv").html("");
+                    $("#resultDiv").html(data);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    DisplayTextMessages(XMLHttpRequest.responseText);
+                    clearInterval(timer);
+                }
+            });
+        
+        }
+        function onPickShip() {
+        var grid = $("#PickShipDetailGrid").data("tGrid");
+        var rows = grid.$tbody.children("tr:not(.t-no-data)");
+        var idStr = "";
+        var qtyStr = "";
+        var errorStr = "";
+        for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+            var row = $(rows[rowIndex]);
+            var id = row.find("#Id").val();
+
+            var qty = row.find("#CurrentShipQty").val();
+            if (qty != "" && !isNaN(qty) && parseFloat(qty) > 0) {
+                
+                if (idStr == "") {
+                    idStr = id;
+                    qtyStr = qty;
+                } else {
+                    idStr += "," + id;
+                    qtyStr += "," + qty;
+                }
+            }
+        }
+        if (errorStr != "") {
+            $message.error(errorStr);
+            return;
+        }
+        var data = {
+            "idStr": idStr,
+            "qtyStr": qtyStr,
+            "deliveryGroup": $("#Picker").val()
+        }
+        $.ajax({
+            type: "post",
+            dataType: "Html",
+            data: data,
+            url: "/PickList/PickShipOrder/",
+            cache: false,
+            success: function (data, textStatus) {
+                var $tGrid = $("#content");
+                $($tGrid).html(data);
+
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+
+    function FlowStrategy_Change()
+    { }
+    </script>
+
+</fieldset>
+<div id="resultDiv">
+
+</div>
+

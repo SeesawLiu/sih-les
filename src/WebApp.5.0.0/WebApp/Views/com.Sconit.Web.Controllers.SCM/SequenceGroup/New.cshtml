@@ -1,0 +1,78 @@
+﻿@model com.Sconit.Entity.SCM.SequenceGroup
+@{
+    ViewBag.Title = "Index";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_SequenceGroup_View" });
+}
+<fieldset>
+    <legend>@Resources.SCM.SequenceGroup.SequenceGroup_New_Title</legend>
+    @using (Html.BeginForm())
+    {   
+        <div class="search">
+            <div class="search-label">
+                <label>
+                    @Resources.SCM.SequenceGroup.SequenceGroup_Code
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.EditorFor(model => model.Code)
+                @Html.ValidationMessageFor(model => model.Code)
+            </div>
+            <div class="search-label">
+                <label>
+                    @Resources.SCM.SequenceGroup.SequenceGroup_ProdLine
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_FlowComboBox", "Common",
+        new
+        {
+            controlName = "ProductLine",
+            type = (int)com.Sconit.CodeMaster.OrderType.Production,
+            isVanOrder = true,
+            selectedValue = Model != null ? Model.ProductLine : string.Empty
+        });
+                }
+                @Html.ValidationMessageFor(model => model.ProductLine)
+            </div>
+            <div class="search-label">
+                <label>
+                    @Resources.SCM.SequenceGroup.SequenceGroup_SequenceBatch
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.Telerik().NumericTextBoxFor(model => model.SequenceBatch).DecimalDigits(0).MinValue(1)
+                @Html.ValidationMessageFor(model => model.SequenceBatch)
+            </div>
+        <div class="search-label">
+            <label>
+                @Resources.SCM.SequenceGroup.SequenceGroup_OpReference
+            </label>
+        </div>
+        <div class="search-field">
+            @Html.EditorFor(model => model.OpReference)
+            @Resources.SCM.SequenceGroup.SequenceGroup_OpRefRemark
+        </div>
+       @* <div class="search-label">
+                <label>
+                    @Resources.SCM.SequenceGroup.SequenceGroup_IsActive
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.CheckBox("IsActive", Model != null ? Model.IsActive: true)
+            </div>*@
+        </div>
+
+        <div class="search-footer">
+            @Html.Button(Resources.Global.Button_New, "Url_SequenceGroup_View", new Dictionary<string, string>()
+	        {
+	            {"type", "submit"},
+	            {"id", "btnNew"},
+                {"needconfirm","true"}
+	        })
+            <button type="button" id="btnExport" onclick="location.href='@Url.Content("~/SequenceGroup/List")'">
+                @Resources.Global.Button_Back
+            </button>
+        </div>
+    }
+</fieldset>

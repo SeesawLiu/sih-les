@@ -1,0 +1,42 @@
+﻿@model IEnumerable<com.Sconit.Entity.MD.Shipper>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+                .Name("ShipperGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Code);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Code).ClientTemplate(Html.ActionLink("<#= Code #>", "Edit", "Shipper", new { ID = "<#= Code #>" }, null).ToString());
+            columns.Bound(o => o.Description);
+            columns.Bound(o => o.Location);
+            columns.Bound(o => o.Address);
+            columns.Bound(o => o.Contact);
+            columns.Bound(o => o.Tel);
+            columns.Bound(o => o.Email);
+            columns.Bound(o => o.IsActive).ClientTemplate("<input type='checkbox' disabled='disabled' name='IsActive' <#= IsActive? checked='checked' : '' #> />");
+        })
+                .Scrollable(c => c.Enabled(false))
+                        .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxList", "Shipper"))
+                        .ClientEvents(events => events.OnDataBinding("ShipperGrid_OnDataBinding"))
+                .Pageable(settings =>
+                {
+                    settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+                    settings.PageSize(ViewBag.PageSize);
+                })
+                .EnableCustomBinding(true)
+                .Sortable()
+                .Resizable(resizing => resizing.Columns(true))
+            )
+    <script type="text/javascript">
+        function ShipperGrid_OnDataBinding(e) {
+            e.data = {
+                SearchCode: $('#SearchCode').val(),
+                SearchDescription: $('#SearchDescription').val(),
+                SearchLocation: $('#SearchLocation').val(),
+                SearchAddress: $('#SearchAddress').val()
+            };
+        }
+    </script>
+</fieldset>

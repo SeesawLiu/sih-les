@@ -1,0 +1,205 @@
+﻿@model com.Sconit.Entity.PRD.ItemConsume
+@{
+    ViewBag.Title = "厂内/外消化档编辑";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_ItemConsume_View" });
+}
+<fieldset>
+    <legend>@Resources.PRD.ItemConsume.ItemConsume_Edit_Title</legend>
+    @using (Html.BeginForm("SaveEdit", "ItemConsume"))
+    {   
+        @Html.HiddenFor(model => model.ConsumedQty)
+        <div class="search">
+            <div class="search-label">
+                <label>
+                    @Resources.PRD.ItemConsume.ItemConsume_SourceType
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_CodeMasterDropDownList", "Common", new
+        {
+            code = com.Sconit.CodeMaster.CodeMaster.SourceType,
+            controlName = "SourceType",
+            selectedValue = (int)Model.SourceType,
+            enable = false
+        });
+                }
+                @Html.ValidationMessageFor(model => model.SourceType)
+                @Html.HiddenFor(model => model.Version)
+                @Html.HiddenFor(model => model.SourceType)
+                @Html.HiddenFor(model => model.Id)
+                @Html.HiddenFor(model => model.CreateUserName)
+            @Html.HiddenFor(model => model.CreateDate)
+            @Html.HiddenFor(model => model.CreateUserId)
+            </div>
+            <div class="search-label">
+                <label>
+                    @Resources.PRD.ItemConsume.ItemConsume_Item
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_ItemComboBox", "Common",
+            new
+            {
+                controlName = "Item",
+                selectedValue = Model.Item != null ? Model.Item : string.Empty,
+                enable = false
+            });                    
+                }
+                @Html.HiddenFor(model => model.Item)
+                @Html.ValidationMessageFor(model => model.Item)
+            </div>
+            <div class="search-label">
+                <label>
+                    @Resources.PRD.ItemConsume.ItemConsume_Qty
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.EditorFor(model => model.Qty)
+                @Html.ValidationMessageFor(model => model.Qty)
+            </div>
+            <div class="search-label">
+                <label>
+                    @Resources.PRD.ItemConsume.ItemConsume_EffectiveDate
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.EditorFor(model => model.EffectiveDate)
+            </div>
+            <div class="search-label">
+                <label>
+                    @Resources.PRD.ItemConsume.ItemConsume_PONo
+                </label>
+            </div>
+            <div class="search-field">
+             <div id="PurchaseOrderComboBoxDiv">
+                @{
+        Html.RenderAction("_PurchaseOrderComboBox", "Common",
+            new
+            {
+                controlName = "PONo",
+                selectedValue = Model.PONo
+            });
+                }
+                </div>
+                @Html.ValidationMessageFor(model => model.PONo)
+            </div>
+            <div class="search-label">
+                <label>
+                    @Resources.PRD.ItemConsume.ItemConsume_IsClose
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.DisplayFor(model => model.IsClose)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.ConsumedQty)
+            </div>
+            <div class="editor-field-2">
+                @Html.DisplayFor(model => model.ConsumedQty)
+                @Html.HiddenFor(model => model.ConsumedQty)
+            </div>
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            @Html.Button(Resources.Global.Button_Save, "Url_ItemConsume_View", new Dictionary<string, string>()
+	        {
+	            {"type", "submit"},
+	            {"id", "btnsava"},
+                {"needconfirm","true"}
+        
+	        })
+           @* @Html.Button(Resources.Global.Button_Delete, "Url_ItemConsume_View", new Dictionary<string, string>()
+	        {
+	            {"type", "button"},
+	            {"id", "btndelete"},
+                {"needconfirm","true"},
+                {"onclick","butDelete()"}
+	        })*@
+            @{
+        if (!Model.IsClose)
+        {
+                @Html.Button(Resources.Global.Button_Closed, "Url_EOSwitch_Edit", new Dictionary<string, string>()
+                                                                                          {
+                                                                                              {"type", "button"},
+                                                                                              {"id", "btnSave"},
+                                                                                              {"needconfirm","true"},
+                                                                                              {"onclick","location.href='"+@Url.Content("~/ItemConsume/Close/"+@Model.Id)+"'"}
+                                                                                          })
+        }
+            }
+            <button type="button" id="btnReturn" onclick="location.href='@Url.Content("~/ItemConsume/List")'">
+                @Resources.Global.Button_Back
+            </button>
+        </div>
+    }
+    <script type="text/javascript">
+
+
+        $(function () {
+            reloadPurchaseOrderComboBox(($("#SourceType").val() == 1 || $("#SourceType").val() == ""));
+        });
+
+        function reloadPurchaseOrderComboBox(isOut) {
+            var getData = {
+                controlName: "PONo",
+                selectedValue: $("#PONo").val(),
+                enable: isOut
+            }
+            $.ajax({
+                type: "post",
+                dataType: "html",
+                url: "/common/_PurchaseOrderComboBox/",
+                data: getData,
+                success: function (data, textStatus) {
+                    $("#PurchaseOrderComboBoxDiv").html(data);
+                }
+            });
+        }
+        function butDelete() {
+            location.href = '@Url.Content("~/ItemConsume/DeleteId/" + @Model.Id)'
+        }
+
+        function savaEdit() {
+
+            var successesul;
+            var dataTo = { "Id": $("#Id").val() }
+            var data = {
+                "Id": $("#Id").val(),
+                "Item": $("#Item").val(),
+                "Location": $("#Location").val(),
+                "Bin": $("#Bin").val()
+            };
+
+            $.ajax({
+                type: "get",
+                dataType: "text",
+                cache: false,
+                url: "/LocationLayOut/SaveEdit/",
+                data: data,
+                success: function (data, textStatus) {
+                    successesul = data;
+                    if (successesul != "") {
+                        $.ajax({
+                            type: "get",
+                            dataType: "html",
+                            cache: false,
+                            url: "/LocationLayOut/Edit/",
+                            data: dataTo,
+                            success: function (data, textStatus) {
+                                var $tGrid = $("#content");
+                                $($tGrid).html(data);
+
+                                $("#successesul").html("<li>" + successesul + "</li>");
+                            }
+                        });
+                    }
+                }
+            });
+
+
+        }
+ 
+    </script>
+</fieldset>

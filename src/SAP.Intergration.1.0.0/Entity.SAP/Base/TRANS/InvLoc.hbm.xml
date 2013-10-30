@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+    <class name="com.Sconit.Entity.SAP.TRANS.InvLoc, com.Sconit.Entity.SAP" table="SAP_InvLoc" lazy="false">
+        <id name="Id" column="Id" type="Int64" unsaved-value="0" >
+            <generator class="identity" />
+        </id>
+        <property name="SourceType" column="SourceType" type="Int32"/>
+        <property name="SourceId" column="SourceId" type="Int64"/>
+        <property name="FRBNR" column="FRBNR" type="String" length="16"/>
+        <property name="SGTXT" column="SGTXT" type="String" length="5"/>
+        <property name="CreateUser" column="CreateUser" type="String" length="50" update="false"/>
+        <property name="CreateDate" column="CreateDate" type="DateTime" update="false"/>
+    </class>
+</hibernate-mapping>

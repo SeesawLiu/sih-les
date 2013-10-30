@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.CUST.ProdBomDetForecast, com.Sconit.Entity" table="CUST_ProdBomDetForecast" lazy="false">
+		<composite-id>
+			<key-property name="RSNUM" column="RSNUM" type="Int32"  />
+			<key-property name="RSPOS" column="RSPOS" type="Int32"  />
+		</composite-id>
+		<property name="AUFNR" column="AUFNR" type="String" length="12"/>	
+		<property name="WERKS" column="WERKS" type="String" length="4"/>	
+		<property name="MATNR" column="MATNR" type="String" length="50"/>	
+		<property name="MEINS" column="MEINS" type="String" length="6"/>	
+		<property name="BDMNG" column="BDMNG" type="Decimal"/>	
+		<property name="CHARG" column="CHARG" type="String" length="50"/>	
+		<property name="BDTER" column="BDTER" type="DateTime"/>	
+		<property name="CreateDate" column="CreateDate" type="DateTime" update="false"/>	
+  	</class>
+</hibernate-mapping>

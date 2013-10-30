@@ -1,0 +1,40 @@
+﻿@model IEnumerable<com.Sconit.Entity.ORD.CabProductionView>
+<script type="text/javascript">
+
+    function HomeMadeOutGrid1_OnDataBinding(e) {
+        e.data = {
+            Flow: $('#Flow').val()
+        };
+    }
+</script>
+@(Html.Telerik().Grid(Model)
+                  .Name("HomeMadeOutGrid1")
+          .DataKeys(keys =>
+                        {
+                            keys.Add(p => p.OrderDetailId);
+                        })
+          .Columns(columns =>
+          {
+              columns.Bound(o => o.Sequence);
+              columns.Bound(o => o.SubSequence);
+              columns.Bound(o => o.TraceCode);
+              columns.Bound(o => o.Model);
+              columns.Bound(o => o.ModelDescription);
+              columns.Bound(o => o.Item);
+              columns.Bound(o => o.ItemDesc);
+              columns.Bound(o => o.StartTime);
+              columns.Bound(o => o.Flow);
+              columns.Bound(o => o.CabOutStatusDescription);
+          })
+          .Scrollable(c => c.Enabled(false))
+                  .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxHomeMadeViewList", "CabGuide", new RouteValueDictionary { { "Type", (int)com.Sconit.CodeMaster.CabType.SelfMade }, { "IsOut", "true" } }))
+                      .ClientEvents(events => events.OnDataBinding("HomeMadeOutGrid1_OnDataBinding"))
+          .Pageable(settings =>
+                        {
+                            settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+                            settings.PageSize(ViewBag.PageSize);
+                        })
+                        .EnableCustomBinding(true)
+          .Sortable()
+          .Resizable(resizing => resizing.Columns(true))
+          )

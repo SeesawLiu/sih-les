@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{77C17A8B-0E1B-48B3-AF80-3741A530DB3A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>com.Sconit.Entity.SD</RootNamespace>
+    <AssemblyName>com.Sconit.Entity.SD</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ACC\Permission.cs" />
+    <Compile Include="ACC\User.cs" />
+    <Compile Include="INV\Hu.cs" />
+    <Compile Include="INV\QualityBarcode.cs" />
+    <Compile Include="INV\StockTakeDetail.cs" />
+    <Compile Include="INV\StockTakeMaster.cs" />
+    <Compile Include="MD\Bin.cs" />
+    <Compile Include="MD\Item.cs" />
+    <Compile Include="MD\Location.cs" />
+    <Compile Include="ORD\IpDetail.cs" />
+    <Compile Include="ORD\IpMaster.cs" />
+    <Compile Include="ORD\MiscOrderDetail.cs" />
+    <Compile Include="ORD\MiscOrderMaster.cs" />
+    <Compile Include="ORD\OrderBomDetail.cs" />
+    <Compile Include="ORD\OrderDetail.cs" />
+    <Compile Include="ORD\OrderMaster.cs" />
+    <Compile Include="ORD\PickListDetail.cs" />
+    <Compile Include="ORD\PickListMaster.cs" />
+    <Compile Include="ORD\InspectDetail.cs" />
+    <Compile Include="ORD\InspectMaster.cs" />
+    <Compile Include="ORD\PickTask.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SCM\FlowDetail.cs" />
+    <Compile Include="SCM\FlowMaster.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core.5.0.0\CodeMaster\CodeMaster.csproj">
+      <Project>{54A57A3A-8722-451D-983B-9D2990D2D121}</Project>
+      <Name>CodeMaster</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

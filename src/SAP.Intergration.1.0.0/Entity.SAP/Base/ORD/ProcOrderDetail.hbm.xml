@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.SAP.ORD.ProcOrderDetail, com.Sconit.Entity.SAP" table="SAP_ProcOrderDetail" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<property name="EBELN" column="EBELN" type="String" length="50"/>	
+		<property name="EBELP" column="EBELP" type="String" length="50"/>	
+		<property name="ETENR" column="ETENR" type="String" length="50"/>	
+		<property name="EINDT" column="EINDT" type="String" length="50"/>
+        <property name="MATNR" column="MATNR" type="String" length="50"/>	
+		<property name="MENGE" column="MENGE" type="Decimal"/>	
+		<property name="WEMNG" column="WEMNG" type="Decimal"/>	
+		<property name="WAMNG" column="WAMNG" type="Decimal"/>
+        <property name="EKPOBJ" column="EKPOBJ" type="String" length="50"/>
+        <property name="Status" column="Status" type="Int16"/>	
+		<property name="CreateDate" column="CreateDate" type="DateTime" update="false"/>	
+		<property name="LastModifyDate" column="LastModifyDate" type="DateTime"/>	
+		<property name="ErrorCount" column="ErrorCount" type="Int32"/>	
+  	</class>
+</hibernate-mapping>

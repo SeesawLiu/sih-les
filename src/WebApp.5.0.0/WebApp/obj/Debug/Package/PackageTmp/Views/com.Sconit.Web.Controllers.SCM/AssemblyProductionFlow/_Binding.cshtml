@@ -1,0 +1,72 @@
+﻿@using com.Sconit.Web.Models.SearchModels.SCM
+@model IEnumerable<com.Sconit.Entity.SCM.FlowBinding>
+<script type="text/javascript">
+    function onAssemblyFlowDataBinding(e) {
+        e.data = {
+            //prodLineType: 0,
+            flowstrategy: 1,
+            prodLineType: '@((int)com.Sconit.CodeMaster.ProdLineType.Subassembly)'
+        }
+    }
+
+    function onAssemblyFlowChange(e) {
+        if (e.value != null) {
+            var combobox = $(this).data("tComboBox");
+            if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                combobox.value("");
+                $(e.target).parent().parent().next().text("");
+                combobox.reload();
+            } else {
+
+            }
+        }
+    }
+</script>
+<fieldset>
+    <legend>@Resources.SCM.FlowMaster.FlowMaster_TabProdLineBinding</legend>
+    <br />
+    @(Html.Telerik().Grid(Model)
+        .Name("FlowBinding")
+            // .Editable(editing => editing.Mode(GridEditMode.InCell))
+        .ToolBar(commands =>
+        {
+            commands.Insert();
+        })
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+                 .DataBinding(dataBinding => dataBinding.Ajax()
+                                                            .Insert("_InsertBinding", "AssemblyProductionFlow", new { flow = ViewBag.flow })
+                                                            .Select("_AjaxBinding", "AssemblyProductionFlow", new { MasterFlow = ViewBag.flow })
+                                                            .Delete("_DeleteBinding", "AssemblyProductionFlow", new { flow = ViewBag.flow })
+                                                            .Update("_UpdateBinding", "AssemblyProductionFlow", new { flow = ViewBag.flow }))
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.BindedFlow.Code).EditorTemplateName("AssemblyGridComboBox");
+            columns.Bound(o => o.BindedFlowDescription).ReadOnly();
+            columns.Bound(o => o.JointOpReference);
+            columns.Bound(o => o.LeadTime);
+            columns.Command(commands =>
+            {
+                commands.Edit();
+                commands.Delete();
+            });
+        })
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+            settings.PageSize(ViewBag.PageSize);
+        })
+        .Sortable()
+        .EnableCustomBinding(true)
+        .Resizable(resizing => resizing.Columns(true))
+        .Scrollable(c => c.Enabled(false))
+        .ClientEvents(events => events.OnError("TelerikGridView_OnError"))
+    )
+    <div class="editor-footer">
+        @Html.Hidden("isFromList", true)
+        <button type="button" id="btnBack" onclick="location.href='@Url.Content("~/AssemblyProductionFlow/List")'">
+            @Resources.Global.Button_Back</button>
+    </div>
+</fieldset>

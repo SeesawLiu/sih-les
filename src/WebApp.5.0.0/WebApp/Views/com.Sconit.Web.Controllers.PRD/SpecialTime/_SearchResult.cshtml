@@ -1,0 +1,40 @@
+﻿@model IEnumerable<com.Sconit.Entity.PRD.SpecialTime>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("SpecialTimeGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .Columns(columns =>
+        {
+            // columns.Bound(o => o.TypeDescription);
+            columns.Bound(o => o.Region).ClientTemplate(Html.ActionLink("<#= Region #><#= '&nbsp;&nbsp;&nbsp;&nbsp;' #>", "Edit", "SpecialTime", new { ID = "<#= Id #>" }, null).ToString());
+
+            columns.Bound(o => o.StartTime).Format(com.Sconit.Entity.BusinessConstants.TELERIK_LONG_DATE_FORMAT);
+            columns.Bound(o => o.EndTime).Format(com.Sconit.Entity.BusinessConstants.TELERIK_LONG_DATE_FORMAT);
+            columns.Bound(o => o.Description);
+
+        })
+                .Scrollable(c => c.Enabled(false))
+                .EnableCustomBinding(true)
+                        .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxList", "SpecialTime"))
+                .ClientEvents(events => events.OnDataBinding("SpecialTimeGrid_OnDataBinding"))
+                .Pageable(settings =>
+                {
+                    settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+                    settings.PageSize(ViewBag.PageSize);
+                })
+                .Sortable()
+                .Resizable(resizing => resizing.Columns(true))
+          )
+    <script type="text/javascript">
+        function SpecialTimeGrid_OnDataBinding(e) {
+            e.data = {
+                Region: $('#SpecialTimeRegion').val(),
+                StartTime: $('#StartTime').val(),
+                EndTime: $('#EndTime').val()
+            };
+        } 
+    </script>
+</fieldset>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.SAP.ORD.CreateScheduleLine, com.Sconit.Entity.SAP" table="SAP_CRSL" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<property name="EINDT" column="EINDT" type="String" length="50"/>	
+		<property name="FRBNR" column="FRBNR" type="String" length="50"/>	
+		<property name="LIFNR" column="LIFNR" type="String" length="50"/>	
+		<property name="MATNR" column="MATNR" type="String" length="50"/>	
+		<property name="MENGE" column="MENGE" type="Decimal"/>	
+		<property name="SGTXT" column="SGTXT" type="String" length="50"/>	
+		<property name="WERKS" column="WERKS" type="String" length="50"/>	
+		<property name="EBELN" column="EBELN" type="String" length="50"/>	
+		<property name="EBELP" column="EBELP" type="String" length="50"/>	
+		<property name="ETENR" column="ETENR" type="String" length="50"/>
+    <property name="PSTYP" column="PSTYP" type="String" length="6"/>
+    <property name="MESSAGE" column="MESSAGE" type="String" length="256"/>	
+		<property name="OrderDetId" column="OrderDetId" type="Int32"/>	
+		<property name="Status" column="Status" type="Int16"/>	
+		<property name="ErrorCount" column="ErrorCount" type="Int32"/>	
+		<property name="CreateDate" column="CreateDate" type="DateTime" update="false"/>
+        <property name="LastModifyDate" column="LastModifyDate" type="DateTime"/>
+    </class>
+</hibernate-mapping>

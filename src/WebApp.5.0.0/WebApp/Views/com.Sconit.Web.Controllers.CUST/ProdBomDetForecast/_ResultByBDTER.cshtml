@@ -1,0 +1,32 @@
+﻿@model IEnumerable<com.Sconit.Web.Models.CUST.ProdBomDetForecastView>
+<fieldset>
+    <button type="button" id="btnExport" onclick="ExportClick()">
+        @Resources.Global.Button_SearchExport</button>
+    @(Html.Telerik().Grid(Model)
+        .Name("ProdBomDetForecastGrid")
+        .DataBinding(dataBinding => dataBinding.Ajax()
+                    .Select("_AjaxListForBDTER", "ProdBomDetForecast"))
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.MATNR);
+            columns.Bound(o => o.REFCODE);
+            columns.Bound(o => o.DESC);
+            columns.Bound(o => o.BDMNG);
+            columns.Bound(o => o.MEINS);
+            columns.Bound(o => o.WERKS);
+            columns.Bound(o => o.BDTER).Format("{0:d}");
+        })
+        .EnableCustomBinding(true)
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(300);
+        })
+        .Resizable(resizing => resizing.Columns(true))
+    )
+</fieldset>
+<script language="javascript" type="text/javascript">
+    function ExportClick() {
+        location.href = '/ProdBomDetForecast/ExportByBDTERXLS/';
+    }
+</script>

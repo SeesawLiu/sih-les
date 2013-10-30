@@ -1,0 +1,2 @@
+insert into sys_menu values ('Url_KanbanCard_Order','结转看板卡','Menu.Kanban.Trans',5000,'结转看板卡','~/KanbanCard/Order','~/Content/Images/Nav/Default.png',1)
+insert into acc_permission (code,desc1,category) values ('Url_KanbanCard_Order','结转看板卡','Kanban')

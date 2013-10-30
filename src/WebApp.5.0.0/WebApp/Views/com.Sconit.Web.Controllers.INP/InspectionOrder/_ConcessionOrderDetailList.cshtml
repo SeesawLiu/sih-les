@@ -1,0 +1,136 @@
+﻿@using com.Sconit.Entity.MD;
+@using com.Sconit.Entity.INV;
+@model IEnumerable<com.Sconit.Entity.INP.ConcessionDetail>
+           
+<script type="text/javascript">
+    function onLocationComboBoxChange(e) {
+      
+    }
+    function onItemComboBoxChange(e) {
+      
+        if (e.value != "") {
+            var combobox = $(this).data("tComboBox");
+            if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                $(e.target).parent().parent().next().html('');
+                $(e.target).parent().parent().next().next().html('');
+                combobox.value("");
+                combobox.reload();
+            }
+            else {
+                var data = {
+                    "itemCode": e.value
+                }
+                $.ajax({
+                    type: "post",
+                    dataType: "json",
+                    url: "/InspectionOrder/_WebInserintDetail/",
+                    data: data,
+                    success: function (data, textStatus) {
+                        $(e.target).parent().parent().next().html('<span class="t-dirty"></span>' + data.ReferenceCode);
+                        $(e.target).parent().parent().next().next().html('<span class="t-dirty"></span>' + data.Description);
+                        $(e.target).parent().parent().next().next().next().html('<span class="t-dirty"></span>' + data.Uom);
+                       // $(e.target).parent().parent().next().next().next().next().html('<span class="t-dirty"></span>' + data.Uom);
+                        $(e.target).parent().parent().next().next().next().next().html('<span class="t-dirty"></span>' + data.UnitCount);
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        DisplayTextMessages(XMLHttpRequest.responseText);
+                    }
+                });
+            }
+
+        }
+    }
+       
+        function onLocationFromComboBoxChange(e) {
+            if (e.value != null) {
+                var combobox = $(this).data("tComboBox");
+                if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                    combobox.value("");
+                    combobox.reload();
+                }
+            }
+        }
+
+        function onLocationFromDataBinding(e) {
+            e.data = {
+                "Region": $("#PartyFrom").val(),
+                "checkRegion": true
+            };
+        }
+
+        function onLocationToComboBoxChange(e) {
+            if (e.value != null) {
+                var combobox = $(this).data("tComboBox");
+                if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                    combobox.value("");
+                    combobox.reload();
+                }
+            }
+        }
+
+        function onLocationToDataBinding(e) {
+            if ($("#PartyTo").val() == "") {
+                e.data = {
+                    "Region": $("#PartyFrom").val(),
+                    "checkRegion": true
+                };
+            }
+            else {
+                e.data = {
+                    "Region": $("#PartyTo").val(),
+                    "checkRegion": true
+                };
+            }
+        }
+        
+
+</script>
+<fieldset>
+    <legend>@Resources.INV.StockTake.StockTakeDetail_Location</legend>
+   @(Html.Telerik().Grid(Model)
+               .Name("ConcessionDetailList")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .Editable(editing => editing.Mode(GridEditMode.InCell))
+        .ToolBar(commands =>
+        {
+                commands.Insert();
+        })
+        .DataBinding(dataBinding =>
+            dataBinding.Ajax()
+           .Select("_SelectConcessionDetailList", "InspectionOrder")
+           
+        )
+        .Columns(columns =>
+        {
+                columns.Bound(o => o.Item).EditorTemplateName("ItemGridForeignKey");
+                columns.Bound(o => o.ReferenceItemCode).ReadOnly(true);
+                columns.Bound(o => o.ItemDescription).ReadOnly(true);
+               // columns.ForeignKey(o => o.Uom, (IEnumerable<Uom>)ViewData["uoms"], "Code", "Code");
+                columns.Bound(o => o.Uom).ReadOnly(true);
+              //columns.Bound(o => o.BaseUom).ReadOnly(true);
+                columns.Bound(o => o.UnitCount).ReadOnly(true);
+               // columns.Bound(o => o.UnitQty).ReadOnly(true);
+                if (ViewBag.Transfer)
+                {
+                    columns.Bound(o => o.LocationFrom).EditorTemplateName("LocationFromGridForeignKey");
+                    columns.Bound(o => o.LocationTo).EditorTemplateName("LocationToGridForeignKey");
+                    columns.Bound(o => o.OrderedQty).Title("数量");
+                }
+                else
+                {
+                    columns.Bound(o => o.LocationTo).EditorTemplateName("LocationToGridForeignKey").Title("库位");
+                    columns.Bound(o => o.Qty);
+                }
+                
+        
+                columns.Command(commands => commands.Delete());
+         
+        })
+        .Scrollable(c => c.Enabled(false))
+        .Resizable(resizing => resizing.Columns(true))
+        .Footer(false)
+            )
+</fieldset>

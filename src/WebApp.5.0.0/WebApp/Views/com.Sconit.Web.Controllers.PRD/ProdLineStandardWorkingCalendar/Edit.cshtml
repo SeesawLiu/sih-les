@@ -1,0 +1,94 @@
+﻿@using com.Sconit.Entity.SYS
+@model com.Sconit.Entity.PRD.StandardWorkingCalendar
+@{
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_ProdLineStandardWorkingCalendar_View" });
+}
+@using (Html.BeginForm())
+{
+    <fieldset>
+        <legend>@Resources.PRD.StandardWorkingCalendar.StandardWorkingCalendar_Edit_Title</legend>
+        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.CreateUserName)
+        @Html.HiddenFor(model => model.CreateDate)
+        @Html.HiddenFor(model => model.LastModifyUserName)
+        @Html.HiddenFor(model => model.LastModifyDate)
+        <div class="editor">
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.Region)
+            </div>
+            <div class="editor-field-2">
+                @{
+    Html.RenderAction("_FlowComboBox", "Common", new
+    {
+        controlName = "ProdLine",
+        type = (int)com.Sconit.CodeMaster.OrderType.Production,
+        selectedValue = Model.ProdLine
+    });
+                }
+                @Html.ValidationMessageFor(model => model.Region)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.Shift)
+            </div>
+            <div class="editor-field-2">
+                @{
+    Html.RenderAction("_ShiftMasterDropDownList", "Common", new
+                                                                {
+                                                                    controlName = "Shift",
+                                                                    includeBlankOption = true,
+                                                                    selectedValue = Model.Shift
+                                                                });
+                }
+                @Html.ValidationMessageFor(model => model.Shift)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.DayOfWeek)
+            </div>
+            <div class="editor-field-2">
+                @{
+    Html.RenderAction("_CodeMasterDropDownList", "Common", new
+    {
+        code = com.Sconit.CodeMaster.CodeMaster.DayOfWeek,
+        controlName = "DayOfWeek",
+        selectedValue = (int)Model.DayOfWeek
+    });
+                }
+                @Html.ValidationMessageFor(model => model.DayOfWeek)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.Type)
+            </div>
+            <div class="editor-field-2">
+                @{
+    Html.RenderAction("_CodeMasterDropDownList", "Common", new
+                                                               {
+                                                                   code = com.Sconit.CodeMaster.CodeMaster.WorkingCalendarType,
+                                                                   controlName = "Type",
+                                                                   includeBlankOption = true,
+                                                                   blankOptionDescription = CodeDetail.SpecialValueEnum.BlankValue,
+                                                                   blankOptionValue = "",
+                                                                   selectedValue = (int)Model.Type
+                                                               });
+                }
+                @Html.ValidationMessageFor(model => model.Type)
+            </div>
+        </div>
+        <div class="editor-footer">
+            @Html.Button(Resources.Global.Button_Save, "Url_ProdLineStandardWorkingCalendar_Edit", new Dictionary<string, string>()
+	{
+	    {"type", "submit"},
+	    {"id", "btnSave"},
+        {"needconfirm","true"}
+	})
+            @Html.Button(Resources.Global.Button_Delete, "Url_ProdLineStandardWorkingCalendar_Delete", new Dictionary<string, string>()
+	{
+	    {"type", "button"},
+	    {"id", "btnSupplierDel"},
+        {"needconfirm","true"},
+        {"onclick","location.href='"+@Url.Content("~/ProdLineStandardWorkingCalendar/Delete/"+@Model.Id)+"'"}
+	})
+            <button type="button" id="btnBack" onclick="location.href='@Url.Content("~/ProdLineStandardWorkingCalendar/List")'">
+                @Resources.Global.Button_Back</button>
+        </div>
+    </fieldset>
+}

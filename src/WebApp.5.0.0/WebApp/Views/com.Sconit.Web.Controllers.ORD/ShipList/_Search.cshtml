@@ -1,0 +1,65 @@
+﻿@using com.Sconit.Entity.ORD
+@using com.Sconit.Entity.SYS
+@using com.Sconit.Web.Models.SearchModels.ORD
+<fieldset>
+    @using (Html.BeginForm("List", "ShipList"))
+    {   
+        <div class="search">
+            <div class="search-label">
+                <label for="ShipList_ShipNo">
+                    @Resources.ORD.ShipList.ShipList_ShipNo
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("ShipNo", TempData["ShipListSearchModel"] != null ? ((ShipListSearchModel)TempData["ShipListSearchModel"]).ShipNo : string.Empty) 
+            </div>
+            <div class="search-label">
+                <label for="ShipList_Vehicle">
+                    @Resources.ORD.ShipList.ShipList_Vehicle
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("Vehicle", TempData["ShipListSearchModel"] != null ? ((ShipListSearchModel)TempData["ShipListSearchModel"]).Vehicle : string.Empty) 
+            </div>
+            <div class="search-label">
+                <label for="ShipList_Shipper">
+                    @Resources.ORD.ShipList.ShipList_Shipper
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+                Html.RenderAction("_ShipperComboBox", "Common", new
+                                                             {
+                                                                 controlName = "Shipper",
+                                                                 checkLocation = false,
+                                                                 selectedValue = TempData["ShipListSearchModel"] != null ? ((ShipListSearchModel)TempData["ShipListSearchModel"]).Shipper : string.Empty
+                                                             });
+                }
+            </div>
+            <div class="search-label">
+                <label for="ShipList_Status">
+                    @Resources.ORD.ShipList.ShipList_Status
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_CodeMasterDropDownList", "Common", new
+        {
+            code = com.Sconit.CodeMaster.CodeMaster.OrderStatus,
+            controlName = "Status",
+            includeBlankOption = true,
+            selectedValue = TempData["ShipListSearchModel"] != null ? ((ShipListSearchModel)TempData["ShipListSearchModel"]).Status : null
+        });
+                }
+            </div>
+        </div>
+        <div class="search-footer">
+         @Html.Hidden("isFromList", true)
+            <button type="submit" id="btnSearch">
+                @Resources.Global.Button_Search</button>
+            <button type="button" id="btnNew" onclick="location.href='@Url.Content("~/ShipList/New")'">
+                @Resources.Global.Button_New</button>
+        </div>
+
+    }
+</fieldset>

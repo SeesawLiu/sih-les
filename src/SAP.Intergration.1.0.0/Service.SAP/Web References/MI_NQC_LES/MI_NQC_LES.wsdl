@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:p1="http://www.sih.cq.cn/sap/mm/08" xmlns:rfc="urn:sap-com:document:sap:rfc:functions" name="MI_NQC_LES" targetNamespace="http://www.sih.cq.cn/sap/mm/08" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema xmlns="urn:sap-com:document:sap:rfc:functions" targetNamespace="urn:sap-com:document:sap:rfc:functions" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <xsd:element name="ZSIH_MM_NQC">
+        <xsd:complexType>
+          <xsd:all>
+            <xsd:element name="IT_DATA">
+              <xsd:complexType>
+                <xsd:sequence>
+                  <xsd:element minOccurs="0" maxOccurs="unbounded" name="item" type="rfc:ZSNQC" />
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:all>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ZSIH_MM_NQC.Response">
+        <xsd:complexType>
+          <xsd:all>
+            <xsd:element name="IT_DATA">
+              <xsd:complexType>
+                <xsd:sequence>
+                  <xsd:element minOccurs="0" maxOccurs="unbounded" name="item" type="rfc:ZSNQC" />
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:all>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:complexType name="ZSNQC">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="MATNR">
+            <xsd:simpleType>
+              <xsd:restriction base="xsd:string">
+                <xsd:maxLength value="18" />
+              </xsd:restriction>
+            </xsd:simpleType>
+          </xsd:element>
+          <xsd:element minOccurs="0" name="LIFNRR">
+            <xsd:simpleType>
+              <xsd:restriction base="xsd:string">
+                <xsd:maxLength value="10" />
+              </xsd:restriction>
+            </xsd:simpleType>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:complexType>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="rfc.ZSIH_MM_NQC.Input">
+    <wsdl:part name="parameters" element="rfc:ZSIH_MM_NQC" />
+  </wsdl:message>
+  <wsdl:message name="rfc.ZSIH_MM_NQC.Output">
+    <wsdl:part name="parameters" element="rfc:ZSIH_MM_NQC.Response" />
+  </wsdl:message>
+  <wsdl:portType name="MI_NQC_LES">
+    <wsdl:operation name="MI_NQC_LES">
+      <wsdl:input message="p1:rfc.ZSIH_MM_NQC.Input" />
+      <wsdl:output message="p1:rfc.ZSIH_MM_NQC.Output" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="MI_NQC_LESBinding" type="p1:MI_NQC_LES">
+    <binding transport="http://schemas.xmlsoap.org/soap/http" xmlns="http://schemas.xmlsoap.org/wsdl/soap/" />
+    <wsdl:operation name="MI_NQC_LES">
+      <operation soapAction="http://sap.com/xi/WebService/soap1.1" xmlns="http://schemas.xmlsoap.org/wsdl/soap/" />
+      <wsdl:input>
+        <body use="literal" xmlns="http://schemas.xmlsoap.org/wsdl/soap/" />
+      </wsdl:input>
+      <wsdl:output>
+        <body use="literal" xmlns="http://schemas.xmlsoap.org/wsdl/soap/" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="MI_NQC_LESService">
+    <wsdl:port name="MI_NQC_LESPort" binding="p1:MI_NQC_LESBinding">
+      <address location="http://10.86.128.63:8000/XISOAPAdapter/MessageServlet?channel=:LES01:CC_SOAP8&amp;version=3.0&amp;Sender.Service=LES01&amp;Interface=http%3A%2F%2Fwww.sih.cq.cn%2Fsap%2Fmm%2F08%5EMI_NQC_LES" xmlns="http://schemas.xmlsoap.org/wsdl/soap/" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

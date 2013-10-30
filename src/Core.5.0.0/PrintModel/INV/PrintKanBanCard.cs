@@ -1,0 +1,65 @@
+using System;
+using System.Runtime.Serialization;
+using System.Collections.Generic;
+
+namespace com.Sconit.PrintModel.INV
+{
+    [Serializable]
+    [DataContract]
+    public partial class PrintKanBanCard 
+    {
+        [DataMember]
+        public string CardNo { get; set; }
+        [DataMember]
+        public string Flow { get; set; }
+
+        [DataMember]
+        public string LocationTo { get; set; }
+        [DataMember]
+        public string Item { get; set; }
+        [DataMember]
+        public string ItemDescription { get; set; }
+        [DataMember]
+        public string ItemType { get; set; }
+        [DataMember]
+        public string Uom { get; set; }
+        [DataMember]
+        public string ManufactureParty { get; set; }
+        [DataMember]
+        public Decimal UnitCount { get; set; }
+        [DataMember]
+        public string Container { get; set; }
+        [DataMember]
+        public Decimal Qty { get; set; }
+        [DataMember]
+        public Int32 StationUseQty { get; set; }
+        [DataMember]
+        public string MultiStation { get; set; }
+        [DataMember]
+        public string Note { get; set; }
+        [DataMember]
+        public string Sequence { get; set; }
+
+        [DataMember]
+        public Int32 Number { get; set; }
+        [DataMember]
+        public Int32 TotalCount { get; set; }
+        [DataMember]
+        public Int32? ThumbNo { get; set; }
+        [DataMember]
+        public string ReferenceItemCode { get; set; }
+
+        [DataMember]
+        public string LocBin { get; set; }
+
+        public string OpRefSequence { get; set; }
+
+        public string OpRef { get; set; }
+
+        public string GroupDesc { get; set; }
+        //[DataMember]
+        //public IList<PrintKanBanCardInfo> KanBanDetails { get; set; }
+
+    }
+
+}

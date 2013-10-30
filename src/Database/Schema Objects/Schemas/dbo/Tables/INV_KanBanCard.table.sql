@@ -1,0 +1,27 @@
+﻿CREATE TABLE [dbo].[INV_KanBanCard] (
+    [Code]             VARCHAR (50)    NOT NULL,
+    [Flow]             VARCHAR (50)    NOT NULL,
+    [LocTo]            VARCHAR (50)    NOT NULL,
+    [Item]             VARCHAR (50)    NOT NULL,
+    [ItemDesc]         VARCHAR (50)    NOT NULL,
+    [ItemCategory]     VARCHAR (100)   NULL,
+    [Uom]              VARCHAR (5)     NOT NULL,
+    [ManufactureParty] VARCHAR (50)    NULL,
+    [UnitCount]        DECIMAL (18, 8) NOT NULL,
+    [Qty]              INT             NULL,
+    [PackType]         VARCHAR (50)    NULL,
+    [StaUseQty]        INT             NOT NULL,
+    [MultiSta]         VARCHAR (200)   NULL,
+    [Note]             VARCHAR (50)    NULL,
+    [ThumbNo]          INT             NULL,
+    [IsEleKanBan]      BIT             NOT NULL,
+    [CreateUser]       INT             NOT NULL,
+    [CreateUserNm]     VARCHAR (100)   NOT NULL,
+    [CreateDate]       DATETIME        NOT NULL,
+    [LastModifyUser]   INT             NOT NULL,
+    [LastModifyUserNm] VARCHAR (100)   NOT NULL,
+    [LastModifyDate]   DATETIME        NOT NULL,
+    [RefItemCode]      VARCHAR (50)    NULL,
+    [Routing]          VARCHAR (50)    NULL
+);
+

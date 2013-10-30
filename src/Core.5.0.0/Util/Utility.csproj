@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{3617942C-4554-4B04-927C-5D5AF677D262}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>com.Sconit.Utility</RootNamespace>
+    <AssemblyName>com.Sconit.Utility</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Ionic.Zip, Version=1.9.1.5, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\Ionic.Zip.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\..\Lib\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI">
+      <HintPath>..\..\Lib\NPOI.dll</HintPath>
+    </Reference>
+    <Reference Include="NVelocity">
+      <HintPath>..\..\Lib\NVelocity.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Messaging" />
+    <Reference Include="System.Web" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BarcodeHelper.cs" />
+    <Compile Include="CSVWriter.cs" />
+    <Compile Include="DatePeriodRepititionHelper.cs" />
+    <Compile Include="EncryptHelper.cs" />
+    <Compile Include="FlatFileReader.cs" />
+    <Compile Include="FlatFileWriter.cs" />
+    <Compile Include="FtpHelper.cs" />
+    <Compile Include="ImportHelper.cs" />
+    <Compile Include="KanbanUtility.cs" />
+    <Compile Include="LotNoHelper.cs" />
+    <Compile Include="Report\Operator\RepComposeSeqOrderOperator.cs" />
+    <Compile Include="Report\Operator\RepInvTransOperator.cs" />
+    <Compile Include="Report\Operator\RepProductOrderDetViewOperator.cs" />
+    <Compile Include="Report\Operator\RepReceiptDetViewOperator.cs" />
+    <Compile Include="Report\Operator\RepIpDetViewOperator.cs" />
+    <Compile Include="Report\Operator\RepLogisticOrderDetViewOperator.cs" />
+    <Compile Include="Report\Operator\RepWMSDatFileOperator.cs" />
+    <Compile Include="Report\Operator\RepLesInLogOperator.cs" />
+    <Compile Include="Report\Operator\RepBatchProductionOrderOperator.cs" />
+    <Compile Include="Report\Operator\RepLocationDetailViewOperator.cs" />
+    <Compile Include="Report\Operator\RepScheduleLineItemOperator.cs" />
+    <Compile Include="Report\Operator\RepInspectOrderOperator.cs" />
+    <Compile Include="Report\Operator\RepRejectOrderOperator.cs" />
+    <Compile Include="Report\Operator\RepStockTakingOperator.cs" />
+    <Compile Include="Report\Operator\RepKBLabelOperator.cs" />
+    <Compile Include="Report\Operator\RepDistributeLabelOperator.cs" />
+    <Compile Include="Report\Operator\RepKanBanCardOperator.cs" />
+    <Compile Include="Report\Operator\RepMiscOrderOperator.cs" />
+    <Compile Include="Report\Operator\RepProductionOrderOperator.cs" />
+    <Compile Include="Report\Operator\RepSequenceOrderOperator.cs" />
+    <Compile Include="Report\Operator\RepKitOrderOperator.cs" />
+    <Compile Include="Report\Operator\RepASNTransferOperator.cs" />
+    <Compile Include="Report\Operator\RepASNProcurementOperator.cs" />
+    <Compile Include="Report\Operator\RepEKanBanCardOperator.cs" />
+    <Compile Include="SecurityHelper.cs" />
+    <Compile Include="ExceptionHelper.cs" />
+    <Compile Include="ControlHelper.cs" />
+    <Compile Include="MessageQueueHelper.cs" />
+    <Compile Include="NVelocityTemplateRepository.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Report\IReportBase.cs" />
+    <Compile Include="Report\IReportGen.cs" />
+    <Compile Include="Report\Operator\RepASNOperator.cs" />
+    <Compile Include="Report\Operator\RepBarCodeA4Operator.cs" />
+    <Compile Include="Report\Operator\RepBarCodeOperator.cs" />
+    <Compile Include="Report\Operator\RepDistributionOrderOperator.cs" />
+    <Compile Include="Report\Operator\RepPickListOrderOperator.cs" />
+    <Compile Include="Report\Operator\RepAssembleOrderOperator.cs" />
+    <Compile Include="Report\Operator\RepPurchaseOrderOperator.cs" />
+    <Compile Include="Report\Operator\RepReceiptOrderOperator.cs" />
+    <Compile Include="Report\Operator\RepTransferOderOperator.cs" />
+    <Compile Include="Report\ReportBase.cs" />
+    <Compile Include="Report\ReportGen.cs" />
+    <Compile Include="Report\RepTemplate1.cs" />
+    <Compile Include="Report\RepTemplate2.cs" />
+    <Compile Include="ServiceURLHelper.cs" />
+    <Compile Include="SMTPHelper.cs" />
+    <Compile Include="SystemHelper.cs" />
+    <Compile Include="XlsHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core.FIS.5.0.0\Entity.FIS\Entity.FIS.csproj">
+      <Project>{1BF00E66-5386-4427-B129-442EBF60F7C7}</Project>
+      <Name>Entity.FIS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SAP.Intergration.1.0.0\Entity.SAP\Entity.SAP.csproj">
+      <Project>{CE4C027B-3135-4888-B6E2-D2DBF3E764D3}</Project>
+      <Name>Entity.SAP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CodeMaster\CodeMaster.csproj">
+      <Project>{54A57A3A-8722-451D-983B-9D2990D2D121}</Project>
+      <Name>CodeMaster</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Entity\Entity.csproj">
+      <Project>{E4710EAE-2F94-423E-BD3E-258E054714AE}</Project>
+      <Name>Entity</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PrintModel\PrintModel.csproj">
+      <Project>{1FFDB06F-EB22-4C88-ACAD-C9B92B17FE10}</Project>
+      <Name>PrintModel</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

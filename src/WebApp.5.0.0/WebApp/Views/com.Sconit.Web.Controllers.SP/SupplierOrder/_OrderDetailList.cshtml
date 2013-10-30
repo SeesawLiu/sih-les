@@ -1,0 +1,56 @@
+﻿@using com.Sconit.Entity.MD;
+@using com.Sconit.Entity.ORD;
+@model IEnumerable<com.Sconit.Entity.ORD.OrderDetail>
+
+<fieldset>
+    <legend>@Resources.ORD.OrderDetail.OrderDetail_Title</legend>
+    @(Html.Telerik().Grid(Model)
+        .Name("OrderDetail")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .DataBinding(dataBinding =>
+            dataBinding.Ajax()
+            .Select("_SelectBatchEditing", "SupplierOrder", new {orderNo = ViewBag.orderNo })
+        )
+        //.Editable(editing => editing.Mode(GridEditMode.InCell))
+        //.ToolBar(commands =>
+        //{
+        //    if (ViewBag.Status == com.Sconit.CodeMaster.OrderStatus.Submit || ViewBag.Status == com.Sconit.CodeMaster.OrderStatus.InProcess)
+        //    {
+        //        commands.Custom().Text(@Resources.Global.Button_SaveDetail).HtmlAttributes(new { onClick = "onSaveDetail()", href = "#" });
+        //    }
+        //})
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Id).Hidden().ClientTemplate("<input type='text' id='Id' name='Id' style='width:70px' value='<#=Id #>'/>");
+            columns.Bound(o => o.Sequence).ReadOnly(true);
+            columns.Bound(o => o.ExternalOrderNo).ClientTemplate("<div><#=(ExternalOrderNo==''||ExternalOrderNo==null) ?BillAddressDescription:ExternalOrderNo #></div>").ReadOnly(true).Title("计划协议号");
+           // columns.Bound(o => o.ExternalOrderNo).ReadOnly(true);
+            columns.Bound(o => o.ExternalSequence).ReadOnly(true).Title("计划协议行号");
+            columns.Bound(o => o.Item).ReadOnly(true);
+            columns.Bound(o => o.ReferenceItemCode).ReadOnly(true);
+            columns.Bound(o => o.ItemDescription).ReadOnly(true);
+            columns.Bound(o => o.Uom).ReadOnly(true);
+            columns.Bound(o => o.UnitCount).ReadOnly(true);
+            columns.Bound(o => o.UnitCountDescription).ReadOnly(true);
+            columns.Bound(o => o.LocationTo).ReadOnly(true);
+            if (ViewBag.Status == com.Sconit.CodeMaster.OrderStatus.Submit || ViewBag.Status == com.Sconit.CodeMaster.OrderStatus.InProcess)
+            {
+                columns.Bound(o => o.CurrentShipQty).Title("本次发货数").ClientTemplate("<input type='text' id='CurrentShipQty' name='CurrentShipQty' style='width:70px' value='<#=OrderedQty - ShippedQty #>'/>");
+            }
+            //else
+            //{
+            //    columns.Bound(o => o.CurrentShipQty).ReadOnly(true);
+            //}
+            columns.Bound(o => o.OrderedQty).ReadOnly(true);
+            columns.Bound(o => o.ShippedQty).ReadOnly(true);
+            columns.Bound(o => o.ReceivedQty).ReadOnly(true);
+          
+        })
+        .Scrollable(c => c.Enabled(false))
+        .Sortable()
+        .Footer(false)
+    )
+</fieldset>

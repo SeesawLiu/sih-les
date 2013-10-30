@@ -1,0 +1,235 @@
+﻿@using com.Sconit.Entity.MD
+@using com.Sconit.Entity.SYS
+@using com.Sconit.Web.Models.SearchModels.ORD
+@model com.Sconit.Entity.ORD.IpMaster
+@{
+    ViewBag.Title = "送货单";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_Supplier_Deliveryorder_Query" });
+}
+<fieldset>
+    @using (Html.BeginForm("List", "SupplierIpMaster"))
+    {   
+        <fieldset>
+            <legend>@Resources.ORD.OrderMaster.OrderMaster_BaseInfo</legend>
+            <div class="editor">
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.IpNo)
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.IpNo)
+                    @Html.HiddenFor(model => model.IpNo)
+                    @Html.HiddenFor(model => model.Version)
+                    @Html.HiddenFor(model => model.Type)
+                </div>
+                @*  <div class="editor-label-2">
+                    @Html.LabelFor(model => model.OrderType)
+                </div>
+                <div class="editor-field-2">
+                    @{
+        Html.RenderAction("_CodeMasterDropDownList", "Common", new
+        {
+            code = com.Sconit.CodeMaster.CodeMaster.OrderType,
+            controlName = "IpOrderType",
+            orderType = com.Sconit.CodeMaster.OrderType.Procurement,
+            isSupplier = true,
+            includeBlankOption = true,
+            blankOptionDescription = CodeDetail.SpecialValueEnum.BlankValue,
+            blankOptionValue = "",
+            selectedValue = Model != null ? (int)Model.OrderType : 0,
+            enable = false
+        });
+                    }
+                </div>*@
+                <div class="editor-label-2">
+                    <label>
+                        @Resources.ORD.IpMaster.IpMaster_Flow
+                    </label>
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.Flow)
+                </div>
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.Status)
+                </div>
+                <div class="editor-field-2">
+                    @{
+               Html.RenderAction("_CodeMasterDropDownList", "Common",
+                   new
+                   {
+                       code = com.Sconit.CodeMaster.CodeMaster.OrderStatus,
+                       controlName = "Status",
+                       selectedValue = Model != null ? (int)Model.Status : 0,
+                       enable = false
+                   });
+                    }
+                    @Html.HiddenFor(model => model.Status)
+                </div>
+                <div class="editor-label-2">
+                    <label>
+                        @Resources.ORD.IpMaster.IpMaster_PartyTo
+                    </label>
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.PartyToName)
+                    @Html.HiddenFor(model => model.PartyTo)
+                </div>
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.ShipFromAddress)
+                </div>
+                <div class="editor-field-2">
+                    @{
+               Html.RenderAction("_AddressComboBox", "Common",
+                   new
+                   {
+                       controlName = "ShipFrom",
+                       type = (int)com.Sconit.CodeMaster.AddressType.ShipAddress,
+                       selectedValue = Model.ShipFrom,
+
+                       enable = false
+                   });
+                    }
+                </div>
+                <div class="editor-label-2">
+                    <label>
+                        @*@Html.LabelFor(model => model.ShipToContact)*@
+                        <label>
+                            SIH收货地址</label>
+                    </label>
+                </div>
+                <div class="editor-field-2">
+                    @{
+               Html.RenderAction("_AddressComboBox", "Common",
+                   new
+                   {
+                       controlName = "ShipTo",
+                       type = (int)com.Sconit.CodeMaster.AddressType.ShipAddress,
+                       selectedValue = Model.ShipTo,
+
+                       enable = false
+                   });
+                    }
+                </div>
+                <div class="editor-label-2">
+                    <label>
+                        供应商联系人
+                    </label>
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.ShipFromContact)
+                </div>
+                <div class="editor-label-2">
+                    <label>
+                        SIH联系人
+                    </label>
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.ShipToContact)
+                </div>
+                <div class="editor-label-2">
+                    <label>
+                        供应商联系电话
+                    </label>
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.ShipFromTel)
+                </div>
+                <div class="editor-label-2">
+                    <label>
+                        SIH联系电话
+                    </label>
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.ShipFromTel)
+                </div>
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.Dock)
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.Dock)
+                </div>
+                <div class="editor-label-2">
+                    <label>
+                        已打印</label>
+                </div>
+                <div class="editor-field-2">
+                    @Html.CheckBox("IsPrintAsn", Model.IsAsnPrinted, new { disabled = true })
+                </div>
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.CreateUserName)
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.CreateUserName)
+                </div>
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.CreateDate)
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.CreateDate)
+                </div>
+            </div>
+        </fieldset>
+    }
+    <div class="search-footer">
+        @Html.Hidden("isFromList", true)
+        <button type="button" id="btnprint" onclick="Print()">
+            @Resources.Global.Button_Print</button>
+        <button type="button" id="btnExport" onclick="Export()">@Resources.Global.Button_Export</button>
+        @if ((string)ViewBag.UrlId == "OrderShipEdit")
+        {//要货单Edit页面发货跳转
+            <button type="button" id="btnOrderShipEdit"  onclick="location.href='@Url.Content("~/SupplierOrder/Edit/?orderNo=" + ViewBag.OrderNo)'">
+                @Resources.Global.Button_Back</button>
+        }
+        else if ((string)ViewBag.UrlId == "SupplierShipOrder")
+        {
+            <button type="button" id="btnShipBack"  onclick="location.href='@Url.Content("~/SupplierOrder/ShipIndex")'">
+                @Resources.Global.Button_Back</button>
+        }
+        else if ((string)ViewBag.UrlId == "ScheduLine")
+        {
+            <button type="button" id="btnSchedulineBack"  onclick="location.href='@Url.Content("~/SupplierScheduling/Index")'">
+                @Resources.Global.Button_Back</button>
+        }
+        else
+        {
+            <button type="button" id="btnBack"  onclick="location.href='@Url.Content("~/SupplierIpMaster/List")'">
+                @Resources.Global.Button_Back</button>
+        }
+    </div>
+</fieldset>
+@{
+    Html.RenderAction("_IpDetailList", "SupplierIpMaster", new { IpNo = Model.IpNo });
+}
+<form id="hiddenForm" action="/SupplierIpMaster/SaveToClient" target="_blank" method="post">
+<input id="ipNo" name="ipNo" type="hidden" />
+</form>
+<script type="text/javascript" language="javascript">
+    //    function Export(e) {
+    //        window.open("/SupplierIpMaster/SaveToClient/?ipNo=" + $("#IpNo").val());
+    //    }
+    function Export(e) {
+        $("#ipNo").val($("#IpNo").val());
+        $("#hiddenForm").submit();
+    }
+
+
+    function Print(e) {
+        var data = {
+            "ipNo": $("#IpNo").val()
+        };
+        $.ajax({
+            type: "post",
+            dataType: "text",
+            url: "/SupplierIpMaster/Print/",
+            data: data,
+            success: function (data, textStatus) {
+                if (data != "") {
+                    PrintOrder(data);
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                var errorMessages = "<li>" + XMLHttpRequest.responseText + "</li>";
+                $("#errorsul").html(errorMessages);
+            }
+        });
+    }
+</script>

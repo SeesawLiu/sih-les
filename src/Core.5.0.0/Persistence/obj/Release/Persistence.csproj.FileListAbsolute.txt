@@ -1,0 +1,12 @@
+G:\Project\sih-les\src\Core.5.0.0\Persistence\bin\Release\com.Sconit.Persistence.dll
+G:\Project\sih-les\src\Core.5.0.0\Persistence\bin\Release\com.Sconit.Persistence.pdb
+G:\Project\sih-les\src\Core.5.0.0\Persistence\bin\Release\Castle.Core.dll
+G:\Project\sih-les\src\Core.5.0.0\Persistence\bin\Release\Castle.Facilities.NHibernateIntegration.dll
+G:\Project\sih-les\src\Core.5.0.0\Persistence\bin\Release\Castle.Windsor.dll
+G:\Project\sih-les\src\Core.5.0.0\Persistence\bin\Release\NHibernate.dll
+G:\Project\sih-les\src\Core.5.0.0\Persistence\bin\Release\Castle.Services.Transaction.dll
+G:\Project\sih-les\src\Core.5.0.0\Persistence\bin\Release\log4net.dll
+G:\Project\sih-les\src\Core.5.0.0\Persistence\bin\Release\Iesi.Collections.dll
+G:\Project\sih-les\src\Core.5.0.0\Persistence\obj\Release\ResolveAssemblyReference.cache
+G:\Project\sih-les\src\Core.5.0.0\Persistence\obj\Release\com.Sconit.Persistence.dll
+G:\Project\sih-les\src\Core.5.0.0\Persistence\obj\Release\com.Sconit.Persistence.pdb

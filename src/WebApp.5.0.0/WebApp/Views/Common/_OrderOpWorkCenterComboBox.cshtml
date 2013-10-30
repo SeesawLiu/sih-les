@@ -1,0 +1,17 @@
+﻿@model System.Web.Mvc.SelectList
+@{
+    string name = ViewBag.ControlName;
+    string id = string.IsNullOrWhiteSpace(ViewBag.ControlId) ? name : ViewBag.ControlId;
+    bool enable = ViewBag.Enable != null ? ViewBag.Enable : true;
+    string orderno = ViewBag.OrderNo;
+}
+@(Html.Telerik().ComboBox()
+                .Name(name)
+                          .AutoFill(true)
+                                          .HighlightFirstMatch(true)
+                .HiddenInputHtmlAttributes(new { id = id })
+                                    .DataBinding(binding => binding.Ajax().Select("_AjaxLoadingOrderOpWorkCenter", "Common", new { orderno = orderno }))
+                                           .ClientEvents(events => events.OnChange("EmptyChange"))
+                .BindTo(Model)
+                .Enable(enable)
+             )

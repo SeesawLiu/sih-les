@@ -1,0 +1,114 @@
+﻿@using com.Sconit.Entity.ACC
+@using com.Sconit.Web.Models.SearchModels.MRP
+<fieldset>
+    <script type="text/javascript">
+        function WeekOfYearStart_Change(e) {
+            $.ajax({
+                type: "get",
+                dataType: "text",
+                url: "/ProdLineMiWeeklyPlan/_GetStartTime/",
+                data: { weekOfYear: e.value },
+                cache: false,
+                success: function (data) {
+                    $("#startTime").text(data);
+                    ClearMessage();
+                }
+            });
+        }
+
+        function doWeekSearch() {
+            ClearMessage();
+            if ($('#WeekOfYearStart').val() == "") {
+                $message.error("开始周不能为空。");
+                return;
+            }
+            var data = {
+                "Flow": $('#Flow').val(),
+                "Item": $('#Item').val(),
+                "StartWeek": $('#WeekOfYearStart').val()
+            };
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                url: "/ProdLineMiWeeklyPlan/_GetProdLineMiWeeklyPlanList/",
+                cache: false,
+                data: data,
+                success: function (data, textStatus) {
+                    var tabStrip = $("#divPlanDetail");
+                    $(tabStrip).html(data.Info);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    DisplayTextMessages(XMLHttpRequest.responseText);
+                    var tabStrip = $("#divPlanDetail");
+                    $(tabStrip).html("");
+                }
+            });
+        }
+
+       
+    </script>
+    @using (Html.BeginForm("List", "ProdLineMiWeeklyPlan"))
+    {   
+        <div class="search">
+            <div class="search-label">
+                <label for="CustomerPlan_Flow">
+                    @Resources.MRP.CustomerPlan.CustomerPlan_Flow
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_FlowComboBox", "Common",
+            new
+            {
+                controlName = "Flow",
+                type = (int)com.Sconit.CodeMaster.OrderType.Production,
+                resourceGroup = (int)com.Sconit.CodeMaster.ResourceGroup.MI,
+                selectedValue = string.Empty
+            });
+                }
+            </div>
+            <div class="search-label">
+                <label for="CustomerPlan_Item">
+                    @Resources.MRP.CustomerPlan.CustomerPlan_Item
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_ItemComboBox", "Common",
+            new
+            {
+                controlName = "Item",
+                selectedValue = string.Empty
+            });
+                }
+            </div>
+            <div class="search-label">
+                <label>
+                    开始周
+                </label>
+            </div>
+            <div class="search-field">
+                <span id="WeekOfYearStartdiv">
+                    @{
+        Html.RenderAction("_WeekOfYearDropDownList", "Common",
+                new
+                {
+                    includeBlankOption = true,
+                    controlName = "WeekOfYearStart",
+                    time = System.DateTime.Now,
+                    startWeek = 25,
+                    endWeek = 35,
+                    selectedValue = string.Empty
+                });
+                    }
+                </span>&nbsp&nbsp<span id="startTime"></span>
+            </div>
+        </div>
+        <div class="search-footer">
+            <button type="button" id="btnSearchWeek" onclick="doWeekSearch()">
+                @Resources.Global.Button_Search</button>
+        </div>
+    }
+</fieldset>
+<div id="divPlanDetail">
+</div>

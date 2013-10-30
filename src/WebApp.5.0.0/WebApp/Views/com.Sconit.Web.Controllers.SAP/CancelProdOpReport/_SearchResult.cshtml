@@ -1,0 +1,51 @@
+﻿@using com.Sconit.Entity.SAP.TRANS;
+@model IEnumerable<com.Sconit.Entity.SAP.ORD.CancelProdOpReport>
+
+
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("CancelProdOpReportGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Id);
+            columns.Bound(o => o.AUFNR);
+            columns.Bound(o => o.TEXT);
+            columns.Bound(o => o.Status);
+            columns.Bound(o => o.CreateDate);
+            columns.Bound(o => o.LastModifyDate);
+            columns.Bound(o => o.ErrorCount);
+            columns.Bound(o => o.ReceiptNo);
+            columns.Bound(o => o.OrderNo);
+            columns.Bound(o => o.OrderOpId);
+            
+        })
+               
+        .Scrollable(c => c.Enabled(false))
+        .EnableCustomBinding(true)
+                .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxList", "CancelProdOpReport"))
+                        .ClientEvents(events => events.OnDataBinding("CancelProdOpReportGrid_OnDataBinding"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(ViewBag.PageSize);
+        })
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+    )
+    <script type="text/javascript">
+        function CancelProdOpReportGrid_OnDataBinding(e) {
+          
+            e.data = {
+                AUFNR: $('#AUFNR').val(),
+                Status: $('#Status').val(),
+                StartDate: $('#StartDate').val(),
+                EndDate: $('#EndDate').val()
+                
+            };
+        }
+    </script>
+</fieldset>

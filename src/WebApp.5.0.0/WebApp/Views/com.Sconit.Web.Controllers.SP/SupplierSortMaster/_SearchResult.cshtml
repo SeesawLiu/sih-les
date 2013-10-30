@@ -1,0 +1,148 @@
+﻿@model IEnumerable<com.Sconit.Entity.ORD.OrderMaster>
+<script type="text/javascript">
+    $(function () {
+        $("#checkAll").click(function () {
+            $('input[name="checkedRecords"]').attr("checked", this.checked);
+            showButtons();
+        });
+    });
+
+    function showButtons() {
+        var $checkRecords = $("input[name='checkedRecords']");
+        $("#checkAll").attr("checked", $checkRecords.length == $("input[name='checkedRecords']:checked").length ? true : false);
+        $("#btnPrint").attr("style", $("input[name='checkedRecords']:checked").length > 0 ? "display:inline" : "display:none");
+        $("#btnDetExport").attr("style", $("input[name='checkedRecords']:checked").length > 0 ? "display:inline" : "display:none");
+        $("#btnExportPrint").attr("style", $("input[name='checkedRecords']:checked").length > 0 ? "display:inline" : "display:none");
+        $("#btnComposePrint").attr("style", $("input[name='checkedRecords']:checked").length > 0 ? "display:inline" : "display:none");
+
+    } 
+</script>           
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("OrderMasterGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.OrderNo);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.OrderNo)
+                 .ClientTemplate("<input type='checkbox' id='checkedRecords' name='checkedRecords' value='<#= OrderNo #>' onClick='showButtons()'  />")
+                 .HeaderTemplate("<input type='checkbox' id='checkAll' name='checkAll' />")
+                 .Width(36).HtmlAttributes(new { style = "text-align:center" });
+            columns.Bound(o => o.OrderNo).ClientTemplate(Html.ActionLink("<#= OrderNo #>", "Edit", "SupplierSortMaster", new { OrderNo = "<#= OrderNo #>"}, null).ToString());
+            columns.Bound(o => o.WindowTime);
+            columns.Bound(o => o.OrderPriorityDescription);
+            columns.Bound(o => o.PartyToName);
+            columns.Bound(o => o.Dock);
+            columns.Bound(o => o.Flow);
+            columns.Bound(o => o.FlowDescription);
+            columns.Bound(o => o.TraceCode).Title("拨次");
+            columns.Bound(o => o.SupplierOrderStatusDescription);
+            columns.Bound(o => o.IsListPrice).Title(Resources.ORD.OrderMaster.OrderMaster_IsSee).ClientTemplate("<input type='checkbox' disabled='disabled' name='IsListPrice' <#= IsListPrice? checked='checked' : '' #> />");
+            columns.Bound(o => o.IsPrintOrder).Title("已打印").ClientTemplate("<input type='checkbox' disabled='disabled' name='IsPrintOrder' <#= IsPrintOrder? checked='checked' : '' #> />");
+            columns.Bound(o => o.CreateUserName);
+            columns.Bound(o => o.CreateDate);
+        })
+            .DetailView(details => details.ClientTemplate(
+            Html.Telerik().Grid<com.Sconit.Entity.ORD.OrderDetail>()
+            .Name("OrderDetail_<#= OrderNo #>")
+            .Columns(columns =>
+            {
+                columns.Bound(o => o.Id).Hidden();
+                columns.Bound(o => o.IsChangeDetail).Hidden();
+                columns.Bound(o => o.Sequence);
+                columns.Bound(o => o.ReserveNo).Title("Van号");
+                columns.Bound(o => o.Item);
+                columns.Bound(o => o.ReferenceItemCode);
+                columns.Bound(o => o.BinTo).Title("工位");
+                columns.Bound(o => o.OrderedQty);
+                columns.Bound(o => o.ItemDescription);
+                columns.Bound(o => o.ReserveLine).Title("车辆流水号");
+                columns.Bound(o => o.StartDateFormat).Title("预计消耗时间");
+                columns.Bound(o => o.ManufactureParty);
+                columns.Bound(o => o.ICHARG);
+            })
+            .DataBinding(dataBinding => dataBinding.Ajax()
+                    .Select("_AjaxOrderDetail", "SupplierSortMaster", new { orderNo = "<#= OrderNo #>" }))
+                    .ClientEvents(events => events.OnRowDataBound("OrderDetailGrid_OnComplete").OnDataBinding("OrderDetailGrid_OnDataBinding"))
+            .Footer(false)
+            .Resizable(resizing => resizing.Columns(true))
+            .ToHtmlString()
+            ))
+        .Scrollable(c => c.Enabled(false))
+        .EnableCustomBinding(true)
+                .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxList", "SupplierSortMaster"))
+                .ClientEvents(events => events.OnDataBinding("OrderMasterGrid_OnDataBinding"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(ViewBag.PageSize);
+        })
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+    )
+     @{ Html.Telerik().Window()
+        .Name("EditOrder")
+        .Title("KIT明细维护")
+        .Draggable(true)
+        .Scrollable(true)
+        .Resizable()
+        .Height(500)
+        .Width(800)
+        .Modal(true)
+        .Visible(false)
+        .Render();
+    }
+    <script type="text/javascript">
+        function editOrderDetClick(e) {
+            var detailWindow = $("#EditOrder").data("tWindow");
+            detailWindow.ajaxRequest("/SupplierSortMaster/_EditOrderDetailList/", { "id": e })
+            detailWindow.center().open();
+        }
+
+        var j = 1;
+        function OrderDetailGrid_OnComplete(e) {
+            if (j > 1) return;
+            var rows = $("tbody").children("tr:not(.t-no-data)");
+            for (var i = 0; i < rows.length; i++) {
+                var cells = $(rows[i]).children();
+                var id = cells.eq(0).text().toString();
+                if (cells.eq(1).text().toString() == "true") {
+                    cells.eq(3).replaceWith("<td align='left'><a href='javascript:editOrderDetClick(" + id + ")'>" + cells.eq(3).text() + "</a></td>");
+                }
+            }
+            j++;
+        }
+
+        function OrderDetailGrid_OnDataBinding(e) {
+            $(e.target).find("tbody").find("tr").children().html("正在查询,请稍等…");
+            j = 1;
+        }
+
+        function OrderMasterGrid_OnDataBinding(e) {
+            e.data = {
+                OrderNo: $('#OrderNo').val(),
+                Flow: $('#Flow').val(),
+                Priority: $('#Priority').val(),
+                PartyFrom: $('#PartyFrom').val(),
+                PartyTo: $('#PartyTo').val(),
+                DateFrom: $('#DateFrom').val(),
+                DateTo: $('#DateTo').val(),
+                Status: $('#Status').val(),
+                CreateUserName: $('#CreateUserName').val(),
+                SubType: $('#SubType').val(),
+                ReferenceOrderNo: $('#ReferenceOrderNo').val(),
+                ExternalOrderNo: $('#ExternalOrderNo').val(),
+                Sequence: $('#Sequence').val(),
+                SequenceGroup: $('#SequenceGroup').val(),
+                TraceCode: $('#TraceCode').val(),
+                Item: $('#Item').val(),
+                OrderStrategy: $('#OrderStrategy').val(),
+                TraceCode: $('#TraceCode').val(),
+                IsListPrice: $('#IsListPrice').is(":checked"),
+                IsPrintOrder: $("#IsPrintOrder").is(":checked")
+            };
+        } 
+    </script>
+</fieldset>

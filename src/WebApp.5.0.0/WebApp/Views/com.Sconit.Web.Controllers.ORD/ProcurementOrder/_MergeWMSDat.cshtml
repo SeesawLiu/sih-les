@@ -1,0 +1,76 @@
+﻿@model IEnumerable<com.Sconit.Entity.FIS.WMSDatFile>
+<script type="text/javascript">
+    $(function () {
+        $("#checkAll").click(function () {
+            $('input[name="checkedRecords"]').attr("checked", this.checked);
+            showButtons();
+        });
+    });
+    function showButtons() {
+        var $checkRecords = $("input[name='checkedRecords']");
+        var showButton = false;
+        for (var i = 0; i < $checkRecords.length; i++) {
+            if ($checkRecords[i].checked) {
+                showButton = true;
+                break;
+            }
+        }
+        $("#checkAll").attr("checked", $checkRecords.length == $("input[name='checkedRecords']:checked").length ? true : false);
+        $("#btnReceive").attr("style", showButton ? "display:inline" : "display:none");
+    }
+
+    function WMSDatFileGrid_OnDataBinding(e) {
+        e.data = {
+            orderNo: $('#OrderNoHidden').val()
+        };
+    }
+ 
+</script>
+<fieldset>
+    <legend>@Resources.ORD.OrderDetail.OrderDetail_Title</legend>
+    @using (Html.BeginForm())
+    { 
+        @(Html.Telerik().Grid(Model)
+            .Name("WMSDatFileGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+            .Editable(editing => editing.Mode(GridEditMode.InCell))
+            .Columns(columns =>
+        {
+            columns.Bound(o => o.Id).ReadOnly()
+              .ClientTemplate("<input type='checkbox' id='Id' name='checkedRecords' value='<#= Id #>' onClick='showButtons()'  />")
+              .HeaderTemplate("<input type='checkbox' id='checkAll' name='checkAll' />")
+              .Width(36).HtmlAttributes(new { style = "text-align:center" });
+            columns.Bound(o => o.WmsNo).ReadOnly();
+            columns.Bound(o => o.OrderNo).ReadOnly();
+            columns.Bound(o => o.OrderQty).ReadOnly();
+            columns.Bound(o => o.Qty).ReadOnly();
+            columns.Bound(o => o.ReceiveTotal).ReadOnly();
+            columns.Bound(o => o.CancelQty).ReadOnly();
+            columns.Bound(o => o.CurrentReceiveQty).ClientTemplate("<input type='text' id='CurrentReceiveQty' name='CurrentReceiveQty' style='width:70px' value='<#=Qty + CancelQty-ReceiveTotal #>'/>").Format("{0:N}");
+            columns.Bound(o => o.WMSId).ReadOnly();
+            columns.Bound(o => o.MoveType).ReadOnly();
+            columns.Bound(o => o.Item).ReadOnly();
+            columns.Bound(o => o.ReferenceItemCode).ReadOnly();
+            columns.Bound(o => o.ItemDescription).ReadOnly();
+            columns.Bound(o => o.Uom).ReadOnly();
+            columns.Bound(o => o.UMLGO).ReadOnly();
+            columns.Bound(o => o.LocationTo).ReadOnly();
+        })
+            .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxMergeWMSDatList", "ProcurementOrder"))
+            .ClientEvents(events => events.OnComplete("TelerikGridView_OnComplete").OnDataBinding("WMSDatFileGrid_OnDataBinding"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(50);
+        })
+        .Scrollable(c => c.Enabled(false))
+                .Resizable(resizing => resizing.Columns(true))
+        .Footer(true)
+    )
+      
+    }
+</fieldset>
+

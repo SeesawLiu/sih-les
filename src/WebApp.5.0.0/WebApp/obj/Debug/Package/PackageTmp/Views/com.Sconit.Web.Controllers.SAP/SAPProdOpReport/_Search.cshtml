@@ -1,0 +1,73 @@
+﻿@using System.Data;
+@using com.Sconit.Web.Models.SearchModels.SI
+<fieldset>
+    @using (Html.BeginForm("List", "SAPProdOpReport"))
+    {   
+        <div class="search">
+            <div class="search-label">
+                <label for="Status">
+                    Status
+                </label>
+            </div>
+            <div class="search-field">
+                @{Html.RenderAction("_StatusDropDownList", "Common", new
+                  {
+                      controlName = "Status",
+                      selectedValue = TempData["SearchModel"] != null ? ((SearchModel)TempData["SearchModel"]).Status : 2
+                  });
+                }
+            </div>
+            <div class="search-label">
+                <label>
+                    AUFNR
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("AUFNR", TempData["SearchModel"] != null ? ((SearchModel)TempData["SearchModel"]).AUFNR : string.Empty)
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_DateFrom">
+                    DateFrom
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DateTimePicker().Name("StartDate").Format("yyyy-MM-dd HH:mm").Value(DateTime.Now.AddDays(-1)))
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_DateTo">
+                    DateTo
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DateTimePicker().Name("EndDate").Format("yyyy-MM-dd HH:mm").Value(DateTime.Now))
+            </div>
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            <button type="submit" id="btnSearch">
+                @Resources.Global.Button_Search</button>
+            <button type="button" id="btnReSend" onclick="btnReSendClick()">
+               重发</button>
+        </div>
+    }
+</fieldset>
+<script type="text/javascript">
+    function btnReSendClick() {
+        var $checkRecords = $("input[name='checkedRecords']");
+        var idStr = "";
+        for (var i = 0; i < $checkRecords.length; i++) {
+            if ($checkRecords[i].checked) {
+                var id = $checkRecords[i].value ;
+                if (idStr == "") {
+                    idStr = id;
+                } else {
+                    idStr += "," + id;
+                }
+            }
+        }
+        location.href = "/SAPProdOpReport/ReSendProdOpReport/?idStr=" + idStr;
+    }
+    function Export(e) {
+        $("#hiddenForm").submit();
+    }
+</script>

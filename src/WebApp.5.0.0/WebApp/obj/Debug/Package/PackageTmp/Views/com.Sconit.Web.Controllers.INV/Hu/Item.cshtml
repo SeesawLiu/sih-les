@@ -1,0 +1,268 @@
+﻿@model com.Sconit.Entity.MD.Item
+@using com.Sconit.Web.Models.SearchModels.MD
+<fieldset>
+    <script type="text/javascript">
+        function Item_Change(e) {
+
+            $('#ManufactureParty').data('tComboBox').value('');
+            $('#ManufactureParty').data('tComboBox').text('');
+            $("#ManufactureParty").data("tComboBox").reload();
+            if (e.value != null) {
+
+                var combobox = $(this).data("tComboBox");
+                if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                    combobox.value("");
+                    combobox.reload();
+                    $("#HuUom").val("");
+                    var data = {
+                        "selectedValue": "",
+                        "ControlName": "HuUom"
+                    }
+                    $.ajax({
+                        type: "post",
+                        dataType: "html",
+                        url: "/Common/_UomDropDownList/",
+                        data: data,
+                        cache: false,
+                        success: function (data) {
+                            $("#UomDropDownList").html(data);
+                        }
+                    });
+                    $("#Description").val("");
+                    $("#HuUnitCount").val("");
+                    $("#MinUnitCount").val("");
+                    $("#supplierLotNo").val("");
+
+
+                } else {
+                    var data = {
+                        "itemCode": e.value
+                    };
+                    $.ajax({
+                        type: "post",
+                        dataType: "Json",
+                        url: "/Hu/_GetItemDetail/",
+                        data: data,
+                        success: function (data, textStatus) {
+                            if (data != "") {
+                                $("#HuUom").val(data.Uom);
+                                $("#Description").val(data.Description);
+                                $("#HuUnitCount").val(data.UnitCount);
+                                $("#MinUnitCount").val(data.MinUnitCount);
+                                $("#ReferenceCode").val(data.ReferenceCode);
+                                $("#supplierLotNo").val(data.supplierLotNo);
+                                var data = {
+                                    "selectedValue": data.Uom,
+                                    "ControlName": "HuUom"
+                                }
+                                $.ajax({
+                                    type: "post",
+                                    dataType: "html",
+                                    url: "/Common/_UomDropDownList/",
+                                    data: data,
+                                    cache: false,
+                                    success: function (data) {
+                                        $("#UomDropDownList").html(data);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+
+            }
+        }
+
+        function ManufactureParty_DataBinding(e) {
+            e.data = {
+                Item: $("#ItemCode").val()
+            }
+        }
+
+
+        function onCreateByItem(isExport) {
+            ClearMessage();
+            var i = 0;
+            var str = "";
+            if ($("#ItemCode").val() == "" || $("#ItemCode").val() == undefined) {
+                $message.error("打印明细不能为空。");
+                i = 1;
+            }
+            if ($("#HuUom").val() == "" || $("#HuUom").val() == undefined) {
+                $message.error("单位不能为空。");
+                i = 1;
+            }
+            if ($("#HuUnitCount").val() == "" || $("#HuUnitCount").val() == undefined) {
+                $message.error("单包装不能为空。");
+                i = 1;
+            }
+            if ($("#LotNo").val() == "" || $("#LotNo").val() == undefined) {
+                $message.error("批号不能为空。");
+                i = 1;
+            }
+            if ($("#ManufactureParty").val() == "" || $("#ManufactureParty").val() == undefined) {
+                $message.error("制造商不能为空。");
+                i = 1;
+            }
+            if ($("#HuQty").val() == "" || $("#HuQty").val() == undefined) {
+                $message.error("数量不能为空。");
+                i = 1;
+            }
+            if (i == 1) {
+                return;
+            }
+            var data = {
+                "ItemCode": $("#ItemCode").val(),
+                "HuUom": $("#HuUom").val(),
+                "HuUnitCount": $("#HuUnitCount").val(),
+                "LotNo": $("#LotNo").val(),
+                "HuQty": $("#HuQty").val(),
+                "ManufactureParty": $("#ManufactureParty").val(),
+                "isExport": isExport,
+                "supplierLotNo": $("#supplierLotNo").val()
+
+            }
+            $.ajax({
+                type: "post",
+                dataType: "Json",
+                url: "/Hu/CreateHuByItem/",
+                data: data,
+                cache: false,
+                success: function (data) {
+                    DisplayJsonMessages(data);
+                    if (data != null) {
+                        if (data.Data.PrintUrl != "") {
+                            PrintOrder(data.Data.PrintUrl);
+                        }
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    DisplayTextMessages(XMLHttpRequest.responseText);
+                }
+            });
+        }
+
+    </script>
+    <div class="search">
+        <div class="search-label">
+            <label>
+                @Resources.MD.Item.Item_Code
+            </label>
+        </div>
+        <div class="search-field">
+            @{
+                Html.RenderAction("_ItemComboBox", "Common",
+                    new
+                    {
+                        controlName = "ItemCode",
+                        selectedValue = Model != null ? Model.Code : string.Empty,
+                        coupled = true
+                    });
+            }
+        </div>
+        <div class="search-label">
+            <label>
+                @Resources.MD.Item.Item_Description
+            </label>
+        </div>
+        <div class="search-field">
+            @Html.TextBox("Description", string.Empty, new { disabled = true })
+        </div>
+        <div class="search-label">
+            <label>
+                @Resources.MD.Item.Item_HuUom
+            </label>
+        </div>
+        <div class="search-field">
+            <div id="UomDropDownList">
+                @{
+                    Html.RenderAction("_UomDropDownList", "Common",
+                        new
+                        {
+                            controlName = "HuUom",
+                            includeBlankOption = false,
+                            selectedValue = Model != null ? Model.HuUom : string.Empty
+                        });
+                }
+            </div>
+        </div>
+        <div class="search-label">
+            <label>
+                @Resources.MD.Item.Item_ReferenceCode
+            </label>
+        </div>
+        <div class="search-field">
+            @Html.TextBox("ReferenceCode", string.Empty, new { disabled = true })
+        </div>
+        <div class="search-label">
+            <label>
+                @Resources.MD.Item.Item_UC
+            </label>
+        </div>
+        <div class="search-field">
+            @Html.TextBox("HuUnitCount", string.Empty)
+        </div>
+        @*        <div class="search-label">
+            <label>
+                @Resources.MD.Item.Item_MinUnitCount
+            </label>
+        </div>
+        <div class="search-field">
+            @Html.TextBox("MinUnitCount", string.Empty)
+        </div>*@
+        <div class="search-label">
+            <label>
+                @Resources.MD.Item.Item_HuQty
+            </label>
+        </div>
+        <div class="search-field">
+            @Html.TextBox("HuQty", Model != null ? Model.HuQty.ToString() : string.Empty)
+        </div>
+        <div class="search-label">
+            <label>
+                @Resources.MD.Item.Item_LotNo
+            </label>
+        </div>
+        <div class="search-field">
+            @Html.TextBox("LotNo", Model != null ? Model.LotNo : com.Sconit.Utility.LotNoHelper.GenerateLotNo())
+        </div>
+        <div class="search-label">
+            <label>
+                @Resources.MD.Item.Item_supplierLotNo
+            </label>
+        </div>
+        <div class="search-field">
+            @Html.TextBox("supplierLotNo", Model != null ? Model.supplierLotNo : string.Empty)
+        </div>
+        <div class="search-label">
+            <label>
+                @Resources.MD.Item.Item_ManufactureParty
+            </label>
+        </div>
+        <div class="search-field">
+            @{
+                Html.RenderAction("_ManufacturePartyComboBox", "Common",
+                    new
+                    {
+                        controlName = "ManufactureParty",
+                        selectedValue = Model != null ? Model.ManufactureParty : string.Empty
+                    });
+            }
+        </div>
+    </div>
+    <div class="editor-footer">
+        @Html.Button(Resources.Global.Button_Print, "Url_Inventory_Hu_New", new Dictionary<string, string>()
+	            {
+	                {"type", "button"},
+	                {"id", "btnPrint"},
+                    {"needconfirm","true"},
+                    {"onclick","onCreateByItem(false)"}
+	            })
+        @* @Html.Button(Resources.Global.Button_Export, "Url_Inventory_Hu_New", new Dictionary<string, string>()
+	            {
+	                {"type", "button"},
+	                {"id", "btnExport"},
+                    {"needconfirm","true"}
+	            })*@
+    </div>
+</fieldset>

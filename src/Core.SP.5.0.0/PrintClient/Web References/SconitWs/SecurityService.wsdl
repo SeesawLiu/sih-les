@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://com.Sconit.WebService.SecurityService/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://com.Sconit.WebService.SecurityService/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://com.Sconit.WebService.SecurityService/">
+      <s:element name="VerifyUserPassword">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="password" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="VerifyUserPasswordResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="VerifyUserPasswordResult" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetUserPermissionCodes">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetUserPermissionCodesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetUserPermissionCodesResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfString">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetUserPermissionCodesByType">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="permissionType" type="tns:PermissionCategoryType" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:simpleType name="PermissionCategoryType">
+        <s:restriction base="s:string">
+          <s:enumeration value="Url" />
+          <s:enumeration value="Region" />
+          <s:enumeration value="Customer" />
+          <s:enumeration value="Supplier" />
+          <s:enumeration value="Terminal" />
+        </s:restriction>
+      </s:simpleType>
+      <s:element name="GetUserPermissionCodesByTypeResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetUserPermissionCodesByTypeResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetUserPermissionCodesByTypes">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="permissionType" type="tns:ArrayOfPermissionCategoryType" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfPermissionCategoryType">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="PermissionCategoryType" type="tns:PermissionCategoryType" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetUserPermissionCodesByTypesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetUserPermissionCodesByTypesResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="VerifyUserPasswordSoapIn">
+    <wsdl:part name="parameters" element="tns:VerifyUserPassword" />
+  </wsdl:message>
+  <wsdl:message name="VerifyUserPasswordSoapOut">
+    <wsdl:part name="parameters" element="tns:VerifyUserPasswordResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetUserPermissionCodesSoapIn">
+    <wsdl:part name="parameters" element="tns:GetUserPermissionCodes" />
+  </wsdl:message>
+  <wsdl:message name="GetUserPermissionCodesSoapOut">
+    <wsdl:part name="parameters" element="tns:GetUserPermissionCodesResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetUserPermissionCodesByTypeSoapIn">
+    <wsdl:part name="parameters" element="tns:GetUserPermissionCodesByType" />
+  </wsdl:message>
+  <wsdl:message name="GetUserPermissionCodesByTypeSoapOut">
+    <wsdl:part name="parameters" element="tns:GetUserPermissionCodesByTypeResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetUserPermissionCodesByTypesSoapIn">
+    <wsdl:part name="parameters" element="tns:GetUserPermissionCodesByTypes" />
+  </wsdl:message>
+  <wsdl:message name="GetUserPermissionCodesByTypesSoapOut">
+    <wsdl:part name="parameters" element="tns:GetUserPermissionCodesByTypesResponse" />
+  </wsdl:message>
+  <wsdl:portType name="SecurityServiceSoap">
+    <wsdl:operation name="VerifyUserPassword">
+      <wsdl:input message="tns:VerifyUserPasswordSoapIn" />
+      <wsdl:output message="tns:VerifyUserPasswordSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetUserPermissionCodes">
+      <wsdl:input message="tns:GetUserPermissionCodesSoapIn" />
+      <wsdl:output message="tns:GetUserPermissionCodesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetUserPermissionCodesByType">
+      <wsdl:input message="tns:GetUserPermissionCodesByTypeSoapIn" />
+      <wsdl:output message="tns:GetUserPermissionCodesByTypeSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetUserPermissionCodesByTypes">
+      <wsdl:input message="tns:GetUserPermissionCodesByTypesSoapIn" />
+      <wsdl:output message="tns:GetUserPermissionCodesByTypesSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="SecurityServiceSoap" type="tns:SecurityServiceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="VerifyUserPassword">
+      <soap:operation soapAction="http://com.Sconit.WebService.SecurityService/VerifyUserPassword" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserPermissionCodes">
+      <soap:operation soapAction="http://com.Sconit.WebService.SecurityService/GetUserPermissionCodes" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserPermissionCodesByType">
+      <soap:operation soapAction="http://com.Sconit.WebService.SecurityService/GetUserPermissionCodesByType" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserPermissionCodesByTypes">
+      <soap:operation soapAction="http://com.Sconit.WebService.SecurityService/GetUserPermissionCodesByTypes" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="SecurityServiceSoap12" type="tns:SecurityServiceSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="VerifyUserPassword">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SecurityService/VerifyUserPassword" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserPermissionCodes">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SecurityService/GetUserPermissionCodes" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserPermissionCodesByType">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SecurityService/GetUserPermissionCodesByType" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserPermissionCodesByTypes">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SecurityService/GetUserPermissionCodesByTypes" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="SecurityService">
+    <wsdl:port name="SecurityServiceSoap" binding="tns:SecurityServiceSoap">
+      <soap:address location="http://localhost:1122/WebService/SecurityService.asmx" />
+    </wsdl:port>
+    <wsdl:port name="SecurityServiceSoap12" binding="tns:SecurityServiceSoap12">
+      <soap12:address location="http://localhost:1122/WebService/SecurityService.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

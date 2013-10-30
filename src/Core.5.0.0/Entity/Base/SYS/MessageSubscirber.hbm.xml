@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.SYS.MessageSubscirber, com.Sconit.Entity" table="SYS_MsgSubscirber" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<property name="Description" column="Desc1" type="String" length="200"/>	
+		<property name="Emails" column="Emails" type="String" length="2000"/>
+        <property name="Mobiles" column="Mobiles" type="String" length="500"/>
+        <property name="MaxMessageSize" column="MaxMsgSize" type="Int32"/>	
+  	</class>
+</hibernate-mapping>

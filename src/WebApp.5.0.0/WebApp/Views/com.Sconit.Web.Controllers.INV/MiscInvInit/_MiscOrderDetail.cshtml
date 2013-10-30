@@ -1,0 +1,140 @@
+﻿@model IEnumerable<com.Sconit.Entity.ORD.MiscOrderDetail>
+<fieldset>
+    <script type="text/javascript">
+        function onItemComboBoxChange(e) {
+            if (e.value != null && e.value != "") {
+                var combobox = $(this).data("tComboBox");
+                if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                    combobox.value("");
+                    var $itemCell = $(e.target).parent().parent();
+                    $itemCell.next().html("");
+                    $itemCell.next().next().html("");
+                    $itemCell.next().next().next().html("");
+                    $itemCell.next().next().next().next().html("");
+                    combobox.reload();
+                }
+                else {
+                    var data = {
+                        "Code": e.value
+                    };
+                    $.ajax({
+                        type: "post",
+                        dataType: "json",
+                        url: "/MiscInvInit/_WebOrderDetail/",
+                        data: data,
+                        success: function (data, textStatus) {
+                            var $tGrid = $("#MiscOrderDetailGrid").data("tGrid");
+                            var oldData = $tGrid.dataItem($(e.target).parent().parent().parent());
+                            var $itemCell = $(e.target).parent().parent();
+                            if (data.Sequence > 0) {
+                                $itemCell.prev().html('<span class="t-dirty"></span>' + data.Sequence);
+                            }
+                            $itemCell.next().html(data.ReferenceItemCode);
+                            $itemCell.next().next().html('<span class="t-dirty"></span>' + data.ItemDescription);
+                            $itemCell.next().next().next().html('<span class="t-dirty"></span>' + data.Uom);
+                            $itemCell.next().next().next().next().html('<span class="t-dirty"></span>' + data.UnitCount);
+                            if (oldData != undefined) {
+                                oldData.Sequence = data.Sequence;
+                                oldData.ReferenceItemCode = data.ReferenceCode;
+                                oldData.ItemDescription = data.ItemDescription;
+                                oldData.Uom = data.Uom;
+                                oldData.UnitCount = data.UnitCount;
+                                oldData.ReferenceItemCode = data.ReferenceItemCode;
+                            }
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            DisplayTextMessages(XMLHttpRequest.responseText);
+                        }
+                    });
+                }
+            }
+        }
+
+        function onLocationComboBoxChange(e) {
+            var combobox = $(this).data("tComboBox");
+            if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                combobox.value("");
+                combobox.reload();
+            }
+        }
+
+        function onLocationDataBinding(e) {
+            e.data = {
+                "Region": $("#Region").val(),
+                "checkRegion": true
+            };
+        }
+    </script>
+    <legend>库存初始化明细</legend>
+    @(Html.Telerik().Grid(Model)
+                                .Name("MiscOrderDetailGrid")
+                 .Editable(editing => editing.Mode(GridEditMode.InCell))
+         .ToolBar(commands =>
+         {
+             if (ViewBag.IsCreate)
+             {
+                 commands.Insert();
+             }
+         })
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .DataBinding(dataBinding => dataBinding.Ajax()
+        .Select("_SelectMiscOrderDetail", "MiscInvInit", new { miscOrderNo = ViewBag.miscOrderNo }))
+        .Columns(columns =>
+        {
+            if (ViewBag.IsCreate)
+            {
+                columns.Bound(o => o.Sequence).Width(60);
+                columns.Bound(o => o.Item).EditorTemplateName("ItemGridForeignKey").Width(200);
+            }
+            else
+            {
+                columns.Bound(o => o.Sequence).Width(60).ReadOnly(true);
+                columns.Bound(o => o.Item).ReadOnly(true).Width(200);
+            }
+            columns.Bound(o => o.ReferenceItemCode).ReadOnly(true).Width(150);
+            columns.Bound(o => o.ItemDescription).ReadOnly(true).Width(150);
+            columns.Bound(o => o.Uom).ReadOnly(true).Width(100);
+            columns.Bound(o => o.UnitCount).ReadOnly(true).Width(100);
+            if (ViewBag.IsCreate)
+            {
+                columns.Bound(o => o.ManufactureParty).EditorTemplateName("ManufacturePartyGridComboBox").Width(200).Title("寄售供应商");
+                columns.Bound(o => o.Location).EditorTemplateName("LocationGridForeignKey").Width(200);
+                columns.Bound(o => o.Qty).Width(100);
+                columns.Command(commands => commands.Delete()).Width(100);
+            }
+            else
+            {
+                columns.Bound(o => o.ManufactureParty).ReadOnly(true).Title("寄售供应商");
+                columns.Bound(o => o.Location).Width(200).ReadOnly(true);
+                columns.Bound(o => o.Qty).Width(100).ReadOnly(true);
+            }
+
+        })
+                 .Resizable(resizing => resizing.Columns(false))
+                .Pageable(settings =>
+                {
+                    settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+                    settings.PageSize(ViewBag.PageSize);
+                })
+            )
+<script type="text/javascript">
+    function onManufacturePartyDataBinding(e) {
+//        e.data = {
+//            "item": $(e.target).parent().parent().parent().children().eq(2).text()
+//        }
+    }
+
+    function onManufacturePartyChange(e) {
+        if (e.value != null) {
+            var combobox = $(this).data("tComboBox");
+            if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                combobox.value("");
+                combobox.reload();
+            }
+        }
+    }
+</script>
+</fieldset>

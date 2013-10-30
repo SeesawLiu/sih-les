@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DiscoveryClientResultsFile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Results>
+    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.ContractReference" url="file:///G:/Project/sih/10.Interface/WSDL/MI_CRSL_LES.wsdl" filename="MI_CRSL_LES.wsdl" />
+  </Results>
+</DiscoveryClientResultsFile>

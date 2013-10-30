@@ -1,0 +1,89 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_Production_GetCurrentVanOrder" });
+}
+
+
+<fieldset>
+    <div class="search">
+        <div class="editor-label-2">
+            <label>
+                工厂
+            </label>
+        </div>
+        <div class="editor-field-2">
+            @Html.TextBox("Plant")
+        </div>
+        <div class="editor-label-2">
+            <label>
+                Sap生产单号
+            </label>
+        </div>
+        <div class="editor-field-2">
+            @Html.TextBox("SapOrderNo")
+        </div>
+         <div class="search-label">
+                <label for="OrderMaster_Flow">
+                    @Resources.ORD.OrderMaster.OrderMaster_Flow_Production
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_FlowComboBox", "Common",
+            new
+            {
+                controlName = "ProdLine",
+                type = (int)com.Sconit.CodeMaster.OrderType.Production,
+                isVanOrder = true
+            });
+                }
+            </div>
+             <div class="search-label">
+            <label>
+                <a href='/Resource/Templates/UploadTemplate/GetCurrentVanOrder.xls'>模板下载</a>
+            </label>
+        </div>
+        <div class="search-field">
+            @(Html.Telerik().Upload()
+                            .Name("attachments")
+                            .Multiple(false)
+                            .Async(async => async
+                            .Save("ImportGetCurrentVanOrder", "ProductionOrder")
+                                .AutoUpload(true))
+                         .ClientEvents(e => e.OnSuccess("TelerikonUpload_OnSuccess")))
+        </div>
+    </div>
+    <div class="search-footer">
+        <button type="button" id="btnGetCurrentVanOrder" onclick="doGetCurrentVanOrderClick()">
+            整车生产单导入</button>
+    </div>
+</fieldset>
+<script type="text/javascript">
+    function doGetCurrentVanOrderClick() {
+        if ($('#Plant').val() == "") {
+            $message.error("工厂不能为空。");
+            return;
+        }
+        if ($('#SapOrderNo').val() == "") {
+            $message.error("Sap订单号不能为空。");
+            return;
+        }
+        if ($('#ProdLine').val() == "") {
+            $message.error("生产线不能为空。");
+            return;
+        }
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            data: { plant: $('#Plant').val(), sapOrderNo: $('#SapOrderNo').val(), prodLine: $('#ProdLine').val() },
+            url: "/ProductionOrder/GetCurrentVanOrder/",
+            cache: false,
+            success: function (data, textStatus) {
+                DisplayJsonMessages(data);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+</script>

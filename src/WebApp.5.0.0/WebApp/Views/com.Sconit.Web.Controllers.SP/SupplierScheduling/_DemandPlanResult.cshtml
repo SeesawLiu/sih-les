@@ -1,0 +1,70 @@
+﻿@model IEnumerable<com.Sconit.Web.Models.ORD.ScheduleBody>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+                .Name("DemandPlanItemGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.OrderNo);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.OrderNo);
+            columns.Bound(o => o.Sequence);
+            //columns.Bound(o => o.Supplier);
+            columns.Bound(o => o.Item);
+            columns.Bound(o => o.ItemDescription);
+            columns.Bound(o => o.ReferenceItemCode);
+            columns.Bound(o => o.Uom);
+            columns.Bound(o => o.DemandQty).Title("需求数量");
+            columns.Bound(o => o.ReceivedQty);
+            columns.Bound(o => o.DemandDate).Title("需求时间");
+        })
+                    .DetailView(details => details.ClientTemplate(
+                            Html.Telerik().Grid<com.Sconit.Web.Models.ORD.ScheduleBody>()
+                            .Name("OrderDetail_<#= OrderNo #>_<#= OrderNo #>_<#= Supplier #>_<#= Item #>")
+                    .Columns(columns =>
+                    {
+                        //columns.Bound(o => o.OrderNo);
+                        //columns.Bound(o => o.Sequence);
+                        //columns.Bound(o => o.Supplier);
+                        //columns.Bound(o => o.Item);
+                        //columns.Bound(o => o.ItemDescription);
+                        //columns.Bound(o => o.ReferenceItemCode);
+                        //columns.Bound(o => o.Uom);
+                        //columns.Bound(o => o.LocationTo);
+                        //columns.Bound(o => o.ShipQty);
+                        //columns.Bound(o => o.OrderQty);
+                        //columns.Bound(o => o.BackOrderQty);
+                        //columns.Bound(o => o.ForecastQty);
+                        columns.Bound(o => o.DemandQty).Title("需求数量");
+                        columns.Bound(o => o.ReceivedQty);  
+                        columns.Bound(o => o.DemandDate).Title("需求时间");
+
+                    })
+                    .DataBinding(dataBinding => dataBinding.Ajax()
+                    .Select("_AjaxDemandPlanDetail", "SupplierScheduling", new { extNo = "<#= OrderNo #>", extSeq = "<#= Sequence #>", supplier = "<#= Supplier #>", item = "<#= Item #>" }))
+                    .Footer(false)
+                    .Resizable(resizing => resizing.Columns(true))
+                    .ToHtmlString()
+                    ))
+                .Scrollable(c => c.Enabled(false))
+                        .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxDemandPlanList", "SupplierScheduling"))
+                        .ClientEvents(events => events.OnDataBinding("DemandPlanItemGrid_OnDataBinding").OnComplete("TelerikGridView_OnComplete"))
+                .Pageable(settings =>
+                {
+                    settings.Total(ViewBag.Total != null ? ViewBag.Total : 0); ;
+                    settings.PageSize(ViewBag.PageSize);
+                })
+                .EnableCustomBinding(true)
+                .Sortable()
+                .Resizable(resizing => resizing.Columns(true))
+            )
+    @Html.Hidden("Supplier", (string)ViewBag.Supplier)
+    <script type="text/javascript">
+        function DemandPlanItemGrid_OnDataBinding(e) {
+            e.data = {
+                Item: $('#Item').val()
+            };
+        } 
+    </script>
+</fieldset>

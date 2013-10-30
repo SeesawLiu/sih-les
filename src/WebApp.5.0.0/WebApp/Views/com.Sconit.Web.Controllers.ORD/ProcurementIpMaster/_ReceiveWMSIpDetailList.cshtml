@@ -1,0 +1,100 @@
+﻿@model IEnumerable<com.Sconit.Entity.FIS.WMSDatFile>
+<fieldset>
+
+<script type="text/javascript">
+
+    function OnHuQtyBlur(e) {
+//        $("#successesul").html('');
+//        $("#errorsul").html("");
+        if (e.value != "") {
+            if (parseInt(e.value) < 0 || isNaN(e.value)) {
+                
+                $(e).val('');
+//                $("#successesul").html('');
+                //                $("#errorsul").html("本次收货数只能为大于0的数字。");
+                alert("本次收货数只能为大于0的数字。");
+            }
+            else {
+                if (parseFloat($(e).parent().prev().prev().prev().prev().text()) < parseFloat(e.value)) {
+                    $(e).val('');
+                    $("#successesul").html('');
+                    alert("本次收货数不能大于本次发货数。");
+                }
+                
+            }
+        }
+    }
+
+
+    $(function () {
+        $("#checkAll").click(function () {
+            $('input[name="checkedRecords"]').attr("checked", this.checked);
+            showButtons();
+        });
+    });
+
+    function showButtons() {
+        var $checkRecords = $("input[name='checkedRecords']");
+        $("#checkAll").attr("checked", $checkRecords.length == $("input[name='checkedRecords']:checked").length ? true : false);
+        $("#btnReceive").attr("style", $("input[name='checkedRecords']:checked").length > 0 ? "display:inline" : "display:none");
+
+    } 
+
+</script>
+    @(Html.Telerik().Grid(Model)
+        .Name("WmsIpDetail")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .Columns(columns =>
+        {
+            //columns.Bound(o => o.Id).Title("<input type='checkbox' id='checkAll' name='checkAll' />");
+            columns.Bound(o => o.Id)
+              .ClientTemplate("<input type='checkbox' id='Id' name='checkedRecords' value='<#= Id #>' onClick='showButtons()'  />")
+              .HeaderTemplate("<input type='checkbox' id='checkAll' name='checkAll' />")
+              .Width(36).HtmlAttributes(new { style = "text-align:center" });
+            columns.Bound(o => o.WmsNo);
+            columns.Bound(o => o.OrderNo);
+            columns.Bound(o => o.OrderQty);
+            columns.Bound(o => o.Qty);
+            columns.Bound(o => o.ReceiveTotal);
+            columns.Bound(o => o.CancelQty);
+            columns.Bound(o => o.CurrentReceiveQty).ClientTemplate("<input type='text' id='CurrentReceiveQty' name='CurrentReceiveQty' style='width:70px' value='<#=Qty + CancelQty-ReceiveTotal #>'/>").Format("{0:N}");
+            columns.Bound(o => o.WMSId);
+            columns.Bound(o => o.MoveType);
+            columns.Bound(o => o.Item);
+            columns.Bound(o => o.ReferenceItemCode);
+            columns.Bound(o => o.ItemDescription);
+         
+            columns.Bound(o => o.Uom);
+            columns.Bound(o => o.UMLGO);
+            columns.Bound(o => o.LocationTo);
+
+               // .ClientTemplate(string.Format("<input type='text' id='CurrentReceiveQty' name='CurrentReceiveQty' style='width:70px' value='<#=Qty #>'/>"));
+            
+        })
+           // .CellAction(cell =>
+           // {
+            //    if (cell.Column.Member == "Id")
+            //    {
+            //        cell.Text = string.Format("<input type='checkbox' id='Id' name='checkedRecords'  value='" + cell.DataItem.Id + "' onClick='showButtons()' />");
+            //    }
+            //    if (cell.Column.Member == "CurrentReceiveQty")
+            //    {
+            //        cell.Text = string.Format("<input type='text' id='CurrentReceiveQty' onblur='OnHuQtyBlur(this)' name='CurrentReceiveQty' style='width:70px'  value='" + (cell.DataItem.Qty+cell.DataItem.CancelQty-cell.DataItem.ReceiveTotal).ToString("f2") + "'/>");
+            //    }
+          //  })
+         .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxReceiveWMSIpDetailList", "ProcurementIpMaster",new{wmsNo=(string)ViewBag.WmsNo}))
+         .ClientEvents(events => events.OnComplete("TelerikGridView_OnComplete"))
+       // .Scrollable(c => c.Enabled(false))
+        // .Sortable()
+         .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(50);
+        })
+        .Resizable(resizing => resizing.Columns(true))
+        .Footer(true)
+    )
+</fieldset>

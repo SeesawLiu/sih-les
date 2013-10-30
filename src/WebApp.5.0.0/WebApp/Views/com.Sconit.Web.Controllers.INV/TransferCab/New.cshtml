@@ -1,0 +1,141 @@
+﻿@model com.Sconit.Entity.CUST.VehicleInFactoryMaster
+@{
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_TransferCab_View" });
+}
+<script type="text/javascript">
+
+    $(function () {
+        $("#HuId").keydown(function () {
+            if (event.keyCode == 13) {
+                ClearMessage();
+                var data = {
+                    "HuId": $(this).val()
+                };
+                $(this).val("");
+                $.ajax({
+                    type: "post",
+                    dataType: "json",
+                    data: data,
+                    url: "/TransferCab/HuScan/",
+                    cache: false,
+                    success: function (data, textStatus) {
+                        if (data.OrderNo) {
+                            $('#label_OrderNo,#field_OrderNo,#label_TraceCode,#field_TraceCode').show();
+                            $('#OrderNo').val(data.OrderNo);
+                            $('#TraceCode').val(data.TraceCode);
+                        }
+                        if (data.Item) {
+                            $('#label_Item,#field_Item,#label_ItemDescription,#field_ItemDescription').show();
+                            $('#Item').val(data.Item);
+                            $('#ItemDescription').val(data.ItemDescription);
+                            $('#HuIdVal').val(data.HuId);
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        DisplayTextMessages(XMLHttpRequest.responseText);
+                    }
+                });
+            }
+        });
+    });
+    function onCreate() {
+        var Flow = $("#Flow").val();
+        if (Flow == "") {
+            $message.error('路线不能为空！');
+            return;
+        }
+        var data = {
+            "OrderNo": $("#OrderNo").val(),
+            "HuId": $("#HuIdVal").val(),
+            "Flow": $("#Flow").val()
+        };
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            url: "/TransferCab/CreateTransferCab/",
+            data: data,
+            success: function (data) {
+                DisplayJsonMessages(data);
+                $.ajax({
+                    type: "get",
+                    dataType: "html",
+                    url: "/TransferCab/New/",
+                    data: data,
+                    success: function (data) {
+                        $('#content').html(data);
+                    }
+                });
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+</script>
+@using (Html.BeginForm())
+{
+    <fieldset>
+        <div class="editor">
+            <div class="editor-label-2">
+                <label>
+                    @Resources.ORD.TransferHu.TransferHu_Flow
+                </label>
+            </div>
+            <div class="editor-field-2">
+                @{
+    Html.RenderAction("_FlowComboBox", "Common", new
+    {
+        controlName = "Flow",
+        type = (int)com.Sconit.CodeMaster.OrderType.Transfer,
+
+    });
+                }
+            </div>
+            <div class="editor-label-2">
+                <label>
+                    @Resources.ORD.TransferHu.TransferHu_HuId
+                </label>
+            </div>
+            <div class="editor-field-2">
+                @Html.TextBox("HuId", null)
+            </div>
+            <div class="editor-label-2" id="label_OrderNo" style="display: none;">
+                <label>
+                    @Resources.ORD.OrderMaster.OrderMaster_OrderNo
+                </label>
+            </div>
+            <div class="editor-field-2" id="field_OrderNo" style="display: none;">
+                @Html.TextBox("OrderNo", null, new { disabled = true })
+            </div>
+            <div class="editor-label-2" id="label_TraceCode" style="display: none;">
+                <label>
+                    @Resources.ORD.OrderMaster.OrderMaster_TraceCode
+                </label>
+            </div>
+            <div class="editor-field-2" id="field_TraceCode" style="display: none;">
+                @Html.TextBox("TraceCode", null, new { disabled = true })
+            </div>
+            <div class="editor-label-2" id="label_Item" style="display: none;">
+                <label>
+                    @Resources.ORD.OrderDetail.OrderDetail_Item
+                </label>
+            </div>
+            <div class="editor-field-2" id="field_Item" style="display: none;">
+                @Html.TextBox("Item", null, new { disabled = true })
+            </div>
+            <div class="editor-label-2" id="label_ItemDescription" style="display: none;">
+                <label>
+                    @Resources.ORD.OrderDetail.OrderDetail_ItemDescription
+                </label>
+            </div>
+            <div class="editor-field-2" id="field_ItemDescription" style="display: none;">
+                @Html.TextBox("ItemDescription", null, new { disabled = true })
+            </div>
+            @Html.Hidden("HuIdVal")
+        </div>
+        <div class="editor-footer">
+            <button type="button" id="btnNew" onclick="onCreate()">
+                @Resources.Global.Button_Confirm</button>
+        </div>
+    </fieldset>
+}

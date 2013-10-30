@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+    <class name="com.Sconit.Entity.LOG.ProdOrderPauseResume, com.Sconit.Entity" table="LOG_ProdOrderPauseResume" lazy="false">
+        <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+            <generator class="identity" />
+        </id>
+        <property name="ProdLine" column="ProdLine" type="String" length="50" />
+        <property name="ProdLineDesc" column="ProdLineDesc" type="String" length="100" />
+        <property name="OrderNo" column="OrderNo" type="String" length="50" />
+        <property name="BeforeOrderNo" column="BeforeOrderNo" type="String" length="50" />
+        <property name="VanCode" column="VanCode" type="String" length="50" />
+        <property name="CurrentOperation" column="CurrentOperation" type="String" length="50" />
+        <property name="OprateType" column="OprateType"  />
+        <property name="CreateUserName" column="CreateUserName" type="String" length="50" />
+        <property name="CreateDate" column="CreateDate" type="DateTime" />
+        <property name="BeforeVanCode" column="BeforeVanCode" type="String" length="50" />
+        <property name="Seq" column="Seq" type="Int64" />
+        <property name="SubSeq" column="SubSeq" type="Int32" />
+        <property name="BeforeSeq" column="BeforeSeq" type="Int64" />
+        <property name="BeforeSubSeq" column="BeforeSubSeq" type="Int32" />
+    </class>
+</hibernate-mapping>

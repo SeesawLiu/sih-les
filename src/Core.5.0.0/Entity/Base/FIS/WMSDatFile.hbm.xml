@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+    <class name="com.Sconit.Entity.FIS.WMSDatFile, com.Sconit.Entity" table="FIS_WMSDatFile" lazy="false">
+        <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+            <generator class="identity" />
+        </id>
+        <version name="Version" column="Version" type="Int32"  />
+        <property name="MoveType" column="MoveType" type="String" length="50"/>
+        <property name="BLDAT" column="BLDAT" type="String" length="50"/>
+        <property name="BUDAT" column="BUDAT" type="String" length="50"/>
+        <property name="PO" column="PO" type="String" length="50"/>
+        <property name="POLine" column="POLine" type="String" length="50"/>
+        <property name="VBELN" column="VBELN" type="String" length="50"/>
+        <property name="POSNR" column="POSNR" type="String" length="50"/>
+        <property name="LIFNR" column="LIFNR" type="String" length="50"/>
+        <property name="WERKS" column="WERKS" type="String" length="50"/>
+
+        <property name="LGORT" column="LGORT" type="String" length="50"/>
+        <property name="SOBKZ" column="SOBKZ" type="String" length="50"/>
+        <property name="Item" column="Item" type="String" length="50"/>
+        <property name="Qty" column="Qty" type="Decimal"/>
+        <property name="Uom" column="Uom" type="String" length="50"/>
+        <property name="UMLGO" column="UMLGO" type="String" length="50"/>
+        <property name="GRUND" column="GRUND" type="String" length="50"/>
+        <property name="KOSTL" column="KOSTL" type="String" length="50"/>
+
+        <property name="WmsNo" column="WmsNo" type="String" length="50"/>
+        <property name="RSNUM" column="RSNUM" type="String" length="50"/>
+        <property name="RSPOS" column="RSPOS" type="String" length="50"/>
+        <property name="WMSId" column="WMSId" type="String" length="50"/>
+        <property name="WmsLine" column="WmsLine" type="String" length="50"/>
+        <property name="OLD" column="OLD" type="String" length="50"/>
+        <property name="INSMK" column="INSMK" type="String" length="50"/>
+        <property name="XABLN" column="XABLN" type="String" length="50"/>
+        <property name="AUFNR" column="AUFNR" type="String" length="50"/>
+
+        <property name="UMMAT" column="UMMAT" type="String" length="50"/>
+        <property name="UMWRK" column="UMWRK" type="String" length="50"/>
+
+
+
+
+        <property name="IsHand" column="IsHand" type="Boolean"/>
+        <property name="CreateDate" column="CreateDate" type="DateTime" />
+        <property name="FileName" column="FileName" type="String" length="50"/>
+        <property name="WBS" column="WBS" type="String" length="50"/>
+        <property name="HuId" column="HuId" type="String" length="50"/>
+        <property name="ReceiveTotal" column="ReceiveTotal" type="Decimal" />
+        <property name="CancelQty" column="CancelQty" type="Decimal" />
+    </class>
+</hibernate-mapping>

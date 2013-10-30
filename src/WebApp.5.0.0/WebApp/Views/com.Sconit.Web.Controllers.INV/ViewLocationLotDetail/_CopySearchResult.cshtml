@@ -1,0 +1,67 @@
+﻿@model IEnumerable<com.Sconit.Entity.VIEW.LocationDetailView>
+<script type="text/javascript">
+    function LocationDetailViewGrid_OnDataBinding(e) {
+//        var locations = $("#LocationCode").val();
+//        var locArrs = $("#LocaiontExample").data('handsontable').getData();
+//        for (var i = 0; i < locArrs.length; i++) {
+//            if (locArrs[i][0] != "" && locArrs[i][0] != null && locArrs[i][0] != " ") {
+//                locations += "," + locArrs[i][0];
+//            }
+//        }
+//        var items = $("#ItemCode").val();
+//        var itemArrs = $("#ItemExample").data('handsontable').getData();
+//        for (var i = 0; i < itemArrs.length; i++) {
+//            if (itemArrs[i][0] != "" && itemArrs[i][0] != null && itemArrs[i][0] != " ") {
+//                items += "," + itemArrs[i][0];
+//            }
+//        }
+//        if (locations == "") {
+//            locations = ",";
+//        }
+//        if (items == "") {
+//            items = ",";
+//        }
+        e.data = {
+            "locations": $("#locations").val(),
+            "items": $("#items").val(),
+            "IsSapLocation": $("#IsSapLocation").is(":checked"),
+            "IsShowCSSupplier": $("#IsShowCSSupplier").is(":checked")
+        };
+    }
+</script>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+       .Name("LocationDetailViewGrid")
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Item);
+            columns.Bound(o => o.ItemDescription);
+            columns.Bound(o => o.RefrenceItemCode);
+            columns.Bound(o => o.Uom);
+            columns.Bound(o => o.Location);
+            columns.Bound(o => o.Qty);
+            if (ViewBag.IsShowCSSupplier)
+            {
+                columns.Bound(o => o.suppliers).Title("寄售供应商");
+            }
+            else
+            {
+                columns.Bound(o => o.ConsignmentQty);
+            }
+            columns.Bound(o => o.QualifyQty);
+            columns.Bound(o => o.InspectQty);
+            columns.Bound(o => o.RejectQty);
+        })
+        .Scrollable(c => c.Enabled(false))
+        .EnableCustomBinding(true)
+        .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxCopyList", "ViewLocationLotDetail"))
+        .ClientEvents(events => events.OnDataBinding("LocationDetailViewGrid_OnDataBinding").OnComplete("TelerikGridView_OnComplete"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+            settings.PageSize(20);
+        })
+        .Resizable(resizing => resizing.Columns(true))
+    ) 
+</fieldset>
+

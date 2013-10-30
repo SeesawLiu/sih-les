@@ -1,0 +1,342 @@
+﻿@using com.Sconit.Entity.SYS
+@model com.Sconit.Entity.ORD.OrderMaster
+ @{
+    ViewBag.Title = "Index";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_SequenceOrder_View" });
+}
+
+<script type="text/javascript">
+    function ShipFrom_DataBinding(e) {
+        e.data = {
+            party: $("#PartyFrom").val()
+        };
+    }
+    function More(va) {
+        if (va.innerHTML == "More...") {
+            document.getElementById("divMore").style.display = 'inline'
+            document.getElementById("more").innerHTML = "Hide...";
+        }
+        else {
+            document.getElementById("divMore").style.display = 'none'
+            document.getElementById("more").innerHTML = "More...";
+        }
+    }
+
+    function ShipTo_DataBinding(e) {
+        e.data = {
+            party: $("#PartyTo").val()
+        };
+    }
+
+    function LocationTo_DataBinding(e) {
+        e.data = {
+            region: $("#PartyTo").val()
+        };
+    }
+
+    function LocationFrom_DataBinding(e) {
+        e.data = {
+            region: $("#PartyFrom").val()
+        };
+    }
+
+    function BillAddress_DataBinding(e) {
+        e.data = {
+            party: $("#PartyFrom").val()
+        };
+    }
+
+    function PriceList_DataBinding(e) {
+        e.data = {
+            party: $("#PartyFrom").val()
+        };
+    }
+</script>
+
+    <fieldset>
+        <legend>@Resources.ORD.SequenceMaster.SequenceMaster_Title_BaseInfo</legend>
+        <div class="editor">
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.OrderNo)
+            </div>
+            <div class="editor-field-2">
+                @Html.HiddenFor(model => model.OrderNo)
+                @Html.DisplayFor(model => model.OrderNo)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.Flow)
+            </div>
+            <div class="editor-field-2">
+                @Html.DisplayFor(model => model.Flow)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.Type)
+            </div>
+            <div class="search-field">
+                @Html.DisplayFor(model => model.OrderTypeDescription)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.Status)
+            </div>
+            <div class="editor-field-2">
+                @Html.DisplayFor(model => model.OrderStatusDescription)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.StartTime)
+            </div>
+            <div class="editor-field-2">
+                @Html.DisplayFor(model => model.StartTime)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.WindowTime)
+            </div>
+            <div class="editor-field-2">
+                @Html.DisplayFor(model => model.WindowTime)
+            </div>
+            
+            <div class="editor-label-2">
+                <label>
+                    @Resources.ORD.SequenceMaster.SequenceMaster_PartyFromName
+                </label>
+            </div>
+            <div class="editor-field-2">
+                @Html.DisplayFor(model => model.PartyFromName)
+            </div>
+            <div class="editor-label-2">
+                <label>
+                    @Resources.ORD.SequenceMaster.SequenceMaster_PartyToName
+                </label>
+            </div>
+            <div class="editor-field-2">
+                @Html.DisplayFor(model => model.PartyToName)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.ShipFromAddress)
+            </div>
+            <div class="editor-field-2">
+                @Html.DisplayFor(model => model.ShipFromAddress)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.ShipToAddress)
+            </div>
+            <div class="editor-field-2">
+                @Html.DisplayFor(model => model.ShipToAddress)
+            </div>
+            <div class="editor-label-2">
+                 @Html.LabelFor(model => model.ShipFromContact)
+            </div>
+            <div class="editor-field-2">
+                @Html.DisplayFor(model => model.ShipFromContact)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.ShipToContact)
+            </div>
+            <div class="editor-field-2">
+                @Html.DisplayFor(model => model.ShipToContact)
+            </div>
+            <div class="editor-label-2">
+                  @Html.LabelFor(model => model.ShipFromTel)
+            </div>
+            <div class="editor-field-2">
+                @Html.DisplayFor(model => model.ShipFromTel)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.ShipToTel)
+            </div>
+            <div class="editor-field-2">
+                @Html.DisplayFor(model => model.ShipToTel)
+            </div>
+      
+          
+        </div>
+    </fieldset>
+        <div id="divMore" style="display: none">
+        <fieldset>
+            <legend>@Resources.ORD.SequenceMaster.SequenceMaster_Title_Audit</legend>
+            <div class="editor">
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.CreateUserName)
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.CreateUserName)
+                </div>
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.CreateDate)
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.CreateDate)
+                </div>
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.LastModifyUserName)
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.LastModifyUserName)
+                </div>
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.LastModifyDate)
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.LastModifyDate)
+                </div>
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.CancelUserName)
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.CancelUserName)
+                </div>
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.CancelDate)
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.CancelDate)
+                </div>
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.CloseUserName)
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.CloseUserName)
+                </div>
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.CloseDate)
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.CloseDate)
+                </div>
+            </div>
+        </fieldset>
+      
+        <fieldset>
+            <legend>@Resources.ORD.SequenceMaster.SequenceMaster_PrintOption</legend>
+            <div class="editor">
+              
+             
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.IsPrintAsn)
+                </div>
+                <div class="editor-field-2">
+          
+                        @Html.CheckBoxFor(model => model.IsPrintAsn, new { disabled = true })
+              
+                </div>
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.AsnTemplate)
+                </div>
+                <div class="editor-field-2">
+                    @{
+    Html.RenderAction("_CodeMasterDropDownList", "Common",
+        new { code = com.Sconit.CodeMaster.CodeMaster.AsnTemplate, controlName = "AsnTemplate", selectedValue = Model.AsnTemplate, enable = false });
+                    }
+                </div>
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.IsPrintReceipt)
+                </div>
+                <div class="editor-field-2">
+                    @{
+           
+                        @Html.CheckBoxFor(model => model.IsPrintReceipt, new { disabled = true })
+             
+                    }
+                </div>
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.ReceiptTemplate)
+                </div>
+                <div class="editor-field-2">
+                    @{
+    Html.RenderAction("_CodeMasterDropDownList", "Common",
+        new { code = com.Sconit.CodeMaster.CodeMaster.ReceiptTemplate, controlName = "ReceiptTemplate", selectedValue = Model.ReceiptTemplate, enable = false });
+                    }
+                </div>
+            </div>
+        </fieldset>
+       
+        <fieldset>
+            <legend>@Resources.ORD.SequenceMaster.SequenceMaster_AutomaticControl</legend>
+            <div class="editor">
+   
+                <div class="editor-label-3">
+                    @Html.LabelFor(model => model.IsAutoReceive)
+                </div>
+                <div class="editor-field-3">
+                    @{
+         
+                        @Html.CheckBoxFor(model => model.IsAutoReceive, new { disabled = true })
+          
+                    }
+                </div>
+            
+            </div>
+        </fieldset>
+    </div>
+    <div>
+        <a type="text/html" onclick="More(this)" href="#" id="more">More...</a>
+    </div>
+    
+    <div class="editor-footer">
+        @Html.Button(Resources.Global.Button_Ship, "Url_SequenceMaster_Ship", new Dictionary<string, string>()
+	    {
+	        {"type", "button"},
+	        {"id", "btnShip"},
+            {"needconfirm","true"},
+            {"onclick","onShip()"}
+	    })
+        <button type="button" id="btnBack" onclick="location.href='@Url.Content("~/SequenceMaster/List")'">
+            @Resources.Global.Button_Back</button>
+    </div>  
+@{
+    Html.RenderAction("_ShipOrderDetailList", "SequenceMaster", new { orderNo = Model.OrderNo });
+}
+<script type="text/javascript" language="javascript">
+    function onShip() {
+        var checkedOrders = $("#CheckedOrders").val();
+        var grid = $("#OrderDetail").data("tGrid");
+        var rows = grid.$tbody.children("tr:not(.t-no-data)");
+        var idStr = "";
+        var qtyStr = "";
+
+        for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+            var row = $(rows[rowIndex]);
+            var id = row.find("#Id").val();
+
+            var qty = row.find("#CurrentShipQty").val();
+            if (qty != "" && !isNaN(qty) && parseFloat(qty) > 0) {
+                if (idStr == "") {
+                    idStr = id;
+                    qtyStr = qty;
+                } else {
+                    idStr += "," + id;
+                    qtyStr += "," + qty;
+                }
+            }
+        }
+        var data = {
+            "idStr": idStr,
+            "qtyStr": qtyStr
+        }
+        $.ajax({
+            type: "post",
+            dataType: "Json",
+            data: data,
+            url: "/SequenceMaster/ShipOrder/",
+            cache: false,
+            success: function (data, textStatus) {
+                DisplayJsonMessages(data);
+                if (data != "") {
+                    $.ajax({
+                        type: "get",
+                        dataType: "html",
+                        data: { orderNo: $("#OrderNo").val() },
+                        url: "/SequenceMaster/Edit/",
+                        cache: false,
+                        success: function (data, textStatus) {
+                            var $tGrid = $("#content");
+                            $($tGrid).html(data);
+                        }
+                    });
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+</script>

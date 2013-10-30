@@ -1,0 +1,98 @@
+﻿@model com.Sconit.Entity.PRD.MultiSupplyGroup
+<div class="editor">
+    @Html.HiddenFor(model => model.GroupNo)
+    @Html.HiddenFor(model => model.EffSupplier)
+    @Html.HiddenFor(model => model.TargetCycleQty)
+    @Html.HiddenFor(model => model.AccumulateQty)
+    @Html.HiddenFor(model => model.Description)
+    @Html.HiddenFor(model => model.Version)
+    @Html.HiddenFor(model => model.CreateUserName)
+    @Html.HiddenFor(model => model.CreateDate)
+    @Html.HiddenFor(model => model.LastModifyUserName)
+    @Html.HiddenFor(model => model.LastModifyDate)
+    <div class="editor-label-2">
+        @Html.LabelFor(model => model.GroupNo)
+    </div>
+    <div class="editor-field-2">
+        @Html.DisplayFor(model => model.GroupNo)
+    </div>
+    <div class="editor-label-2">
+        @Html.LabelFor(model => model.Description)
+    </div>
+    <div class="editor-field-2">
+        @Html.DisplayFor(model => model.Description)
+    </div>
+    <div class="editor-label-2">
+        @Html.LabelFor(model => model.EffSupplier)
+    </div>
+    <div class="editor-field-2">
+        @Html.DisplayFor(model => model.EffSupplier)
+    </div>
+    <div class="editor-label-2">
+        @Html.LabelFor(model => model.TargetCycleQty)
+    </div>
+    <div class="editor-field-2">
+        @Html.DisplayFor(model => model.TargetCycleQty)
+    </div>
+    <div class="editor-label-2">
+        @Html.LabelFor(model => model.AccumulateQty)
+    </div>
+    <div class="editor-field-2">
+        @Html.DisplayFor(model => model.AccumulateQty)
+    </div>
+    <div class="editor-label-2">
+        @Html.LabelFor(model => model.KBEffSupplier)
+    </div>
+    <div class="editor-field-2">
+        @Html.DisplayFor(model => model.KBEffSupplier)
+    </div>
+    <div class="editor-label-2">
+        @Html.LabelFor(model => model.KBTargetCycleQty)
+    </div>
+    <div class="editor-field-2">
+        @Html.DisplayFor(model => model.KBTargetCycleQty)
+    </div>
+    <div class="editor-label-2">
+        @Html.LabelFor(model => model.KBAccumulateQty)
+    </div>
+    <div class="editor-field-2">
+        @Html.DisplayFor(model => model.KBAccumulateQty)
+    </div>
+</div>
+<div class="editor-footer">
+    @Html.Button(Resources.Global.Button_Delete, "Url_MultiSupplyGroup_Delete", new Dictionary<string, string>()
+	{
+	    {"type", "button"},
+	    {"id", "btnDel"},
+        {"needconfirm","true"},
+        {"onclick","location.href='"+Url.Content("~/MultiSupplyGroup/Delete/" + Model.GroupNo) +"'"}
+	})
+    <button type="button" id="btnBack" onclick="location.href='@Url.Content("~/MultiSupplyGroup/List")'">
+        @Resources.Global.Button_Back</button>
+</div>
+<div id="divSupplierList">
+    @{
+        Html.RenderAction("_SupplierList", "MultiSupplyGroup", new { GroupNo = Model.GroupNo });
+    }
+</div>
+<script language="javascript" type="text/javascript">
+
+    function btnDelete_Click() {
+        var data = {
+            "Id": $("#GroupNo").val()
+        };
+        $.ajax({
+            type: "post",
+            dataType: "html",
+            url: "/MultiSupplyGroup/Delete/",
+            data: data,
+            cache: false,
+            success: function (data, textStatus) {
+                //                 location.href = '/ShiftMaster/List';
+                var tabStrip = $("#TabStrip");
+                var tabStripContent1 = tabStrip.data("tTabStrip").getContentElement(0);
+                $(tabStripContent1).html(data);
+            }
+        });
+    }
+</script>

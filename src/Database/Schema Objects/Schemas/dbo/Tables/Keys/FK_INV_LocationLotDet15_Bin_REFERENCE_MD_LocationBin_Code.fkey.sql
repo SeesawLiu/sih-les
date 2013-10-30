@@ -1,0 +1,3 @@
+﻿ALTER TABLE [dbo].[INV_LocationLotDet_15]
+    ADD CONSTRAINT [FK_INV_LocationLotDet15_Bin_REFERENCE_MD_LocationBin_Code] FOREIGN KEY ([Bin]) REFERENCES [dbo].[MD_LocationBin] ([Code]) ON DELETE NO ACTION ON UPDATE NO ACTION;
+

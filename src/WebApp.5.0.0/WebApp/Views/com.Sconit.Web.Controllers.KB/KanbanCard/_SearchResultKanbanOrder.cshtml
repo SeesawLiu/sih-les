@@ -1,0 +1,276 @@
+﻿@using com.Sconit.Web.Models.SearchModels.KB
+@using com.Sconit.Web.Models.KB;
+@model IEnumerable<com.Sconit.Entity.KB.KanbanScan>
+<script type="text/javascript">
+    $(function () {
+        $("#checkAll").click(function () {
+            $('input[name="checkedRecords"]').attr("checked", this.checked);
+            var $checkRecords = $("input[name='checkedRecords']");
+            var showButton = false;
+            for (var i = 0; i < $checkRecords.length; i++) {
+                if ($checkRecords[i].checked) {
+                    showButton = true;
+                    break;
+                }
+            }
+            if (showButton) {
+                $("#btnOrder").removeAttr("disabled");
+            } else {
+                $("#btnOrder").attr("disabled", "disabled");
+            }
+        });
+
+//        $("#checkFlowAll").click(function () {
+//            $('input[name="checkedFlows"]').attr("checked", this.checked);
+//            var $checkedFlows = $("input[name='checkedFlows']");
+
+//            var showFlowButton = false;
+//            for (var i = 0; i < $checkedFlows.length; i++) {
+//                if ($checkedFlows[i].checked) {
+//                    showFlowButton = true;
+//                    break;
+//                }
+//            }
+
+//            if (showFlowButton) {
+//                $("#btnMultiOrder").removeAttr("disabled");
+//            } else {
+//                $("#btnMultiOrder").attr("disabled", "disabled");
+//            }
+
+//        });
+    });
+
+    function showButtons() {
+        var $checkRecords = $("input[name='checkedRecords']");
+        var showButton = false;
+        for (var i = 0; i < $checkRecords.length; i++) {
+            if ($checkRecords[i].checked) {
+                showButton = true;
+                break;
+            }
+        }
+        $("#checkAll").attr("checked", $checkRecords.length == $("input[name='checkedRecords']:checked").length ? true : false);
+        if (showButton) {
+            $("#btnOrder").removeAttr("disabled");
+        } else {
+            $("#btnOrder").attr("disabled", "disabled");
+        }
+    }
+
+//    function showFlowButtons() {
+//        var $checkedFlows = $("input[name='checkedFlows']");
+//        var showButton = false;
+//        for (var i = 0; i < $checkedFlows.length; i++) {
+//            if ($checkedFlows[i].checked) {
+//                showButton = true;
+//                break;
+//            }
+//        }
+//        $("#checkFlowAll").attr("checked", $checkedFlows.length == $("input[name='checkedFlows']:checked").length ? true : false);
+//        if (showButton) {
+//            $("#btnMultiOrder").removeAttr("disabled");
+//        } else {
+//            $("#btnMultiOrder").attr("disabled", "disabled");
+//        }
+//    }
+
+//    function SupplierRegionGrid_OnDataBinding(e) {
+//        e.data = {
+//            Supplier: $('#Supplier').val()
+//        };
+//    }
+
+    function KanbanOrderGrid_OnDataBinding(e) {
+        e.data = {
+            Flow: $('#Flow').val()
+        };
+    }
+
+
+    function onRowSelected(e) {
+        var kanbanOrderGrid = $('#KanbanOrderGrid').data('tGrid');
+        $('#Flow').attr("value", e.row.cells[1].innerHTML);
+        $('#OrderTime').attr("value", e.row.cells[6].innerHTML);
+        kanbanOrderGrid.rebind();
+    }
+
+    function btnSingleOrder_Click() {
+        var $checkRecords = $("input[name='checkedRecords']");
+        var idStr = "";
+        for (var i = 0; i < $checkRecords.length; i++) {
+            if ($checkRecords[i].checked) {
+                var id = $checkRecords[i].value;
+                if (idStr == "") {
+                    idStr = id;
+                } else {
+                    idStr += "," + id;
+                }
+            }
+        }
+
+        var data = {
+            ChosenScans: idStr,
+            OrderTime: $('#OrderTime').val(),
+            Flow: $('#Flow').val()
+        };
+        $("#btnOrder").attr("disabled", true);
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            url: '/KanbanCard/OrderNow/',
+            data: data,
+            cache: false,
+            success: function (data, textStatus) {
+                DisplayJsonMessages(data);
+                
+                $("#btnOrder").attr("disabled", false);
+                var searchData = {
+                    OrderTime: $('#OrderTime').val(),
+                    Supplier: $('#Supplier').val()
+                };
+                $.ajax({
+                    type: "Get",
+                    dataType: "html",
+                    url: '/KanbanCard/ListSupplierRegion/',
+                    data: searchData,
+                    cache: false,
+                    success: function (data, textStatus) {
+                        var $tGrid = $("#content");
+                        $($tGrid).html(data);
+                    }
+                });
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                $("#btnOrder").attr("disabled", false);
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+
+    function btnMultiOrder_Click() {
+        var $checkedFlows = $("input[name='checkedFlows']");
+        var flowStr = "";
+        var windowTimeStr = "";
+        for (var i = 0; i < $checkedFlows.length; i++) {
+            if ($checkedFlows[i].checked) {
+                var flow = $checkedFlows[i].value;
+                var windowTime = $checkedFlows[i].attributes["windowTime"].value;
+                if (flowStr == "") {
+                    flowStr = flow;
+                    windowTimeStr = windowTime;
+                } else {
+                    flowStr += "," + flow;
+                    windowTimeStr += "," + windowTime;
+                }
+            }
+        }
+
+        var data = {
+            flowStr: flowStr,
+            windowTimeStr: windowTimeStr,
+            Supplier: $('#Supplier').val(),
+            OrderTime: $('#MultiOrderTime').val()
+        };
+        $("#btnMultiOrder").attr("disabled", true);
+
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            url: '/KanbanCard/MultiOrderNow/',
+            data: data,
+            cache: false,
+            success: function (data, textStatus) {
+                DisplayJsonMessages(data);
+              
+                $("#btnMultiOrder").attr("disabled", false);
+                var searchData = {
+                    Supplier: $('#Supplier').val()
+                };
+                $.ajax({
+                    type: "Get",
+                    dataType: "html",
+                    url: '/KanbanCard/ListSupplierRegion/',
+                    data: searchData,
+                    cache: false,
+                    success: function (data, textStatus) {
+                        var $tGrid = $("#content");
+                        $($tGrid).html(data);
+                    }
+                });
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                $("#btnMultiOrder").attr("disabled", false);
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+
+
+    }
+</script>
+<fieldset>
+    <legend>@Resources.KB.KanbanCard.KanbanCard_Order</legend>
+    @using (Html.BeginForm())
+    {
+        
+        @Html.Hidden("Flow", string.Empty)
+@*
+        KanbanOrderSearchModel searchModel = ViewBag.SearchModel;
+        @Html.Hidden("Supplier", searchModel.Supplier)*@
+        <div class="search-footer">
+            <table>
+                <tr>
+                    <td>
+                        <label>
+                            @Resources.KB.KanbanCard.KanbanCard_WindowTime
+                        </label>
+                    </td>
+                    <td>
+                        @(Html.Telerik().DateTimePicker().Format(com.Sconit.Entity.BusinessConstants.LONG_DATE_FORMAT).Name("OrderTime").Value(DateTime.Now.AddMinutes(30)))
+                    </td>
+                    <td>
+                        @Html.Button(Resources.KB.KanbanCard.KanbanCard_Order, "Url_KanbanCard_Order", new Dictionary<string, string>()
+	        {
+	            {"type", "button"},
+	            {"id", "btnOrder"},
+                  {"onclick","btnSingleOrder_Click()"},
+	        })
+                    </td>
+                </tr>
+            </table>
+        </div>
+    }
+    @(Html.Telerik().Grid(Model)
+        .Name("KanbanOrderGrid")
+                .DataKeys(keys =>
+                {
+                    keys.Add(p => p.Id);
+                })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Id).ReadOnly(true)
+                .ClientTemplate("<input type='checkbox' id='checkedRecords' name='checkedRecords' value='<#= Id #>' checked='checked'  onClick='showButtons()'   />")
+                .HeaderTemplate("<input type='checkbox' id='checkAll' name='checkAll' checked='checked' />")
+                .Width(36).HtmlAttributes(new { style = "text-align:center" });
+            columns.Bound(o => o.CardNo).ReadOnly(true);
+            columns.Bound(o => o.Supplier).ReadOnly(true);
+            columns.Bound(o => o.SupplierName).ReadOnly(true);
+            columns.Bound(o => o.LogisticCenterCode).ReadOnly(true);
+            columns.Bound(o => o.Item).ReadOnly(true);
+            columns.Bound(o => o.ItemDescription).ReadOnly(true);
+            columns.Bound(o => o.ScanTime).ReadOnly(true);
+            columns.Bound(o => o.ScanQty).ReadOnly(true);
+        })
+
+        .EnableCustomBinding(true)
+                .DataBinding(dataBinding => dataBinding.Ajax().Select("_KanbanOrderAjaxList", "KanbanCard"))
+                .ClientEvents(events => events.OnDataBinding("KanbanOrderGrid_OnDataBinding"))
+                      .Pageable(settings =>
+                      {
+                          settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+                          settings.PageSize(100);
+                      })
+                        .Sortable()
+                        .Resizable(resizing => resizing.Columns(true))
+    )
+</fieldset>

@@ -1,0 +1,117 @@
+﻿@model IEnumerable<com.Sconit.Entity.ORD.OrderOperation>
+<script type="text/javascript">
+    function onSaveCurrentOperation() {
+        var grid = $("#CurrentOrderOperationGrid").data("tGrid");
+        var rows = grid.$tbody.children("tr:not(.t-no-data)");
+        var idStr = "";
+        var qtyStr = "";
+        var sQtyStr = "";
+        for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+            var row = $(rows[rowIndex]);
+            var id = row.find("input[name=Id]").val();
+            var qty = row.find("input[name=CurrentReportQty]").val();
+            var sQty = row.find("input[name=CurrentScrapQty]").val();
+            if ((!isNaN(qty) && qty != "" && qty != 0) || (!isNaN(sQty) && sQty != "" && sQty != 0)) {
+                qty = !isNaN(qty) && qty != "" ? qty : 0;
+                sQty = !isNaN(sQty) && sQty != "" ? sQty : 0;
+                if (idStr == "") {
+                    idStr = id;
+                    qtyStr = qty;
+                    sQtyStr = sQty;
+                } else {
+                    idStr += "," + id;
+                    qtyStr += "," + qty;
+                    sQtyStr += "," + sQty;
+                }
+            }
+        }
+        var data = {
+            "idStr": idStr,
+            "qtyStr": qtyStr,
+            "sQtyStr": sQtyStr
+        };
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            data: data,
+            url: "/ProductionOrder/_NonVanReport/",
+            cache: false,
+            success: function (data, textStatus) {
+                DisplayJsonMessages(data);
+                $('#Operation').data('tComboBox').text('');
+                $('#Operation').data('tComboBox').value('');
+                $.ajax({
+                    type: "get",
+                    dataType: "html",
+                    data: { id: $('#Operation').val() },
+                    url: "/ProductionOrder/_NonVanCurrentOrderOperationList/",
+                    cache: false,
+                    success: function (data, textStatus) {
+                        $("#divCurrentOrderOp").html(data);
+                    }
+                });
+                $.ajax({
+                    type: "get",
+                    dataType: "html",
+                    data: { orderNo: $('#OrderNo').val(), operation: $('#Operation').val() },
+                    url: "/ProductionOrder/_NonVanReceiveOrderOperationList/",
+                    cache: false,
+                    success: function (data, textStatus) {
+                        $("#divRecOrderDetail").html(data);
+                    }
+                });
+            },
+
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+</script>
+<fieldset>
+    <legend>@Resources.ORD.OrderOperation.OrderOperation_Operation</legend>
+    @(Html.Telerik().Grid(Model)
+                .Name("CurrentOrderOperationGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+                          .ToolBar(commands =>
+                          {
+                              commands.Custom().Text(@Resources.Global.Button_Confirm).HtmlAttributes(new { onClick = "onSaveCurrentOperation()", href = "#" });
+                          })
+                .Columns(columns =>
+                {
+                    columns.Bound(o => o.Id).Hidden();
+                    columns.Bound(o => o.Item).ReadOnly().Width(150);
+                    columns.Bound(o => o.ItemDescription).ReadOnly().Width(200);
+                    columns.Bound(o => o.Uom).ReadOnly().Width(60);
+                    columns.Bound(o => o.UnitCount).Format("{0:N}").ReadOnly().Width(100);
+                    columns.Bound(o => o.OrderedQty).Format("{0:N}").ReadOnly().Width(100);
+                    columns.Bound(o => o.Operation).ReadOnly().Width(100);
+                    columns.Bound(o => o.WorkCenter).ReadOnly().Width(120);
+                    columns.Bound(o => o.ReportQty).Format("{0:N}").ReadOnly().Width(120);
+
+                    columns.Bound(o => o.CurrentReportQty).Format("{0:N}").Width(90);//.ClientTemplate("<input type='text' name='CurrentReportQty' style='width:70px' />");
+                    columns.Bound(o => o.CurrentScrapQty).Format("{0:N}").Width(90);//.ClientTemplate("<input type='text' name='CurrentScrapQty' style='width:70px' />");
+                })
+                        .CellAction(cell =>
+                        {
+                            if (cell.Column.Member == "Id")
+                            {
+                                cell.Text = string.Format("<input type='text' id='Id' name='Id' style='display:none' value='" + cell.DataItem.Id + "'/>");
+                            }
+                            if (cell.Column.Member == "CurrentReportQty")
+                            {
+                                cell.Text = string.Format("<input type='text' id='CurrentReportQty' name='CurrentReportQty' style='width:70px' value='" + cell.DataItem.CurrentReportQty.ToString("0.00") + "'/>");
+                            }
+                            if (cell.Column.Member == "CurrentScrapQty")
+                            {
+                                cell.Text = string.Format("<input type='text' id='CurrentScrapQty' name='CurrentScrapQty' style='width:70px' value='" + cell.DataItem.CurrentScrapQty.ToString("0.00") + "'/>");
+                            }
+                        })
+                .Scrollable(c => c.Enabled(false))
+                        .Resizable(resizing => resizing.Columns(true))
+                .Footer(false)
+    )
+</fieldset>

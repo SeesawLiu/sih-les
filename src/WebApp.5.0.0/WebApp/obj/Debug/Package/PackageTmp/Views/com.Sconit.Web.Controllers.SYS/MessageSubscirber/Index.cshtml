@@ -1,0 +1,42 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_MessageSubscirber_View" });
+}
+
+<fieldset>
+    @(Html.Telerik().Grid<com.Sconit.Entity.SYS.MessageSubscirber>()
+  .Name("Grid")
+  .DataKeys(keys =>
+  {
+      keys.Add(p => p.Id);
+  })
+  .DataBinding(dataBinding =>
+  {
+      dataBinding.Ajax()
+         .Update("UpdateAction", "MessageSubscirber")
+         .Select("_AjaxIndex", "MessageSubscirber");
+  })
+  .Columns(columns =>
+  {
+
+      columns.Bound(o => o.Id).Hidden();
+      columns.Bound(o => o.MaxMessageSize).Hidden();
+      columns.Bound(o => o.Description).Title("描述");
+      columns.Bound(o => o.Emails).Title("邮件地址");
+      columns.Command(commands =>
+      {
+          commands.Edit().ButtonType(GridButtonType.ImageAndText);
+      });
+  })
+  .Editable(editing => editing.Mode(GridEditMode.InLine))
+          .ClientEvents(events => events.OnComplete("TelerikGridView_OnComplete"))
+    .Pageable(settings =>
+    {
+        settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+        settings.PageSize(50); 
+    })
+    .Footer(false)
+  .Scrollable(c => c.Enabled(false))
+  .Sortable()
+  )
+</fieldset>

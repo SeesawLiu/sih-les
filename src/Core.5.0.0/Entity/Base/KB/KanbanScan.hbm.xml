@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="com.Sconit.Entity.KB.KanbanScan, com.Sconit.Entity" table="KB_KanbanScan" lazy="false">
+    <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      <generator class="identity" />
+    </id>
+    <version name="Version" column="Version" type="Int32"  />
+    <property name="CardNo" column="CardNo" type="String" length="100"/>
+    <property name="Sequence" column="Seq" type="String" length="10"/>
+    <property name="Flow" column="Flow" type="String" length="50"/>
+    <property name="FlowDetailId" column="FlowDetId" type="Int32"/>
+
+    <property name="Region" column="Region" type="String" length="50"/>
+    <property name="RegionName" column="RegionName" type="String" length="100"/>
+    <property name="Supplier" column="Supplier" type="String" length="50" />
+    <property name="SupplierName" column="SupplierName" type="String" length="100" />
+    <property name="LogisticCenterCode" column="LCCode" type="String" length="50"/>
+    <property name="Item" column="Item" type="String" length="50"/>
+    <property name="ItemDescription" column="ItemDesc" type="String" length="100"/>
+
+    <property name="PONo" column="PONo" type="String" length="50"/>
+    <property name="POLineNo" column="POLineNo" type="String" length="50"/>
+
+    <property name="ScanTime" column="ScanTime" type="DateTime" />
+    <property name="ScanQty" column="ScanQty" type="Decimal" />
+    <property name="ScanUserId" column="ScanUser" type="Int32" />
+    <property name="ScanUserName" column="ScanUserNm" type="String" length="100"/>
+
+    <property name="IsOrdered" column="IsOrdered" type="Boolean"  />
+    <property name="OrderTime" column="OrderTime" type="DateTime"/>
+    <property name="OrderQty" column="OrderQty" type="Decimal"/>
+    <property name="OrderUserId" column="OrderUser" type="Int32" />
+    <property name="OrderUserName" column="OrderUserNm" type="String" length="100"/>
+    <property name="OrderNo" column="OrderNo" type="String" length="50"/>
+    <property name="TempKanbanCard" column="TempKanbanCard" type="String" length="50"/>
+    <property name="IsKit" column="IsKit" type="Boolean"  />
+    <property name="KBCalc" column="KBCalc"  />
+    <property name="ReferenceItemCode" column="RefItemCode"  type="String" length="50"/>
+    
+    <property name="CreateUserId" column="CreateUser" type="Int32" update="false"  />
+    <property name="CreateUserName" column="CreateUserNm" type="String" length="100" update="false" />
+    <property name="CreateDate" column="CreateDate" type="DateTime" update="false"  />
+    <property name="LastModifyUserId" column="LastModifyUser" type="Int32"  />
+    <property name="LastModifyUserName" column="LastModifyUserNm" type="String" length="100" />
+    <property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />
+  </class>
+</hibernate-mapping>

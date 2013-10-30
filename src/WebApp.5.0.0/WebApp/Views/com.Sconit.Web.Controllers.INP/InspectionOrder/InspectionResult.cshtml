@@ -1,0 +1,91 @@
+﻿@model IEnumerable<com.Sconit.Entity.INP.InspectResult>
+<script language="javascript" type="text/javascript">
+
+    function grid_OnDataBinding(e) {
+        e.data = {
+            InspectNo: $('#InspectNo').val(),
+            Item: $('#Item').val()
+        };
+    }
+    function onSearch() {
+        var data = {
+            InspectNo: $('#InspectNo').val(),
+            Item: $('#Item').val()
+        };
+        $.ajax({
+            type: "post",
+            dataType: "html",
+            url: "/InspectionOrder/InspectionResult/",
+            data: data,
+            cache: false,
+            success: function (data, textStatus) {
+                var tabStrip = $("#TabStrip");
+                var tabStripContent = tabStrip.data("tTabStrip").getContentElement(1);
+                $(tabStripContent).html(data);
+            }
+        });
+    }
+</script>
+<fieldset>
+    @using (Html.BeginForm())
+    {   
+        <div class="search">
+            <div class="search-label">
+                <label for="InspectMaster_InspectNo">
+                    @Resources.INP.InspectResult.InspectResult_Item
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_ItemComboBox", "Common",
+            new
+            {
+                controlName = "Item",
+                selectedValue = ViewBag.Item
+            });
+                }
+            </div>
+        </div>
+        <div class="search-footer">
+            <button type="button" id="btnSearch" onclick="onSearch();">
+                @Resources.Global.Button_Search</button>
+        </div>
+    }
+</fieldset>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("InspectResultGrid")
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.InspectDetailSequence);
+            columns.Bound(o => o.InspectNo);
+            columns.Bound(o => o.Item);
+            columns.Bound(o => o.ReferenceItemCode);
+            columns.Bound(o => o.ItemDescription);
+            columns.Bound(o => o.Uom);
+            columns.Bound(o => o.UnitCount).Format("{0:N}");
+           
+            columns.Bound(o => o.HuId);
+            columns.Bound(o => o.LotNo);
+            columns.Bound(o => o.CurrentLocation);
+            columns.Bound(o => o.JudgeQty).Format("{0:N}");
+            columns.Bound(o => o.JudgeResultDescription);
+            columns.Bound(o => o.FailCodeDescription);
+            columns.Bound(o => o.CreateUserName);
+            columns.Bound(o => o.CreateDate);
+            columns.Bound(o => o.Note);
+            columns.Bound(o => o.RejectHandleResult);
+        })
+        .Scrollable(c => c.Enabled(false))
+        .EnableCustomBinding(true)
+        .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxInspectionResultList", "InspectionOrder"))
+                .ClientEvents(events => events.OnDataBinding("grid_OnDataBinding"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(ViewBag.PageSize);
+        })
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+      )
+</fieldset>

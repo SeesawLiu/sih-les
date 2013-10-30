@@ -1,0 +1,72 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_SequenceOrder_MakeupOrder" });
+}
+@using com.Sconit.Entity.ORD
+
+<fieldset>
+    <div class="search">
+    <div class="search-label">
+            <label for="OrderMaster_Flow">
+                整车生产线
+            </label>
+        </div>
+        <div class="search-field">
+            @{
+    Html.RenderAction("_FlowComboBox", "Common",
+        new
+        {
+            controlName = "ProdLine",
+            //flowstrategy=(int)com.Sconit.CodeMaster.FlowStrategy.SEQ,
+            type = (int)com.Sconit.CodeMaster.OrderType.Production,
+            isVanOrder = true,
+            selectedValue = string.Empty
+        });
+            }
+        </div>
+        <div class="editor-label-2">
+            <label>
+                @Resources.ORD.OrderMaster.OrderMaster_TraceCode
+            </label>
+        </div>
+        <div class="editor-field-2">
+            @Html.TextBox("TraceCode", string.Empty)
+        </div>
+    </div>
+    <div class="search-footer">
+        <button type="button" id="btnNew" onclick="handNewClick()" >
+            @Resources.Global.Button_Add</button>
+           
+    </div>
+</fieldset>
+
+<script type="text/javascript" language="javascript">
+    function handNewClick() {
+        data = {
+            ProdLine: $('#ProdLine').val(),
+            TraceCode: $('#TraceCode').val()
+        }
+        if (data["ProdLine"] == "") {
+            $message.error("整车生产线不能为空。");
+            return;
+        }
+        if (data["TraceCode"] == "") {
+            $message.error("Van号不能为空。");
+            return;
+        }
+        $.ajax({
+            type: "post",
+            dataType: "Json",
+            url: "/SequenceMaster/MakeupSequenceOrder/",
+            data: data,
+            cache: false,
+            success: function (data, textStatus) {
+                DisplayJsonMessages(data);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+            DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+</script>
+

@@ -1,0 +1,21 @@
+﻿@model System.Web.Mvc.SelectList
+@{
+    string name = ViewBag.ControlName;
+    string id = string.IsNullOrWhiteSpace(ViewBag.ControlId) ? name : ViewBag.ControlId;
+    bool enable = ViewBag.Enable != null ? ViewBag.Enable : true;
+    bool checkLocation = ViewBag.CheckLocation != null ? ViewBag.CheckLocation : false;
+
+    string onBindingName = checkLocation ? "Shipper_DataBinding" : "EmptyDataBinding";
+}
+@(Html.Telerik().ComboBox()
+                .Name(name)
+                          .AutoFill(true)
+                                          .HighlightFirstMatch(true)
+                .HiddenInputHtmlAttributes(new { id = id })
+                                        .DataBinding(binding => binding.Ajax().Select("_AjaxLoadingShipper", "Common", new { checkLocation = checkLocation }))
+                .ClientEvents(events => events
+                            .OnDataBinding(onBindingName)
+                )
+                .BindTo(Model)
+                .Enable(enable)
+             )

@@ -1,0 +1,82 @@
+﻿@model IEnumerable<com.Sconit.Entity.ORD.OrderMaster>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("OrderMasterGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.OrderNo);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.OrderNo).ClientTemplate(Html.ActionLink("<#= OrderNo #>", "Edit", "SupplierOrder", new { OrderNo = "<#= OrderNo #>", Flow = "<#= Flow #>" }, null).ToString());
+            columns.Bound(o => o.WindowTime);
+            columns.Bound(o => o.OrderPriorityDescription);
+            columns.Bound(o => o.PartyToName);
+            columns.Bound(o => o.Dock);
+            columns.Bound(o => o.Flow);
+            columns.Bound(o => o.SupplierOrderStatusDescription);
+            columns.Bound(o => o.IsListPrice).Title(Resources.ORD.OrderMaster.OrderMaster_IsSee).ClientTemplate("<input type='checkbox' disabled='disabled' name='IsListPrice' <#= IsListPrice? checked='checked' : '' #> />");
+            //columns.Bound(o => o.IsPrintOrder).Title(Resources.ORD.OrderMaster.OrderMaster_IsSee).ClientTemplate("<input type='checkbox' disabled='disabled' name='IsPrintOrder' <#= IsPrintOrder? checked='checked' : '' #> />");
+            columns.Bound(o => o.CreateUserName);
+            columns.Bound(o => o.CreateDate);
+        })
+                 .DetailView(details => details.ClientTemplate(
+                    Html.Telerik().Grid<com.Sconit.Entity.ORD.OrderDetail>()
+                    .Name("OrderDetail_<#= OrderNo #>")
+                    .Columns(columns =>
+                    {
+                        columns.Bound(o => o.Sequence);
+                        columns.Bound(o => o.ExternalOrderNo).ClientTemplate("<div><#=(ExternalOrderNo==''||ExternalOrderNo==null) ?BillAddressDescription:ExternalOrderNo #></div>").Title("计划协议号");
+                        //columns.Bound(o => o.ExternalOrderNo);
+                        columns.Bound(o => o.ExternalSequence).Title("计划协议行号");
+                        columns.Bound(o => o.Item);
+                        columns.Bound(o => o.ReferenceItemCode);
+                        columns.Bound(o => o.ItemDescription);
+                        columns.Bound(o => o.Uom);
+                        columns.Bound(o => o.UnitCount);
+                        columns.Bound(o => o.UnitCountDescription);
+                        columns.Bound(o => o.LocationTo);
+                        columns.Bound(o => o.OrderedQty);
+                        columns.Bound(o => o.ShippedQty);
+                        columns.Bound(o => o.ReceivedQty);
+                    })
+                    .DataBinding(dataBinding => dataBinding.Ajax()
+                    .Select("_AjaxOrderDetail", "SupplierOrder", new { orderNo = "<#= OrderNo #>" }))
+                    .Footer(false)
+                    .Resizable(resizing => resizing.Columns(true))
+                    .ToHtmlString()
+                    ))
+        .Scrollable(c => c.Enabled(false))
+        .EnableCustomBinding(true)
+                .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxList", "SupplierOrder"))
+                .ClientEvents(events => events.OnDataBinding("OrderMasterGrid_OnDataBinding"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(ViewBag.PageSize);
+        })
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+    )
+    <script type="text/javascript">
+        function OrderMasterGrid_OnDataBinding(e) {
+            e.data = {
+                OrderNo: $('#OrderNo').val(),
+                Flow: $('#Flow').val(),
+                PartyFrom: $('#PartyFrom').val(),
+                DateFrom: $('#DateFrom').val(),
+                DateTo: $('#DateTo').val(),
+                Dock: $('#Dock').val(),
+                Status: $('#Status').val(),
+                Priority: $('#Priority').val(),
+                ReferenceOrderNo: $('#ReferenceOrderNo').val(),
+                ExternalOrderNo: $('#ExternalOrderNo').val(),
+                WMSNO: $('#WMSNO').val(),
+                Sequence: $('#Sequence').val(),
+                IsListPrice: $('#IsListPrice').is(":checked"),
+                IsPrintOrder: $('#IsPrintOrder').is(":checked")
+
+            };
+        } 
+    </script>
+</fieldset>

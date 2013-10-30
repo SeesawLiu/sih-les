@@ -1,0 +1,26 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_ProdBomDetForecast_View" });
+}
+@{ Html.Telerik().TabStrip()
+        .Name("TabStrip")
+        .Items(tabstrip =>
+        {
+            tabstrip.Add()
+               .Text(Resources.CUST.ProdBomDetForecast.ProdBomDetForecast_Tab_ByBDTER)
+                .LoadContentFrom("_ResultByBDTER", "ProdBomDetForecast");
+
+            tabstrip.Add()
+                .Text(Resources.CUST.ProdBomDetForecast.ProdBomDetForecast_Tab_ByCHARG)
+                .LoadContentFrom("List", "ProdBomDetForecast");
+        })
+        
+        .Render();
+}
+@{ Html.Telerik().ScriptRegistrar()
+        .OnDocumentReady(
+    @<text> var tabIndex = "@TempData["TabIndex"]"; var tabstrip = $("#TabStrip").data("tTabStrip");
+    var item = $("li", tabstrip.element)[tabIndex != "" ? tabIndex : 0]; tabstrip.select(item);
+    </text>
+        );
+}

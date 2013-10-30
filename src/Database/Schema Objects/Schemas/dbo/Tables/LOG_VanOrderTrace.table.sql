@@ -1,0 +1,28 @@
+﻿CREATE TABLE [dbo].[LOG_VanOrderTrace] (
+    [Id]               BIGINT          IDENTITY (1, 1) NOT NULL,
+    [UUID]             VARCHAR (50)    NULL,
+    [Flow]             VARCHAR (50)    NULL,
+    [OrderNo]          VARCHAR (50)    NULL,
+    [OrderDetSeq]      INT             NULL,
+    [OrderDetId]       BIGINT          NULL,
+    [Priority]         TINYINT         NULL,
+    [StartTime]        DATETIME        NULL,
+    [WindowTime]       DATETIME        NULL,
+    [EMWindowTime]     DATETIME        NULL,
+    [ReqTimeFrom]      DATETIME        NULL,
+    [ReqTimeTo]        DATETIME        NULL,
+    [Item]             VARCHAR (50)    NULL,
+    [RefItemCode]      VARCHAR (50)    NULL,
+    [ItemDesc]         VARCHAR (100)   NULL,
+    [Uom]              VARCHAR (50)    NULL,
+    [UC]               DECIMAL (18, 8) NULL,
+    [ManufactureParty] VARCHAR (50)    NULL,
+    [Location]         VARCHAR (50)    NULL,
+    [OpRef]            VARCHAR (50)    NULL,
+    [NetOrderQty]      DECIMAL (18, 8) NULL,
+    [OrgOpRefQty]      DECIMAL (18, 8) NULL,
+    [GrossOrderQty]    DECIMAL (18, 8) NULL,
+    [OpRefQty]         DECIMAL (18, 8) NULL,
+    [CreateDate]       DATETIME        DEFAULT (getdate()) NOT NULL
+);
+

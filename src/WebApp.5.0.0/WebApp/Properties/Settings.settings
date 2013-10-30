@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="com.Sconit.Web.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="com_Sconit_WebApp_EncryptDencrypt_EncryptDencryptService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://ws.sih.cq.cn/SIHWEBSERVICE/EncryptDencrypt/EncryptDencryptService.asmx</Value>
+    </Setting>
+    <Setting Name="com_Sconit_WebApp_SAPService_SAPService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://localhost:1122/WebService/SAPService.asmx</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

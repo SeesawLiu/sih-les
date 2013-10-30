@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="com.Sconit.Entity.KB.KanbanCard, com.Sconit.Entity" table="KB_KanbanCard" lazy="false">
+    <id name="CardNo" column="CardNo" type="String" unsaved-value="null" >
+      <generator class="assigned" />
+    </id>
+    <version name="Version" column="Version" type="Int32"  />
+    <property name="Sequence" column="Seq" type="String" length="10"/>
+    <property name="Flow" column="Flow" type="String" length="50"/>
+    <property name="FlowDetailId" column="FlowDetId" type="Int32"/>
+    <property name="Region" column="Region" type="String" length="50"/>
+    <property name="RegionName" column="RegionName" type="String" length="100"/>
+    <property name="LogisticCenterCode" column="LCCode" type="String" length="50"/>
+    <property name="Supplier" column="Supplier" type="String" length="50" />
+    <property name="SupplierName" column="SupplierName" type="String" length="100" />
+    <property name="Item" column="Item" type="String" length="50" />
+    <property name="ItemDescription" column="ItemDesc" type="String" length="100" />
+    <property name="Qty" column="Qty" type="Decimal"/>
+    <property name="Container" column="Container" type="String" length="50" />
+    <property name="LocBin" column="LocBin" type="String" length="50" />
+    <property name="Shelf" column="Shelf" type="String" length="50" />
+    <property name="QiTiaoBian" column="QiTiaoBian" type="String" length="50" />
+    <property name="PONo" column="PONo" type="String" length="50"/>
+    <property name="POLineNo" column="POLineNo" type="String" length="50"/>
+    <property name="Status" column="Status"  />
+    <property name="MultiSupplyGroup" column="MultiSupplyGroup" type="String" length="50" />
+    <property name="Location" column="Location" type="String" length="50" />
+    <property name="OpRef" column="OpRef" type="String" length="50" />
+    <property name="EffectiveDate" column="EffDate" type="DateTime"/>
+    <property name="FreezeDate" column="FreezeDate" type="DateTime"/>
+    <property name="LastUseDate" column="LastUseDate" type="DateTime"/>
+    <property name="NeedReprint" column="NeedReprint" type="Boolean"  />
+    <property name="IsKit" column="IsKit" type="Boolean"  />
+    <property name="KBCalc" column="KBCalc"  />
+    <property name="IsTrace" column="IsTrace" type="Boolean"  />
+    <property name="IsLost" column="IsLost" type="Boolean"  />
+    <property name="LostCount" column="LostCount" type="Int32"  />
+    <property name="GroupNo" column="GroupNo"  type="String" length="50"/>
+    <property name="GroupDesc" column="GroupDesc" type="String" length="50" />
+    <property name="LogisticCenterName" column="LCName" type="String" length="50" />
+    <property name="TotalCount" column="TotalCount" type="Int32"  />
+    <property name="KitCount" column="KitCount" type="Int32"  />
+    <property name="Number" column="Number" type="Int32"  />
+    <property name="CreateUserId" column="CreateUser" type="Int32" update="false"/>
+    <property name="CreateUserName" column="CreateUserNm" type="String" length="100" update="false"/>
+    <property name="CreateDate" column="CreateDate" type="DateTime" update="false"/>
+    <property name="LastModifyUserId" column="LastModifyUser" type="Int32"/>
+    <property name="LastModifyUserName" column="LastModifyUserNm" type="String" length="100"/>
+    <property name="LastModifyDate" column="LastModifyDate" type="DateTime"/>
+    <property name="ReferenceItemCode" column="RefItemCode"  type="String" length="50"/>
+    <property name="MultiStation" column="MultiSta"  type="String" length="200"/>
+    <property name="ItemType" column="ItemType"  type="String" length="50"/>
+    <property name="OpRefSequence" column="OpRefSeq"  type="String" length="50"/>
+  </class>
+</hibernate-mapping>

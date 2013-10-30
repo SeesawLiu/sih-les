@@ -1,0 +1,168 @@
+﻿@using com.Sconit.Entity.SYS
+@using com.Sconit.Web.Models.SearchModels.ORD
+<script type="text/javascript">
+    //    function Flow_Change(e) {
+    //        if (e.value != "") {
+    //            var combobox = $(this).data("tComboBox");
+    //            if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+    //                combobox.value("");
+    //                combobox.text("");
+    //                combobox.reload();
+
+    //            }
+    //        }
+    //    }
+
+    function onScheduleRefresh(e) {
+        if ($("#Item").val() == "" && $("#PartyFrom").val() == "") {
+            $message.error("请选择一个供应商或者物料刷新。");
+            return;
+        }
+        var data = {
+            "Item": $("#Item").val(),
+            "PartyFrom": $("#PartyFrom").val()
+        };
+        $.ajax({
+            type: "post",
+            dataType: "html",
+            url: "/ScheduleLine/Refresh/",
+            data: data,
+            cache: false,
+            success: function (data, textStatus) {
+                var $tGrid = $("#content");
+                $($tGrid).html(data);
+            }
+        });
+    }
+
+    function onSearch() {
+        if ($("#Item").val() == "" && $("#PartyFrom").val() == "") {
+            $message.error("请选择一个供应商或者物料进行查询。");
+            return;
+        }
+        var oldDate = new Date();
+        var timer = setInterval(function () { oldDate = getSpeedDate(oldDate) }, 1000);
+        var data = {
+            "PartyFrom": $("#PartyFrom").val(),
+            "Item": $("#Item").val(),
+            "ListDays": $("#ListDays").val(),
+            "NotIncludeZeroShipQty": $("#cbZeroQty").is(':checked')
+        }
+        $.ajax({
+            type: "post",
+            dataType: "html",
+            url: "/ScheduleLine/_ScheduleLineList/",
+            data: data,
+            cache: false,
+            success: function (data, textStatus) {
+                stopSearch(timer);
+                $("#SpeedDiv").hide();
+                $("#fdOrderDetail").html(data);
+                $("#fdOrderDetail").show();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+                stopSearch(timer);
+                $("#SpeedDiv").hide();
+            }
+        });
+    }
+
+    function getSpeedDate(oldDate) {
+        var newDate = new Date();
+        var date = newDate - oldDate;
+        var minutess = parseInt(date / 1000);
+
+        var showTime = "00:" + (parseInt(minutess / 60) < 10 ? ("0" + parseInt(minutess / 60)) : parseInt(minutess / 60)) + ":" + (parseInt(minutess % 60) < 10 ? ("0" + parseInt(minutess % 60)) : parseInt(minutess % 60));
+        $("#SpeedDiv").text("正在为您查询,请稍等!已用时: " + showTime).show();
+        return oldDate;
+    }
+
+    function stopSearch(timer) {
+        clearInterval(timer);
+    }
+
+    function showDetail() {
+        if ($('input[name="cbShowDetail"]').attr("checked") == "checked") {
+            $("#dayLabel").attr("style", "display:hidden");
+            $("#dayText").attr("style", "display:hidden");
+            $("#ListDays").val(21);
+        } else {
+            $("#dayLabel").attr("style", "display:none");
+            $("#dayText").attr("style", "display:none");
+            $("#ListDays").val(0);
+        }
+    }
+</script>
+@using (Html.BeginForm())
+{   
+    <fieldset>
+        <div class="search">
+            <div class="search-label">
+                <label for="OrderMaster_Flow">
+                    @Resources.ORD.OrderMaster.OrderMaster_PartyFrom_Supplier
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+    Html.RenderAction("_OrderMasterPartyFromComboBox", "Common",
+        new
+        {
+            controlName = "PartyFrom",
+            orderType = (int)com.Sconit.CodeMaster.OrderType.Procurement,
+            selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).PartyFrom : string.Empty
+        });
+                }
+            </div>
+            <div class="search-label">
+                <label>
+                    @Resources.ORD.OrderDetail.OrderDetail_Item
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+    Html.RenderAction("_ItemComboBox", "Common", new
+    {
+        controlName = "Item",
+        selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).Item : string.Empty
+    });
+                }
+            </div>
+            <div class="search-label">
+                <label>
+                    显示明细
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.CheckBox("cbShowDetail", false, new { onClick = "showDetail();" })
+            </div>
+            <div class="search-label" id="dayLabel" style="display: none">
+                <label>
+                    @Resources.ORD.OrderDetail.OrderDetail_ListDays
+                </label>
+            </div>
+            <div class="search-field" id="dayText" style="display: none">
+                @Html.TextBox("ListDays", 0)
+            </div>
+            <div class="search-label">
+                <label>
+                    过滤可发货数量为0的记录
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.CheckBox("cbZeroQty", true)
+            </div>
+        </div>
+        <div class="search-footer">
+            <button type="button" id="btnSearch" onclick="onSearch()">
+                @Resources.Global.Button_Search</button>
+            @*<button type="button" id="btnRefresh" onclick="onScheduleRefresh()">
+                @Resources.Global.Button_Refresh</button>*@
+        </div>
+    </fieldset>
+    <div id="SpeedDiv" style="text-align: center;">
+    </div>
+    <div id="fdOrderDetail" style="display: none;">
+    </div>
+
+}

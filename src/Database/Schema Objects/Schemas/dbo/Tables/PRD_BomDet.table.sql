@@ -1,0 +1,26 @@
+﻿CREATE TABLE [dbo].[PRD_BomDet] (
+    [Id]               INT             IDENTITY (1, 1) NOT FOR REPLICATION NOT NULL,
+    [Bom]              VARCHAR (50)    NOT NULL,
+    [Item]             VARCHAR (50)    NOT NULL,
+    [Op]               INT             NULL,
+    [OpRef]            VARCHAR (50)    NULL,
+    [Uom]              VARCHAR (5)     NOT NULL,
+    [StruType]         TINYINT         NOT NULL,
+    [StartDate]        DATETIME        NOT NULL,
+    [EndDate]          DATETIME        NULL,
+    [RateQty]          DECIMAL (18, 8) NOT NULL,
+    [ScrapPct]         DECIMAL (18, 8) NOT NULL,
+    [BFStrategy]       VARCHAR (50)    NULL,
+    [BFMethod]         TINYINT         NOT NULL,
+    [FeedMethod]       TINYINT         NOT NULL,
+    [IsAutoFeed]       BIT             NOT NULL,
+    [Location]         VARCHAR (50)    NULL,
+    [IsPrint]          BIT             NOT NULL,
+    [CreateUser]       INT             NOT NULL,
+    [CreateUserNm]     VARCHAR (100)   NOT NULL,
+    [CreateDate]       DATETIME        NOT NULL,
+    [LastModifyUser]   INT             NOT NULL,
+    [LastModifyUserNm] VARCHAR (100)   NOT NULL,
+    [LastModifyDate]   DATETIME        NOT NULL
+);
+

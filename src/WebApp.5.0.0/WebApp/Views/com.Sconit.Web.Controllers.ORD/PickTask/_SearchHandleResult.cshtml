@@ -1,0 +1,57 @@
+﻿@model IEnumerable<com.Sconit.Entity.ORD.PickTask>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("PickTaskHandleGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.PickId);
+        })
+        .Editable(editing => editing.Mode(GridEditMode.InCell))
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.PickId).ReadOnly(true)
+                .ClientTemplate("<input type='checkbox' id='checkedRecords' name='checkedRecords' value='<#= PickId #>' onClick='showButtons()'   />")
+                .HeaderTemplate("<input type='checkbox' id='checkAll' name='checkAll' />")
+                .Width(36).HtmlAttributes(new { style = "text-align:center" });
+            columns.Bound(o => o.PickId).ReadOnly();
+            columns.Bound(o => o.PrintCount).ReadOnly();
+            columns.Bound(o => o.OrderNo).ReadOnly();
+            columns.Bound(o => o.Flow).ReadOnly();
+            columns.Bound(o => o.Item).ReadOnly();
+            columns.Bound(o => o.ItemDesc).ReadOnly();
+            //columns.Bound(o => o.IsHold).ClientTemplate("<input type='checkbox' disabled='disabled' name='IsHold' <#= IsHold? checked='checked' : '' #> />");
+            //columns.Bound(o => o.LocationFromName);
+            columns.Bound(o => o.LocationToName).ReadOnly();
+            columns.Bound(o => o.ReleaseDate).ReadOnly();
+            columns.Bound(o => o.WindowTime).ReadOnly();
+            columns.Bound(o => o.OrderedQty).ReadOnly();
+            columns.Bound(o => o.PickedQty).ReadOnly();
+            columns.Bound(o => o.Picker).ReadOnly();
+            columns.Bound(o => o.NewPicker).EditorTemplateName("PickerGridForeignKey").Width(100);
+            columns.Bound(o => o.Item).Hidden();
+            columns.Bound(o => o.LocationFrom).Hidden();
+       })
+        .Scrollable(c => c.Enabled(false))
+                .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxListHandle", "PickTask"))
+                        .ClientEvents(events => events.OnDataBinding("PickTaskHandleGrid_OnDataBinding"))
+                .EnableCustomBinding(true)
+                .Sortable()
+                .Resizable(resizing => resizing.Columns(true))
+        )
+             <script type="text/javascript">
+                 function PickTaskHandleGrid_OnDataBinding(e) {
+                     e.data = {
+                         LocationFrom: $('#LocationFrom').val(),
+                         Picker: $('#Picker').val(),
+                         OrderNo: $('#OrderNo').val(),
+                         Item: $('#Item').val(),
+                         Flow:$("#Flow").val(),
+                         ReleaseStart: $('#ReleaseStart').val(),
+                         ReleaseEnd: $("#ReleaseEnd").val(),
+                         WindowStart: $('#WindowStart').val(),
+                         WindowEnd: $("#WindowEnd").val(),
+                         ShowHold: $('#ShowHold').is(':checked')
+                     }
+                 }
+    </script>
+</fieldset>

@@ -1,0 +1,139 @@
+﻿@using com.Sconit.Entity.SYS
+@model com.Sconit.Entity.ORD.PickListMaster
+
+<fieldset>
+    @using (Html.BeginForm())
+    {
+        <fieldset>
+            <legend>@Resources.ORD.OrderMaster.OrderMaster_BaseInfo</legend>
+            <div class="editor">
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.PickListNo)
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.PickListNo)
+                    @Html.HiddenFor(model => model.PickListNo)
+                    @Html.HiddenFor(model => model.Version)
+                </div>
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.StartTime)
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.StartTime, new { disabled = false })
+                </div>
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.WindowTime)
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.WindowTime, new { disabled = false })
+                </div>
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.Status)
+                </div>
+                <div class="editor-field-2">
+                    @{
+        Html.RenderAction("_CodeMasterDropDownList", "Common",
+            new
+            {
+                code = com.Sconit.CodeMaster.CodeMaster.PickListStatus,
+                controlName = "Status",
+                selectedValue = Model != null ? (int)Model.Status : 0,
+                enable = false
+            });
+                    }
+                    @Html.HiddenFor(model => model.Status)
+                </div>
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.PartyFromName)
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.PartyFromName)
+                    @Html.HiddenFor(model => model.PartyFrom)
+                </div>
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.PartyToName)
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.PartyToName)
+                    @Html.HiddenFor(model => model.PartyTo)
+                </div>
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.CreateUserName)
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.CreateUserName)
+                </div>
+                <div class="editor-label-2">
+                    @Html.LabelFor(model => model.CreateDate)
+                </div>
+                <div class="editor-field-2">
+                    @Html.DisplayFor(model => model.CreateDate)
+                </div>
+                <div class="editor-label-2">
+                   <label>是否已打印</label>
+                </div>
+                <div class="editor-field-2">
+                    @Html.CheckBoxFor(model => model.IsPrintAsn)
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="editor-footer">
+            <button type="button" id="btnPrint" onclick="Print()">
+                @Resources.Global.Button_Print</button>
+            <button type="button" id="btnExport" onclick="Export()">
+                @Resources.Global.Button_Export</button>
+               @if (ViewBag.UrlId == "List")
+               {
+            <button type="button" id="btnBack" onclick="location.href='@Url.Content("~/PickList/List")'">
+                @Resources.Global.Button_Back</button>
+               }
+               else { 
+               <button type="button" id="btnBackNew" onclick="location.href='@Url.Content("~/PickList/NewDetailIndex")'">
+                @Resources.Global.Button_Back</button>
+               }
+        </div>
+    }
+</fieldset>
+<div id="divPickListDetail">
+    @{
+        Html.RenderAction("PickListDetail", "PickList", new { pickListNo = Model.PickListNo });
+    }
+</div>
+<form id="hiddenForm" action="/PickList/SaveToClient" target="_blank"
+method="post">
+<input id="pickListNo" name="pickListNo" type="hidden" />
+</form>
+<script type="text/javascript">
+ 
+    function Export(e) {
+        $("#pickListNo").val($("#PickListNo").val());
+        $("#hiddenForm").submit();
+    }
+//    function Export(e) {
+//        window.open("/PickList/SaveToClient/?pickListNo=" + $("#PickListNo").val());
+//    }
+
+    function Print(e) {
+        //window.open("/ProcurementOrder/SaveToClient/?orderNo=" + $("#OrderNo").val());
+        var data = {
+            "pickListNo": $("#PickListNo").val()
+        };
+        $.ajax({
+            type: "post",
+            dataType: "text",
+            url: "/PickList/Print/",
+            data: data,
+            success: function (data, textStatus) {
+                if (data != "") {
+                    PrintOrder(data);
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                var errorMessages = "<li>" + XMLHttpRequest.responseText + "</li>";
+                $("#errorsul").html(errorMessages);
+            }
+        });
+    }
+ 
+</script>

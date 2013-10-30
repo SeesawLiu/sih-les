@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.SAP.ORD.ProdOrderBomDet, com.Sconit.Entity.SAP" table="SAP_ProdOrderBomDet" lazy="false">
+		<id name="Id" column="Id" type="Int64" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<property name="AUFNR" column="AUFNR" type="String" length="50"/>
+        <property name="ORDER_MATERIAL" column="ORDER_MATERIAL" type="String" length="50"/>
+        <property name="MATERIAL" column="MATERIAL" type="String" length="50"/>	
+		<property name="BISMT" column="BISMT" type="String" length="50"/>	
+		<property name="MAKTX" column="MAKTX" type="String" length="200"/>	
+		<property name="BASE_UOM" column="BASE_UOM" type="String" length="5"/>	
+		<property name="REQ_QUAN" column="REQ_QUAN" type="Decimal"/>	
+		<property name="STORAGE_LOCATION" column="STORAGE_LOCATION" type="String" length="50"/>	
+		<property name="GW" column="GW" type="String" length="50"/>	
+		<property name="SEQUENCE" column="SEQUENCE" type="String" length="50"/>	
+		<property name="OPERATION" column="OPERATION" type="String" length="50"/>	
+		<property name="RESERVATION_NUMBER" column="RESERVATION_NUMBER" type="String" length="50"/>	
+		<property name="RESERVATION_ITEM" column="RESERVATION_ITEM" type="String" length="50"/>	
+		<property name="BESKZ" column="BESKZ" type="String" length="50"/>	
+		<property name="SOBSL" column="SOBSL" type="String" length="50"/>	
+		<property name="WZ" column="WZ" type="String" length="50"/>	
+		<property name="ZOPID" column="ZOPID" type="String" length="50"/>	
+		<property name="ZOPDS" column="ZOPDS" type="String" length="50"/>	
+		<property name="LIFNR" column="LIFNR" type="String" length="50"/>
+        <property name="WORK_CENTER" column="WORK_CENTER" type="String" length="50"/>
+        <property name="ICHARG" column="ICHARG" type="String" length="50"/>
+        <property name="BWART" column="BWART" type="String" length="50"/>
+        <property name="Status" column="Status" type="Int16"/>	
+		<property name="CreateDate" column="CreateDate" type="DateTime" update="false"/>	
+		<property name="LastModifyDate" column="LastModifyDate" type="DateTime"/>	
+		<property name="ErrorCount" column="ErrorCount" type="Int32"/>	
+  	</class>
+</hibernate-mapping>

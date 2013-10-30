@@ -1,0 +1,33 @@
+﻿@using com.Sconit.Web.Models.SearchModels.ORD
+
+<fieldset>
+    @using (Html.BeginForm("List", "OrderItemTrace"))
+    {   
+        <div class="search">
+            <div class="search-label">
+                <label for="OrderItemTrace_OrderNo">
+                    @Resources.ORD.OrderItemTrace.OrderItemTrace_OrderNo
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("OrderNo", TempData["OrderItemTraceSearchModel"] != null ? ((OrderItemTraceSearchModel)TempData["OrderItemTraceSearchModel"]).OrderNo : string.Empty)
+            </div>
+            <div class="search-label">
+                <label for="OrderItemTrace_OpReference">
+                    @Resources.ORD.OrderItemTrace.OrderItemTrace_OpReference
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("OpReference", TempData["OrderItemTraceSearchModel"] != null ? ((OrderItemTraceSearchModel)TempData["OrderItemTraceSearchModel"]).OpReference : string.Empty)
+            </div>
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            @Html.Button(Resources.Global.Button_Search, "Url_OrderItemTrace_View", new Dictionary<string, string>()
+	{
+	    {"type", "submit"},
+	    {"id", "btnSearch"}
+	})
+        </div>
+    }
+</fieldset>

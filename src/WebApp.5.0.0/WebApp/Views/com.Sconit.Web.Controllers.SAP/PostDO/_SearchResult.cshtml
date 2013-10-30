@@ -1,0 +1,85 @@
+﻿@using com.Sconit.Entity.SAP.TRANS;
+@model IEnumerable<com.Sconit.Entity.SAP.ORD.PostDO>
+
+
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+                .Name("CreateScheduleLineGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Id);
+            columns.Bound(o => o.OrderNo);
+            columns.Bound(o => o.ReceiptNo);
+            columns.Bound(o => o.Result);
+            columns.Bound(o => o.ZTCODE);
+            columns.Bound(o => o.StatusName);
+            columns.Bound(o => o.Status);
+            columns.Bound(o => o.CreateDate);
+            columns.Bound(o => o.LastModifyDate);
+            columns.Bound(o => o.ErrorCount);
+            
+            
+        })
+        .Scrollable(c => c.Enabled(false))
+        .EnableCustomBinding(true)
+                                .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxList", "PostDO"))
+                                .ClientEvents(events => events.OnDataBinding("PostDOGrid_OnDataBinding").OnComplete("TelerikGridView_OnComplete").OnRowDataBound("CreateScheduleLineGrid_OnRowDataBound"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(ViewBag.PageSize);
+        })
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+    )
+    <script type="text/javascript">
+        function PostDOGrid_OnDataBinding(e) {
+            i = 0;
+            e.data = {
+                EINDT: $('#OrderNo').val(),
+                FRBNR: $('#ReceiptNo').val(),
+                StartDate: $('#StartDate').val(),
+                EndDate: $('#EndDate').val(),
+                Status:$('#Status').val()
+            };
+        }
+
+    var i = 0;
+    function CreateScheduleLineGrid_OnRowDataBound(e) {
+        if (i != 0) {
+            return;
+        }
+        var rows = $("tbody").children("tr:not(.t-no-data)");
+        for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+            var row = $(rows[rowIndex]);
+            var status = row.children().eq(11).text();
+            var errorCount = row.children().eq(14).text();
+            if (status != "2" || errorCount!="10") {
+                row.children().eq(15).children().hide();
+            }
+        }
+        i = rows.length;
+    }
+
+    function ReSendClick(e) {
+            var data = {
+                Id: $(e).parent().parent().children().eq(0).text()
+            }
+            $.ajax({
+                type: "post",
+                dataType: "html",
+                url: "/CreateScheduleLine/ReSend/",
+                data: data,
+                success: function (data, ordermstr) {
+                    //                    DisplayJsonMessages(data);
+                    //                    $("#ErrorBarCodeListDiv").html(data);
+                    $("#count").html(data);
+                }
+            });
+    }
+    </script>
+</fieldset>

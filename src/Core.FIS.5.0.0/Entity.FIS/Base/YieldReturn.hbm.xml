@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="com.Sconit.Entity.FIS.YieldReturn, com.Sconit.Entity.FIS" table="FIS_YieldReturn" lazy="false">
+    <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      <generator class="identity" />
+    </id>
+    <property name="IpNo" column="IpNo" type="String" length="50"/>
+    <property name="ArriveTime" column="ArriveTime" type="DateTime" />
+    <property name="PartyFrom" column="PartyFrom" type="String" length="50"/>
+    <property name="PartyTo" column="PartyTo" type="String" length="50"/>
+    <property name="Dock" column="Dock" type="String" length="50"/>
+    <property name="IpCreateDate" column="IpCreateDate" type="DateTime" />
+
+    <property name="Seq" column="Seq" type="String" length="50"/>
+    <property name="Item" column="Item" type="String" length="50"/>
+    <property name="ManufactureParty" column="ManufactureParty" type="String" length="50"/>
+    <property name="Qty" column="Qty" type="Decimal"  />
+    <property name="IsConsignment" column="IsConsignment" type="Boolean"  />
+
+    <property name="CreateDate" column="CreateDate" type="DateTime" />
+    <property name="CreateDATDate" column="CreateDATDate" type="DateTime" />
+    <property name="DATFileName" column="DATFileName" type="String" length="50"/>
+	<property name="IsCreateDat" column="IsCreateDat" type="Boolean"/>
+  </class>
+</hibernate-mapping>

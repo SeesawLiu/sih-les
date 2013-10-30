@@ -1,0 +1,159 @@
+﻿@using com.Sconit.Entity.MD
+@using com.Sconit.Web.Models.SearchModels.INV
+<script type="text/javascript">
+    function PartyFrom_Change(e) {
+        if (e.value != "") {
+            var combobox = $(this).data("tComboBox");
+            if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                combobox.value("");
+                combobox.reload();
+
+            } 
+                $('#LocationFrom').data('tComboBox').value('');
+                $('#LocationFrom').data('tComboBox').text('');
+                $("#LocationFrom").data("tComboBox").reload();
+            
+        }
+    }
+
+    function LocationFrom_DataBinding(e) {
+        e.data = {
+            region: $('#PartyFrom').val()
+        };
+    }
+
+    function PartyTo_Change(e) {
+        if (e.value != "") {
+            var combobox = $(this).data("tComboBox");
+            if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                combobox.value("");
+                combobox.reload();
+
+            } 
+                $('#LocationTo').data('tComboBox').value('');
+                $('#LocationTo').data('tComboBox').text('');
+                $("#LocationTo").data("tComboBox").reload();
+            
+        }
+    }
+
+    function LocationTo_DataBinding(e) {
+        e.data = {
+            region: $('#PartyTo').val()
+        };
+    }
+
+</script>
+
+<fieldset>
+
+    @using (Html.BeginForm("List", "ItemExchange"))
+    {   
+        <div class="search">
+            <div class="search-label">
+                <label for="ItemExchange_ItemFrom">
+                    @Resources.INV.ItemExchange.ItemExchange_ItemFrom
+                </label>
+            </div>
+            <div class="search-field">
+               @{
+        Html.RenderAction("_ItemComboBox", "Common", new
+                               {
+                                   controlName = "ItemFrom",
+                                   selectedValue = TempData["ItemExchangeSearchModel"] != null ? ((ItemExchangeSearchModel)TempData["ItemExchangeSearchModel"]).ItemFrom : null 
+                                });
+                }
+            </div>
+             <div class="search-label">
+                <label for="ItemExchange_ItemTo">
+                    @Resources.INV.ItemExchange.ItemExchange_ItemTo
+                </label>
+            </div>
+            <div class="search-field">
+
+                  @{
+        Html.RenderAction("_ItemComboBox", "Common", new
+                               {
+                                   controlName = "ItemTo",
+                                   selectedValue = TempData["ItemExchangeSearchModel"] != null ? ((ItemExchangeSearchModel)TempData["ItemExchangeSearchModel"]).ItemTo : null
+                               });
+                }
+            </div>
+             <div class="search-label">
+                <label for="ItemExchange_RegionFrom">
+                     @Resources.INV.ItemExchange.ItemExchange_RegionFrom
+                </label>
+            </div>
+            <div class="search-field">
+ @{
+        Html.RenderAction("_RegionComboBox", "Common", new
+                               {
+                                    isChange=true,
+                                   ControlId = "PartyFrom",
+                                   controlName = "RegionFrom",
+                                   selectedValue = TempData["ItemExchangeSearchModel"] != null ? ((ItemExchangeSearchModel)TempData["ItemExchangeSearchModel"]).RegionFrom : null
+                               });
+                }            </div>
+              <div class="search-label">
+                <label for="ItemExchange_RegionTo">
+                    @Resources.INV.ItemExchange.ItemExchange_RegionTo
+                </label>
+            </div>
+            <div class="search-field">
+ @{
+        Html.RenderAction("_RegionComboBox", "Common", new
+                               {
+                                    isChange=true,
+                                   ControlId = "PartyTo",
+                                   controlName = "RegionTo",
+                                   selectedValue = TempData["ItemExchangeSearchModel"] != null ? ((ItemExchangeSearchModel)TempData["ItemExchangeSearchModel"]).RegionTo : null
+                               });
+                }            
+                </div>
+                 <div class="search-label">
+                <label for="ItemExchange_LocationFrom">
+                   @Resources.INV.ItemExchange.ItemExchange_LocationFrom
+                </label>
+            </div>
+                 <div class="search-field">
+ @{
+        Html.RenderAction("_LocationComboBox", "Common", new
+                               {
+                                   checkRegion = true,
+                                   controlName = "LocationFrom",
+                                   selectedValue = TempData["ItemExchangeSearchModel"] != null ? ((ItemExchangeSearchModel)TempData["ItemExchangeSearchModel"]).LocationFrom : null
+                               });
+                }           
+                 </div>
+              <div class="search-label">
+                <label for="ItemExchange_LocationTo">
+                   @Resources.INV.ItemExchange.ItemExchange_LocationTo
+                </label>
+            </div>
+            <div class="search-field">
+ @{
+        Html.RenderAction("_LocationComboBox", "Common", new
+                               {
+                                   checkRegion = true,
+                                   controlName = "LocationTo",
+                                   selectedValue = TempData["ItemExchangeSearchModel"] != null ? ((ItemExchangeSearchModel)TempData["ItemExchangeSearchModel"]).LocationTo : null
+                               });
+                }            
+                </div>
+
+        </div>
+        <div class="search-footer">
+            <button type="submit" id="btnSearch">
+                @Resources.Global.Button_Search</button>
+            @*<button type="button" id="btnNew" onclick="location.href='@Url.Content("~/ItemDiscontinue/New")'">
+                @Resources.Global.Button_New</button>*@
+                @Html.Button(Resources.Global.Button_New, "Url_Inventory_ItemExchange_New", new Dictionary<string, string>()
+	{
+	    {"type", "button"},
+	    {"id", "btnAdd"},
+        {"onclick","location.href='"+Url.Content("~/ItemExchange/New/" ) +"'"}
+	})
+        </div>
+
+    }
+</fieldset>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="com.Sconit.Entity.KB.KanbanCalc, com.Sconit.Entity" table="KB_KanbanCalc" lazy="false">
+    <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      <generator class="identity" />
+    </id>
+
+    <property name="BatchNo" column="BatchNo" type="String" length="200"/>
+    <property name="Qty" column="Qty" type="Decimal" />
+    <property name="Container" column="Container" type="String" length="50"/>
+    <property name="LocBin" column="LocBin" type="String" length="50"/>
+    <property name="Shelf" column="Shelf" type="String" length="50"/>
+    <property name="QiTiaoBian" column="QiTiaoBian" type="String" length="50"/>
+    <property name="Ret" column="Ret"  />
+    <property name="Msg" column="Msg" type="String" length="50"/>
+    <property name="OpTime" column="OpTime" type="DateTime" />
+    <property name="KanbanDeltaNum" column="KanbanDeltaNum" type="Int32" />
+    <property name="KanbanNum" column="KanbanNum" type="Int32" />
+    <property name="CalcKanbanNum" column="CalcKanbanNum" type="Decimal" />
+    <property name="CalcConsumeDate" column="CalcConsumeDate" type="DateTime"/>
+    <property name="CalcConsumeQty" column="CalcConsumeQty" type="Decimal" />
+
+    <property name="CardNo" column="CardNo" type="String" length="100"/>
+    <property name="Sequence" column="Seq" type="String" length="10"/>
+    <property name="Flow" column="Flow" type="String" length="50"/>
+    <property name="FlowDetailId" column="FlowDetId" type="Int32"/>
+    <property name="Region" column="Region" type="String" length="50"/>
+    <property name="RegionName" column="RegionName" type="String" length="100"/>
+    <property name="LogisticCenterCode" column="LCCode" type="String" length="50"/>
+    <property name="Supplier" column="Supplier" type="String" length="50" />
+    <property name="SupplierName" column="SupplierName" type="String" length="100" />
+    <property name="Item" column="Item" type="String" length="50" />
+    <property name="ItemDescription" column="ItemDesc" type="String" length="100" />
+    <property name="PONo" column="PONo" type="String" length="50"/>
+    <property name="POLineNo" column="POLineNo" type="String" length="50"/>
+    <property name="Status" column="Status"  />
+    <property name="MultiSupplyGroup" column="MultiSupplyGroup" type="String" length="50" />
+    <property name="EffectiveDate" column="EffDate" type="DateTime"/>
+    <property name="FreezeDate" column="FreezeDate" type="DateTime"/>
+    <property name="LastUseDate" column="LastUseDate" type="DateTime"/>
+    <property name="NeedReprint" column="NeedReprint" type="Boolean"  />
+    <property name="IsKit" column="IsKit" type="Boolean"  />
+    <property name="KitCount" column="KitCount" type="Int32"  />
+    <property name="KBCalc" column="KBCalc"  />
+    <property name="IsTrace" column="IsTrace" type="Boolean"  />
+    <property name="GroupNo" column="GroupNo"  type="String" length="50"/>
+    <property name="GroupDesc" column="GroupDesc" type="String" length="50" />
+    <property name="LogisticCenterName" column="LCName" type="String" length="50" />
+    <property name="SafeKanbanNum" column="SafeKanbanNum" type="Decimal" />
+    <property name="BatchKanbanNum" column="BatchKanbanNum" type="Decimal" />
+    <property name="Location" column="Location" type="String" length="50" />
+    <property name="OpRef" column="OpRef" type="String" length="50" />
+    <property name="Tiao" column="Tiao" type="Int32" />
+    <property name="Bian" column="Bian" type="Int32" />
+    <property name="CreateUserId" column="CreateUser" type="Int32" update="false"/>
+    <property name="CreateUserName" column="CreateUserNm" type="String" length="100" update="false"/>
+    <property name="CreateDate" column="CreateDate" type="DateTime" update="false"/>
+    <property name="LastModifyUserId" column="LastModifyUser" type="Int32"/>
+    <property name="LastModifyUserName" column="LastModifyUserNm" type="String" length="100"/>
+    <property name="LastModifyDate" column="LastModifyDate" type="DateTime"/>
+  </class>
+</hibernate-mapping>

@@ -1,0 +1,66 @@
+﻿@using com.Sconit.Web.Models.SearchModels.ORD
+@using com.Sconit.Entity.SYS
+
+<fieldset>
+    
+        <div class="search">
+            <div class="search-label">
+                <label for="OrderMaster_OrderNo">
+                    @Resources.ORD.OrderMaster.OrderMaster_OrderNo
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("ResumeOrderNo")
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_TraceCode">
+                    @Resources.ORD.OrderMaster.OrderMaster_TraceCode
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("ResumeTraceCode")
+                @Html.Hidden("ResumeFlow", (string)ViewBag.Flow)
+                @Html.Hidden("CurrentOrderNo", (string)ViewBag.CurrentOrderNo)
+            </div>
+            @if ((bool)ViewBag.IsForceResume)
+            {
+            <div class="search-label">
+                <label for="OrderMaster_TraceCode">
+                    强制恢复
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.CheckBox("IsForceResume",false)
+            </div>
+            }
+
+   
+        </div>
+        <div class="search-footer">
+            <button type="button" id="btnSearch" onclick="doSearchClick()">
+                @Resources.Global.Button_Search</button>
+        </div>
+</fieldset>
+<div id="SelectResumeOrderNoListDiv">
+
+</div>
+<script type="text/javascript">
+    function doSearchClick() {
+        var data = {
+            currentOrderNo: $('#CurrentOrderNo').val(),
+            OrderNo: $('#ResumeOrderNo').val(),
+            TraceCode: $('#ResumeTraceCode').val(),
+            Flow: $('#ResumeFlow').val(),
+            IsForceResume: $('#IsForceResume').is(":checked")
+        };
+        $.ajax({
+            type: "post",
+            dataType: "html",
+            url: "/ProductionOrder/_SelectResumeOrderNoList/",
+            data: data,
+            success: function (data, textStatus) {
+                $("#SelectResumeOrderNoListDiv").html(data);
+            }
+        });
+     }
+</script>

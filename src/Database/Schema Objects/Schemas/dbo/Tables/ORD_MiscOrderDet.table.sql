@@ -1,0 +1,27 @@
+﻿CREATE TABLE [dbo].[ORD_MiscOrderDet] (
+    [Id]               INT             IDENTITY (1, 1) NOT FOR REPLICATION NOT NULL,
+    [MiscOrderNo]      VARCHAR (50)    NULL,
+    [Seq]              INT             NOT NULL,
+    [Item]             VARCHAR (50)    NOT NULL,
+    [ItemDesc]         VARCHAR (100)   NOT NULL,
+    [RefItemCode]      VARCHAR (50)    NULL,
+    [Uom]              VARCHAR (5)     NOT NULL,
+    [BaseUom]          VARCHAR (5)     NOT NULL,
+    [UC]               DECIMAL (18, 8) NOT NULL,
+    [UnitQty]          DECIMAL (18, 8) NOT NULL,
+    [Location]         VARCHAR (50)    NULL,
+    [ReserveNo]        VARCHAR (50)    NULL,
+    [ReserveLine]      VARCHAR (50)    NULL,
+    [Qty]              DECIMAL (18, 8) NOT NULL,
+    [CreateUser]       INT             NOT NULL,
+    [CreateUserNm]     VARCHAR (100)   NOT NULL,
+    [CreateDate]       DATETIME        NOT NULL,
+    [LastModifyUser]   INT             NOT NULL,
+    [LastModifyUserNm] VARCHAR (100)   NOT NULL,
+    [LastModifyDate]   DATETIME        NOT NULL,
+    [ManufactureParty] VARCHAR (50)    NULL,
+    [EBELN]            VARCHAR (50)    NULL,
+    [EBELP]            VARCHAR (50)    NULL,
+    [WMSSeq]           VARCHAR (50)    NULL
+);
+

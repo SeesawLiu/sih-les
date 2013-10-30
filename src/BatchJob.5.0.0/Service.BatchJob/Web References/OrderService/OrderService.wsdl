@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://com.Sconit.WebService.OrderService/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://com.Sconit.WebService.OrderService/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://com.Sconit.WebService.OrderService/">
+      <s:element name="AutoCloseOrder">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AutoCloseOrderResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="AutoCloseASN">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="dateTime" type="s:dateTime" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AutoCloseASNResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="OutCab">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="orderNo" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="OutCabResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="TansferCab">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="orderNo" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="flowCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="qualityBarcode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TansferCabResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="CancelReportOrderOp">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="orderOpReportId" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CancelReportOrderOpResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="BackFlushVanOrder">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="BackFlushVanOrderResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="RunLeanEngine">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="RunLeanEngineResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="AutoGenAnDonOrder">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AutoGenAnDonOrderResponse">
+        <s:complexType />
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="AutoCloseOrderSoapIn">
+    <wsdl:part name="parameters" element="tns:AutoCloseOrder" />
+  </wsdl:message>
+  <wsdl:message name="AutoCloseOrderSoapOut">
+    <wsdl:part name="parameters" element="tns:AutoCloseOrderResponse" />
+  </wsdl:message>
+  <wsdl:message name="AutoCloseASNSoapIn">
+    <wsdl:part name="parameters" element="tns:AutoCloseASN" />
+  </wsdl:message>
+  <wsdl:message name="AutoCloseASNSoapOut">
+    <wsdl:part name="parameters" element="tns:AutoCloseASNResponse" />
+  </wsdl:message>
+  <wsdl:message name="OutCabSoapIn">
+    <wsdl:part name="parameters" element="tns:OutCab" />
+  </wsdl:message>
+  <wsdl:message name="OutCabSoapOut">
+    <wsdl:part name="parameters" element="tns:OutCabResponse" />
+  </wsdl:message>
+  <wsdl:message name="TansferCabSoapIn">
+    <wsdl:part name="parameters" element="tns:TansferCab" />
+  </wsdl:message>
+  <wsdl:message name="TansferCabSoapOut">
+    <wsdl:part name="parameters" element="tns:TansferCabResponse" />
+  </wsdl:message>
+  <wsdl:message name="CancelReportOrderOpSoapIn">
+    <wsdl:part name="parameters" element="tns:CancelReportOrderOp" />
+  </wsdl:message>
+  <wsdl:message name="CancelReportOrderOpSoapOut">
+    <wsdl:part name="parameters" element="tns:CancelReportOrderOpResponse" />
+  </wsdl:message>
+  <wsdl:message name="BackFlushVanOrderSoapIn">
+    <wsdl:part name="parameters" element="tns:BackFlushVanOrder" />
+  </wsdl:message>
+  <wsdl:message name="BackFlushVanOrderSoapOut">
+    <wsdl:part name="parameters" element="tns:BackFlushVanOrderResponse" />
+  </wsdl:message>
+  <wsdl:message name="RunLeanEngineSoapIn">
+    <wsdl:part name="parameters" element="tns:RunLeanEngine" />
+  </wsdl:message>
+  <wsdl:message name="RunLeanEngineSoapOut">
+    <wsdl:part name="parameters" element="tns:RunLeanEngineResponse" />
+  </wsdl:message>
+  <wsdl:message name="AutoGenAnDonOrderSoapIn">
+    <wsdl:part name="parameters" element="tns:AutoGenAnDonOrder" />
+  </wsdl:message>
+  <wsdl:message name="AutoGenAnDonOrderSoapOut">
+    <wsdl:part name="parameters" element="tns:AutoGenAnDonOrderResponse" />
+  </wsdl:message>
+  <wsdl:portType name="OrderServiceSoap">
+    <wsdl:operation name="AutoCloseOrder">
+      <wsdl:input message="tns:AutoCloseOrderSoapIn" />
+      <wsdl:output message="tns:AutoCloseOrderSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="AutoCloseASN">
+      <wsdl:input message="tns:AutoCloseASNSoapIn" />
+      <wsdl:output message="tns:AutoCloseASNSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="OutCab">
+      <wsdl:input message="tns:OutCabSoapIn" />
+      <wsdl:output message="tns:OutCabSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="TansferCab">
+      <wsdl:input message="tns:TansferCabSoapIn" />
+      <wsdl:output message="tns:TansferCabSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="CancelReportOrderOp">
+      <wsdl:input message="tns:CancelReportOrderOpSoapIn" />
+      <wsdl:output message="tns:CancelReportOrderOpSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="BackFlushVanOrder">
+      <wsdl:input message="tns:BackFlushVanOrderSoapIn" />
+      <wsdl:output message="tns:BackFlushVanOrderSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="RunLeanEngine">
+      <wsdl:input message="tns:RunLeanEngineSoapIn" />
+      <wsdl:output message="tns:RunLeanEngineSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="AutoGenAnDonOrder">
+      <wsdl:input message="tns:AutoGenAnDonOrderSoapIn" />
+      <wsdl:output message="tns:AutoGenAnDonOrderSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="OrderServiceSoap" type="tns:OrderServiceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="AutoCloseOrder">
+      <soap:operation soapAction="http://com.Sconit.WebService.OrderService/AutoCloseOrder" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AutoCloseASN">
+      <soap:operation soapAction="http://com.Sconit.WebService.OrderService/AutoCloseASN" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OutCab">
+      <soap:operation soapAction="http://com.Sconit.WebService.OrderService/OutCab" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TansferCab">
+      <soap:operation soapAction="http://com.Sconit.WebService.OrderService/TansferCab" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CancelReportOrderOp">
+      <soap:operation soapAction="http://com.Sconit.WebService.OrderService/CancelReportOrderOp" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BackFlushVanOrder">
+      <soap:operation soapAction="http://com.Sconit.WebService.OrderService/BackFlushVanOrder" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RunLeanEngine">
+      <soap:operation soapAction="http://com.Sconit.WebService.OrderService/RunLeanEngine" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AutoGenAnDonOrder">
+      <soap:operation soapAction="http://com.Sconit.WebService.OrderService/AutoGenAnDonOrder" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="OrderServiceSoap12" type="tns:OrderServiceSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="AutoCloseOrder">
+      <soap12:operation soapAction="http://com.Sconit.WebService.OrderService/AutoCloseOrder" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AutoCloseASN">
+      <soap12:operation soapAction="http://com.Sconit.WebService.OrderService/AutoCloseASN" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OutCab">
+      <soap12:operation soapAction="http://com.Sconit.WebService.OrderService/OutCab" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TansferCab">
+      <soap12:operation soapAction="http://com.Sconit.WebService.OrderService/TansferCab" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CancelReportOrderOp">
+      <soap12:operation soapAction="http://com.Sconit.WebService.OrderService/CancelReportOrderOp" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BackFlushVanOrder">
+      <soap12:operation soapAction="http://com.Sconit.WebService.OrderService/BackFlushVanOrder" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RunLeanEngine">
+      <soap12:operation soapAction="http://com.Sconit.WebService.OrderService/RunLeanEngine" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AutoGenAnDonOrder">
+      <soap12:operation soapAction="http://com.Sconit.WebService.OrderService/AutoGenAnDonOrder" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="OrderService">
+    <wsdl:port name="OrderServiceSoap" binding="tns:OrderServiceSoap">
+      <soap:address location="http://localhost:1122/WebService/OrderService.asmx" />
+    </wsdl:port>
+    <wsdl:port name="OrderServiceSoap12" binding="tns:OrderServiceSoap12">
+      <soap12:address location="http://localhost:1122/WebService/OrderService.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

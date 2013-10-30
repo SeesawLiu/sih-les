@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+    <class name="com.Sconit.Entity.SAP.ORD.AlterDO, com.Sconit.Entity.SAP" table="SAP_AlterDO" lazy="false">
+        <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+            <generator class="identity" />
+        </id>
+        <property name="OrderNo" column="OrderNo" type="String" />
+        <property name="Sequence" column="Sequence" type="Int32" />
+        <property name="Item" column="Item" type="String" />
+        <property name="Plant" column="Plant" type="String" />
+        <property name="Location" column="Location" type="String" />
+        <property name="Qty" column="Qty" type="Decimal"/>
+        <property name="Uom" column="Uom" type="String" />
+        <property name="KUNAG" column="KUNAG" type="String" />
+        <property name="KUNNR" column="KUNNR" type="String" />
+        <property name="Action" column="Action" type="String" />
+        <property name="WindowTime" column="WindowTime" type="DateTime"/>
+        <property name="ExternalOrderNo" column="ExternalOrderNo" type="String" />
+        <property name="Status" column="Status" type="Int32"/>
+        <property name="CreateDate" column="CreateDate" type="DateTime" update="false"/>
+        <property name="LastModifyDate" column="LastModifyDate" type="DateTime"/>
+        <property name="ErrorCount" column="ErrorCount" type="Int32"/>
+    </class>
+</hibernate-mapping>

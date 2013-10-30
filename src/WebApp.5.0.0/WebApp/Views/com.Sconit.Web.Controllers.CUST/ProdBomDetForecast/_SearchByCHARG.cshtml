@@ -1,0 +1,46 @@
+﻿@using com.Sconit.Web.Models.CUST
+@using com.Sconit.Entity.CUST
+@using (Html.BeginForm("List", "ProdBomDetForecast"))
+{   
+    <fieldset>
+        <div class="search">
+            <div class="search-label">
+                <label for="ProdBomDetForecast_CHARG">
+                    @Resources.CUST.ProdBomDetForecast.ProdBomDetForecast_CHARG
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("CHARG", TempData["CHARG"] != null ? ((ProdBomDetForecast)TempData["CHARG"]).CHARG : string.Empty)
+            </div>
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            <button type="button" id="btnSearch" onclick="SearchCharg();">
+                @Resources.Global.Button_Search</button>
+            <button type="button" id="btnExport" onclick="ExportClick()">
+                @Resources.Global.Button_SearchExport</button>
+        </div>
+    </fieldset>
+}
+<script language="javascript" type="text/javascript">
+    function SearchCharg() {
+        var data = {
+            "charg": $("#CHARG").val()
+        };
+        $.ajax({
+            type: "get",
+            dataType: "html",
+            url: "/ProdBomDetForecast/List/",
+            data: data,
+            cache: false,
+            success: function (data, textStatus) {
+                var tabStrip = $("#TabStrip");
+                var tabStripContent2 = tabStrip.data("tTabStrip").getContentElement(1);
+                $(tabStripContent2).html(data);
+            }
+        });
+    }
+    function ExportClick() {
+        location.href = '/ProdBomDetForecast/ExportByCHARGXLS/';
+    }
+</script>

@@ -1,0 +1,28 @@
+﻿@model IList<com.Sconit.Entity.ORD.OrderItemTraceResult>
+  
+<fieldset>
+<legend>关键件扫描信息</legend>
+    @(Html.Telerik().Grid(Model)
+                        .Name("OrderItemTraceResultGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.TraceCode);
+            columns.Bound(o => o.OpReference);
+            columns.Bound(o => o.Item);
+            columns.Bound(o => o.ItemShortCode);
+            columns.Bound(o => o.ItemDescription);
+            columns.Bound(o => o.BarCode);
+            columns.Bound(o => o.IsWithdraw);
+        })
+                       
+                .Scrollable(c => c.Enabled(false))
+                .EnableCustomBinding(true)
+                .Resizable(resizing => resizing.Columns(true))
+            )
+    
+</fieldset>
+

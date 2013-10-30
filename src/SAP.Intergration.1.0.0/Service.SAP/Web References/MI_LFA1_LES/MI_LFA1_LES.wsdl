@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:p1="http://www.sih.cq.cn/sap/mm/01" name="MI_LFA1_LES" targetNamespace="http://www.sih.cq.cn/sap/mm/01" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema xmlns="http://www.sih.cq.cn/sap/mm/01" targetNamespace="http://www.sih.cq.cn/sap/mm/01" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <xsd:element name="MT_SAP" type="p1:DT_SAP" />
+      <xsd:element name="MT_LES" type="p1:DT_LES" />
+      <xsd:complexType name="DT_LES">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="ITEM">
+            <xsd:annotation>
+              <xsd:appinfo source="http://sap.com/xi/TextID">133769607bd311e1c114001f3bc9732b</xsd:appinfo>
+            </xsd:annotation>
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element minOccurs="0" name="supplierCode" type="xsd:string">
+                  <xsd:annotation>
+                    <xsd:appinfo source="http://sap.com/xi/TextID">1337b7807bd311e180c7001f3bc9732b</xsd:appinfo>
+                  </xsd:annotation>
+                </xsd:element>
+                <xsd:element minOccurs="0" name="oldsupplierCode" type="xsd:string">
+                  <xsd:annotation>
+                    <xsd:appinfo source="http://sap.com/xi/TextID">1337b7817bd311e1b593001f3bc9732b</xsd:appinfo>
+                  </xsd:annotation>
+                </xsd:element>
+                <xsd:element minOccurs="0" name="supplierName" type="xsd:string">
+                  <xsd:annotation>
+                    <xsd:appinfo source="http://sap.com/xi/TextID">1337b7827bd311e185a4001f3bc9732b</xsd:appinfo>
+                  </xsd:annotation>
+                </xsd:element>
+                <xsd:element minOccurs="0" name="ShipFromAddr" type="xsd:string">
+                  <xsd:annotation>
+                    <xsd:appinfo source="http://sap.com/xi/TextID">4f613fa07c6511e1a01500059a3c7800</xsd:appinfo>
+                  </xsd:annotation>
+                </xsd:element>
+                <xsd:element minOccurs="0" name="ShipFromTel" type="xsd:string">
+                  <xsd:annotation>
+                    <xsd:appinfo source="http://sap.com/xi/TextID">4f613fa17c6511e1943700059a3c7800</xsd:appinfo>
+                  </xsd:annotation>
+                </xsd:element>
+                <xsd:element minOccurs="0" name="ShipFromFax" type="xsd:string">
+                  <xsd:annotation>
+                    <xsd:appinfo source="http://sap.com/xi/TextID">4f613fa27c6511e1813700059a3c7800</xsd:appinfo>
+                  </xsd:annotation>
+                </xsd:element>
+                <xsd:element minOccurs="0" name="ShipFromContact" type="xsd:string">
+                  <xsd:annotation>
+                    <xsd:appinfo source="http://sap.com/xi/TextID">4f613fa37c6511e1af3200059a3c7800</xsd:appinfo>
+                  </xsd:annotation>
+                </xsd:element>
+              </xsd:sequence>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="DT_SAP">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="INPUT" type="xsd:string">
+            <xsd:annotation>
+              <xsd:appinfo source="http://sap.com/xi/TextID">30c3b1407bd411e19adb001f3bc9732b</xsd:appinfo>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:complexType>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="MT_SAP">
+    <wsdl:part name="MT_SAP" element="p1:MT_SAP" />
+  </wsdl:message>
+  <wsdl:message name="MT_LES">
+    <wsdl:part name="MT_LES" element="p1:MT_LES" />
+  </wsdl:message>
+  <wsdl:portType name="MI_LFA1_LES">
+    <wsdl:operation name="MI_LFA1_LES">
+      <wsdl:input message="p1:MT_SAP" />
+      <wsdl:output message="p1:MT_LES" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="MI_LFA1_LESBinding" type="p1:MI_LFA1_LES">
+    <binding transport="http://schemas.xmlsoap.org/soap/http" xmlns="http://schemas.xmlsoap.org/wsdl/soap/" />
+    <wsdl:operation name="MI_LFA1_LES">
+      <operation soapAction="http://sap.com/xi/WebService/soap1.1" xmlns="http://schemas.xmlsoap.org/wsdl/soap/" />
+      <wsdl:input>
+        <body use="literal" xmlns="http://schemas.xmlsoap.org/wsdl/soap/" />
+      </wsdl:input>
+      <wsdl:output>
+        <body use="literal" xmlns="http://schemas.xmlsoap.org/wsdl/soap/" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="MI_LFA1_LESService">
+    <wsdl:port name="MI_LFA1_LESPort" binding="p1:MI_LFA1_LESBinding">
+      <address location="http://10.86.128.31:8000/XISOAPAdapter/MessageServlet?channel=:LES01:CC_SOAP1&amp;version=3.0&amp;Sender.Service=LES01&amp;Interface=http%3A%2F%2Fwww.sih.cq.cn%2Fsap%2Fmm%2F01%5EMI_LFA1_LES" xmlns="http://schemas.xmlsoap.org/wsdl/soap/" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

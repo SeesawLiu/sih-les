@@ -1,0 +1,146 @@
+﻿@model IEnumerable<com.Sconit.Entity.ORD.OrderMaster>
+<script type="text/javascript">
+    $(function () {
+        $("#checkAll").click(function () {
+            var thisCheck = this.checked;
+            var subCheckd = false;
+            $('input[name="checkedRecords"]').each(function (index, domEle) {
+                if ($(domEle).attr("disabled") == undefined) {
+                    $(domEle).attr("checked", thisCheck);
+                    subCheckd = thisCheck;
+                }
+            });
+            if (thisCheck && subCheckd) {
+                $("#btnPrint").show();
+            }
+            else {
+                $("#btnPrint").hide();
+            }
+        });
+    });
+
+    function showButtons() {
+        var $checkRecords = $("input[name='checkedRecords']");
+        var showButton = false;
+        for (var i = 0; i < $checkRecords.length; i++) {
+            if ($checkRecords[i].checked) {
+                showButton = true;
+                break;
+            }
+        }
+        $("#checkAll").attr("checked", $checkRecords.length == $("input[name='checkedRecords']:checked").length ? true : false);
+        if (showButton) {
+            $("#btnPrint").show();
+        }
+        else {
+            $("#btnPrint").hide();
+        }
+    }
+
+    function btnPrint_Click() {
+        var $checkRecords = $("input[name='checkedRecords']:checked");
+
+        var checkedIds = "";
+        for (var i = 0; i < $checkRecords.length; i++) {
+            if (checkedIds == "") {
+                checkedIds = $checkRecords[i].value;
+            } else {
+                checkedIds += "," + $checkRecords[i].value;
+            }
+        }
+
+        var data = {
+            "orderNos": checkedIds
+        };
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            url: "/ProductionOrder/Print/",
+            data: data,
+            success: function (data, textStatus) {
+                if (data != "") {
+                    var urls = data.PrintUrl.split(',');
+                    for (var i = 0; i < urls.length; i++) {
+                        PrintOrder(urls[i]);
+                    }
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+</script>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("OrderMasterGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.OrderNo);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.OrderNo)
+                    .ClientTemplate("<input type='checkbox' id='checkedRecords' name='checkedRecords' value='<#= OrderNo #>' onClick='showButtons()' />")
+                    .HeaderTemplate("<input type='checkbox' id='checkAll' name='checkAll' />")
+                    .Width(36).HtmlAttributes(new { style = "text-align:center" });
+
+            columns.Bound(o => o.OrderNo).ClientTemplate(Html.ActionLink("<#= OrderNo #>", "VanEdit", "ProductionOrder", new { OrderNo = "<#= OrderNo #>", Flow = "<#= Flow #>" }, null).ToString());
+            columns.Bound(o => o.Flow).Title(@Resources.ORD.OrderMaster.OrderMaster_Flow_Production);
+            columns.Bound(o => o.FlowDescription).Title(@Resources.ORD.OrderMaster.OrderMaster_FlowDescription_Production);
+            columns.Bound(o => o.ShipFromContact).Title(@Resources.ORD.OrderDetail.OrderDetail_Item);
+
+            columns.Bound(o => o.TraceCode);
+            columns.Bound(o => o.ExternalOrderNo);
+            columns.Bound(o => o.PartyFromName).Title(@Resources.ORD.OrderMaster.OrderMaster_PartyFromName_Production);
+
+            columns.Bound(o => o.StartDate);
+            columns.Bound(o => o.StartUserName);
+            columns.Bound(o => o.CompleteDate);
+            columns.Bound(o => o.CompleteUserName);
+            columns.Bound(o => o.OrderStatusDescription);
+            columns.Bound(o => o.CreateUserName);
+            columns.Bound(o => o.CreateDate);
+            columns.Bound(o => o.CurrentOperation);
+
+            columns.Bound(o => o.PauseSequence);
+            columns.Bound(o => o.PauseTime);
+            columns.Bound(o => o.PauseStatusDescription);
+
+        })
+        .Scrollable(c => c.Enabled(false))
+        .EnableCustomBinding(true)
+                        .DataBinding(dataBinding => dataBinding.Ajax().Select("_VanAjaxList", "ProductionOrder"))
+                .ClientEvents(events => events.OnDataBinding("OrderMasterGrid_OnDataBinding"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(ViewBag.PageSize);
+        })
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+    )
+    <script type="text/javascript">
+        function OrderMasterGrid_OnDataBinding(e) {
+            e.data = {
+                OrderNo: $('#OrderNo').val(),
+                Flow: $('#Flow').val(),
+                PartyFrom: $('#PartyFrom').val(),
+                DateFrom: $('#DateFrom').val(),
+                DateTo: $('#DateTo').val(),
+                Status: $('#Status').val(),
+                CreateUserName: $('#CreateUserName').val(),
+                ExternalOrderNo: $('#ExternalOrderNo').val(),
+                WMSNO: $('#WMSNO').val(),
+                Type: $('#Type').val(),
+                TraceCode: $('#TraceCode').val(),
+                IsPause: $('#IsPause').val(),
+                Item: $('#Item').val(),
+                StartTime: $('#StartTime').val(),
+                EndTime: $('#EndTime').val(),
+                WindowTimeFrom: $('#WindowTimeFrom').val(),
+                WindowTimeTo: $('#WindowTimeTo').val()
+            };
+        } 
+    </script>
+</fieldset>

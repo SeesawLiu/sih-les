@@ -1,0 +1,647 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Application" xml:space="preserve">
+    <value>应用管理</value>
+  </data>
+  <data name="Application_Access_Control" xml:space="preserve">
+    <value>访问控制</value>
+  </data>
+  <data name="Application_Address" xml:space="preserve">
+    <value>地址</value>
+  </data>
+  <data name="Application_Permission" xml:space="preserve">
+    <value>权限组</value>
+  </data>
+  <data name="Application_Location" xml:space="preserve">
+    <value>库位</value>
+  </data>
+  <data name="Application_Role" xml:space="preserve">
+    <value>角色</value>
+  </data>
+  <data name="Application_Uom" xml:space="preserve">
+    <value>计量单位</value>
+  </data>
+  <data name="Application_User" xml:space="preserve">
+    <value>用户</value>
+  </data>
+  <data name="Application_Currency" xml:space="preserve">
+    <value>货币</value>
+  </data>
+  <data name="Application_WorkingCalendar" xml:space="preserve">
+    <value>工作日历</value>
+  </data>
+  <data name="Application_PermissionGroup" xml:space="preserve">
+    <value>权限组</value>
+  </data>
+  <data name="Application_ItemCategory" xml:space="preserve">
+    <value>产品类</value>
+  </data>
+  <data name="Application_Item" xml:space="preserve">
+    <value>物料</value>
+  </data>
+  <data name="Application_UserFav" xml:space="preserve">
+    <value>用户偏好</value>
+  </data>
+  <data name="Application_EntityPreference" xml:space="preserve">
+    <value>企业选项</value>
+  </data>
+  <data name="Application_FinanceCalendar" xml:space="preserve">
+    <value>会计期间</value>
+  </data>
+  <data name="Procurement_OrderMstr" xml:space="preserve">
+    <value>要货单</value>
+  </data>
+  <data name="Application_Routing" xml:space="preserve">
+    <value>工艺流程</value>
+  </data>
+  <data name="Procurement_ProcurementFlow" xml:space="preserve">
+    <value>采购路线</value>
+  </data>
+  <data name="Url_Supplier_View" xml:space="preserve">
+    <value>供应商</value>
+  </data>
+  <data name="Url_Customer_View" xml:space="preserve">
+    <value>客户</value>
+  </data>
+  <data name="Application_StockTake" xml:space="preserve">
+    <value>盘点</value>
+  </data>
+  <data name="Distribution_Setup_Customer" xml:space="preserve">
+    <value>客户</value>
+  </data>
+  <data name="Distribution_DistributionFlow" xml:space="preserve">
+    <value>销售路线</value>
+  </data>
+  <data name="Procurement_SubconctractingFlow" xml:space="preserve">
+    <value>委外路线</value>
+  </data>
+  <data name="Procurement_CustomerGoodsFlow" xml:space="preserve">
+    <value>客供品路线</value>
+  </data>
+  <data name="Inventory_TransferFlow" xml:space="preserve">
+    <value>移库路线</value>
+  </data>
+  <data name="Procurement_OrderMstr_View" xml:space="preserve">
+    <value>查询</value>
+    <comment>要货单查询</comment>
+  </data>
+  <data name="Procurement_OrderMstr_New" xml:space="preserve">
+    <value>新建</value>
+    <comment>新建要货单</comment>
+  </data>
+  <data name="Distribution_OrderMstr_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="Distribution_OrderMstr" xml:space="preserve">
+    <value>发货单</value>
+  </data>
+  <data name="Procurement_PriceList" xml:space="preserve">
+    <value>采购价格单</value>
+  </data>
+  <data name="Distribution_PriceList" xml:space="preserve">
+    <value>销售价格单</value>
+  </data>
+  <data name="Production_ProductionFlow" xml:space="preserve">
+    <value>生产线</value>
+  </data>
+  <data name="Procurement_Receipt" xml:space="preserve">
+    <value>收货单</value>
+  </data>
+  <data name="Procurement_IpMaster" xml:space="preserve">
+    <value>送货单</value>
+  </data>
+  <data name="Procurement_OrderMstr_BatchProcess" xml:space="preserve">
+    <value>批量处理</value>
+  </data>
+  <data name="Quality_InspectionOrder" xml:space="preserve">
+    <value>报验单</value>
+  </data>
+  <data name="Url_InspectionOrder_New" xml:space="preserve">
+    <value>新建</value>
+  </data>
+  <data name="Url_InspectionOrder_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="Distribution_OrderMstr_New" xml:space="preserve">
+    <value>新建</value>
+  </data>
+  <data name="Quality_RejectOrder" xml:space="preserve">
+    <value>不合格品处理单</value>
+  </data>
+  <data name="Quality_RejectOrder_New" xml:space="preserve">
+    <value>新建</value>
+  </data>
+  <data name="Application_Container" xml:space="preserve">
+    <value>容器</value>
+  </data>
+  <data name="Production_OrderMstr" xml:space="preserve">
+    <value>生产单</value>
+  </data>
+  <data name="Production_OrderMstr_New" xml:space="preserve">
+    <value>新建</value>
+  </data>
+  <data name="Production_OrderMstr_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="Url_IssueType_View" xml:space="preserve">
+    <value>分类</value>
+  </data>
+  <data name="Url_IssueLevel_View" xml:space="preserve">
+    <value>等级</value>
+  </data>
+  <data name="Quality_RejectOrder_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="Distribution_PickList" xml:space="preserve">
+    <value>拣货单</value>
+  </data>
+  <data name="Distribution_IpMaster" xml:space="preserve">
+    <value>送货单</value>
+  </data>
+  <data name="Distribution_IpMaster_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="Distribution_ASNGap" xml:space="preserve">
+    <value>收发差异</value>
+  </data>
+  <data name="Distribution_ASNGap_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="Distribution_OrderMstr_Ship" xml:space="preserve">
+    <value>发货</value>
+  </data>
+  <data name="Procurement_OrderMstr_Receive" xml:space="preserve">
+    <value>收货</value>
+  </data>
+  <data name="Distribution_PickList_New" xml:space="preserve">
+    <value>新建</value>
+  </data>
+  <data name="Distribution_PickList_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="Procurement_IpMaster_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="Procurement_IpMaster_Receive" xml:space="preserve">
+    <value>收货</value>
+  </data>
+  <data name="Procurement_IpMaster_Cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="Production_OrderMstr_Receive" xml:space="preserve">
+    <value>收货</value>
+  </data>
+  <data name="Production_MaterialIn_FeedOrderMaster" xml:space="preserve">
+    <value>工单投料</value>
+  </data>
+  <data name="Production_MaterialIn" xml:space="preserve">
+    <value>投料</value>
+  </data>
+  <data name="Production_MaterialIn_FeedProductLine" xml:space="preserve">
+    <value>生产线投料</value>
+  </data>
+  <data name="Production_MaterialIn_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="Inventory_Hu" xml:space="preserve">
+    <value>条码</value>
+  </data>
+  <data name="Inventory_Hu_New" xml:space="preserve">
+    <value>新增</value>
+  </data>
+  <data name="Inventory_Hu_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="Production_MaterialIn_ForceFeedOrderMaster" xml:space="preserve">
+    <value>工单强制投料</value>
+  </data>
+  <data name="Production_MaterialIn_ForceFeedProductLine" xml:space="preserve">
+    <value>生产线强制投料</value>
+  </data>
+  <data name="Distribution_PickList_Ship" xml:space="preserve">
+    <value>发货</value>
+  </data>
+  <data name="Production_MaterialIn_BackFlush" xml:space="preserve">
+    <value>投料回冲</value>
+  </data>
+  <data name="Application_ItemDiscontinue" xml:space="preserve">
+    <value>后续物料</value>
+  </data>
+  <data name="Application_Region" xml:space="preserve">
+    <value>区域</value>
+  </data>
+  <data name="Application_CodeMaster" xml:space="preserve">
+    <value>数据字典</value>
+  </data>
+  <data name="Procurement_OrderMstr_QuickNew" xml:space="preserve">
+    <value>快速要货</value>
+  </data>
+  <data name="Distribution_OrderMstr_BatchProcess" xml:space="preserve">
+    <value>批量处理</value>
+  </data>
+  <data name="Distribution_OrderMstr_QuickNew" xml:space="preserve">
+    <value>快速发货</value>
+  </data>
+  <data name="Production_OrderMstr_BatchProcess" xml:space="preserve">
+    <value>批量处理</value>
+  </data>
+  <data name="Production_OrderMstr_QuickNew" xml:space="preserve">
+    <value>快速生产</value>
+  </data>
+  <data name="Production_OrderMaster_Pause" xml:space="preserve">
+    <value>生产单暂停</value>
+  </data>
+  <data name="Production_ProductLine_Pause" xml:space="preserve">
+    <value>生产线暂停/恢复</value>
+  </data>
+  <data name="Application_FinanceCalendar_Close" xml:space="preserve">
+    <value>月结</value>
+  </data>
+  <data name="Procurement_SequenceOrder" xml:space="preserve">
+    <value>排序单</value>
+  </data>
+  <data name="Procurement_SequenceOrder_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="SupplierActBill" xml:space="preserve">
+    <value>采购未开票</value>
+  </data>
+  <data name="SupplierBill" xml:space="preserve">
+    <value>采购账单</value>
+  </data>
+  <data name="SupplierIpMaster" xml:space="preserve">
+    <value>发货通知</value>
+  </data>
+  <data name="SupplierOrder" xml:space="preserve">
+    <value>查看要货单</value>
+  </data>
+  <data name="SupplierOrderIssue" xml:space="preserve">
+    <value>发货</value>
+  </data>
+  <data name="SupplierPlanBill" xml:space="preserve">
+    <value>供应商寄售</value>
+  </data>
+  <data name="SupplierPrintHu" xml:space="preserve">
+    <value>供应商条码打印</value>
+  </data>
+  <data name="SupplierReceipt" xml:space="preserve">
+    <value>供货收货单</value>
+  </data>
+  <data name="SupplierSchedule" xml:space="preserve">
+    <value>供应商日程</value>
+  </data>
+  <data name="InspectionOrder_Judge" xml:space="preserve">
+    <value>判定</value>
+  </data>
+  <data name="Procurement_Receipt_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="Quality_ConcessionOrder" xml:space="preserve">
+    <value>让步使用单</value>
+  </data>
+  <data name="Quality_ConcessionOrder_New" xml:space="preserve">
+    <value>新建</value>
+  </data>
+  <data name="Quality_ConcessionOrder_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="DIstribution_ReturnReceipt" xml:space="preserve">
+    <value>退货收货单</value>
+  </data>
+  <data name="DIstribution_ReturnReceipt_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="Inventory_StockTake" xml:space="preserve">
+    <value>盘点</value>
+  </data>
+  <data name="Inventory_StockTake_New" xml:space="preserve">
+    <value>新建</value>
+  </data>
+  <data name="Inventory_StockTake_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="Inventory_InMiscOrder" xml:space="preserve">
+    <value>计划外入库</value>
+  </data>
+  <data name="Inventory_InMiscOrder_New" xml:space="preserve">
+    <value>新建</value>
+  </data>
+  <data name="Inventory_InMiscOrder_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="Inventory_OutMiscOrder" xml:space="preserve">
+    <value>计划外出库</value>
+  </data>
+  <data name="Inventory_OutMiscOrder_New" xml:space="preserve">
+    <value>新建</value>
+  </data>
+  <data name="Inventory_OutMiscOrder_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="Procurement_OrderMstr_Return" xml:space="preserve">
+    <value>退货单</value>
+  </data>
+  <data name="Procurement_OrderMstr_ReturnIndex" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="Procurement_OrderMstr_ReturnNew" xml:space="preserve">
+    <value>新建</value>
+  </data>
+  <data name="Application_Bom" xml:space="preserve">
+    <value>物料清单</value>
+  </data>
+  <data name="Distribution_OrderMstr_Return" xml:space="preserve">
+    <value>退货单</value>
+  </data>
+  <data name="Distribution_OrderMstr_ReturnIndex" xml:space="preserve">
+    <value>查看</value>
+  </data>
+  <data name="Distribution_OrderMstr_ReturnNew" xml:space="preserve">
+    <value>新建</value>
+  </data>
+  <data name="PickStrategy" xml:space="preserve">
+    <value>拣货策略</value>
+  </data>
+  <data name="Distribution_IpMaster_Receive" xml:space="preserve">
+    <value>发货确认</value>
+  </data>
+  <data name="ScheduleLine_OrderMstr_View" xml:space="preserve">
+    <value>计划协议</value>
+  </data>
+  <data name="Production_MaterialIn_ReturnProductLine" xml:space="preserve">
+    <value>生产线退料</value>
+  </data>
+  <data name="Production_MaterialIn_ReturnReturnOrderMaster" xml:space="preserve">
+    <value>工单退料</value>
+  </data>
+  <data name="Quality_RejectOrder_Return" xml:space="preserve">
+    <value>不合格品退货</value>
+  </data>
+  <data name="Distribution_IpGap" xml:space="preserve">
+    <value>收发差异</value>
+  </data>
+  <data name="Distribution_IpGap_Adjust" xml:space="preserve">
+    <value>调整</value>
+  </data>
+  <data name="Distribution_IpGap_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="Procurement_IpGap" xml:space="preserve">
+    <value>收发差异</value>
+  </data>
+  <data name="Procurement_IpGap_Adjust" xml:space="preserve">
+    <value>调整</value>
+  </data>
+  <data name="Procurement_IpGap_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="Procurement_VehicleInFactory" xml:space="preserve">
+    <value>车辆进出厂</value>
+  </data>
+  <data name="Procurement_VehicleInFactory_New" xml:space="preserve">
+    <value>新建</value>
+  </data>
+  <data name="Procurement_VehicleInFactory_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="URL_Inventory_ShelfLifeWarning" xml:space="preserve">
+    <value>保质期预警</value>
+  </data>
+  <data name="Inventory_ItemExchange" xml:space="preserve">
+    <value>库存物料替换</value>
+  </data>
+  <data name="Inventory_ItemExchange_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="Inventory_InventoryFreeze" xml:space="preserve">
+    <value>库存冻结</value>
+  </data>
+  <data name="Inventory_InventoryFreeze_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="Inventory_KanBanCard_View" xml:space="preserve">
+    <value>看板卡</value>
+  </data>
+  <data name="Url_KanBanCardInfo_View" xml:space="preserve">
+    <value>看板卡</value>
+  </data>
+  <data name="QualityDoor_New" xml:space="preserve">
+    <value>新建</value>
+  </data>
+  <data name="QualityDoor_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="Url_QualityDoor" xml:space="preserve">
+    <value>质量门</value>
+  </data>
+  <data name="Production_OrderMstr_Import" xml:space="preserve">
+    <value>导入</value>
+  </data>
+  <data name="InspectionOrder_Detail" xml:space="preserve">
+    <value>明细查询</value>
+  </data>
+  <data name="Production_OrderMaster_Resume" xml:space="preserve">
+    <value>生产单恢复</value>
+  </data>
+  <data name="Production_SeqImport" xml:space="preserve">
+    <value>整车序列导入</value>
+  </data>
+  <data name="DistributionShipTire_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="DIstribution_ShipTire" xml:space="preserve">
+    <value>轮胎发货</value>
+  </data>
+  <data name="Distribution_SequenceOrder" xml:space="preserve">
+    <value>排序单</value>
+  </data>
+  <data name="SequenceOrder_Detail" xml:space="preserve">
+    <value>明细查询</value>
+  </data>
+  <data name="SequenceOrder_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="Quality_RejectOrder_Detail" xml:space="preserve">
+    <value>明细查询</value>
+  </data>
+  <data name="Quality_RejectOrder_WorkersWaste" xml:space="preserve">
+    <value>工废</value>
+  </data>
+  <data name="Quality_RejectOrder_Transfer" xml:space="preserve">
+    <value>不合格品移库</value>
+  </data>
+  <data name="Quality_InspectionOrder_Transfer" xml:space="preserve">
+    <value>待验品移库</value>
+  </data>
+  <data name="Url_DeferredFeedCounter_View" xml:space="preserve">
+    <value>空车上线</value>
+  </data>
+  <data name="ScheduleLine_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="Distribution_Receipt" xml:space="preserve">
+    <value>收货单</value>
+  </data>
+  <data name="Distribution_Receipt_View" xml:space="preserve">
+    <value>查看</value>
+  </data>
+  <data name="Production_OrderMstr_FZComplete" xml:space="preserve">
+    <value>分装生产单下线</value>
+  </data>
+  <data name="HuLocationLotDetail.Inventory" xml:space="preserve">
+    <value>条码库存报表</value>
+  </data>
+  <data name="PRD_ProdLineLocationDet" xml:space="preserve">
+    <value>在制品查询</value>
+  </data>
+  <data name="OrderMstr_Distribution_Receipt" xml:space="preserve">
+    <value>交货单过账</value>
+  </data>
+  <data name="PRD_ProdLineLocationDetFeed" xml:space="preserve">
+    <value>关键件投料</value>
+  </data>
+  <data name="InspectResultExt_View" xml:space="preserve">
+    <value>入场检验信息更新</value>
+  </data>
+  <data name="Url_Custodian" xml:space="preserve">
+    <value>保管员</value>
+  </data>
+  <data name="Procurement_SQOrderMstr_View" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="Procurement_SQOrderMstr" xml:space="preserve">
+    <value>双桥要货单</value>
+  </data>
+  <data name="Procurement_SQOrderMstr_Cancel" xml:space="preserve">
+    <value>取消配送标签</value>
+  </data>
+  <data name="Nondelivery_Procurement_View" xml:space="preserve">
+    <value>要货未到信息查询</value>
+  </data>
+  <data name="Menu.ProcurementInfo" xml:space="preserve">
+    <value>采购信息</value>
+  </data>
+  <data name="Supplier_SupplierPortal" xml:space="preserve">
+    <value>0085双桥供货</value>
+  </data>
+  <data name="Cust_ScheduleLineItem" xml:space="preserve">
+    <value>路线明细缺失报表</value>
+  </data>
+</root>

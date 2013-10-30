@@ -1,0 +1,21 @@
+﻿@{
+    ViewBag.Title = "List";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_CheckFlowList_View" });
+}
+<script type="text/javascript">
+
+            function ExportClick() {
+                location.href = "/ItemFlow/ExportCheckFlowXLS/";
+            }
+</script>
+<fieldset>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            <button type="button" id="btnExport" onclick="ExportClick()">
+                @Resources.Global.Button_Export</button>
+        </div>
+        
+</fieldset>
+
+
+@Html.Partial("_CheckResult")

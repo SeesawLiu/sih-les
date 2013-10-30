@@ -1,0 +1,3 @@
+﻿ALTER TABLE [dbo].[ORD_RecLocationDet_4]
+    ADD CONSTRAINT [FK_ORD_RecLocationDet4_Item_REFERENCE_MD_Item_Code] FOREIGN KEY ([Item]) REFERENCES [dbo].[MD_Item] ([Code]) ON DELETE NO ACTION ON UPDATE NO ACTION;
+

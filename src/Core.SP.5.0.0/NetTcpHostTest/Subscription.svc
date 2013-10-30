@@ -1,0 +1,1 @@
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="com.Sconit.SP.Services.Impl.Subscription" CodeBehind="com.Sconit.SP.Services.Impl.Subscription.cs" %>

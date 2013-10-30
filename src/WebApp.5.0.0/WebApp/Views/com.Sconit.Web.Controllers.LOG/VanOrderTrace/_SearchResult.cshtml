@@ -1,0 +1,73 @@
+﻿@model IEnumerable<com.Sconit.Entity.LOG.VanOrderTrace>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+                .Name("VanOrderTraceGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Flow);
+            columns.Bound(o => o.OrderNo);
+            columns.Bound(o => o.OrderPriorityDescription);
+            columns.Bound(o => o.OpReference);
+            columns.Bound(o => o.Item);
+            columns.Bound(o => o.ItemDesc);
+            columns.Bound(o => o.UnitCount);
+            columns.Bound(o => o.NetOrderQty);
+            columns.Bound(o => o.OrgOpRefQty);
+            columns.Bound(o => o.GrossOrderQty);
+            columns.Bound(o => o.OpRefQty);
+            columns.Bound(o => o.WindowTime);
+            columns.Bound(o => o.ReqTimeFromTo);
+            columns.Bound(o => o.CreateDate);
+        })
+                 .DetailView(details => details.ClientTemplate(
+                                            Html.Telerik().Grid<com.Sconit.Entity.LOG.VanOrderBomTrace>()
+                                    .Name("VanOrderBomTrace_<#= UUID #>")
+                                .Columns(columns =>
+                                {
+                                    columns.Bound(o => o.CPTime);
+                                    columns.Bound(o => o.ProdLine);
+                                    columns.Bound(o => o.VanOrderNo);
+                                    columns.Bound(o => o.TraceCode);
+                                    columns.Bound(o => o.OpReference);
+                                    //columns.Bound(o => o.ProdCode);
+                                    //columns.Bound(o => o.ProdSeq);
+                                    columns.Bound(o => o.OrderQty);
+                                    columns.Bound(o => o.LocFrom);
+                                    columns.Bound(o => o.LocTo);
+                                })
+                                .DataBinding(dataBinding => dataBinding.Ajax()
+                                .Select("_AjaxOrderBomTrace", "VanOrderTrace", new { uUID = "<#= UUID #>" }))
+                                .Footer(false)
+                                .Resizable(resizing => resizing.Columns(true))
+                                .ToHtmlString()
+                    ))
+                .Scrollable(c => c.Enabled(false))
+                        .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxList", "VanOrderTrace"))
+                        .ClientEvents(events => events.OnDataBinding("VanOrderTraceGrid_OnDataBinding"))
+                .Pageable(settings =>
+                {
+                    settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+                    settings.PageSize(ViewBag.PageSize);
+                })
+                .EnableCustomBinding(true)
+                .Sortable()
+                .Resizable(resizing => resizing.Columns(true))
+            )
+    <script type="text/javascript">
+        function VanOrderTraceGrid_OnDataBinding(e) {
+            e.data = {
+                Flow: $('#Flow').val(),
+                OrderNo: $('#OrderNo').val(),
+                Item: $('#Item').val(),
+                OpReference: $('#OpReference').val(),
+                CreateDateFrom: $('#CreateDateFrom').val(),
+                CreateDateTo: $('#CreateDateTo').val()
+
+            };
+        }
+    </script>
+</fieldset>

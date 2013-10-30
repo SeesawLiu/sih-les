@@ -1,0 +1,107 @@
+﻿@model IEnumerable<com.Sconit.Entity.ORD.OrderDetail>
+<fieldset>
+<script type="text/javascript">
+    function PickShipGrid_OnDataBinding(e) {
+       
+//        if ($("#Picker").val() == "" || $("#Picker").val() == undefined) {
+//            $message.error("配送组不能为空。");
+//            return;
+//        }
+        e.data = {
+            OrderNo: $('#OrderNo').val(),
+            Flow: $('#Flow').val(),
+            Status: $('#Status').val(),
+            Item: $('#Item').val(),
+            DateFrom: $('#DateFrom').val(),
+            DateTo: $('#DateTo').val(),
+            Picker: $('#Picker').val()
+        };
+    }
+
+    $(function () {
+        $("#checkAll").click(function () {
+            $('input[name="checkedRecords"]').attr("checked", this.checked);
+            showButtons();
+        });
+    });
+
+    function showButtons() {
+        var $checkRecords = $("input[name='checkedRecords']");
+        $("#checkAll").attr("checked", $checkRecords.length == $("input[name='checkedRecords']:checked").length ? true : false);
+        $("#btnShip").attr("style", $("input[name='checkedRecords']:checked").length > 0 ? "display:inline" : "display:none");
+
+    }
+
+
+    function doDeleteClick(id) {
+        if (confirm("确定要关闭吗？")) {
+            var data = {
+                "Picker": $("#Picker").val(),
+                "OrderNo": $("#OrderNo").val(),
+                "Flow": $("#Flow").val(),
+                "Item": $("#Item").val(),
+                "DateFrom": $("#DateFrom").val(),
+                "DateTo": $("#DateTo").val(),
+                "isFromList": true,
+                "id": id
+            };
+            $.ajax({
+                type: "post",
+                dataType: "html",
+                data: data,
+                url: "/PickList/DeleteDetailById/",
+                cache: false,
+                success: function (data, textStatus) {
+                    $("#endDiv").html("");
+                    $("#resultDiv").html(data);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    DisplayTextMessages(XMLHttpRequest.responseText);
+                }
+            });
+        }
+    }
+
+
+</script>
+    @(Html.Telerik().Grid(Model)
+        .Name("PickShipDetailGrid")
+        .Columns(columns =>
+        {
+            //要货单号、物料代码、旧图号、物料描述、制造商、剩余订单数、本次拣货数、库存数、来源库位、目的库位、工位、窗口时间、创建日期
+            columns.Bound(o => o.Id)
+               .ClientTemplate("<input type='checkbox' id='checkedRecords' name='checkedRecords' value='<#= Id #>' onClick='showButtons()' style='display:<#=Picker==null ||Picker==''?'none':'inline'  #>'  />")
+               .HeaderTemplate("<input type='checkbox' id='checkAll' name='checkAll' />")
+               .Width(36).HtmlAttributes(new { style = "text-align:center" });
+            //columns.Bound(o => o.Id).Hidden().ClientTemplate("<input type='text' id='Id' name='Id' style='display:none' value='<#=Id #>'/>");
+            columns.Bound(o => o.Picker).ClientTemplate("<input type='label' id='DeliveryGroup' name='DeliveryGroup' style='width:70px' value='<#=Picker #>'/>").Hidden();
+            columns.Bound(o => o.PickerDesc);
+            columns.Bound(o => o.Item);
+            columns.Bound(o => o.ReferenceItemCode);
+            columns.Bound(o => o.ItemDescription);
+            columns.Bound(o => o.ManufactureParty);
+            columns.Bound(o => o.ShippedQty).Title("剩余订单数").ClientTemplate("<div><#=OrderedQty - ShippedQty-PickedQty #></div>");
+            columns.Bound(o => o.CurrentShipQty).Title("本次拣货数").ClientTemplate("<input type='text' id='CurrentShipQty' name='CurrentShipQty' style='width:70px' value='<#=OrderedQty - ShippedQty-PickedQty #>'/>");
+            columns.Bound(o => o.InventoryQty).Title("可用库存").ClientTemplate("<div><#=InventoryQty - OccupyQty #></div>");
+            columns.Bound(o => o.LocationFrom);
+            columns.Bound(o => o.LocationTo);
+            columns.Bound(o => o.BinTo);
+            columns.Bound(o => o.OrderNo);
+            columns.Bound(o => o.WindowTime);
+            columns.Bound(o => o.CreateDate);
+            columns.Bound(o => o.Id).Title(" ").ClientTemplate("<input type='button' value='关闭' onclick='doDeleteClick(<#=Id #>)' >");
+        })
+        .Scrollable(c => c.Enabled(false))
+        //.Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+        .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxNewDetail", "PickList"))
+        .ClientEvents(events => events.OnDataBinding("PickShipGrid_OnDataBinding").OnComplete("TelerikGridView_OnComplete"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(ViewBag.PageSize);
+        })
+    )
+</fieldset>
+
+

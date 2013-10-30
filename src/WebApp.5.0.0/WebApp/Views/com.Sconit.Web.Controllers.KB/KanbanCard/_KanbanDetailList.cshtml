@@ -1,0 +1,160 @@
+﻿@using com.Sconit.Entity.MD;
+@using com.Sconit.Entity.ORD;
+@model IEnumerable<com.Sconit.Entity.SCM.FlowDetail>
+<script type="text/javascript">
+    function onSaveFlowDetail() {
+        var grid = $("#FlowDetail").data("tGrid");
+        var rows = grid.$tbody.children("tr:not(.t-no-data)");
+        var idStr = "";
+        var poNoStr = "";
+        var qtyStr = "";
+        for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+            var row = $(rows[rowIndex]);
+            var orderQty = row.find("#OrderQty").val();
+            if (orderQty != "" && orderQty != 0) {
+                var id = row.find("#Id").val();
+                var pono = row[0].childNodes[11].lastChild == null ? "" : row[0].childNodes[11].lastChild.nodeValue;
+                if (idStr == "") {
+                    idStr = id;
+                    poNoStr = pono;
+                    qtyStr = orderQty;
+                } else {
+                    idStr += "," + id;
+                    poNoStr += "," + pono;
+                    qtyStr += "," + orderQty;
+                }
+            }
+        }
+
+
+        var data = {
+            "flowIdStr": idStr,
+            "flowPoNoStr": poNoStr,
+            "flowQtyStr": qtyStr,
+            "flow": $("#Flow").val(),
+            "EffectiveDate": $("#EffectiveDate").val()
+        }
+
+        $.ajax({
+            type: "Post",
+            dataType: "html",
+            data: data,
+            url: "/KanbanCard/CreateKanbanCard/",
+            cache: false,
+            success: function (data, textStatus) {
+                //  DisplayJsonMessages(data);
+                //                $("#fdOrderDetail").html(data);
+                //                $("#fdOrderDetail").show();
+                $("#content").html(data);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+
+
+    function onDeleteFlowDetail() {
+        var grid = $("#FlowDetail").data("tGrid");
+        var rows = grid.$tbody.children("tr:not(.t-no-data)");
+        var idStr = "";
+        var qtyStr = "";
+        for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+            var row = $(rows[rowIndex]);
+            var orderQty = row.find("#OrderQty").val();
+            if (orderQty != "" && orderQty != 0) {
+                var id = row.find("#Id").val();
+                if (idStr == "") {
+                    idStr = id;
+                    qtyStr = orderQty;
+                } else {
+                    idStr += "," + id;
+                    qtyStr += "," + orderQty;
+                }
+            }
+        }
+
+
+        var data = {
+            "flowIdStr": idStr,
+            "flowQtyStr": qtyStr
+        }
+
+        $.ajax({
+            type: "Post",
+            dataType: "html",
+            data: data,
+            url: "/KanbanCard/DeleteKanbanCard/",
+            cache: false,
+            success: function (data, textStatus) {
+                $("#content").html(data);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+
+
+
+    function OnOrderQtyBlur(e) {
+        if (e.value != "") {
+            if (parseInt(e.value) < 0 || isNaN(e.value)) {
+                $(e).val('');
+                $(e).next().html("<font color='red'>数量只能为大于0数字</font>");
+            }
+            else {
+                $(e).next().html("");
+            }
+        }
+    }
+
+    function FlowDetGrid_OnDataBinding(e) {
+        e.data = {
+            flow: $('#Flow').val(),
+            item: $('#SearchItem').val()
+        };
+    }
+
+</script>
+<fieldset>
+    <legend>@Resources.KB.KanbanCard.FlowDetail_Title</legend>
+    @(Html.Telerik().Grid(Model)
+        .Name("FlowDetail")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .Editable(editing => editing.Mode(GridEditMode.InCell))
+        .EnableCustomBinding(true)
+        .DataBinding(dataBinding =>dataBinding.Ajax().Select("_AjaxFlowDetail", "KanbanCard"))
+        .ClientEvents(events => events.OnDataBinding("FlowDetGrid_OnDataBinding"))
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Id).Hidden().ClientTemplate("<input type='text' style='width:40px;' id='Id'  name='Id' value='<#= Id #>' />").Hidden();
+            columns.Bound(o => o.Sequence).ReadOnly();
+            columns.Bound(o => o.Item).ReadOnly();
+            columns.Bound(o => o.ReferenceItemCode).ReadOnly();
+            columns.Bound(o => o.ItemDescription).ReadOnly();
+            columns.Bound(o => o.MinUnitCount).ReadOnly();
+            columns.Bound(o => o.UnitCount).ClientTemplate("<input type='text' style='width:40px;' id='UnitCount'  name='UnitCount' value='<#= UnitCount #>' />").Hidden();
+            columns.Bound(o => o.UnitCountDescription).ReadOnly();
+            columns.Bound(o => o.Uom).ReadOnly();
+            columns.Bound(o => o.LocationFrom).ReadOnly();
+            columns.Bound(o => o.LocationTo).ReadOnly();
+            columns.Bound(o => o.BinTo).Title("工位").ReadOnly();
+            columns.Bound(o => o.OrderQty).ClientTemplate("<input type='text' style='width:60px;' id='OrderQty' onblur='OnOrderQtyBlur(this)'    name='OrderQty' value='<#= OrderQty #>' /><span ><span>").Title("增减数量"); ;
+            //columns.Bound(o => o.POLineNo).ClientTemplate("<input type='text' style='width:60px;' id='POLineNo'    name='POLineNo' value='<#= POLineNo #>' /><span ><span>");
+            columns.Bound(o => o.CycloidAmount).Title("当前张数").ReadOnly();;
+        })
+                
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total != null ? ViewBag.Total : 1);
+            settings.PageSize(ViewBag.PageSize);
+        })
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+            )
+</fieldset>
+

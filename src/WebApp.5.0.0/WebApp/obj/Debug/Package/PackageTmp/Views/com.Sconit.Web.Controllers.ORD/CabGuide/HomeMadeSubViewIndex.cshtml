@@ -1,0 +1,27 @@
+﻿@{
+    ViewBag.Title = "";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_CabGuideHomeMadeSubView_View" });
+}
+@{ Html.Telerik().TabStrip()
+        .Name("HomeMadeViewTabStrip")
+        .Items(tabstrip =>
+        {
+            tabstrip.Add()
+                .Text("未出库")
+                .LoadContentFrom("_HomeMadeSubView2", "CabGuide")
+                .HtmlAttributes(new { onclick = "CleanTabMessage()" });
+
+            tabstrip.Add()
+               .Text("已出库")
+                .LoadContentFrom("_HomeMadeSubView", "CabGuide")
+                .HtmlAttributes(new { onclick = "CleanTabMessage()" });
+        })
+        .Render();
+}
+@{ Html.Telerik().ScriptRegistrar()
+        .OnDocumentReady(
+    @<text> var tabIndex = "@TempData["TabIndex"]"; var tabstrip = $("#HomeMadeViewTabStrip").data("tTabStrip");
+    var item = $("li", tabstrip.element)[tabIndex != "" ? tabIndex : 0]; tabstrip.select(item);
+    </text>
+        );
+}

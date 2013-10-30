@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.FIS.LesINLog, com.Sconit.Entity.FIS" table="FIS_LesINLog" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+    <property name="Type" column="Type" type="String" length="50"/>
+    <property name="MoveType" column="MoveType" type="String" length="50"/>
+    <property name="Sequense" column="Sequense" type="String" length="50"/>
+    <property name="PO" column="PO" type="String" length="50"/>
+    <property name="POLine" column="POLine" type="String" length="50"/>
+    <property name="WMSNo" column="WMSNo" type="String" length="50"/>
+    <property name="WMSLine" column="WMSLine" type="String" length="50"/>
+    <property name="HandTime" column="HandTime" type="DateTime" />
+    
+    <property name="FileName" column="FileName" type="String" length="50"/>
+    <property name="Item" column="Item" type="String" length="50"/>
+    <property name="HandResult" column="HandResult" type="String" length="50"/>
+    <property name="ErrorCause" column="ErrorCause" type="String" length="500"/>
+    <property name="IsCreateDat" column="IsCreateDat" type="Boolean"/>
+    <property name="ASNNo" column="ASNNo" type="String" length="50"/>
+    <property name="ExtNo" column="ExtNo" type="String" length="50"/>
+
+    <property name="Qty" column="Qty" type="Decimal"  />
+    <property name="QtyMark" column="QtyMark" type="Boolean"/>
+
+    <property name="UploadDate" column="UploadDate" type="DateTime" />
+    <property name="LesFileName" column="LesFileName" type="String" length="50"/>
+  </class>
+</hibernate-mapping>

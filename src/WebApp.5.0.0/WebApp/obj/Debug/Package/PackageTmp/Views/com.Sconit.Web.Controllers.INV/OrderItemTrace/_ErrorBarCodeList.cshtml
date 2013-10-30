@@ -1,0 +1,70 @@
+﻿@model IList<com.Sconit.Entity.ORD.ErrorBarCode>
+
+
+<fieldset>
+<legend>错误关键件条码</legend>
+    @(Html.Telerik().Grid(Model)
+                                .Name("ErrorBarCodeGrid")
+       
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Sequence);
+            columns.Bound(o => o.BarCode);
+            columns.Bound(o => o.Message);
+            columns.Bound(o => o.ProdCodeSeq).Title("");
+            columns.Bound(o => o.Delete).Title("");
+
+        })
+                .CellAction(cell =>
+                {
+                    if (cell.Column.Member == "ProdCodeSeq")
+                    {
+                        cell.Text = string.Format("<input type='button' id='ProdCodeSeq' name='ProdCodeSeq'  onclick='doClick(this)'  value='手工匹配'/>");
+                    }
+                    if (cell.Column.Member == "Delete")
+                    {
+                        cell.Text = string.Format("<input type='button' id='Delete' name='Delete'  onclick='dodeleteClick(this)'  value='删除'/>");
+                    }
+                    if (cell.Column.Member == "Message")
+                    {
+                        cell.Text = string.Format("<span> <font color='red'>"+cell.DataItem.Message+"</font></span>");
+                    }
+                })
+
+                .Scrollable(c => c.Enabled(false))
+                .EnableCustomBinding(true)
+                .Resizable(resizing => resizing.Columns(true))
+            )
+            <input type="hidden" id="SequenceHidden" />
+            <input type="hidden" id="ErrorBarCode" />
+            <input type="hidden" id="IsUpdateItemHidden" />
+</fieldset>
+<script type="text/javascript">
+    function doClick(e) {
+        var sequence = $(e).parent().parent().children().eq(0).text();
+//        var barCode = $(e).parent().parent().children().eq(1).text();
+//        var isUpdateItem = $(e).parent().parent().children().eq(5).text();
+        $("#SequenceHidden").val(sequence);
+//        $("#ErrorBarCode").val(barCode);
+//        $("#IsUpdateItemHidden").val(isUpdateItem);
+        var detailWindow = $("#OrderBomDetailWindow").data("tWindow");
+        detailWindow.ajaxRequest("/OrderItemTrace/_NewItemTraceResultList/", { prodCodeSeq: $("#ProdCodeSeq").val(), sequence: sequence })
+        detailWindow.center().open();
+
+    }
+
+    function dodeleteClick(e) {
+        var sequences = $(e).parent().parent().children().eq(0).text();
+        $.ajax({
+            type: 'get',
+            dataType: "html",
+            url: "/OrderItemTrace/DeleteErrorBarCodeList/",
+            data: { sequence: sequences },
+            cache: false,
+            success: function (data) {
+                $("#ErrorBarCodeListDiv").html(data);
+            }
+        });
+    }
+</script>
+

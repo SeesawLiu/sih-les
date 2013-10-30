@@ -1,0 +1,83 @@
+﻿@model IEnumerable<com.Sconit.Web.Models.MenuModel>
+@*<script type="text/javascript">
+
+    function ClearMessage() {
+        $("#divMessage").empty();
+        //            var mainFrame = top.document.getElementsByName("rightall")[0];
+        //            mainFrame.rows = "*,0";
+    }
+
+    var flag = false;
+    function Resize() {
+        //            var mainFrame = top.document.getElementsByName("rightall")[0];
+        //            if (flag) {
+        //                mainFrame.rows = "*,25";
+        //            }
+        //            else {
+        //                mainFrame.rows = "*,300";
+        //            }
+        flag = !flag;
+    }
+
+</script>
+<style type="text/css">
+    .header
+    {
+        padding: 5;
+        position: fixed;
+        width: 50px;
+    }
+    #divMessage li.error
+    {
+        list-style-image: url('/Content/Images/Message/Error.gif');
+        background-color: #ffeedd;
+    }
+    #divMessage li.warning
+    {
+        list-style-image: url('/Content/Images/Message/Warning.gif');
+        background-color: #ffff66;
+    }
+    #divMessage li.success
+    {
+        list-style-image: url('/Content/Images/Message/Success.gif');
+        background-color: #ddffaa;
+    }
+    #divMessage li
+    {
+        padding-left: 15px;
+        height: 24px;
+        margin-bottom: 1px;
+        margin-right: 0px;
+    }
+</style>
+<div style="position: absolute; right: 50px; top: 0px;">
+    <div class="header">
+        <input name="Clear" title="清除日志" type="button" onclick="ClearMessage()" id="Clear"
+            style="width: 20px; height: 20px; background: url('/Content/Images/Message/ico_clear.gif') no-repeat;
+            border: none;" />
+        <input name="Normal" title="窗口缩放" type="button" onclick="Resize()" id="Normal" style="width: 20px;
+            height: 20px; background: url('/Content/Images/Message/ico_resize.gif') no-repeat;
+            border: none;" />
+    </div>
+</div>
+<div id="divMessage">
+</div>*@
+<div style="margin: 3px 0 7px 0">
+    @{
+        List<MenuModel> menus = this.Model.Reverse().ToList();
+        int i = 0;
+        <span>Home -> </span>        
+        foreach (var menu in menus)
+        {
+            i++;
+        <span>
+            @Html.Label(menu.Name)
+        </span>
+            if (i < menus.Count())
+            {
+        <span>-></span>   
+            }
+        }  
+    
+    }
+</div>

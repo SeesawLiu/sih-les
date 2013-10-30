@@ -1,0 +1,365 @@
+﻿@using com.Sconit.Entity.SYS
+@using com.Sconit.Web.Models.SearchModels.ORD
+<script type="text/javascript">
+    function Flow_Change(e) {
+        $("#btnShipByQty").hide();
+        $("#btnPreview").hide();
+        if (e.value != "") {
+            var combobox = $(this).data("tComboBox");
+            if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                combobox.value("");
+                combobox.reload();
+            }
+        }
+    }
+
+    function onScheduleRefresh(e) {
+        if ($("#Flow").val() == "") {
+            alert("路线为必填项。");
+            return;
+        }
+        var data = {
+            "flow": $("#Flow").val()
+        };
+        $.ajax({
+            type: "post",
+            dataType: "html",
+            url: "/SupplierScheduling/Refresh/",
+            data: data,
+            cache: false,
+            success: function (data, textStatus) {
+               
+                var $tGrid = $("#content");
+                $($tGrid).html(data);
+                if('@ViewBag.IsShow'=='True')
+                {
+                    $("#btnShipByQty").show();
+                    $("#btnPreview").show();
+                }else{
+                    $("#btnShipByQty").hide();
+                    $("#btnPreview").hide();
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+                $("#btnShipByQty").hide();
+                $("#btnPreview").hide();
+            }
+        });
+    }
+
+
+    function onBtnShipByQty() {
+        ClearMessage();
+        var dateStr = "";
+        var errorStr = "";
+        var bb = false;
+        var OrderNoStr = "";
+        var SequenceStr = "";
+        var CurrentShipQtyStr = "";
+        var SureShipQtyStr = "";
+        var rows = $("tbody").children("tr:not(.t-no-data)");
+        for (var i = 0; i < rows.length; i++) {
+            var cells = $(rows[i]).children();
+            var CurrentShipQty = cells.find("#CurrentShipQty").val();
+            if (CurrentShipQty != "" && CurrentShipQty != undefined) {
+                if (isNaN(CurrentShipQty) || !(parseFloat(CurrentShipQty) > 0)) {
+                    $message.error("第" + (i + 1) + "行发货数填写不正确。");
+                    bb = true;
+                }
+                else {
+                    if (OrderNoStr == "") {
+                        OrderNoStr = cells.eq(0).text();
+                        SequenceStr = cells.eq(1).text();
+                        CurrentShipQtyStr = CurrentShipQty;
+                        SureShipQtyStr = cells.eq(18).text();
+                    } else {
+                        OrderNoStr += "," + cells.eq(0).text();
+                        SequenceStr += "," + cells.eq(1).text();
+                        CurrentShipQtyStr += "," + CurrentShipQty;
+                        SureShipQtyStr += "," + cells.eq(18).text();
+                    }
+                }
+            }
+        }
+        if (bb) {
+            return;
+        }
+        if (OrderNoStr == "") {
+            $message.error('发货明细不能为空，请填写发货数量。');
+            return;
+        }
+
+        var data = {
+            "Flow": $("#hFlow").val(),
+            "OrderNoStr": OrderNoStr,
+            "SequenceStr": SequenceStr,
+            "CurrentShipQtyStr": CurrentShipQtyStr,
+            "SureShipQtyStr": SureShipQtyStr
+        }
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            url: "/SupplierScheduling/ShipOrderByQty/",
+            data: data,
+            cache: false,
+            success: function (data, textStatus) {
+                DisplayJsonMessages(data);
+                var dataStatement = {
+                    "IpNo": data.Data.IpNo,
+                    "urlId":"ScheduLine",
+                    "OrderNo":""
+                }
+                $.ajax({
+                    type: "post",
+                    dataType: "html",
+                    data: dataStatement,
+                    url: "/SupplierIpMaster/_Edit/",
+                    cache: false,
+                    success: function (data, textStatus) {
+                        var $tGrid = $("#content");
+                        $($tGrid).html(data);
+                    }
+                });
+
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+    //    $(function () {
+    //        var handler = function () { }
+    //        var timer = setInterval(handler, 1000);
+    //        var clear = function () { clearInterval(timer); }
+    //    });
+
+    function getSpeedDate(oldDate) {
+        var newDate = new Date();
+        var date = newDate - oldDate;
+        var minutess = parseInt(date / 1000);
+        //       var nHours = newDate.getHours();       //获取当前小时数(0-23)
+        //       var nMinutes = newDate.getMinutes();     //获取当前分钟数(0-59)
+        //       var nSwcinds = newDate.getSeconds();     //获取当前秒数(0-59)
+
+        //      // var newDate = new Date();
+        //       var oHours = oldDate.getHours();       //获取当前小时数(0-23)
+        //       var oMinutes = oldDate.getMinutes();     //获取当前分钟数(0-59)
+        //       var oSwcinds = oldDate.getSeconds();     //获取当前秒数(0-59)
+
+        var showTime = "00:" + (parseInt(minutess / 60) < 10 ? ("0" + parseInt(minutess / 60)) : parseInt(minutess / 60)) + ":" + (parseInt(minutess % 60) < 10 ? ("0" + parseInt(minutess % 60)) : parseInt(minutess % 60));
+        $("#SpeedDiv").text("正在为您查询,请稍等!已用时: " + showTime).show();
+        return oldDate;
+    }
+
+    function stopSearch(timer) {
+        clearInterval(timer);
+    }
+    //    function onSpeed() {
+    //        var oldDate = new Date();
+    //        var showTime = getSpeedDate(oldDate);
+    //        var timer = setInterval(handler, 1000);
+    //       
+    //    }
+
+    function onSearch() {
+        if ($("#Flow").val() == "") {
+            alert("路线为必填项。");
+            return;
+        }
+        $("#hFlow").val($("#Flow").val());
+        var oldDate = new Date();
+        // var showTime = getSpeedDate(oldDate);
+        var timer = setInterval(function () { oldDate = getSpeedDate(oldDate) }, 1000);
+        //  var timer = setTimeout(alert(oldDate), 1000);
+        var data = {
+            "Flow": $("#Flow").val(),
+            "Item": $("#Item").val(),
+            "ListDays": $("#ListDays").val(),
+            "NotIncludeZeroShipQty": $("#cbZeroQty").is(':checked')
+        }
+        $.ajax({
+            type: "post",
+            dataType: "html",
+            url: "/SupplierScheduling/_ScheduleLineList/",
+            data: data,
+            cache: false,
+            success: function (data, textStatus) {
+                stopSearch(timer);
+                $("#SpeedDiv").hide();
+                $("#fdOrderDetail").html(data);
+                $("#fdOrderDetail").show();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                stopSearch(timer);
+                $("#SpeedDiv").hide();
+                DisplayTextMessages(XMLHttpRequest.responseText);
+                $("#btnShipByQty").hide();
+                $("#btnPreview").hide();
+            }
+        });
+    }
+    function showDetail() {
+        if ($('input[name="cbShowDetail"]').attr("checked") == "checked") {
+            $("#dayLabel").attr("style", "display:hidden");
+            $("#dayText").attr("style", "display:hidden");
+            $("#ListDays").val(21);
+        } else {
+            $("#dayLabel").attr("style", "display:none");
+            $("#dayText").attr("style", "display:none");
+            $("#ListDays").val(0);
+        }
+    }
+
+    function onBtnPreview() {
+        ClearMessage();
+        var bb = false;
+        var OrderNoStr = "";
+        var SequenceStr = "";
+        var rows = $("tbody").children("tr:not(.t-no-data)");
+        for (var i = 0; i < rows.length; i++) {
+            var cells = $(rows[i]).children();
+            var CurrentShipQty = cells.find("#CurrentShipQty").val();
+            if (CurrentShipQty != "" && parseFloat(CurrentShipQty) > 0) {
+                if (CurrentShipQty != "" && CurrentShipQty != undefined) {
+                    if (isNaN(CurrentShipQty) || !(parseFloat(CurrentShipQty) > 0)) {
+                        $message.error("第" + (i + 1) + "行发货数填写不正确。");
+                        bb = true;
+                    }
+                    else {
+                        if (OrderNoStr == "") {
+                            OrderNoStr = cells.eq(0).text();
+                            SequenceStr = cells.eq(1).text();
+                            CurrentShipQtyStr = CurrentShipQty;
+                        } else {
+                            OrderNoStr += "," + cells.eq(0).text();
+                            SequenceStr += "," + cells.eq(1).text();
+                            CurrentShipQtyStr += "," + CurrentShipQty;
+                        }
+                    }
+                }
+            }
+        }
+        if (bb) {
+            return;
+        }
+        if (OrderNoStr == "") {
+            $message.error('发货明细为空，无法预览。');
+            return;
+        }
+        var data = {
+            "OrderNoStr": OrderNoStr,
+            "SequenceStr": SequenceStr,
+            "CurrentShipQtyStr": CurrentShipQtyStr
+        }
+        var detailWindow = $("#PreviewShipDetailWindow").data("tWindow");
+        detailWindow.ajaxRequest("/SupplierScheduling/_PreviewShipDetailWindow/", data)
+        detailWindow.center().open();
+    }
+</script>
+@using (Html.BeginForm())
+{   
+    <fieldset>
+        <div class="search">
+            <div class="search-label">
+                <label for="OrderMaster_Flow">
+                    @Resources.ORD.OrderMaster.OrderMaster_Flow
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+    Html.RenderAction("_FlowComboBox", "Common",
+        new
+        {
+            controlName = "Flow",
+            isChange = true,
+            isSupplier = true,
+            type = (int)com.Sconit.CodeMaster.OrderType.Procurement,
+            selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).Flow : string.Empty
+        });
+                }
+                @Html.Hidden("hFlow")
+            </div>
+            <div class="search-label">
+                <label>
+                    @Resources.ORD.OrderDetail.OrderDetail_Item
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+    Html.RenderAction("_ItemComboBox", "Common", new
+    {
+        controlName = "Item",
+        selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).Item : string.Empty
+    });
+                }
+            </div>
+            <div class="search-label">
+                <label>
+                    显示明细
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.CheckBox("cbShowDetail", false, new { onClick = "showDetail();" })
+            </div>
+            <div class="search-label" id="dayLabel" style="display: none">
+                <label>
+                    @Resources.ORD.OrderDetail.OrderDetail_ListDays
+                </label>
+            </div>
+            <div class="search-field" id="dayText" style="display: none">
+                @Html.TextBox("ListDays", 0)
+            </div>
+            <div class="search-label">
+                <label>
+                    过滤可发货数量为0的记录
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.CheckBox("cbZeroQty", true)
+            </div>
+        </div>
+        <div class="search-footer">
+            <button type="button" id="btnSearch" onclick="onSearch()">
+                @Resources.Global.Button_Search</button>
+            @*<button type="button" id="btnRefresh" onclick="onScheduleRefresh()">
+                @Resources.Global.Button_Refresh</button>*@
+            @Html.Button(Resources.Global.Button_Ship, "Url_OrderMstr_ScheduleLine_Ship", new Dictionary<string, string>()
+	        {
+	            {"type", "button"},
+	            {"id", "btnShipByQty"},
+	            {"style", "display:none"},
+                {"needconfirm","true"},
+                {"onclick","onBtnShipByQty()"}
+	        })
+            @*   <button type="button" id="btnRefresh" onclick="onScheduleRefresh()">
+                @Resources.Global.Button_Refresh</button>*@
+            @Html.Button("预览", "Url_OrderMstr_ScheduleLine_Ship", new Dictionary<string, string>()
+	        {
+	            {"type", "button"},
+	            {"id", "btnPreview"},
+	            {"style", "display:none"},
+                {"needconfirm","true"},
+                {"onclick","onBtnPreview()"}
+	        })
+        </div>
+    </fieldset>
+    <div id="SpeedDiv" style="text-align: center;">
+    </div>
+    <div id="fdOrderDetail" style="display: none;">
+    </div>
+ 
+}
+@{Html.Telerik().Window()
+        .Name("PreviewShipDetailWindow")
+        .Title("发货明细预览")
+        .Draggable(true)
+        .Scrollable(true)
+        .Resizable()
+        .Width(900)
+       .Height(300)
+        .Visible(false)
+           .Modal(true)
+
+       .Render();
+}

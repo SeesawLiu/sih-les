@@ -1,0 +1,49 @@
+﻿@using com.Sconit.Web.Models.SearchModels.SCM
+@model IEnumerable<com.Sconit.Entity.SCM.FlowMaster>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+                        .Name("FlowTaktAjust")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Code);
+        })
+                .DataBinding(dataBinding => dataBinding.Ajax()
+                                                               .Select("_AjaxList", "FlowTaktAjust")
+                                                               .Update("_Update", "FlowTaktAjust", new RouteValueDictionary()
+                                                                                    {
+                                                                                        { "PartyFrom", (FlowTaktAjustSearchModel)TempData["FlowTaktAjustSearchModel"] != null ? ((FlowTaktAjustSearchModel)TempData["FlowTaktAjustSearchModel"]).PartyFrom : string.Empty },
+                                                                                        { "Code", (FlowTaktAjustSearchModel)TempData["FlowTaktAjustSearchModel"] != null ? ((FlowTaktAjustSearchModel)TempData["FlowTaktAjustSearchModel"]).Code : string.Empty }
+                                                                                    }))
+                .Columns(columns =>
+                             {
+                                 columns.Bound(o => o.Code).Title("生产线").ReadOnly();
+                                 columns.Bound(o => o.Description).Title("生产线描述").ReadOnly();
+                                 columns.Bound(o => o.PartyFrom).Title("区域").ReadOnly();
+                                 columns.Bound(o => o.TaktTime).Title("节拍时间(秒)");
+                                 columns.Bound(o => o.TaktTime).Title("节拍时间(分)")
+                                     .ClientTemplate("<label> <#= parseInt(TaktTime*100/60)/100 #></label>").ReadOnly();
+                                 // .ClientTemplate("<input type='checkbox' disabled='disabled' name='IsDefault' <#= true? checked='checked' : '' #> />");
+
+                                 columns.Command(commands =>
+                                 {
+                                     commands.Edit();
+                                 }).Width(190);
+                             })
+                .Scrollable(c => c.Enabled(false))
+                .ClientEvents(events => events.OnDataBinding("FlowTaktAjustGrid_OnDataBinding"))
+                .Pageable(settings =>
+                {
+                    settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+                    settings.PageSize(ViewBag.PageSize);
+                })
+                .EnableCustomBinding(true)
+                .Sortable()
+                  )
+    <script type="text/javascript">
+        function FlowTaktAjustGrid_OnDataBinding(e) {
+            e.data = {
+                Code: $('#Code').val()
+            };
+        }
+    </script>
+</fieldset>

@@ -1,0 +1,59 @@
+﻿@using com.Sconit.CodeMaster
+@model com.Sconit.Entity.PRD.SpecialTime
+@{
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_SpecialTime_WorkView" });
+}
+@using (Html.BeginForm())
+{
+    <fieldset>
+        <div class="editor">
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.Region)
+            </div>
+            <div class="editor-field-2">
+                @{
+    Html.RenderAction("_RegionComboBox", "Common", new
+                                                       {
+                                                           controlName = "Region",
+                                                           controlId = "SpecialTimeRegion",
+                                                           selectedValue = Model != null ? Model.Region : string.Empty
+                                                       });
+                }
+                @Html.ValidationMessageFor(model => model.Region)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.Type)
+            </div>
+            <div class="editor-field-2">
+                @Html.Label(Resources.CodeDetail.CodeDetail_WorkingCalendar_Work)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.StartTime)
+            </div>
+            <div class="editor-field-2">
+                @Html.Telerik().DateTimePickerFor(model => model.StartTime)
+                @Html.ValidationMessageFor(model => model.StartTime)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.EndTime)
+            </div>
+            <div class="editor-field-2">
+                @Html.Telerik().DateTimePickerFor(model => model.EndTime)
+                @Html.ValidationMessageFor(model => model.EndTime)
+            </div>
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.Description)
+            </div>
+            <div class="editor-field-2">
+                @Html.EditorFor(model => model.Description)
+                @Html.ValidationMessageFor(model => model.Description)
+            </div>
+        </div>
+        <div class="editor-footer">
+            <button type="submit" id="btnNew">
+                @Resources.Global.Button_New</button>
+            <button type="button" id="btnBack" onclick="location.href='@Url.Content("~/SpecialTime/WorkList")'">
+                @Resources.Global.Button_Back</button>
+        </div>
+    </fieldset>
+}

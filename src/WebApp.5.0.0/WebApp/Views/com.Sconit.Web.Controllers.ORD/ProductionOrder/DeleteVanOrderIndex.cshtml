@@ -1,0 +1,55 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_Production_DeleteVanOrder" });
+}
+<fieldset>
+    <div class="search">
+        <div class="editor-label-2">
+            <label>
+                @Resources.ORD.OrderMaster.OrderMaster_TraceCode
+            </label>
+        </div>
+        <div class="editor-field-2">
+            @Html.TextBox("VanCode")
+        </div>
+        <div class="search-label">
+            <label>
+                <a href='/Resource/Templates/UploadTemplate/DeleteVanOrder.xls'>模板下载</a>
+            </label>
+        </div>
+        <div class="search-field">
+            @(Html.Telerik().Upload()
+                            .Name("attachments")
+                            .Multiple(false)
+                            .Async(async => async
+                            .Save("ImportDeleteVanOrder", "ProductionOrder")
+                            .AutoUpload(true))
+                         .ClientEvents(e => e.OnSuccess("TelerikonUpload_OnSuccess")))
+        </div>
+    </div>
+    <div class="search-footer">
+        <button type="button" id="btnDeleteVanOrder" onclick="doDeleteClick()">
+            @Resources.Global.Button_Delete</button>
+    </div>
+</fieldset>
+<script type="text/javascript">
+    function doDeleteClick() {
+        if ($('#VanCode').val() == "") {
+            $message.error("Van号不能为空。");
+            return;
+        }
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            data: { vanCode: $('#VanCode').val() },
+            url: "/ProductionOrder/DeleteVanOrder/",
+            cache: false,
+            success: function (data, textStatus) {
+                DisplayJsonMessages(data);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+</script>

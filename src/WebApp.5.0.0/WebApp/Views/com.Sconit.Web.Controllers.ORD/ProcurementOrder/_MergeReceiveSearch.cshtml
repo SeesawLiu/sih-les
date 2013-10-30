@@ -1,0 +1,210 @@
+﻿@using com.Sconit.Entity.SYS
+<div id="DivNewInspection">
+    <fieldset>
+        <div class="editor">
+            <div class="editor-label-2">
+                <label>
+                   @* @Resources.ORD.OrderMaster.OrderMaster_OrderNo*@
+                   单号
+                </label>
+            </div>
+            <div class="editor-field-2">
+                @Html.TextBox("OrderNo", null)
+                @Html.Hidden("OrderNoHidden")
+                @Html.Hidden("SearchUrl")
+                @Html.Hidden("RecUrl")
+                @Html.Hidden("OrderType")
+            </div>
+        </div>
+        <div class="editor-footer">
+            @Html.Button(Resources.Global.Button_Receive, "Url_ProcurementIpMaster_Receive", new Dictionary<string, string>()
+            {
+	            {"type", "button"},
+	            {"id", "btnReceive"},
+                {"needconfirm","true"},
+                {"style","display:none"},
+                {"onclick","onReceive()"}
+            })
+
+            @Html.Button("指定寄售供应商", "", new Dictionary<string, string>()
+            {
+	            {"type", "button"},
+	            {"id", "btnSpecify"},
+                {"needconfirm","true"},
+                {"style","display:none"},
+                {"onclick","onSpecifyClick()"}
+            })
+        </div>
+    </fieldset>
+    <div id="DivReceiveDetails">
+    </div>
+</div>
+<script type="text/javascript">
+    function onSpecifyClick() {
+        if ($("#OrderNoHidden").val() == "") {
+            $message.error("请先扫描单号。");
+            return;
+        }
+        var data = {
+            "orderNo": $("#OrderNoHidden").val()
+        }
+        $("#btnSpecify").attr("disabled", true);
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            data: data,
+            url: "/ProcurementOrder/SpecifySequenceOrderCSSupplier/",
+            cache: false,
+            success: function (returnData, textStatus) {
+                DisplayJsonMessages(returnData);
+                $("#btnSpecify").attr("disabled", false);
+                $.ajax({
+                    type: "post",
+                    dataType: "html",
+                    data: { "orderNo": $("#OrderNoHidden").val(), "orderType": $("#OrderType").val() },
+                    url: $("#SearchUrl").val(),
+                    cache: false,
+                    success: function (data, textStatus) {
+                        $("#DivReceiveDetails").html(data);
+                    }
+                });
+//                DisplayJsonMessages(returnData);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+
+    $("#OrderNo").keydown(function () {
+        if (event.keyCode == 13) {
+            $("#btnReceive").attr("style", "display:none");
+            $("#btnSpecify").attr("style", "display:none");
+            var data = {
+                "orderNo": $(this).val()
+            };
+            if ($(this).val() == "") {
+                $message.error("请扫描订单号，进行收货。");
+                return;
+            }
+            $("#OrderNo").attr("disabled", true);
+            $("#DivReceiveDetails").html("正在处理中……");
+            $("#OrderNoHidden").val($(this).val());
+            $(this).val("");
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                data: data,
+                url: "/ProcurementOrder/CheckOrderType/",
+                cache: false,
+                success: function (data, textStatus) {
+                    DisplayJsonMessages(data);
+                    $("#OrderNo").attr("disabled", false);
+                    if (data.IsTrue) {
+                        $("#OrderType").val(data.OrderType);
+                        if ($("#OrderType").val() == "1") {//采购
+                            $("#btnSpecify").attr("style", "display:none");
+                        } else if ($("#OrderType").val() == "2") {//移库
+                            $("#btnSpecify").attr("style", "display:inline");
+                        }
+                        if (data.Type == "ORD") {//要货单
+                            $("#SearchUrl").val("/ProcurementOrder/_MergeOrderDetail/");
+                            $("#RecUrl").val("/ProcurementOrder/MergeReceiveOrderDetail/");
+                        } else if (data.Type == "SEQ") {//排序单
+                            $("#SearchUrl").val("/ProcurementOrder/_MergeSEQOrderDetail/");
+                            $("#RecUrl").val("/ProcurementOrder/MergeSEQReceiveOrderDetail/");
+                        }
+                        else if (data.Type == "ASN") {//ASN
+                            $("#SearchUrl").val("/ProcurementOrder/_MergeASNOrderDetail/");
+                            $("#RecUrl").val("/ProcurementOrder/MergeReceiveASNOrderDetail/");
+                        }
+                        else if (data.Type == "WMS") {//WMS
+                            $("#SearchUrl").val("/ProcurementOrder/_MergeWMSDat/");
+                            $("#RecUrl").val("/ProcurementOrder/MergeReceiveWMSDat/");
+                        }
+                        $.ajax({
+                            type: "post",
+                            dataType: "html",
+                            data: { "orderNo": $("#OrderNoHidden").val(),"orderType":$("#OrderType").val() },
+                            url: $("#SearchUrl").val(),
+                            cache: false,
+                            success: function (data, textStatus) {
+                                $("#DivReceiveDetails").html(data);
+                            }
+                        });
+
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    $("#btnReceive").attr("style", "display:none");
+                    $("#btnSpecify").attr("style", "display:none");
+                    $("#OrderNo").attr("disabled", false);
+                    $("#DivReceiveDetails").html("");
+                    DisplayTextMessages(XMLHttpRequest.responseText);
+                }
+            });
+
+        }
+    });
+
+    function onReceive() {
+        var rows = $("tbody").children();
+        var idStr = "";
+        var qtyStr = "";
+        var LocStr = "";
+        var csSupplierStr = "";
+        for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+            var row = $(rows[rowIndex]);
+            var id = row.find("#Id").val();
+            var qty = row.find("#CurrentReceiveQty").val();
+            var csSupplier = row.find("#CurrentReceiveQty").parent().next().text();
+            if (row.find("#Id").is(":checked")) {
+                if (qty != "" && !isNaN(qty) && parseFloat(qty) > 0) {
+                    if (idStr == "") {
+                        idStr = id;
+                        qtyStr = qty;
+                        csSupplierStr = csSupplier;
+                    } else {
+                        idStr += "," + id;
+                        qtyStr += "," + qty;
+                        csSupplierStr += "," + csSupplier;
+                    }
+                }
+            }
+        }
+        if (idStr == "") {
+            $message.error('请填写数量收货。');
+            return;
+        }
+        var data = {
+            "idStr": idStr,
+            "qtyStr": qtyStr,
+            "csSupplierStr": csSupplierStr
+        };
+        $.ajax({
+            type: "Post",
+            dataType: "json",
+            data: data,
+            url: $("#RecUrl").val(),
+            cache: false,
+            success: function (data, textStatus) {
+                DisplayJsonMessages(data);
+                $.ajax({
+                    type: "post",
+                    dataType: "html",
+                    data: { "orderNo": $("#OrderNoHidden").val(), "orderType": $("#OrderType").val() },
+                    url: $("#SearchUrl").val(),
+                    cache: false,
+                    success: function (data, textStatus) {
+                        $("#DivReceiveDetails").html(data);
+                    }
+                });
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+
+   
+</script>

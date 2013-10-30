@@ -1,0 +1,72 @@
+﻿
+@model IEnumerable<com.Sconit.Entity.ORD.PickResult>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("PickResultGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.ResultId);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.ResultId);
+            columns.Bound(o => o.PickId);
+            columns.Bound(o => o.PickedHu);
+            columns.Bound(o => o.PickedQty);
+            columns.Bound(o => o.Picker);
+            columns.Bound(o => o.PickDate);
+            columns.Bound(o => o.IsShip).ClientTemplate("<input type='checkbox' disabled='disabled' name='IsShip' <#= IsShip? checked='checked' : '' #> />");
+            columns.Bound(o => o.PickDate).Title(string.Empty);
+       })
+        .Scrollable(c => c.Enabled(false))
+                .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxList", "PickResult"))
+                        .ClientEvents(events => events.OnDataBinding("PickResultGrid_OnDataBinding")
+                                                              .OnRowDataBound("PickResultGrid_OnRowDataBound"))
+                .Pageable(settings =>
+                {
+                    settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+                    settings.PageSize(ViewBag.PageSize != null ? ViewBag.PageSize : 10);
+                })
+                .EnableCustomBinding(true)
+                .Sortable()
+                .Resizable(resizing => resizing.Columns(true))
+        )
+    <script type="text/javascript">
+        function PickResultGrid_OnDataBinding(e) {
+            e.data = {
+                PickId: $('#PickId').val()
+            }
+        }
+
+        function PickResultGrid_OnRowDataBound(e) {
+            //可以取消
+            if (!e.dataItem.IsShip) {
+                var buttonId = "b" + (new Date()).valueOf();
+                e.row.cells[7].innerHTML = "<button id='" + buttonId + "' onclick='CancelPickResult(\"" + buttonId + "\",\"" + e.dataItem.ResultId + "\")'" + " type ='button'>" + "取消" + "</button>";
+            }
+        }
+
+        function CancelPickResult(buttonId, resultId) {
+            var data = {
+                "ResultId": resultId
+            }
+            $.ajax({
+                type: "post",
+                dataType: "Json",
+                url: "/PickResult/CancelPickResult/",
+                data: data,
+                cache: false,
+                success: function (data, textStatus) {
+                    if (data != "") {
+                        DisplayJsonMessages(data);
+                        $("#" + buttonId).attr("disabled", "disabled");
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    DisplayTextMessages(XMLHttpRequest.responseText);
+                }
+            });
+
+        }
+    </script>
+</fieldset>

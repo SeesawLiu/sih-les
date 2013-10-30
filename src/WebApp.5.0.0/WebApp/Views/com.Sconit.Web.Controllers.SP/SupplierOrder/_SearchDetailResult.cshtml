@@ -1,0 +1,58 @@
+﻿@model IEnumerable<com.Sconit.Entity.ORD.OrderDetail>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("OrderDetailGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.OrderNo);
+            columns.Bound(o => o.ExternalOrderNo).ClientTemplate("<div><#=(ExternalOrderNo==''||ExternalOrderNo==null) ?BillAddressDescription:ExternalOrderNo #></div>").Title("计划协议号");
+            columns.Bound(o => o.ExternalSequence).Title("计划协议行号");
+            columns.Bound(o => o.Item).Width(100);
+            columns.Bound(o => o.ReferenceItemCode);
+            columns.Bound(o => o.ItemDescription);
+            columns.Bound(o => o.Uom);
+            columns.Bound(o => o.UnitCount);
+            columns.Bound(o => o.UnitCountDescription);
+            columns.Bound(o => o.MastWindowTime);
+            columns.Bound(o => o.MastFlow);
+            columns.Bound(o => o.MastPartyTo).Title("收货区域");
+            columns.Bound(o => o.LocationTo);
+            columns.Bound(o => o.SAPLocation);
+            columns.Bound(o => o.OrderedQty);
+            columns.Bound(o => o.ShippedQty);
+            columns.Bound(o => o.ReceivedQty);
+            columns.Bound(o => o.MastCreateDate);
+        }
+        )
+            // .Groupable(settings => settings.Groups(groups => groups.Add(o => o.Item)).Visible(false))
+        .Scrollable(c => c.Enabled(false))
+        .Sortable(c => c.Enabled(false))
+                            .Resizable(resizing => resizing.Columns(true))
+        .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxOrderDetailList", "SupplierOrder"))
+                          .ClientEvents(events => events.OnDataBinding("OrderMasterGrid_OnDataBinding"))
+                           .Pageable(settings =>
+                           {
+                               settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+                               settings.PageSize(ViewBag.PageSize);
+                           })
+)
+</fieldset>
+<script>
+    function OrderMasterGrid_OnDataBinding(e) {
+        e.data = {
+            OrderNo: $('#OrderNo').val(),
+            Flow: $('#Flow').val(),
+            Item: $('#Item').val(),
+            DateFrom: $('#DateFrom').val(),
+            DateTo: $('#DateTo').val()
+        };
+    }
+
+
+
+
+</script>

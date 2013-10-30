@@ -1,0 +1,100 @@
+﻿@using com.Sconit.Entity.MD;
+@model IEnumerable<com.Sconit.Entity.SCM.FlowDetail>
+<fieldset>
+
+     <script type="text/javascript">
+
+         function FlowDetailGrid_OnDataBinding(e) {
+             e.data = {
+                 Flow: $("#Flow").val(),
+                  Item: $("#Item").val()
+             };
+         }
+         function FlowDetailGrid_OnRowDataBound(e) {
+             $('input[name="UnitCount"]').unbind("blur");
+             $('input[name="UnitCount"]').each(function (a, b) {
+                 if ($(b).attr("IsChangeUnitCount") == "false") {
+                     $(b).parent().replaceWith("<td><lable>" + $(b).val() + "</lable> <input id='UnitCount' key=" + $(b).val() + " name='UnitCount'  type='hidden' /></td>");
+                 }
+                 else {
+                     $(b).val("");
+                     $(b).blur(function () {
+                         if (parseInt($(b).val()) <= 0 || isNaN($(b).val())) {
+                             $(b).val("");
+                             $(b).next().html("<font color='red'>单包装只能为大于0数字</font>");
+                         }
+                         else {
+                             $(b).next().html("");
+                         }
+                     });
+
+                     $(b).focus(function () {
+                         $(b).next().html("");
+                     });
+
+                 }
+
+             });
+         }
+         function OnHuQtyBlur(e) {
+             if (e.value != "") {
+                 if (parseInt(e.value) < 0 || isNaN(e.value)) {
+                     $(e).val('');
+                     $(e).next().html("<font color='red'>数量只能为大于0数字</font>");
+                 }
+                 else {
+                     $(e).next().html("");
+                 }
+             }
+         }
+         function OnHuQtyFocus(e) {
+             $(e).next().html("");
+         }
+    </script>
+
+    <legend>@Resources.INV.Hu.Hu_FlowDetail</legend>
+        @(Html.Telerik().Grid(Model)
+        .Name("FlowDetail")
+
+       .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+
+        .Columns(columns =>
+        {
+             columns.Bound(o => o.Id).Hidden().ClientTemplate("<input type='text' style='width:40px;' id='Id'  name='Id' value='<#= Id #>' />").Hidden();
+            columns.Bound(o => o.IsChangeUnitCount).ClientTemplate("<input type='text' style='width:40px;' id='IsChangeUnitCount'  name='IsChangeUnitCount' value='<#= IsChangeUnitCount #>' />").Hidden();
+          
+            //columns.Bound(o => o.Sequence);
+            columns.Bound(o => o.Item);
+            columns.Bound(o => o.ItemDescription).Sortable(false);
+            columns.Bound(o => o.ReferenceItemCode);
+            columns.Bound(o => o.UnitCount).ClientTemplate("<input type='text' style='width:40px;' id='UnitCount' IsChangeUnitCount='<#= IsChangeUnitCount #>' name='UnitCount' value='<#= UnitCount #>' /><span ><span>").Width(60);
+
+            columns.Bound(o => o.HuQty).ClientTemplate("<input type='text' style='width:40px;' id='HuQty' onblur='OnHuQtyBlur(this)' onfocus='OnHuQtyFocus(this)'   name='HuQty' value='<#= HuQty #>' /><span ><span>").Width(60).Sortable(false);
+            columns.Bound(o => o.SupplierLotNo).ClientTemplate("<input type='text' style='width:80px;' id='SupplierLotNo'  name='SupplierLotNo' value='<#= SupplierLotNo #>' />").Width(100).Sortable(false);
+            columns.Bound(o => o.MinUnitCount);
+            columns.Bound(o => o.UnitCountDescription);
+            //columns.Bound(o => o.Container);
+            columns.Bound(o => o.ContainerDescription);
+            columns.Bound(o => o.Uom);
+            columns.Bound(o => o.ManufactureParty);
+            columns.Bound(o => o.LotNo).Sortable(false);
+
+        })
+
+         .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxFlowDetailList", "SupplierPrintHu"))
+                .ClientEvents(events => events.OnDataBinding("FlowDetailGrid_OnDataBinding")
+                .OnRowDataBound("FlowDetailGrid_OnRowDataBound"))
+                .Pageable(settings =>
+                {
+                    settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+                    settings.PageSize(ViewBag.PageSize); 
+                })
+                .Scrollable(c => c.Enabled(false))
+        .EnableCustomBinding(true)
+                 .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+           )
+</fieldset>

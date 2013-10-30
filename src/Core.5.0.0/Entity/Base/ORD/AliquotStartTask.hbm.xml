@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="com.Sconit.Entity.ORD.AliquotStartTask, com.Sconit.Entity" table="ORD_AliquotStartTask" lazy="false">
+    <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      <generator class="identity" />
+    </id>
+    <property name="Flow" column="Flow" type="String" length="50" />
+    <property name="VanNo" column="VanNo" type="String" length="50" />
+    <property name="IsStart" column="IsStart" type="Boolean"  />
+    <property name="StartTime" column="StartTime" type="DateTime" />
+
+    <property name="CreateUserId" column="CreateUser" type="Int32" update="false"  />
+    <property name="CreateUserName" column="CreateUserNm" type="String" length="100" update="false" />
+    <property name="CreateDate" column="CreateDate" type="DateTime" update="false"  />
+    <property name="LastModifyUserId" column="LastModifyUser" type="Int32"  />
+    <property name="LastModifyUserName" column="LastModifyUserNm" type="String" length="100" />
+    <property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />
+
+    <property name="OrderNo" column="OrderNo" type="String" length="50" />
+  </class>
+</hibernate-mapping>

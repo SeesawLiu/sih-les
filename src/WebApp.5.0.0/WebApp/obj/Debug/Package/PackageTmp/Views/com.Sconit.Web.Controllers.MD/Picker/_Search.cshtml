@@ -1,0 +1,73 @@
+﻿@using com.Sconit.Web.Models.SearchModels.MD
+<fieldset>
+    @using (Html.BeginForm("List", "Picker"))
+    {   
+        <div class="search">
+            <div class="search-label">
+                <label for="Picker_Code">
+                    @Resources.MD.Picker.Picker_Code
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("SearchCode", TempData["PickerSearchModel"] != null ? ((PickerSearchModel)TempData["PickerSearchModel"]).SearchCode : string.Empty)
+            </div>
+            <div class="search-label">
+                <label for="Picker_Description">
+                    @Resources.MD.Picker.Picker_Description
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("SearchDescription", TempData["PickerSearchModel"] != null ? ((PickerSearchModel)TempData["PickerSearchModel"]).SearchDescription : string.Empty)
+            </div>
+            <div class="search-label">
+                <label for="PickRule_Location">
+                    @Resources.MD.Picker.PickRule_Location
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_LocationComboBox", "Common", new
+        {
+            controlName = "SearchLocation",
+            selectedValue = TempData["PickerSearchModel"] != null ? ((PickerSearchModel)TempData["PickerSearchModel"]).SearchLocation : null
+        });
+                }
+            </div>
+            <div class="search-label">
+                <label for="Picker_UserCode">
+                    @Resources.MD.Picker.Picker_UserCode
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_UserComboBox", "Common", new
+                                                         {
+                                                             controlName = "SearchUserCode",
+                                                             IsChange = false,
+                                                             selectedValue = TempData["PickerSearchModel"] != null ? ((PickerSearchModel)TempData["PickerSearchModel"]).SearchUserCode : null
+                                                         });
+                }
+            </div>
+            <div class="search-label">
+                <label for="EOSwitch_OldItem">
+                    @Resources.MD.Picker.Picker_IsActive
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.CheckBox("SearchIsActive", (TempData["PickerSearchModel"] != null && (PickerSearchModel)TempData["PickerSearchModel"] != null ? ((PickerSearchModel)TempData["PickerSearchModel"]).SearchIsActive : true))
+            </div>
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            <button type="submit" id="btnSearch">
+                @Resources.Global.Button_Search</button>
+            @Html.Button(Resources.Global.Button_New, "Url_Picker_View", new Dictionary<string, string>()
+	{
+	    {"type", "button"},
+	    {"id", "btnNew"},
+        {"onclick","location.href='"+@Url.Content("~/Picker/New")+"'"}
+	})
+        </div>
+
+    }
+</fieldset>

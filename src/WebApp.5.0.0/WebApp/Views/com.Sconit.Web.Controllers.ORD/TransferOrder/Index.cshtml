@@ -1,0 +1,298 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = (string)ViewBag.ManuCode });
+}
+<script type="text/javascript">
+
+    function onUpload(e) {
+        e.data = { 
+            "ManuCode": $("#ManuCode").val(),
+            "isAutoPrint": $("#IsAutoPrint").is(":checked"),
+            "shift": $("#Shift").val()
+        };
+
+    }
+
+    function import_OnSuccess(e) {
+        $('.t-upload-files').remove();
+        if (e.XMLHttpRequest.responseText != null) {
+            var json = jQuery.parseJSON(e.XMLHttpRequest.responseText);
+            if (json != null) {
+                if (json.ErrorMessages != null) {
+                    for (var i = 0; i < json.ErrorMessages.length; i++) {
+                        $message.error(json.ErrorMessages[i]);
+                    }
+                }
+                if (json.WarningMessages != null && $("#IsAutoPrint").is(":checked")) {
+                    var printUrlArr = (json.WarningMessages[0] + "").split("*");
+                    for (var i = 0; i < printUrlArr.length; i++) {
+                        PrintOrder(printUrlArr[i]);
+                    }
+                }
+
+                if (json.SuccessMessages != null) {
+                    for (var i = 0; i < json.SuccessMessages.length; i++) {
+                        $message.success(json.SuccessMessages[i]);
+                    }
+                }
+            }
+        }
+    }
+
+    function OrderMasterPartyFrom(e) {
+        if (e.value != "") {
+            var combobox = $(this).data("tComboBox");
+            if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                combobox.value("");
+                combobox.reload();
+            }
+            else {
+                $.ajax({
+                    type: "get",
+                    dataType: "html",
+                    url: "/TransferOrder/_OrderDetailList/",
+                    data:{ "ManuCode": $("#ManuCode").val()},
+                    cache: false,
+                    success: function (data, textStatus) {
+                        $("#fdOrderDetail").html(data);
+                        $("#fdOrderDetail").show();
+                    }
+                });
+            }
+        }
+    }
+
+
+    function onCreate() {
+        ClearMessage();
+
+        var grid = $("#OrderDetail").data("tGrid");
+        if (grid == null) {
+            $message.error('@Resources.ORD.TransferOrder.Errors_OrderDetailIsEmpty');
+            return;
+        }
+        var inserted = grid.changeLog.inserted;
+        var updated = $.grep(grid.changeLog.updated, function (value) { return value != undefined });
+        var deleted = $.grep(grid.changeLog.deleted, function (value) { return value != undefined });
+
+        var oderDetails = grid.changeLog.serialize(inserted, updated, deleted);
+        var ordermstr = {
+            "PartyFrom": $("#PartyFrom").val(),
+            "StartTime": $("#StartTime").val(),
+            "WindowTime": $("#WindowTime").val(),
+            "PartyTo": $("#PartyTo").val(),
+            "ManuCode": $("#ManuCode").val(),
+            "shift": $("#Shift").val(),
+            "isAutoPrint": $("#IsAutoPrint").is(":checked")
+        }
+        grid._convert(oderDetails);
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            url: "/TransferOrder/CreateOrder/",
+            data: $.extend(oderDetails, ordermstr),
+            success: function (data) {
+                if (data != "") {
+                    ClearMessage();
+                    if (data.Data.printUrl != "") {
+                        PrintOrder(data.Data.printUrl);
+                    }
+                    DisplayJsonMessages(data);
+                    $("#fdOrderDetail").html("");
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+
+</script>
+<fieldset>
+    @Html.Hidden("ManuCode", (string)ViewBag.ManuCode)
+    <div class="search">
+        @if (ViewBag.ManuCode == "Url_TransferOrder_View")
+        {
+        <div class="search-label">
+            <label>
+                @Resources.ORD.TransferOrder.TransferOrder_PartyFrom</label>
+        </div>
+        <div class="search-field">
+            @{
+           Html.RenderAction("_OrderMasterPartyFromComboBox", "Common",
+               new
+               {
+                   controlName = "PartyFrom",
+                   orderType = (int)com.Sconit.CodeMaster.OrderType.Distribution,
+                   isChange = true,
+                   isTransfer=true
+
+               });
+            }
+        </div>
+        <div class="search-label">
+            <label for="OrderMaster_PartyTo">
+                @Resources.ORD.TransferOrder.TransferOrder_PartyTo
+            </label>
+        </div>
+        <div class="search-field">
+            @{
+           Html.RenderAction("_OrderMasterPartyToComboBox", "Common",
+                           new
+                           {
+                               controlName = "PartyTo",
+                               orderType = (int)com.Sconit.CodeMaster.OrderType.Distribution,
+                               isTransfer = true
+                           });
+            }
+        </div>
+        }
+        else
+        { 
+        <div class="search-label">
+            <label>
+                @Resources.ORD.TransferOrder.TransferOrder_PartyFrom</label>
+        </div>
+        <div class="search-field">
+            @{
+           Html.RenderAction("_OrderMasterPartyFromComboBox", "Common",
+               new
+               {
+                   controlName = "PartyFrom",
+                   orderType = (int)com.Sconit.CodeMaster.OrderType.Distribution,
+                   isChange = true
+
+               });
+            }
+        </div>
+        <div class="search-label">
+            <label for="OrderMaster_PartyTo">
+                @Resources.ORD.TransferOrder.TransferOrder_PartyTo
+            </label>
+        </div>
+        <div class="search-field">
+            @{
+           Html.RenderAction("_OrderMasterPartyToComboBox", "Common",
+                           new
+                           {
+                               controlName = "PartyTo",
+                               orderType = (int)com.Sconit.CodeMaster.OrderType.Distribution,
+                           });
+            }
+        </div>
+        }
+    @*    <div class="editor-label-1">
+            <label>
+                @Resources.INP.ConcessionMaster.ConcessionMaster_ManufactureParty
+            </label>
+        </div>
+        <div class="editor-field-2">
+            @{
+                Html.RenderAction("_OrderMasterPartyFromComboBox", "Common",
+                    new
+                    {
+                        controlName = "ManufactureParty",
+                        orderType = (int)com.Sconit.CodeMaster.OrderType.Procurement,
+                        isSupplier=true
+                    });
+            }
+        </div>
+        <div class="editor-label-2">
+            <label>
+                寄售状态</label>
+        </div>
+        <div class="editor-field-2">
+            @if ((string)ViewBag.ManuCode == "Url_OrderMstr_Procurement_ReturnNew" || (string)ViewBag.ManuCode == "Url_OrderMstr_Procurement_ReturnQuickNew")
+            {
+                Html.RenderAction("_CodeMasterDropDownList", "Common", new
+                {
+                    code = com.Sconit.CodeMaster.CodeMaster.CheckConsignment,
+                    controlName = "Consignment",
+                    selectedValue = "0",
+                    enable = false
+
+                });
+            }
+            else
+            {
+                Html.RenderAction("_CodeMasterDropDownList", "Common", new
+                {
+                    code = com.Sconit.CodeMaster.CodeMaster.CheckConsignment,
+                    controlName = "Consignment",
+                    selectedValue = string.Empty
+
+                });
+            }
+        </div>*@
+        <div class="search-label">
+            <label for="OrderMaster_PartyTo">
+                @Resources.ORD.TransferOrder.TransferOrder_StartTime
+            </label>
+        </div>
+        <div class="search-field">
+            @(Html.Telerik().DatePicker().Name("StartTime").Format(com.Sconit.Entity.BusinessConstants.SHORT_DATE_FORMAT)
+            .Value(System.DateTime.Today)
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+        </div>
+        <div class="search-label">
+            <label for="OrderMaster_PartyTo">
+                @Resources.ORD.OrderMaster.OrderMaster_WindowTime
+            </label>
+        </div>
+        <div class="search-field">
+            @(Html.Telerik().DateTimePicker().Name("WindowTime").Format(com.Sconit.Entity.BusinessConstants.LONG_DATE_FORMAT)
+            .Value(System.DateTime.Today)
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+        </div>
+         @if (ViewBag.ManuCode == "Url_OrderMstr_Procurement_Import")
+         {
+        <div class="search-label">
+            <label for="OrderMaster_PartyTo">
+                @Resources.ORD.OrderMaster.OrderMaster_Shift_CreateOrderCode
+            </label>
+        </div>
+        <div class="search-field">
+            @{
+           Html.RenderAction("_CreateOrderCodeComboBox", "Common",
+                      new
+                      {
+                          controlName = "Shift"
+                      });
+            }
+        </div>
+         }
+         <div class="search-label">
+         <label for="OrderMaster_PartyTo">
+                自动打印
+            </label>
+        </div>
+        <div class="search-field">
+        @Html.CheckBox("IsAutoPrint", false)
+        </div>
+        <div class="search-label">
+            <label>
+                <a href='/Resource/Templates/UploadTemplate/TransferOrder.xls'>模板下载</a>
+            </label>
+        </div>
+        <div class="search-field">
+            @(Html.Telerik().Upload()
+                            .Name("attachments")
+                            .Multiple(false)
+                            .Async(async => async
+                                        .Save("ImportFreeLocationDetail", "TransferOrder")
+                                .AutoUpload(true))
+                 .ClientEvents(e => e.OnSuccess("import_OnSuccess").OnUpload("onUpload")))
+        </div>
+    </div>
+    <div class="editor-footer">
+        @Html.Button(Resources.Global.Button_New, "Url_TransferOrder_View", new Dictionary<string, string>()
+	        {
+	            {"type", "button"},
+	            {"id", "btnNew"},
+                {"needconfirm","true"},
+                {"onclick","onCreate()"}
+	        })
+    </div>
+</fieldset>
+<div id="fdOrderDetail" style="display: none;">
+</div>

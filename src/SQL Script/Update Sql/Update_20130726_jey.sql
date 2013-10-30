@@ -1,0 +1,1 @@
+alter table ord_picktask add ShippedQty decimal(18,8) null

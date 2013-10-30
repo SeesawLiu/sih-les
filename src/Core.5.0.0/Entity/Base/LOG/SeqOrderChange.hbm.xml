@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.LOG.SeqOrderChange, com.Sconit.Entity" table="LOG_SeqOrderChange" lazy="false">
+    <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      <generator class="identity" />
+    </id>
+    <version name="OrderDetId" column="OrderDetId" type="Int32"  />
+    <property name="OrderNo" column="OrderNo" type="String" length="50" />
+    <property name="Sequence" column="Seq" type="Int32"  />
+    <property name="ExternalOrderNo" column="ExtNo" type="String" length="50" />
+    <property name="ExternalSequence" column="ExtSeq" type="String" length="50" />
+    <property name="Item" column="Item" type="String" length="50" />
+    <property name="ItemDescription" column="ItemDesc" type="String" length="100" />
+    <property name="ReferenceItemCode" column="RefItemCode" type="String" length="50" />
+    <property name="Uom" column="Uom" type="String" length="5" />
+    <property name="ManufactureParty" column="ManufactureParty" type="String" length="50"/>
+    <property name="OrderedQty" column="OrderQty" type="Decimal"  />
+    <property name="BinTo" column="BinTo" type="String" length="50" />
+    <property name="StartDate" column="StartDate" type="DateTime"  />
+    <property name="LocationFrom" column="LocFrom" type="String" length="50" />
+    <property name="LocationFromName" column="LocFromNm" type="String" length="100" />
+    <property name="LocationTo" column="LocTo" type="String" length="50" />
+    <property name="LocationToName" column="LocToNm" type="String" length="100" />
+    <property name="Status" column="Status"  />
+    <property name="Flow" column="Flow" type="String" length="50" />
+    <property name="CreateUserId" column="CreateUserId" type="Int32" update="false"  />
+    <property name="CreateUserName" column="CreateUserNm" type="String" length="100" update="false" />
+    <property name="CreateDate" column="CreateDate" type="DateTime" update="false"  />
+	<property name="ICHARG" column="ICHARG" type="String" length="50" />
+	</class>
+</hibernate-mapping>

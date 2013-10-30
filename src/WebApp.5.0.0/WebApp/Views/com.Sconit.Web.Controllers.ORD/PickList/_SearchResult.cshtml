@@ -1,0 +1,114 @@
+﻿
+@model IEnumerable<com.Sconit.Entity.ORD.PickListMaster>
+<script type="text/javascript">
+    $(function () {
+        $("#checkAll").click(function () {
+            $('input[name="checkedRecords"]').attr("checked", this.checked);
+            showButtons();
+        });
+    });
+
+    function showButtons() {
+        var $checkRecords = $("input[name='checkedRecords']");
+        $("#checkAll").attr("checked", $checkRecords.length == $("input[name='checkedRecords']:checked").length ? true : false);
+        $("#btnPrint").attr("style", $("input[name='checkedRecords']:checked").length > 0 ? "display:inline" : "display:none");
+
+    } 
+
+        function PickListGrid_OnDataBinding(e) {
+            e.data = {
+                PickListNo: $('#PickListNo').val(),
+                Status: $('#Status').val(),
+                StartTime: $('#StartTime').val(),
+                EndTime: $('#EndTime').val(),
+                Flow: $("#Flow").val(),
+                DeliveryGroup: $("#DeliveryGroup").val(),
+                CreateUserName: $("#CreateUserName").val(),
+                PartyFrom: $('#PartyFrom').val(),
+                PartyTo: $("#PartyTo").val(),
+                IsPrint: $("#IsPrint").is(":checked")
+            }
+        }
+
+        function onCancelClick(e) {
+            if (confirm("确定要取消吗？")) {
+                $.ajax({
+                    type: "post",
+                    dataType: "Html",
+                    url: "/PickList/Cancel/?id="+e,
+                    cache: false,
+                    success: function (data, textStatus) {
+                        var $tGrid = $("#content");
+                        $($tGrid).html(data);
+
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        DisplayTextMessages(XMLHttpRequest.responseText);
+                    }
+                });
+            }
+        }
+</script> 
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("PickListGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.PickListNo);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.PickListNo)
+                .ClientTemplate("<input type='checkbox' id='checkedRecords' name='checkedRecords' value='<#= PickListNo #>' onClick='showButtons()'  />")
+                .HeaderTemplate("<input type='checkbox' id='checkAll' name='checkAll' />")
+                .Width(36).HtmlAttributes(new { style = "text-align:center" });
+            columns.Bound(o => o.PickListNo).ClientTemplate(Html.ActionLink("<#= PickListNo #>", "Edit", "PickList", new { ID = "<#= PickListNo #>", UrlId="List" }, null).ToString());
+            columns.Bound(o => o.PartyFromName);
+            columns.Bound(o => o.PartyToName);
+            columns.Bound(o => o.OrderStatusDescription);
+            columns.Bound(o => o.CreateUserName);
+            columns.Bound(o => o.CreateDate);
+            columns.Bound(o => o.IsPrintAsn).Title("是否已打印").ClientTemplate("<input type='checkbox' disabled='disabled' name='IsDefault' <#= IsPrintAsn? checked='checked' : '' #> />");
+            columns.Bound(o => o.Status).Title("").ClientTemplate("<input type='button' name='cancel' id='Cancel' onclick=onCancelClick('<#=PickListNo #>') value='取消' style='display:<#=Status==0?'inline':'none' #>'  >");
+         })
+            .DetailView(details => details.ClientTemplate(
+            Html.Telerik().Grid<com.Sconit.Entity.ORD.PickListDetail>()
+            .Name("PickListDetail_<#= PickListNo #>")
+            .Columns(columns =>
+            {
+                //行号、要货单号、物料代码、旧图号、物料描述、制造商、寄售供应商、拣货数、来源库位、目的库位、工位、窗口时间
+                columns.Bound(o => o.Id).Hidden();
+                columns.Bound(o => o.Sequence);
+                columns.Bound(o => o.OrderNo);
+                columns.Bound(o => o.Item);
+                columns.Bound(o => o.ReferenceItemCode);
+                columns.Bound(o => o.ItemDescription);
+                columns.Bound(o => o.ManufactureParty);
+                columns.Bound(o => o.ConsignmentSupplier).Title("寄售供应商");
+                columns.Bound(o => o.Qty);
+                columns.Bound(o => o.PickedQty).Title("已发数");
+                columns.Bound(o => o.LocationFrom);
+                columns.Bound(o => o.LocationTo);
+                columns.Bound(o => o.Bin);
+                columns.Bound(o => o.WindowTime);
+                
+            })
+            .DataBinding(dataBinding => dataBinding.Ajax()
+            .Select("_AjaxDetailView", "PickList", new { pickListNo = "<#= PickListNo #>" }))
+            .ToHtmlString()
+            ))     
+        .Scrollable(c => c.Enabled(false))
+        .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxList", "PickList"))
+                        .ClientEvents(events => events.OnDataBinding("PickListGrid_OnDataBinding").OnComplete("TelerikGridView_OnComplete"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+            settings.PageSize(ViewBag.PageSize);
+        })
+        .EnableCustomBinding(true)
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+            )
+         
+</fieldset>
+

@@ -1,0 +1,41 @@
+﻿@model IEnumerable<com.Sconit.Entity.VIEW.VanOrderSeqView>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+                .Name("OrderSeqGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.OrderNo);
+        })
+        .Columns(columns =>
+                     {
+                         columns.Bound(o => o.Flow);
+                         columns.Bound(o => o.OrderNo);
+                         columns.Bound(o => o.ExternalOrderNo);
+                         columns.Bound(o => o.TraceCode);
+                         columns.Bound(o => o.Sequence);
+                         columns.Bound(o => o.SubSequence);
+                         columns.Bound(o => o.OrderStatusDescription);
+                         columns.Bound(o => o.CurrentOperation);
+                         columns.Bound(o => o.PauseStatusDescription);
+                     })
+                .Scrollable(c => c.Enabled(false))
+                        .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxList", "OrderSeq"))
+                        .ClientEvents(events => events.OnDataBinding("OrderSeqGrid_OnDataBinding"))
+                .Pageable(settings =>
+                {
+                    settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+                    settings.PageSize(ViewBag.PageSize);
+                })
+                .EnableCustomBinding(true)
+                .Sortable()
+                .Resizable(resizing => resizing.Columns(true))
+            )
+    <script type="text/javascript">
+        function OrderSeqGrid_OnDataBinding(e) {
+            e.data = {
+                ProdLine: $('#ProdLine').val(),
+                TraceCode: $('#TraceCode').val()
+            };
+        }
+    </script>
+</fieldset>

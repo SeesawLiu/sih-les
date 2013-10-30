@@ -1,0 +1,87 @@
+﻿@using com.Sconit.Entity.MD;
+@using com.Sconit.Entity.INV;
+@model IEnumerable<com.Sconit.Entity.INV.StockTakeLocation>
+           
+<script type="text/javascript">
+    function onLocationComboBoxChange(e) {
+        if (e.value != null) {
+            var combobox = $(this).data("tComboBox");
+            if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                combobox.value("");
+                $(e.target).parent().parent().next().text("");
+                combobox.reload();
+            } else {
+                var data = {
+                    "Location": e.value
+                };
+                $.ajax({
+                    type: "post",
+                    dataType: "html",
+                    url: "/StockTake/_LocationDescription/",
+                    data: data,
+                    success: function (data, textStatus) {
+                        $(e.target).parent().parent().next().text(data);
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        DisplayTextMessages(XMLHttpRequest.responseText);
+                    }
+                });
+            }
+        }
+    }
+
+    function onLocationDataBinding(e)
+    {
+   e.data = {
+        "Region": $("#Region").val(),
+                "checkRegion":true
+            };
+    }
+</script>
+<fieldset>
+    <legend>@Resources.INV.StockTake.StockTakeDetail_Location</legend>
+    @(Html.Telerik().Grid(Model)
+        .Name("StockTakeLocation")
+         .ToolBar(commands =>
+         {
+             if (ViewBag.Status == com.Sconit.CodeMaster.StockTakeStatus.Create)
+             {
+                 commands.Insert();
+             }
+         })
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .DataBinding(dataBinding => dataBinding.Ajax()
+                .Select("_Select", "StockTake", new { stNo = ViewBag.StNo })
+                .Insert("_InsertAjaxEditing", "StockTake", new { stNo = ViewBag.StNo })
+                .Update("_UpdateLocation", "StockTake")
+                .Delete("_DeleteLocation", "StockTake", new { stNo = ViewBag.StNo }))
+        .Columns(columns =>
+        {
+            if (ViewBag.Status == com.Sconit.CodeMaster.StockTakeStatus.Create)
+            {
+               // columns.ForeignKey(o => o.Location, (IEnumerable<Location>)ViewData["locations"], "Code", "Code");
+                columns.Bound(o=>o.Location).EditorTemplateName("LocationGridForeignKey");
+            }
+            else {
+                columns.Bound(o => o.Location).ReadOnly();
+            }
+            columns.Bound(o => o.LocationName).ReadOnly();
+            if (ViewBag.Status == com.Sconit.CodeMaster.StockTakeStatus.Create)
+            {
+                columns.Command(commands =>
+                {
+
+                    commands.Edit();
+                    commands.Delete();
+
+                });
+            }
+        })
+        .Scrollable(c => c.Enabled(false))
+        .Sortable()
+        .Footer(false)
+            )
+</fieldset>

@@ -1,0 +1,45 @@
+﻿@model IEnumerable<com.Sconit.Entity.INV.LocationLotDetail>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+                        .Name("HuLocationLotDetailGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.HuId);
+        })
+        .Columns(columns =>
+        {
+
+            columns.Bound(o => o.Location);
+            columns.Bound(o => o.Item);
+            columns.Bound(o => o.ReferenceItemCode);
+            columns.Bound(o => o.ItemDescription);
+            columns.Bound(o => o.HuUom);
+            columns.Bound(o => o.UnitCount);
+            columns.Bound(o => o.ManufactureParty);
+            columns.Bound(o => o.HuId);
+            columns.Bound(o => o.LotNo);
+            columns.Bound(o => o.Qty);
+
+        })
+
+        .Scrollable(c => c.Enabled(false))
+        .EnableCustomBinding(true)
+                .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxList", "HuLocationLotDetail"))
+                                .ClientEvents(events => events.OnDataBinding("HuLocationLotDetailGrid_OnDataBinding"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+            settings.PageSize(ViewBag.PageSize);
+        })
+        .Resizable(resizing => resizing.Columns(true))
+    )
+     <script type="text/javascript">
+         function HuLocationLotDetailGrid_OnDataBinding(e) {
+             e.data = {
+                 Item: $('#Item').val(),
+                 Location: $('#Location').val(),
+                 HuId: $('#HuId').val()
+             };
+         } 
+    </script>
+</fieldset>

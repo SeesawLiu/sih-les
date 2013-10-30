@@ -1,0 +1,165 @@
+﻿@using com.Sconit.Web.Models.SearchModels.INV
+@{
+    ViewBag.Title = "List";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_OrderItemTrace_WithdrawBarCode" });
+}
+<fieldset>
+    <legend>扫描替换</legend>
+    <div class="search">
+        <div id="WithdrawBarcodeDiv">
+            <div class="search-label">
+                <label>
+                    扫描原条码
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("WithdrawBarcode", string.Empty, new { onkeydown = "doWithdrawKeyDowm()" })
+                <input type="hidden" id="Withdrawhidden" />
+            </div>
+        </div>
+        <div id="NewScanBarCodeDiv" style="display:none">
+            <div class="search-label">
+                <label>
+                    扫描替换条码
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("NewScanBarCode", string.Empty, new { onkeydown = "doKeyDowm()" })
+                <input type="hidden" id="NewbarCodehidden" />
+            </div>
+        </div>
+            <div class="search-label">
+                <label>
+                    原条码
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("CurrentlyWithdrawBarcode", string.Empty, new { disabled=true })
+            </div>
+    </div>
+</fieldset>
+
+<fieldset>
+ <legend>查询替换</legend>
+        <div class="search">
+            <div class="search-label">
+                <label for="OrderItemTraceResult_TraceCode">
+                    @Resources.ORD.OrderItemTraceResult.OrderItemTraceResult_TraceCode
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("TraceCode", TempData["OrderItemTraceResultSearchModel"] != null ? ((OrderItemTraceResultSearchModel)TempData["OrderItemTraceResultSearchModel"]).TraceCode : string.Empty)
+            </div>
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            <button type="button" id="btnSearch" onclick="searchClick()">
+            @Resources.Global.Button_Search</button>
+        </div>
+        <br />
+        <div id="GetTraceResutDiv">
+        </div>
+</fieldset>
+
+<script type="text/javascript">
+    function searchClick() {
+        $("#btnSearch").attr("disabled", true);
+        var param = {
+            "TraceCode": $("#TraceCode").val()
+        }
+
+        $.ajax({
+            type: "post",
+            dataType: "html",
+            data: param,
+            cache: false,
+            url: "/OrderItemTrace/_GetTraceResut/",
+            success: function (data) {
+                $("#btnSearch").attr("disabled", false);
+                $("#GetTraceResutDiv").html(data);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+                $("#btnSearch").attr("disabled", false);
+                $("#GetTraceResutDiv").html("");
+            }
+        });
+    }
+
+    //扫描物条码
+    function doWithdrawKeyDowm() {
+        if (event.keyCode == 13) {
+            var barCode = $("#WithdrawBarcode").val();
+            $("#Withdrawhidden,#CurrentlyWithdrawBarcode").val(barCode);
+            $("#WithdrawBarcode").val("");
+            if (barCode == "") {
+                $message.error("条码不能为空。");
+                return;
+            } 
+            else {
+                $("#WithdrawBarcodeDiv").hide();
+                $("#NewScanBarCodeDiv").show();
+                $("#NewScanBarCode").focus();
+            }
+        }
+    }
+    function doKeyDowm() {
+        if (event.keyCode == 13) {
+            var newBarCode = $("#NewScanBarCode").val();
+            $("#NewbarCodehidden").val(newBarCode);
+            $("#NewScanBarCode").val("");
+            if ($("#Withdrawhidden").val() == "") {
+                $message.error("请先扫描原条码。");
+                $("#NewbarCodehidden").val("");
+                $("#NewScanBarCodeDiv").hide();
+                $("#WithdrawBarcodeDiv").show();
+                $("#WithdrawBarcode").focus();
+                return;
+            } else if (newBarCode == "") {
+                if (confirm("替换条码为空，确定要退料吗？")) {
+                    $("#NewbarCodehidden").val("Y");
+                    doSubmitScanBarCode();
+                } else {
+                    $("#NewScanBarCode").focus();
+                    return;
+                }
+            } else if (newBarCode.toUpperCase() == "N") {
+                $("#NewbarCodehidden").val("");
+                $("#NewScanBarCodeDiv").hide();
+                $("#WithdrawBarcodeDiv").show();
+                $("#WithdrawBarcode").focus();
+                $("#CurrentlyWithdrawBarcode").val("");
+                return;
+            }
+            else {
+                doSubmitScanBarCode();
+            }
+        }
+    }
+
+    function doSubmitScanBarCode() {
+        barCode = $("#NewbarCodehidden").val();
+        $.ajax({
+            type: 'post',
+            dataType: "json",
+            url: "/OrderItemTrace/ScanQualityBarCode/",
+            data: { "qualityBarcode":$("#NewbarCodehidden").val(), "orderNo":"", "isForce": false, "isWithdraw": true, "withdrawBarcode":  $("#Withdrawhidden").val() },
+            success: function (dd) {
+                $message.success($("#NewbarCodehidden").val() != 'Y' ? ("关键件" + $("#Withdrawhidden").val() + "替换" + $("#NewbarCodehidden").val() + "成功。") : ("关键件" + $("#Withdrawhidden").val() + "退料成功。"));
+                $("#NewbarCodehidden").val("");
+                $("#NewScanBarCodeDiv").hide();
+                $("#WithdrawBarcodeDiv").show();
+                $("#WithdrawBarcode").focus();
+                $("#CurrentlyWithdrawBarcode").val("");
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                $("#NewbarCodehidden").val("");
+                $("#NewScanBarCodeDiv").hide();
+                $("#WithdrawBarcodeDiv").show();
+                $("#WithdrawBarcode").focus();
+                $("#CurrentlyWithdrawBarcode").val("");
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+</script>

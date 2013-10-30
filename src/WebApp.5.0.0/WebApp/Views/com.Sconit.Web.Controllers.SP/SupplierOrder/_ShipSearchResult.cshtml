@@ -1,0 +1,44 @@
+﻿@model IEnumerable<com.Sconit.Entity.ORD.OrderDetail>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("ShipDetailGrid")
+        .Columns(columns =>
+        {
+         columns.Bound(o => o.Id).Hidden().ClientTemplate("<input type='text' id='Id' name='Id' style='width:70px' value='<#=Id #>'/>");
+            columns.Bound(o => o.Item).ReadOnly(true);
+            columns.Bound(o => o.ReferenceItemCode).ReadOnly(true);
+            columns.Bound(o => o.ItemDescription).ReadOnly(true);
+            columns.Bound(o => o.Uom).ReadOnly(true);
+            columns.Bound(o => o.UnitCount).ReadOnly(true);
+            columns.Bound(o => o.UnitCountDescription).ReadOnly(true);
+            columns.Bound(o => o.LocationTo).ReadOnly(true);
+            columns.Bound(o => o.CurrentShipQty).Title("本次发货数").ClientTemplate("<input type='text' id='CurrentShipQty' name='CurrentShipQty' style='width:70px' value='<#=OrderedQty - ShippedQty #>'/>");
+            columns.Bound(o => o.OrderedQty).ReadOnly(true);
+            columns.Bound(o => o.ShippedQty).ReadOnly(true);
+            columns.Bound(o => o.ReceivedQty).ReadOnly(true);
+        })
+        .Scrollable(c => c.Enabled(false))
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+                                                .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxShipOrderList", "SupplierOrder"))
+                .ClientEvents(events => events.OnDataBinding("PickShipGrid_OnDataBinding").OnComplete("TelerikGridView_OnComplete"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(ViewBag.PageSize);
+        })
+    )
+</fieldset>
+
+<script type="text/javascript">
+    function PickShipGrid_OnDataBinding(e) {
+        e.data = {
+            OrderNo: $('#OrderNo').val(),
+            Flow: $('#Flow').val()
+        };
+    }
+
+
+
+
+</script>

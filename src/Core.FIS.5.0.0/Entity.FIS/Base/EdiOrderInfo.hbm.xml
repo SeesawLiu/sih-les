@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.FIS.EdiOrderInfo, com.Sconit.Entity.FIS" table="FIS_EdiOrderInfo" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+    <property name="OrderNo" column="OrderNo" type="String" length="50"/>
+    <property name="RefOrderNo" column="RefOrderNo" type="String" length="50"/>
+    <property name="Flow" column="Flow" type="String" length="50"/>
+    <property name="Item" column="Item" type="String" length="50"/>
+    <property name="ItemDescription" column="ItemDesc" type="String" length="255"/>
+    <property name="Supplier" column="Supplier" type="String" length="50"/>
+    <property name="WindowTime" column="WindowTime" type="DateTime"/>
+    <property name="OrderQty" column="OrderQty" type="Decimal"/>
+    <property name="ReciveQty" column="ReciveQty" type="Decimal"/>
+    <property name="Sequence" column="Sequence" type="Int32"/>
+    <property name="ShipQty" column="ShipQty" type="Decimal"/>
+    <property name="Bin" column="Bin" type="String" length="50"/>
+    <property name="ReciveDate" column="ReciveDate" type="DateTime"/>
+    <property name="EONo" column="EONo" type="String" length="50"/>
+    <property name="PONo" column="PONo" type="String" length="50"/>
+    <property name="Dock" column="Dock" type="String" length="50"/>
+    <property name="UCDesc" column="UCDesc" type="String" length="50"/>
+    <property name="UnitCount" column="UC" type="Decimal"/>
+    <property name="IsInspect" column="IsInspect" type="Boolean"/>
+    <property name="Code1" column="Code1" type="String" length="3"/>
+    <property name="Code2" column="Code2" type="String" length="3"/>
+    <property name="OrderStrategy" column="OrderStrategy" type="Int16"/>
+    <property name="Type" column="Type" type="Int16"/>
+    <property name="SubType" column="SubType" type="Int16"/>
+    <property name="IsCreateEdi" column="IsCreateEdi" type="Boolean"/>
+    <property name="IsDelayOrder" column="IsDelayOrder" type="Boolean"/>
+    <property name="IsChangeOrder" column="IsChangeOrder" type="Boolean"/>
+    <property name="IsCreateByPO" column="IsCreateByPO" type="Boolean"/>
+    <property name="IsCreateBySA" column="IsCreateBySA" type="Boolean"/>
+    <property name="IsReject" column="IsReject" type="Boolean"/>
+    <property name="Priority" column="Priority" type="Int16"/>
+    <property name="ProdSeq" column="ProdSeq" type="String" length="50"/>
+    <property name="ProdCode" column="ProdCode" type="String" length="50"/>
+    <property name="LastVanNo" column="LastVanNo" type="String" length="50"/>
+    <property name="CurrVanNo" column="CurrVanNo" type="String" length="50"/>
+    <property name="SeqGroup" column="SeqGroup" type="String" length="50"/>
+    <property name="ReceiptNo" column="RecNo" type="String" length="50"/>
+    <property name="RejectedQty" column="RejQty" type="Decimal"  />
+    <property name="Status" column="Status" type="Int16"/>
+    <property name="CreateUserName" column="CreateUserNm" type="String" length="50"/>
+  </class>
+</hibernate-mapping>

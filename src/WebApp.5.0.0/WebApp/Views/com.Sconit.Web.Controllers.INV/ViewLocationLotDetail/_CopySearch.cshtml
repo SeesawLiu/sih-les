@@ -1,0 +1,262 @@
+﻿@using com.Sconit.Web.Models.SearchModels.INV
+@*<script src="../../../Scripts/jquery.handsontable.full.js" type="text/javascript"></script>
+<link href="../../../Content/jquery.handsontable.full.css" rel="stylesheet" type="text/css" />*@
+<script type="text/javascript">
+//    function showLocaiontExampleDiv(e) {
+//        if ($("#LocaiontExampleDiv").attr("show") == "1") {
+//            $("#LocaiontExampleDiv").hide();
+//            $("#LocaiontExampleDiv").css("left", window.event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft+2)
+//            $("#LocaiontExampleDiv").css("top", window.event.clientY + document.body.scrollTop + document.documentElement.scrollTop+2)
+//            $("#LocaiontExampleDiv").attr("show", "0");
+//      
+//        } else {
+//            $("#LocaiontExampleDiv").show();
+//            $("#LocaiontExampleDiv").css("left", window.event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft+2)
+//            $("#LocaiontExampleDiv").css("top", window.event.clientY + document.body.scrollTop + document.documentElement.scrollTop+2)
+//            $("#LocaiontExampleDiv").attr("show", "1");
+//        }
+//    }
+//    function showItemExampleDiv() {
+//        if ($("#ItemExampleDiv").attr("show") == "1") {
+//            $("#ItemExampleDiv").hide();
+//            $("#ItemExampleDiv").css("left", window.event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft + 2)
+//            $("#ItemExampleDiv").css("top", window.event.clientY + document.body.scrollTop + document.documentElement.scrollTop + 2)
+//            $("#ItemExampleDiv").attr("show", "0");
+//        } else {
+//            $("#ItemExampleDiv").show();
+//            $("#ItemExampleDiv").css("left", window.event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft + 2)
+//            $("#ItemExampleDiv").css("top", window.event.clientY + document.body.scrollTop + document.documentElement.scrollTop + 2)
+//            $("#ItemExampleDiv").attr("show", "1");
+//        }
+//    }
+
+//    function searchClick() {
+//        var locations = $("#LocationCode").val();
+//        var locArrs = $("#LocaiontExample").data('handsontable').getData();
+//        for (var i = 0; i < locArrs.length; i++) {
+//            if (locArrs[i][0] != "" && locArrs[i][0] != null && locArrs[i][0] != " ") {
+//                locations += "," + locArrs[i][0];
+//            }
+//        }
+//        var items = $("#ItemCode").val();
+//        var itemArrs = $("#ItemExample").data('handsontable').getData();
+//        for (var i = 0; i < itemArrs.length; i++) {
+//            if (itemArrs[i][0] != "" && itemArrs[i][0] != null && itemArrs[i][0] != " ") {
+//                items += "," + itemArrs[i][0];
+//            }
+//        }
+//        var searchData = {
+//            "locations": locations,
+//            "items": items
+//        }
+//        if (locations == "" && items == "") {
+//            $message.error("查询条件不能为空。");
+//            return;
+//        }
+//        if (locations == "") {
+//            locations = ",";
+//        }
+//        if (items == "") {
+//            items = ",";
+//        }
+//        location.href = "/ViewLocationLotDetail/List/?locations=" + locations+"&items="+items;
+////        $.ajax({
+////            type: "Post",
+////            dataType: "html",
+////            data: searchData,
+////            url: "/ViewLocationLotDetail/List/", 
+////            cache: false,
+////            success: function (data, textStatus) {
+////                $("#content").html(data);
+////            }
+////        });
+//    }
+
+    function ExportClick() {
+//        var locations = $("#LocationCode").val();
+//        var locArrs = $("#LocaiontExample").data('handsontable').getData();
+//        for (var i = 0; i < locArrs.length; i++) {
+//            if (locArrs[i][0] != "" && locArrs[i][0] != null && locArrs[i][0] != " ") {
+//                locations += "," + locArrs[i][0];
+//            }
+//        }
+//        var items = $("#ItemCode").val();
+//        var itemArrs = $("#ItemExample").data('handsontable').getData();
+//        for (var i = 0; i < itemArrs.length; i++) {
+//            if (itemArrs[i][0] != "" && itemArrs[i][0] != null && itemArrs[i][0] != " ") {
+//                items += "," + itemArrs[i][0];
+//            }
+//        }
+//       
+//        if (locations == "" && items == "") {
+//            $message.error("查询条件不能为空。");
+//            return;
+//        }
+//        if (locations == "") {
+//            locations = ",";
+//        }
+//        if (items == "") {
+//            items = ",";
+        //        }
+        var items = $("#items").val();
+        var locations = $("#locations").val();
+        if (locations == "" && items == "") {
+            $message.error("查询条件不能为空。");
+            return;
+        }
+       
+         if (locations == "") {
+            locations = ",";
+        }
+        if (items == "") {
+            items = ",";
+        }
+
+        location.href = "/ViewLocationLotDetail/ExportLocationDetailXLS/?locations=" + locations + "&items=" + items;
+    }
+
+    $(function () {
+        $message.success("请注意：每个数据之间必须以逗号(,)或者按回车进行区分，否则将无法查询出您想要的信息！！");
+    });
+
+</script>
+ 
+<fieldset>
+    @using (Html.BeginForm("List", "ViewLocationLotDetail"))
+    {  
+        <div class="search">
+            <div class="search-label">
+                <label>
+                    @Resources.INV.LocationLotDetail.LocationLotDetail_Location
+                </label>
+            </div>
+            <div class="search-field" >
+            @Html.TextArea("locations", TempData["LocationLotDetailSearchModel"] != null ? ((LocationLotDetailSearchModel)TempData["LocationLotDetailSearchModel"]).locations : string.Empty, new { rows = 4, style = "min-height:0;width:80%" })
+               @* @{
+               Html.RenderAction("_LocationComboBox", "Common", new
+               {
+                   controlName = "LocationCode",
+                   selectedValue = TempData["LocationLotDetailSearchModel"] != null ? ((LocationLotDetailSearchModel)TempData["LocationLotDetailSearchModel"]).LocationCode : string.Empty
+
+               });
+                }*@
+              @*  <img src="../../../Content/Images/Icon/right.gif" onclick="showLocaiontExampleDiv()" />
+                <div  id="LocaiontExampleDiv"  style="z-index:1; border:1px solid #C0C0C8; position:absolute; top:5%;left:32%; width:200px;height:190px; OVERFLOW-Y: auto; OVERFLOW-X:hidden; display:none;" show="0"  >
+                 <div id="LocaiontExample">
+                    </div>
+                </div>*@
+            </div>
+            <div class="search-label">
+                <label for="Hu_HuId">
+                    @Resources.INV.LocationLotDetail.LocationLotDetail_Item
+                </label>
+            </div>
+            <div class="search-field">
+                @*@{
+               Html.RenderAction("_ItemComboBox", "Common",
+                   new
+                   {
+                       controlName = "ItemCode",
+                       selectedValue = TempData["LocationLotDetailSearchModel"] != null ? ((LocationLotDetailSearchModel)TempData["LocationLotDetailSearchModel"]).ItemCode : string.Empty
+                   });
+                    
+                }*@
+            @Html.TextArea("items", TempData["LocationLotDetailSearchModel"] != null ? ((LocationLotDetailSearchModel)TempData["LocationLotDetailSearchModel"]).items : string.Empty, new { rows = 4, style = "min-height:0;width:80%" })
+
+               @* <img src="../../../Content/Images/Icon/right.gif" onclick="showItemExampleDiv()" />
+                <div id="ItemExampleDiv" show="0" style="z-index:1; border:1px solid #C0C0C8;position:absolute; top:7%;left:82%; width:200px;height:190px; OVERFLOW-Y: auto; OVERFLOW-X:hidden; display:none;" >
+                 <div id="ItemExample">
+                    </div>
+                </div>*@
+            </div>
+            <div class="editor-label-2">
+            </div>
+            <div class="editor-field-2">
+            </div>
+            <div class="editor-label-2">
+            </div>
+            <div class="editor-field-2">
+            </div>
+            <div class="editor-label-2">
+            </div>
+            <div class="editor-field-2">
+            </div>
+            <div class="editor-label-2">
+            </div>
+            <div class="editor-field-2">
+            </div>
+            <div class="search-label" >
+                <label>
+                </label>
+            </div>
+            <div class="search-field" >
+               Sap库位
+               @Html.CheckBox("IsSapLocation",false)
+               显示寄售供应商
+               @Html.CheckBox("IsShowCSSupplier", false)
+            </div>
+           
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            @*<button type="button" id="btnSearch" onclick="searchClick()">
+                @Resources.Global.Button_Search</button>*@
+            <button type="submit" id="btnSearch" >
+                @Resources.Global.Button_Search</button>
+            <button type="button" id="btnExport" onclick="ExportClick()">
+                @Resources.Global.Button_SearchExport</button>
+        </div>
+          }
+</fieldset>
+@* <script type="text/javascript" data-jsfiddle="Locaiontexample">
+     var locdata = [[" "], [" "], [" "], [" "], [" "], [" "], [" "]];
+     if ('@ViewBag.Locations' != "" && '@ViewBag.Locations' != null && '@ViewBag.Locations' != undefined) {
+         var locations = '@ViewBag.Locations';
+         var locArr = locations.split(",");
+         for (var i = 0; i < locArr.length; i++) {
+             if (i < 7) {
+                 locdata[i][0] = locArr[i];
+             } else {
+                 locdata.push([locArr[i]])
+             }
+         }
+     }
+     //    cars.add([
+     //  { make: "Dodge", model: "Ram", year: 2012, weight: 6811 },
+     //  { make: "Toyota", model: "Camry", year: 2012, weight: 3190 },
+     //  { make: "Smart", model: "Fortwo", year: 2012, weight: 1808 }
+     //]);
+     $('#LocaiontExample').handsontable({
+         data: locdata,
+         minSpareRows: 1,
+         colHeaders: ["输入库位，一行一个。"],
+         contextMenu: false,
+         rowHeaders: true,
+         fillHandle: true 
+     });
+ </script>
+<script type="text/javascript" data-jsfiddle="ItemExample">
+    var itemdata = [[" "], [" "], [" "], [" "], [" "], [" "], [" "]];
+    if ('@ViewBag.Items' != "" && '@ViewBag.Items' != null && '@ViewBag.Items' != undefined) {
+        var items = '@ViewBag.Items'
+        var itemArr = items.split(",");
+        for (var i = 0; i < itemArr.length; i++) {
+            if (i < 7) {
+                itemdata[i][0] = itemArr[i];
+            } else {
+                itemdata.push([itemArr[i]])
+            }
+        }
+    }
+    $('#ItemExample').handsontable({
+        data: itemdata,
+        minSpareRows: 1,
+        minSpareCols: 1,
+        colHeaders: ["输入物料,一行一个。"],
+        contextMenu: false,
+        rowHeaders: true,
+        fillHandle: true 
+    });
+
+</script>*@
+

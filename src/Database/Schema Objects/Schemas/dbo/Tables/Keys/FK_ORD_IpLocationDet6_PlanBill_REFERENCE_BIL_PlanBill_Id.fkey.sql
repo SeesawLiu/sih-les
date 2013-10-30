@@ -1,0 +1,3 @@
+﻿ALTER TABLE [dbo].[ORD_IpLocationDet_6]
+    ADD CONSTRAINT [FK_ORD_IpLocationDet6_PlanBill_REFERENCE_BIL_PlanBill_Id] FOREIGN KEY ([PlanBill]) REFERENCES [dbo].[BIL_PlanBill] ([Id]) ON DELETE NO ACTION ON UPDATE NO ACTION;
+

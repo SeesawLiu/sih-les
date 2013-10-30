@@ -1,0 +1,24 @@
+﻿@model IEnumerable<com.Sconit.Web.Models.KB.ItemDailyConsumeBody>
+<script type="text/javascript">
+    $(function () {
+        j = 1;
+        if (j > 1) { return; }
+        j++;
+        var rows = $("tbody").children("tr:not(.t-no-data)");
+        for (var i = 0; i < rows.length; i++) {
+            var cells = $(rows[i]).children();
+            cells.eq(4).html("<td><input style='width:40px;' type='text' name='NewMaxConsumeQty' id='NewMaxConsumeQty'   /></td>");
+        } 
+    });
+
+    var j = 1;
+</script>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+                .Name("ItemDailyConsumeGridPrd")
+                .Columns(columns => columns.LoadSettings((IEnumerable<GridColumnSettings>)ViewData["Columns"]))
+                .Scrollable(c => c.Enabled(false))
+                // .ClientEvents(events => events.OnComplete("ItemDailyConsumeGrid2_OnRowDataBound"))
+                .Footer(false)
+     )
+</fieldset>

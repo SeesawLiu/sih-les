@@ -1,0 +1,1 @@
+insert into acc_permission values('Url_OrderItemTraceResult_New','ÅúºÅË¢¶Á','Quality')

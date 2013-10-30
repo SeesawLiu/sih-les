@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="com.Sconit.Entity.PRD.MultiSupplyGroup, com.Sconit.Entity" table="PRD_MultiSupplyGroup" lazy="false">
+    <id name="GroupNo" column="GroupNo" type="String" unsaved-value="null" >
+      <generator class="assigned" />
+    </id>
+    <property name="Version" column="Version" type="Int32" />
+    <property name="EffSupplier" column="EffSupplier" type="String" length="50"/>
+    <property name="TargetCycleQty" column="TargetCycleQty" type="Int32"/>
+    <property name="AccumulateQty" column="AccumulateQty" type="Decimal"/>
+    <property name="CreateUserId" column="CreateUser" type="Int32" update="false"/>
+    <property name="CreateUserName" column="CreateUserNm" type="String" length="100" update="false"/>
+    <property name="CreateDate" column="CreateDate" type="DateTime" update="false"/>
+    <property name="LastModifyUserId" column="LastModifyUser" type="Int32"/>
+    <property name="LastModifyUserName" column="LastModifyUserNm" type="String" length="100"/>
+    <property name="LastModifyDate" column="LastModifyDate" type="DateTime"/>
+    <property name="Description" column="Desc1" type="String" length="100" />
+    <property name="KBEffSupplier" column="KBEffSupplier" type="String" length="50"/>
+    <property name="KBTargetCycleQty" column="KBTargetCycleQty" type="Decimal"/>
+    <property name="KBAccumulateQty" column="KBAccumulateQty" type="Decimal"/>
+  </class>
+</hibernate-mapping>

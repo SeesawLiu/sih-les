@@ -1,0 +1,1002 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://com.Sconit.WebService.SAP.SAPService/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://com.Sconit.WebService.SAP.SAPService/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://com.Sconit.WebService.SAP.SAPService/">
+      <s:element name="ImportItem">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="itemList" type="tns:ArrayOfItem" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfItem">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Item" nillable="true" type="tns:Item" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Item">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:SAPEntityBase">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="Code" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ReferenceCode" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ShortCode" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Description" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Uom" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Plant" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="DISPO" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="PLIFZ" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="BESKZ" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="SOBSL" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="SAPEntityBase" abstract="true" />
+      <s:element name="ImportItemResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="GetItems">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="itemCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="plantCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetItemsResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="GetSuppliers">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="supplierCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSuppliersResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="GetSAPQuota">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="itemCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="plantCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSAPQuotaResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="ExchangeMoveType">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ExchangeMoveTypeResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="AutoCreateVanOrder">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="prodLine" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AutoCreateVanOrderResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="UpdateVanOrder">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="plant" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sapOrderNo" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="prodlLine" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdateVanOrderResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UpdateVanOrderResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfString">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="ReportProdOrderOperation">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReportProdOrderOperationResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="CancelReportProdOrderOperation">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="AUFNR" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="TEXT" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CancelReportProdOrderOperationResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="CancelReportProdOrderOperationResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProcOrders">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="flow" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="supplier" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="item" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="plant" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProcOrdersResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetProcOrdersResult" type="tns:ArrayOfOrderDetail" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfOrderDetail">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="OrderDetail" nillable="true" type="tns:OrderDetail" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="OrderDetail">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:SAPEntityBase">
+            <s:sequence>
+              <s:element minOccurs="1" maxOccurs="1" name="Id" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="OrderNo" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="OrderType" type="tns:OrderType" />
+              <s:element minOccurs="1" maxOccurs="1" name="OrderSubType" type="tns:OrderSubType" />
+              <s:element minOccurs="1" maxOccurs="1" name="Sequence" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="Item" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ItemDescription" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ReferenceItemCode" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="BaseUom" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Uom" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="PartyTo" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="UnitCount" type="s:decimal" />
+              <s:element minOccurs="0" maxOccurs="1" name="UnitCountDescription" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="MinUnitCount" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="QualityType" type="tns:QualityType" />
+              <s:element minOccurs="0" maxOccurs="1" name="ManufactureParty" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="RequiredQty" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="OrderedQty" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="ShippedQty" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="ReceivedQty" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="RejectedQty" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="ScrapQty" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="PickedQty" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="UnitQty" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="ReceiveLotSize" nillable="true" type="s:decimal" />
+              <s:element minOccurs="0" maxOccurs="1" name="LocationFrom" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="LocationFromName" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="LocationTo" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="LocationToName" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="IsInspect" type="s:boolean" />
+              <s:element minOccurs="0" maxOccurs="1" name="BillAddress" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="BillAddressDescription" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="PriceList" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="UnitPrice" nillable="true" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="IsProvisionalEstimate" type="s:boolean" />
+              <s:element minOccurs="0" maxOccurs="1" name="Tax" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="IsIncludeTax" type="s:boolean" />
+              <s:element minOccurs="0" maxOccurs="1" name="Bom" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Routing" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="BillTerm" type="tns:OrderBillTerm" />
+              <s:element minOccurs="0" maxOccurs="1" name="ZOPWZ" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ZOPID" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ZOPDS" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="CreateUserId" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="CreateUserName" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="CreateDate" type="s:dateTime" />
+              <s:element minOccurs="1" maxOccurs="1" name="LastModifyUserId" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="LastModifyUserName" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="LastModifyDate" type="s:dateTime" />
+              <s:element minOccurs="1" maxOccurs="1" name="Version" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="Container" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ContainerDescription" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Currency" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="PickStrategy" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ExtraDemandSource" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="IsScanHu" type="s:boolean" />
+              <s:element minOccurs="0" maxOccurs="1" name="ExternalOrderNo" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ExternalSequence" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="StartDate" nillable="true" type="s:dateTime" />
+              <s:element minOccurs="1" maxOccurs="1" name="EndDate" nillable="true" type="s:dateTime" />
+              <s:element minOccurs="0" maxOccurs="1" name="ReserveNo" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ReserveLine" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="BinTo" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="WMSSeq" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="IsChangeUnitCount" type="s:boolean" />
+              <s:element minOccurs="0" maxOccurs="1" name="AUFNR" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ICHARG" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="BWART" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="FreezeDays" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="Flow" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:simpleType name="OrderType">
+        <s:restriction base="s:string">
+          <s:enumeration value="Procurement" />
+          <s:enumeration value="Transfer" />
+          <s:enumeration value="Distribution" />
+          <s:enumeration value="Production" />
+          <s:enumeration value="SubContract" />
+          <s:enumeration value="CustomerGoods" />
+          <s:enumeration value="SubContractTransfer" />
+          <s:enumeration value="ScheduleLine" />
+          <s:enumeration value="OnlySupplier" />
+        </s:restriction>
+      </s:simpleType>
+      <s:simpleType name="OrderSubType">
+        <s:restriction base="s:string">
+          <s:enumeration value="Normal" />
+          <s:enumeration value="Return" />
+        </s:restriction>
+      </s:simpleType>
+      <s:simpleType name="QualityType">
+        <s:restriction base="s:string">
+          <s:enumeration value="Qualified" />
+          <s:enumeration value="Inspect" />
+          <s:enumeration value="Reject" />
+        </s:restriction>
+      </s:simpleType>
+      <s:simpleType name="OrderBillTerm">
+        <s:restriction base="s:string">
+          <s:enumeration value="NA" />
+          <s:enumeration value="ReceivingSettlement" />
+          <s:enumeration value="AfterInspection" />
+          <s:enumeration value="OnlineBilling" />
+          <s:enumeration value="LinearClearing" />
+          <s:enumeration value="ConsignmentBilling" />
+        </s:restriction>
+      </s:simpleType>
+      <s:element name="GetScheduleLineItem">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="item" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="supplier" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="plant" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetScheduleLineItemResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetScheduleLineItemResult" type="tns:ArrayOfArrayOfAnyType" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfArrayOfAnyType">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="ArrayOfAnyType" nillable="true" type="tns:ArrayOfAnyType" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfAnyType">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="anyType" nillable="true" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="AlterDistributionOrder">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="alterDOs" type="tns:ArrayOfAlterDO" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfAlterDO">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="AlterDO" nillable="true" type="tns:AlterDO" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="AlterDO">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:SAPEntityBase">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="OrderNo" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="Sequence" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="Item" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Plant" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Location" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="Qty" type="s:decimal" />
+              <s:element minOccurs="0" maxOccurs="1" name="Uom" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="KUNAG" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="KUNNR" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Action" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="WindowTime" type="s:dateTime" />
+              <s:element minOccurs="0" maxOccurs="1" name="ExternalOrderNo" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:element name="AlterDistributionOrderResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="AlterDistributionOrderResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="PostDistributionOrder">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="PostDistributionOrderResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="RePostDistributionOrder">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="RePostDistributionOrderResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="ReportLocLotDet">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="ftpServer" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="ftpPort" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="ftpUser" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="ftpPass" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="ftpFolder" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="localFolder" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="localTempFolder" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReportLocLotDetResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="GetProductOrder">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="plant" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sapOrderNoList" type="tns:ArrayOfString" />
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProductOrderResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetProductOrderResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProductOrder2">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="plant" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sapOrderTypeList" type="tns:ArrayOfString" />
+            <s:element minOccurs="1" maxOccurs="1" name="dateOption" type="tns:DateOption" />
+            <s:element minOccurs="1" maxOccurs="1" name="dateFrom" nillable="true" type="s:dateTime" />
+            <s:element minOccurs="1" maxOccurs="1" name="dateTo" nillable="true" type="s:dateTime" />
+            <s:element minOccurs="0" maxOccurs="1" name="mrpCtrlList" type="tns:ArrayOfString" />
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:simpleType name="DateOption">
+        <s:restriction base="s:string">
+          <s:enumeration value="EQ" />
+          <s:enumeration value="GT" />
+          <s:enumeration value="GE" />
+          <s:enumeration value="LT" />
+          <s:enumeration value="LE" />
+          <s:enumeration value="BT" />
+        </s:restriction>
+      </s:simpleType>
+      <s:element name="GetProductOrder2Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetProductOrder2Result" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CreateSAPScheduleLineFromLes">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CreateSAPScheduleLineFromLesResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="GetCurrentVanOrder">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="plant" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sapOrderNo" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="prodlLine" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetCurrentVanOrderResponse">
+        <s:complexType />
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="ImportItemSoapIn">
+    <wsdl:part name="parameters" element="tns:ImportItem" />
+  </wsdl:message>
+  <wsdl:message name="ImportItemSoapOut">
+    <wsdl:part name="parameters" element="tns:ImportItemResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetItemsSoapIn">
+    <wsdl:part name="parameters" element="tns:GetItems" />
+  </wsdl:message>
+  <wsdl:message name="GetItemsSoapOut">
+    <wsdl:part name="parameters" element="tns:GetItemsResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetSuppliersSoapIn">
+    <wsdl:part name="parameters" element="tns:GetSuppliers" />
+  </wsdl:message>
+  <wsdl:message name="GetSuppliersSoapOut">
+    <wsdl:part name="parameters" element="tns:GetSuppliersResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetSAPQuotaSoapIn">
+    <wsdl:part name="parameters" element="tns:GetSAPQuota" />
+  </wsdl:message>
+  <wsdl:message name="GetSAPQuotaSoapOut">
+    <wsdl:part name="parameters" element="tns:GetSAPQuotaResponse" />
+  </wsdl:message>
+  <wsdl:message name="ExchangeMoveTypeSoapIn">
+    <wsdl:part name="parameters" element="tns:ExchangeMoveType" />
+  </wsdl:message>
+  <wsdl:message name="ExchangeMoveTypeSoapOut">
+    <wsdl:part name="parameters" element="tns:ExchangeMoveTypeResponse" />
+  </wsdl:message>
+  <wsdl:message name="AutoCreateVanOrderSoapIn">
+    <wsdl:part name="parameters" element="tns:AutoCreateVanOrder" />
+  </wsdl:message>
+  <wsdl:message name="AutoCreateVanOrderSoapOut">
+    <wsdl:part name="parameters" element="tns:AutoCreateVanOrderResponse" />
+  </wsdl:message>
+  <wsdl:message name="UpdateVanOrderSoapIn">
+    <wsdl:part name="parameters" element="tns:UpdateVanOrder" />
+  </wsdl:message>
+  <wsdl:message name="UpdateVanOrderSoapOut">
+    <wsdl:part name="parameters" element="tns:UpdateVanOrderResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReportProdOrderOperationSoapIn">
+    <wsdl:part name="parameters" element="tns:ReportProdOrderOperation" />
+  </wsdl:message>
+  <wsdl:message name="ReportProdOrderOperationSoapOut">
+    <wsdl:part name="parameters" element="tns:ReportProdOrderOperationResponse" />
+  </wsdl:message>
+  <wsdl:message name="CancelReportProdOrderOperationSoapIn">
+    <wsdl:part name="parameters" element="tns:CancelReportProdOrderOperation" />
+  </wsdl:message>
+  <wsdl:message name="CancelReportProdOrderOperationSoapOut">
+    <wsdl:part name="parameters" element="tns:CancelReportProdOrderOperationResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetProcOrdersSoapIn">
+    <wsdl:part name="parameters" element="tns:GetProcOrders" />
+  </wsdl:message>
+  <wsdl:message name="GetProcOrdersSoapOut">
+    <wsdl:part name="parameters" element="tns:GetProcOrdersResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetScheduleLineItemSoapIn">
+    <wsdl:part name="parameters" element="tns:GetScheduleLineItem" />
+  </wsdl:message>
+  <wsdl:message name="GetScheduleLineItemSoapOut">
+    <wsdl:part name="parameters" element="tns:GetScheduleLineItemResponse" />
+  </wsdl:message>
+  <wsdl:message name="AlterDistributionOrderSoapIn">
+    <wsdl:part name="parameters" element="tns:AlterDistributionOrder" />
+  </wsdl:message>
+  <wsdl:message name="AlterDistributionOrderSoapOut">
+    <wsdl:part name="parameters" element="tns:AlterDistributionOrderResponse" />
+  </wsdl:message>
+  <wsdl:message name="PostDistributionOrderSoapIn">
+    <wsdl:part name="parameters" element="tns:PostDistributionOrder" />
+  </wsdl:message>
+  <wsdl:message name="PostDistributionOrderSoapOut">
+    <wsdl:part name="parameters" element="tns:PostDistributionOrderResponse" />
+  </wsdl:message>
+  <wsdl:message name="RePostDistributionOrderSoapIn">
+    <wsdl:part name="parameters" element="tns:RePostDistributionOrder" />
+  </wsdl:message>
+  <wsdl:message name="RePostDistributionOrderSoapOut">
+    <wsdl:part name="parameters" element="tns:RePostDistributionOrderResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReportLocLotDetSoapIn">
+    <wsdl:part name="parameters" element="tns:ReportLocLotDet" />
+  </wsdl:message>
+  <wsdl:message name="ReportLocLotDetSoapOut">
+    <wsdl:part name="parameters" element="tns:ReportLocLotDetResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetProductOrderSoapIn">
+    <wsdl:part name="parameters" element="tns:GetProductOrder" />
+  </wsdl:message>
+  <wsdl:message name="GetProductOrderSoapOut">
+    <wsdl:part name="parameters" element="tns:GetProductOrderResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetProductOrder2SoapIn">
+    <wsdl:part name="parameters" element="tns:GetProductOrder2" />
+  </wsdl:message>
+  <wsdl:message name="GetProductOrder2SoapOut">
+    <wsdl:part name="parameters" element="tns:GetProductOrder2Response" />
+  </wsdl:message>
+  <wsdl:message name="CreateSAPScheduleLineFromLesSoapIn">
+    <wsdl:part name="parameters" element="tns:CreateSAPScheduleLineFromLes" />
+  </wsdl:message>
+  <wsdl:message name="CreateSAPScheduleLineFromLesSoapOut">
+    <wsdl:part name="parameters" element="tns:CreateSAPScheduleLineFromLesResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetCurrentVanOrderSoapIn">
+    <wsdl:part name="parameters" element="tns:GetCurrentVanOrder" />
+  </wsdl:message>
+  <wsdl:message name="GetCurrentVanOrderSoapOut">
+    <wsdl:part name="parameters" element="tns:GetCurrentVanOrderResponse" />
+  </wsdl:message>
+  <wsdl:portType name="SAPServiceSoap">
+    <wsdl:operation name="ImportItem">
+      <wsdl:input message="tns:ImportItemSoapIn" />
+      <wsdl:output message="tns:ImportItemSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetItems">
+      <wsdl:input message="tns:GetItemsSoapIn" />
+      <wsdl:output message="tns:GetItemsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSuppliers">
+      <wsdl:input message="tns:GetSuppliersSoapIn" />
+      <wsdl:output message="tns:GetSuppliersSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSAPQuota">
+      <wsdl:input message="tns:GetSAPQuotaSoapIn" />
+      <wsdl:output message="tns:GetSAPQuotaSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ExchangeMoveType">
+      <wsdl:input message="tns:ExchangeMoveTypeSoapIn" />
+      <wsdl:output message="tns:ExchangeMoveTypeSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="AutoCreateVanOrder">
+      <wsdl:input message="tns:AutoCreateVanOrderSoapIn" />
+      <wsdl:output message="tns:AutoCreateVanOrderSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateVanOrder">
+      <wsdl:input message="tns:UpdateVanOrderSoapIn" />
+      <wsdl:output message="tns:UpdateVanOrderSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReportProdOrderOperation">
+      <wsdl:input message="tns:ReportProdOrderOperationSoapIn" />
+      <wsdl:output message="tns:ReportProdOrderOperationSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="CancelReportProdOrderOperation">
+      <wsdl:input message="tns:CancelReportProdOrderOperationSoapIn" />
+      <wsdl:output message="tns:CancelReportProdOrderOperationSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetProcOrders">
+      <wsdl:input message="tns:GetProcOrdersSoapIn" />
+      <wsdl:output message="tns:GetProcOrdersSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetScheduleLineItem">
+      <wsdl:input message="tns:GetScheduleLineItemSoapIn" />
+      <wsdl:output message="tns:GetScheduleLineItemSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="AlterDistributionOrder">
+      <wsdl:input message="tns:AlterDistributionOrderSoapIn" />
+      <wsdl:output message="tns:AlterDistributionOrderSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="PostDistributionOrder">
+      <wsdl:input message="tns:PostDistributionOrderSoapIn" />
+      <wsdl:output message="tns:PostDistributionOrderSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="RePostDistributionOrder">
+      <wsdl:input message="tns:RePostDistributionOrderSoapIn" />
+      <wsdl:output message="tns:RePostDistributionOrderSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReportLocLotDet">
+      <wsdl:input message="tns:ReportLocLotDetSoapIn" />
+      <wsdl:output message="tns:ReportLocLotDetSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetProductOrder">
+      <wsdl:input message="tns:GetProductOrderSoapIn" />
+      <wsdl:output message="tns:GetProductOrderSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetProductOrder2">
+      <wsdl:input message="tns:GetProductOrder2SoapIn" />
+      <wsdl:output message="tns:GetProductOrder2SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="CreateSAPScheduleLineFromLes">
+      <wsdl:input message="tns:CreateSAPScheduleLineFromLesSoapIn" />
+      <wsdl:output message="tns:CreateSAPScheduleLineFromLesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCurrentVanOrder">
+      <wsdl:input message="tns:GetCurrentVanOrderSoapIn" />
+      <wsdl:output message="tns:GetCurrentVanOrderSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="SAPServiceSoap" type="tns:SAPServiceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="ImportItem">
+      <soap:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/ImportItem" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetItems">
+      <soap:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/GetItems" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSuppliers">
+      <soap:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/GetSuppliers" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSAPQuota">
+      <soap:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/GetSAPQuota" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ExchangeMoveType">
+      <soap:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/ExchangeMoveType" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AutoCreateVanOrder">
+      <soap:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/AutoCreateVanOrder" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateVanOrder">
+      <soap:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/UpdateVanOrder" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReportProdOrderOperation">
+      <soap:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/ReportProdOrderOperation" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CancelReportProdOrderOperation">
+      <soap:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/CancelReportProdOrderOperation" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProcOrders">
+      <soap:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/GetProcOrders" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetScheduleLineItem">
+      <soap:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/GetScheduleLineItem" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AlterDistributionOrder">
+      <soap:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/AlterDistributionOrder" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PostDistributionOrder">
+      <soap:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/PostDistributionOrder" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RePostDistributionOrder">
+      <soap:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/RePostDistributionOrder" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReportLocLotDet">
+      <soap:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/ReportLocLotDet" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProductOrder">
+      <soap:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/GetProductOrder" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProductOrder2">
+      <soap:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/GetProductOrder2" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CreateSAPScheduleLineFromLes">
+      <soap:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/CreateSAPScheduleLineFromLes" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCurrentVanOrder">
+      <soap:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/GetCurrentVanOrder" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="SAPServiceSoap12" type="tns:SAPServiceSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="ImportItem">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/ImportItem" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetItems">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/GetItems" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSuppliers">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/GetSuppliers" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSAPQuota">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/GetSAPQuota" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ExchangeMoveType">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/ExchangeMoveType" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AutoCreateVanOrder">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/AutoCreateVanOrder" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateVanOrder">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/UpdateVanOrder" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReportProdOrderOperation">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/ReportProdOrderOperation" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CancelReportProdOrderOperation">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/CancelReportProdOrderOperation" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProcOrders">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/GetProcOrders" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetScheduleLineItem">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/GetScheduleLineItem" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AlterDistributionOrder">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/AlterDistributionOrder" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PostDistributionOrder">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/PostDistributionOrder" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RePostDistributionOrder">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/RePostDistributionOrder" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReportLocLotDet">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/ReportLocLotDet" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProductOrder">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/GetProductOrder" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProductOrder2">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/GetProductOrder2" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CreateSAPScheduleLineFromLes">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/CreateSAPScheduleLineFromLes" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCurrentVanOrder">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/GetCurrentVanOrder" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="SAPService">
+    <wsdl:port name="SAPServiceSoap" binding="tns:SAPServiceSoap">
+      <soap:address location="http://localhost:1122/WebService/SAPService.asmx" />
+    </wsdl:port>
+    <wsdl:port name="SAPServiceSoap12" binding="tns:SAPServiceSoap12">
+      <soap12:address location="http://localhost:1122/WebService/SAPService.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,106 @@
+﻿@using com.Sconit.Entity.ACC
+@using com.Sconit.Web.Models.SearchModels.ORD
+@using com.Sconit.Entity.SYS
+@using com.Sconit.Entity.ORD
+<div class="validation-summary-successes">
+    <ul id="popSuccesssul">
+    </ul>
+</div>
+<div class="validation-summary-errors">
+    <ul id="popErrorsul">
+    </ul>
+</div>
+<fieldset>
+    @using (Html.BeginForm())
+    {   
+        <div class="search">
+            <div class="search-label">
+                <label>
+                    @Resources.ORD.OrderBomDetail.OrderBomDetail_Operation
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("Operation", TempData["OrderBomDetailSearchModel"] != null ? ((OrderBomDetailSearchModel)TempData["OrderBomDetailSearchModel"]).Operation.ToString() : string.Empty)
+            </div>
+            <div class="search-label">
+                <label>
+                    @Resources.ORD.OrderBomDetail.OrderBomDetail_OpReference
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("OpReference", TempData["OrderBomDetailSearchModel"] != null ? ((OrderBomDetailSearchModel)TempData["OrderBomDetailSearchModel"]).OpReference : string.Empty)
+            </div>
+            <div class="editor-label-2">
+                <label for="OrderMaster_OrderNo">
+                    @Resources.ORD.OrderBomDetail.OrderBomDetail_Location
+                </label>
+            </div>
+            <div class="editor-field-2">
+                @{
+        Html.RenderAction("_LocationComboBox", "Common",
+            new
+            {
+                controlId = "SearchLocation",
+                controlName = "Location",
+                selectedValue = TempData["OrderBomDetailSearchModel"] != null ? ((OrderBomDetailSearchModel)TempData["OrderBomDetailSearchModel"]).Location : string.Empty
+            });
+                }
+            </div>
+            <div class="editor-label-2">
+                <label>
+                    @Resources.ORD.OrderBomDetail.OrderBomDetail_Item
+                </label>
+            </div>
+            <div class="editor-field-2">
+                @{
+        Html.RenderAction("_ItemComboBox", "Common", new
+        {
+            controlId = "SearchItem",
+            controlName = "Item",
+            selectedValue = TempData["OrderBomDetailSearchModel"] != null ? ((OrderBomDetailSearchModel)TempData["OrderBomDetailSearchModel"]).Item : string.Empty
+        });
+                }
+            </div>
+        </div>
+        <div class="search-footer">
+            <button type="button" id="btnBomDetailSearch" onclick="btnSearchBomDetail_Click();">@Resources.Global.Button_Search</button>
+            <button type="button" id="btnExport" onclick="ExportClick()">@Resources.Global.Button_Export</button>
+        </div>
+        @Html.Hidden("OrderDetailId", (string)ViewBag.OrderDetailId);
+        @Html.Hidden("OrderStatus", (int)ViewBag.OrderStatus);
+        @Html.Hidden("Region", (string)ViewBag.Region)
+    }
+</fieldset>
+<div id="divOrderBomDetailList">
+    @{
+        Html.RenderAction("_OrderBomDetailList", "ProductionOrder", new { orderDetailId = ViewBag.OrderDetailId, OrderStatus = ViewBag.OrderStatus });
+    }
+</div>
+<script language="javascript" type="text/javascript">
+    function btnSearchBomDetail_Click() {
+        $("#popSuccesssul").html('');
+        $("#popErrorsul").html('');
+        var data = {
+            Item: $('#SearchItem').val(),
+            Location: $('#SearchLocation').val(),
+            Operation: $('#Operation').val(),
+            OpReference: $('#OpReference').val(),
+            OrderDetailId: $('#OrderDetailId').val()
+        };
+        $.ajax({
+            type: "post",
+            dataType: "html",
+            url: "/ProductionOrder/_OrderBomDetailList/",
+            data: data,
+            cache: false,
+            success: function (data, textStatus) {
+                $("#divOrderBomDetailList").html(data);
+            }
+        });
+    }
+
+    function ExportClick() {
+        location.href = '/ProductionOrder/ExportOrderBomDetailXLS/?Item=' + $('#SearchItem').val() + "&Operation=" + $('#Operation').val()
+            + "&OpReference=" + $('#OpReference').val() + "&Location=" + $('#SearchLocation').val() + "&OrderDetailId=" + $('#OrderDetailId').val();
+    }
+</script>

@@ -1,0 +1,3 @@
+﻿ALTER TABLE [dbo].[ORD_IpMstr_6]
+    ADD CONSTRAINT [FK_ORD_IpMstr6_ShipFrom_REFERENCE_MD_Address_Code] FOREIGN KEY ([ShipFrom]) REFERENCES [dbo].[MD_Address] ([Code]) ON DELETE NO ACTION ON UPDATE NO ACTION;
+

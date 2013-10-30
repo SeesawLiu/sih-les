@@ -1,0 +1,1 @@
+update sys_menu set name = '整车订单更新',desc1= '整车订单更新' where name = '整车序列导入'

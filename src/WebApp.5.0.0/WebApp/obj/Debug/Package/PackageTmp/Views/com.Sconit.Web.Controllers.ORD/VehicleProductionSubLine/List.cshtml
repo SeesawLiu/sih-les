@@ -1,0 +1,28 @@
+﻿@{
+    ViewBag.Title = "List";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_VehicleProductionSubLineView_View" });
+}
+@Html.Partial("_Search")
+@{ Html.Telerik().TabStrip()
+        .Name("VehicleProductionSubLineTabStrip")
+        .Items(tabstrip =>
+        {
+            tabstrip.Add()
+                .Text("已出库")
+                .LoadContentFrom("_View", "VehicleProductionSubLine")
+                .HtmlAttributes(new { onclick = "CleanTabMessage()" });
+
+            tabstrip.Add()
+               .Text("未出库")
+                .LoadContentFrom("_View2", "VehicleProductionSubLine")
+                .HtmlAttributes(new { onclick = "CleanTabMessage()" });
+        })
+        .Render();
+}
+@{ Html.Telerik().ScriptRegistrar()
+        .OnDocumentReady(
+    @<text> var tabIndex = "@TempData["TabIndex"]"; var tabstrip = $("#VehicleProductionSubLineTabStrip").data("tTabStrip");
+    var item = $("li", tabstrip.element)[tabIndex != "" ? tabIndex : 0]; tabstrip.select(item);
+    </text>
+        );
+}

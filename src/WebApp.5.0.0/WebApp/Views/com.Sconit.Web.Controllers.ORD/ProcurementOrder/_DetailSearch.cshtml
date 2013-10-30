@@ -1,0 +1,305 @@
+﻿@using com.Sconit.Entity.ACC
+@using com.Sconit.Web.Models.SearchModels.ORD
+@using com.Sconit.Entity.SYS
+@using com.Sconit.Entity.ORD
+<fieldset>
+    @using (Html.BeginForm("DetailList", "ProcurementOrder"))
+    {   
+        <div class="search">
+            <div class="search-label">
+                <label for="OrderMaster_OrderNo">
+                    @Resources.ORD.OrderMaster.OrderMaster_OrderNo
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("OrderNo", TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).OrderNo : string.Empty)
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_Flow">
+                    @Resources.ORD.IpMaster.IpMaster_Flow
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_FlowComboBox", "Common",
+            new
+            {
+                controlName = "Flow",
+                type = (int)com.Sconit.CodeMaster.OrderType.Procurement,
+                selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).Flow : string.Empty
+            });
+                }
+            </div>
+            
+            <div class="search-label">
+                <label for="OrderMaster_PartyFrom">
+                    @Resources.ORD.OrderMaster.OrderMaster_PartyFrom
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+               Html.RenderAction("_OrderMasterPartyFromComboBox", "Common",
+                   new
+                   {
+
+                       controlName = "PartyFrom",
+                       orderType = (int)com.Sconit.CodeMaster.OrderType.Procurement,
+                       selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).PartyFrom : string.Empty
+                   });
+                }
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_PartyTo">
+                    @Resources.ORD.OrderMaster.OrderMaster_PartyTo
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+               Html.RenderAction("_OrderMasterPartyToComboBox", "Common",
+                               new
+                               {
+                                   controlName = "PartyTo",
+                                   orderType = (int)com.Sconit.CodeMaster.OrderType.Procurement,
+                                   selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).PartyTo : string.Empty
+                               });
+                }
+            </div>
+             <div class="search-label">
+              <label>
+                    @*@Resources.ORD.OrderDetail.OrderDetail_LocationFrom*@
+                    发货库位
+            </label>
+            </div>
+            <div class="editor-field-2">
+                @{
+        Html.RenderAction("_LocationComboBox", "Common", new
+        {
+            controlName = "LocationFrom",
+            selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).LocationFrom : string.Empty
+
+        });
+                }
+            </div>
+             <div class="search-label">
+              <label>
+                    @Resources.ORD.OrderDetail.OrderDetail_LocationTo
+            </label>
+            </div>
+            <div class="editor-field-2">
+                @{
+        Html.RenderAction("_LocationComboBox", "Common", new
+        {
+            controlName = "LocationTo",
+            selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).LocationTo : string.Empty
+
+        });
+                }
+            </div>
+            <div class="editor-label-2">
+                <label>
+                    @Resources.ORD.OrderMaster.OrderMaster_ReferenceOrderNo
+                </label>
+            </div>
+            <div class="editor-field-2">
+                @Html.TextBox("ReferenceOrderNo", TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).ReferenceOrderNo : string.Empty)
+            </div>
+            <div class="editor-label-2">
+                <label>
+                    @Resources.ORD.OrderMaster.OrderMaster_ExternalOrderNo
+                </label>
+            </div>
+            <div class="editor-field-2">
+                @Html.TextBox("ExternalOrderNo", TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).ExternalOrderNo : string.Empty)
+            </div>
+           <div class="editor-label-2">
+                <label>@Resources.ORD.OrderMaster.OrderMaster_OrderStrategy</label>
+            </div>
+            <div class="editor-field-2">
+               @* @{
+        Html.RenderAction("_FlowStrategyDropDownList", "Common", new
+        {
+            isChange = true,
+            controlName = "OrderStrategy",
+            includeBlankOption = true,
+            selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).OrderStrategy : null
+        });
+                }*@
+                 @{
+        Html.RenderAction("_CodeMasterDropDownList", "Common", new
+        {
+            code = com.Sconit.CodeMaster.CodeMaster.FlowStrategy,
+            controlName = "OrderStrategy",
+            includeBlankOption = true,
+            selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).OrderStrategy : null
+        });
+                }
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_Status">
+                    @Resources.ORD.OrderMaster.OrderMaster_Status
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+               Html.RenderAction("_CodeMasterDropDownList", "Common", new
+               {
+                   code = com.Sconit.CodeMaster.CodeMaster.OrderStatus,
+                   controlName = "Status",
+                   includeBlankOption = true,
+                   selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).Status : 1
+               });
+                }
+            </div>
+             <div class="search-label">
+                <label for="FlowMaster_FirstName">
+                    @Resources.ORD.OrderDetail.OrderDetail_ManufactureParty
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_SupplierComboBox", "Common", new
+        {
+            controlName = "ManufactureParty",
+            selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).ManufactureParty : string.Empty
+        });
+                }
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_OrderNo">
+                    @Resources.ORD.OrderMaster.OrderMaster_Item
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+               Html.RenderAction("_ItemComboBox", "Common",
+                   new
+                   {
+                       controlName = "Item",
+                       selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).Item : string.Empty
+                   });
+                    
+                }
+            </div>
+              <div class="search-label">
+                <label>
+                    @Resources.ORD.OrderMaster.OrderMaster_TraceCode
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("TraceCode", TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).TraceCode : string.Empty)
+            </div>
+            <div class="search-label">
+                <label for="PickRule_Picker">
+                @Resources.MD.Picker.PickRule_Picker
+                </label>
+            </div>
+            <div class="editor-field-2">
+                @{
+                Html.RenderAction("_PickerComboBox", "Common", new
+                {
+                    controlName = "Picker",
+                    selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).Picker : string.Empty
+                });
+                }
+            </div>
+         <div class="search-label">
+                <label for="OrderMaster_DateFrom">
+                    创建日期 从
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DateTimePicker().Format(com.Sconit.Entity.BusinessConstants.LONG_DATE_FORMAT)
+                .Name("DateFrom")
+            .Value(TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).DateFrom : System.DateTime.Now.AddDays(-1))
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_DateTo">
+                    至
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DateTimePicker().Format(com.Sconit.Entity.BusinessConstants.LONG_DATE_FORMAT)
+                .Name("DateTo")
+            .Value(TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).DateTo : null)
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+            </div>
+
+            <div class="search-label">
+                <label for="OrderMaster_DateFrom">
+                    窗口时间 从
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DateTimePicker().Format(com.Sconit.Entity.BusinessConstants.LONG_DATE_FORMAT)
+            .Name("WindowTimeFrom")
+            .Value(TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).WindowTimeFrom : null)
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_DateTo">
+                   至
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DateTimePicker().Format(com.Sconit.Entity.BusinessConstants.LONG_DATE_FORMAT)
+            .Name("WindowTimeTo")
+            .Value(TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).WindowTimeTo : null)
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+            </div>
+
+            <div class="search-label">
+                <label for="OrderMaster_DateTo">
+                    @Resources.ORD.OrderDetail.OrderDetail_Remark
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("ZOPWZ", TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).ZOPWZ : string.Empty)
+            </div>
+             <div class="search-label">
+                <label for="OrderMaster_Shift_CreateOrderCode">
+                    @Resources.ORD.OrderMaster.OrderMaster_Shift_CreateOrderCode
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+               Html.RenderAction("_CreateOrderCodeComboBox", "Common",
+                          new
+                          {
+                              controlName = "Shift",
+                              selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).Shift : null
+                          });
+                }
+            </div>
+            <div class="search-label">
+                <label for="">
+                    未清
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.CheckBox("IsNoneClsoe", TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).IsNoneClsoe : false)
+                
+                &nbsp 已关闭
+                @Html.CheckBox("IsClsoe", TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).IsClsoe : false)
+            </div>
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            <button type="submit" id="btnSearch">
+                @Resources.Global.Button_Search</button>
+              <button type="button" id="btnExport" onclick="Export()">
+                @Resources.Global.Button_Export</button>
+        </div>
+
+    }
+</fieldset>
+<form id="hiddenForm" action="/ProcurementOrder/SaveOrderDetailViewToClient" target="_blank"
+method="post">
+</form>
+<script type="text/javascript">
+    function Export(e) {
+        $("#hiddenForm").submit();
+    }
+    function FlowStrategy_Change()
+    { }
+</script>

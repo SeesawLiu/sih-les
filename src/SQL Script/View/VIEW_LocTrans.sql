@@ -1,0 +1,46 @@
+IF EXISTS(SELECT * FROM SYS.Objects WHERE TYPE='v' AND name='VIEW_LocTrans')
+	DROP VIEW VIEW_LocTrans
+GO
+
+CREATE VIEW VIEW_LocTrans
+AS
+SELECT a.Id,a.OrderNo,a.OrderType,a.OrderSubType,a.OrderDetSeq,a.OrderDetId,a.OrderBomDetId,a.OrderBomDetSeq,a.IpNo,a.IpDetId,a.IpDetSeq,a.RecNo,a.RecDetId,a.RecDetSeq,a.SeqNo,a.TraceCode,a.Item,a.Uom,a.BaseUom,a.Qty,a.IsCS,a.PlanBill,a.PlanBillQty,a.ActBill,a.ActBillQty,a.UnitQty,a.QualityType,a.HuId,a.LotNo,a.TransType,a.IOType,a.PartyFrom,a.PartyTo,a.LocFrom,a.LocTo,a.LocIOReason,a.EffDate,a.CreateUser,a.CreateDate FROM INV_LocTrans_0 AS a
+UNION ALL
+SELECT a.Id,a.OrderNo,a.OrderType,a.OrderSubType,a.OrderDetSeq,a.OrderDetId,a.OrderBomDetId,a.OrderBomDetSeq,a.IpNo,a.IpDetId,a.IpDetSeq,a.RecNo,a.RecDetId,a.RecDetSeq,a.SeqNo,a.TraceCode,a.Item,a.Uom,a.BaseUom,a.Qty,a.IsCS,a.PlanBill,a.PlanBillQty,a.ActBill,a.ActBillQty,a.UnitQty,a.QualityType,a.HuId,a.LotNo,a.TransType,a.IOType,a.PartyFrom,a.PartyTo,a.LocFrom,a.LocTo,a.LocIOReason,a.EffDate,a.CreateUser,a.CreateDate FROM INV_LocTrans_1 AS a
+UNION ALL
+SELECT a.Id,a.OrderNo,a.OrderType,a.OrderSubType,a.OrderDetSeq,a.OrderDetId,a.OrderBomDetId,a.OrderBomDetSeq,a.IpNo,a.IpDetId,a.IpDetSeq,a.RecNo,a.RecDetId,a.RecDetSeq,a.SeqNo,a.TraceCode,a.Item,a.Uom,a.BaseUom,a.Qty,a.IsCS,a.PlanBill,a.PlanBillQty,a.ActBill,a.ActBillQty,a.UnitQty,a.QualityType,a.HuId,a.LotNo,a.TransType,a.IOType,a.PartyFrom,a.PartyTo,a.LocFrom,a.LocTo,a.LocIOReason,a.EffDate,a.CreateUser,a.CreateDate FROM INV_LocTrans_2 AS a
+UNION ALL
+SELECT a.Id,a.OrderNo,a.OrderType,a.OrderSubType,a.OrderDetSeq,a.OrderDetId,a.OrderBomDetId,a.OrderBomDetSeq,a.IpNo,a.IpDetId,a.IpDetSeq,a.RecNo,a.RecDetId,a.RecDetSeq,a.SeqNo,a.TraceCode,a.Item,a.Uom,a.BaseUom,a.Qty,a.IsCS,a.PlanBill,a.PlanBillQty,a.ActBill,a.ActBillQty,a.UnitQty,a.QualityType,a.HuId,a.LotNo,a.TransType,a.IOType,a.PartyFrom,a.PartyTo,a.LocFrom,a.LocTo,a.LocIOReason,a.EffDate,a.CreateUser,a.CreateDate FROM INV_LocTrans_3 AS a
+UNION ALL
+SELECT a.Id,a.OrderNo,a.OrderType,a.OrderSubType,a.OrderDetSeq,a.OrderDetId,a.OrderBomDetId,a.OrderBomDetSeq,a.IpNo,a.IpDetId,a.IpDetSeq,a.RecNo,a.RecDetId,a.RecDetSeq,a.SeqNo,a.TraceCode,a.Item,a.Uom,a.BaseUom,a.Qty,a.IsCS,a.PlanBill,a.PlanBillQty,a.ActBill,a.ActBillQty,a.UnitQty,a.QualityType,a.HuId,a.LotNo,a.TransType,a.IOType,a.PartyFrom,a.PartyTo,a.LocFrom,a.LocTo,a.LocIOReason,a.EffDate,a.CreateUser,a.CreateDate FROM INV_LocTrans_4 AS a
+UNION ALL
+SELECT a.Id,a.OrderNo,a.OrderType,a.OrderSubType,a.OrderDetSeq,a.OrderDetId,a.OrderBomDetId,a.OrderBomDetSeq,a.IpNo,a.IpDetId,a.IpDetSeq,a.RecNo,a.RecDetId,a.RecDetSeq,a.SeqNo,a.TraceCode,a.Item,a.Uom,a.BaseUom,a.Qty,a.IsCS,a.PlanBill,a.PlanBillQty,a.ActBill,a.ActBillQty,a.UnitQty,a.QualityType,a.HuId,a.LotNo,a.TransType,a.IOType,a.PartyFrom,a.PartyTo,a.LocFrom,a.LocTo,a.LocIOReason,a.EffDate,a.CreateUser,a.CreateDate FROM INV_LocTrans_5 AS a
+UNION ALL
+SELECT a.Id,a.OrderNo,a.OrderType,a.OrderSubType,a.OrderDetSeq,a.OrderDetId,a.OrderBomDetId,a.OrderBomDetSeq,a.IpNo,a.IpDetId,a.IpDetSeq,a.RecNo,a.RecDetId,a.RecDetSeq,a.SeqNo,a.TraceCode,a.Item,a.Uom,a.BaseUom,a.Qty,a.IsCS,a.PlanBill,a.PlanBillQty,a.ActBill,a.ActBillQty,a.UnitQty,a.QualityType,a.HuId,a.LotNo,a.TransType,a.IOType,a.PartyFrom,a.PartyTo,a.LocFrom,a.LocTo,a.LocIOReason,a.EffDate,a.CreateUser,a.CreateDate FROM INV_LocTrans_6 AS a
+UNION ALL
+SELECT a.Id,a.OrderNo,a.OrderType,a.OrderSubType,a.OrderDetSeq,a.OrderDetId,a.OrderBomDetId,a.OrderBomDetSeq,a.IpNo,a.IpDetId,a.IpDetSeq,a.RecNo,a.RecDetId,a.RecDetSeq,a.SeqNo,a.TraceCode,a.Item,a.Uom,a.BaseUom,a.Qty,a.IsCS,a.PlanBill,a.PlanBillQty,a.ActBill,a.ActBillQty,a.UnitQty,a.QualityType,a.HuId,a.LotNo,a.TransType,a.IOType,a.PartyFrom,a.PartyTo,a.LocFrom,a.LocTo,a.LocIOReason,a.EffDate,a.CreateUser,a.CreateDate FROM INV_LocTrans_7 AS a
+UNION ALL
+SELECT a.Id,a.OrderNo,a.OrderType,a.OrderSubType,a.OrderDetSeq,a.OrderDetId,a.OrderBomDetId,a.OrderBomDetSeq,a.IpNo,a.IpDetId,a.IpDetSeq,a.RecNo,a.RecDetId,a.RecDetSeq,a.SeqNo,a.TraceCode,a.Item,a.Uom,a.BaseUom,a.Qty,a.IsCS,a.PlanBill,a.PlanBillQty,a.ActBill,a.ActBillQty,a.UnitQty,a.QualityType,a.HuId,a.LotNo,a.TransType,a.IOType,a.PartyFrom,a.PartyTo,a.LocFrom,a.LocTo,a.LocIOReason,a.EffDate,a.CreateUser,a.CreateDate FROM INV_LocTrans_8 AS a
+UNION ALL
+SELECT a.Id,a.OrderNo,a.OrderType,a.OrderSubType,a.OrderDetSeq,a.OrderDetId,a.OrderBomDetId,a.OrderBomDetSeq,a.IpNo,a.IpDetId,a.IpDetSeq,a.RecNo,a.RecDetId,a.RecDetSeq,a.SeqNo,a.TraceCode,a.Item,a.Uom,a.BaseUom,a.Qty,a.IsCS,a.PlanBill,a.PlanBillQty,a.ActBill,a.ActBillQty,a.UnitQty,a.QualityType,a.HuId,a.LotNo,a.TransType,a.IOType,a.PartyFrom,a.PartyTo,a.LocFrom,a.LocTo,a.LocIOReason,a.EffDate,a.CreateUser,a.CreateDate FROM INV_LocTrans_9 AS a
+UNION ALL
+SELECT a.Id,a.OrderNo,a.OrderType,a.OrderSubType,a.OrderDetSeq,a.OrderDetId,a.OrderBomDetId,a.OrderBomDetSeq,a.IpNo,a.IpDetId,a.IpDetSeq,a.RecNo,a.RecDetId,a.RecDetSeq,a.SeqNo,a.TraceCode,a.Item,a.Uom,a.BaseUom,a.Qty,a.IsCS,a.PlanBill,a.PlanBillQty,a.ActBill,a.ActBillQty,a.UnitQty,a.QualityType,a.HuId,a.LotNo,a.TransType,a.IOType,a.PartyFrom,a.PartyTo,a.LocFrom,a.LocTo,a.LocIOReason,a.EffDate,a.CreateUser,a.CreateDate FROM INV_LocTrans_10 AS a
+UNION ALL
+SELECT a.Id,a.OrderNo,a.OrderType,a.OrderSubType,a.OrderDetSeq,a.OrderDetId,a.OrderBomDetId,a.OrderBomDetSeq,a.IpNo,a.IpDetId,a.IpDetSeq,a.RecNo,a.RecDetId,a.RecDetSeq,a.SeqNo,a.TraceCode,a.Item,a.Uom,a.BaseUom,a.Qty,a.IsCS,a.PlanBill,a.PlanBillQty,a.ActBill,a.ActBillQty,a.UnitQty,a.QualityType,a.HuId,a.LotNo,a.TransType,a.IOType,a.PartyFrom,a.PartyTo,a.LocFrom,a.LocTo,a.LocIOReason,a.EffDate,a.CreateUser,a.CreateDate FROM INV_LocTrans_11 AS a
+UNION ALL
+SELECT a.Id,a.OrderNo,a.OrderType,a.OrderSubType,a.OrderDetSeq,a.OrderDetId,a.OrderBomDetId,a.OrderBomDetSeq,a.IpNo,a.IpDetId,a.IpDetSeq,a.RecNo,a.RecDetId,a.RecDetSeq,a.SeqNo,a.TraceCode,a.Item,a.Uom,a.BaseUom,a.Qty,a.IsCS,a.PlanBill,a.PlanBillQty,a.ActBill,a.ActBillQty,a.UnitQty,a.QualityType,a.HuId,a.LotNo,a.TransType,a.IOType,a.PartyFrom,a.PartyTo,a.LocFrom,a.LocTo,a.LocIOReason,a.EffDate,a.CreateUser,a.CreateDate FROM INV_LocTrans_12 AS a
+UNION ALL
+SELECT a.Id,a.OrderNo,a.OrderType,a.OrderSubType,a.OrderDetSeq,a.OrderDetId,a.OrderBomDetId,a.OrderBomDetSeq,a.IpNo,a.IpDetId,a.IpDetSeq,a.RecNo,a.RecDetId,a.RecDetSeq,a.SeqNo,a.TraceCode,a.Item,a.Uom,a.BaseUom,a.Qty,a.IsCS,a.PlanBill,a.PlanBillQty,a.ActBill,a.ActBillQty,a.UnitQty,a.QualityType,a.HuId,a.LotNo,a.TransType,a.IOType,a.PartyFrom,a.PartyTo,a.LocFrom,a.LocTo,a.LocIOReason,a.EffDate,a.CreateUser,a.CreateDate FROM INV_LocTrans_13 AS a
+UNION ALL
+SELECT a.Id,a.OrderNo,a.OrderType,a.OrderSubType,a.OrderDetSeq,a.OrderDetId,a.OrderBomDetId,a.OrderBomDetSeq,a.IpNo,a.IpDetId,a.IpDetSeq,a.RecNo,a.RecDetId,a.RecDetSeq,a.SeqNo,a.TraceCode,a.Item,a.Uom,a.BaseUom,a.Qty,a.IsCS,a.PlanBill,a.PlanBillQty,a.ActBill,a.ActBillQty,a.UnitQty,a.QualityType,a.HuId,a.LotNo,a.TransType,a.IOType,a.PartyFrom,a.PartyTo,a.LocFrom,a.LocTo,a.LocIOReason,a.EffDate,a.CreateUser,a.CreateDate FROM INV_LocTrans_14 AS a
+UNION ALL
+SELECT a.Id,a.OrderNo,a.OrderType,a.OrderSubType,a.OrderDetSeq,a.OrderDetId,a.OrderBomDetId,a.OrderBomDetSeq,a.IpNo,a.IpDetId,a.IpDetSeq,a.RecNo,a.RecDetId,a.RecDetSeq,a.SeqNo,a.TraceCode,a.Item,a.Uom,a.BaseUom,a.Qty,a.IsCS,a.PlanBill,a.PlanBillQty,a.ActBill,a.ActBillQty,a.UnitQty,a.QualityType,a.HuId,a.LotNo,a.TransType,a.IOType,a.PartyFrom,a.PartyTo,a.LocFrom,a.LocTo,a.LocIOReason,a.EffDate,a.CreateUser,a.CreateDate FROM INV_LocTrans_15 AS a
+UNION ALL
+SELECT a.Id,a.OrderNo,a.OrderType,a.OrderSubType,a.OrderDetSeq,a.OrderDetId,a.OrderBomDetId,a.OrderBomDetSeq,a.IpNo,a.IpDetId,a.IpDetSeq,a.RecNo,a.RecDetId,a.RecDetSeq,a.SeqNo,a.TraceCode,a.Item,a.Uom,a.BaseUom,a.Qty,a.IsCS,a.PlanBill,a.PlanBillQty,a.ActBill,a.ActBillQty,a.UnitQty,a.QualityType,a.HuId,a.LotNo,a.TransType,a.IOType,a.PartyFrom,a.PartyTo,a.LocFrom,a.LocTo,a.LocIOReason,a.EffDate,a.CreateUser,a.CreateDate FROM INV_LocTrans_16 AS a
+UNION ALL
+SELECT a.Id,a.OrderNo,a.OrderType,a.OrderSubType,a.OrderDetSeq,a.OrderDetId,a.OrderBomDetId,a.OrderBomDetSeq,a.IpNo,a.IpDetId,a.IpDetSeq,a.RecNo,a.RecDetId,a.RecDetSeq,a.SeqNo,a.TraceCode,a.Item,a.Uom,a.BaseUom,a.Qty,a.IsCS,a.PlanBill,a.PlanBillQty,a.ActBill,a.ActBillQty,a.UnitQty,a.QualityType,a.HuId,a.LotNo,a.TransType,a.IOType,a.PartyFrom,a.PartyTo,a.LocFrom,a.LocTo,a.LocIOReason,a.EffDate,a.CreateUser,a.CreateDate FROM INV_LocTrans_17 AS a
+UNION ALL
+SELECT a.Id,a.OrderNo,a.OrderType,a.OrderSubType,a.OrderDetSeq,a.OrderDetId,a.OrderBomDetId,a.OrderBomDetSeq,a.IpNo,a.IpDetId,a.IpDetSeq,a.RecNo,a.RecDetId,a.RecDetSeq,a.SeqNo,a.TraceCode,a.Item,a.Uom,a.BaseUom,a.Qty,a.IsCS,a.PlanBill,a.PlanBillQty,a.ActBill,a.ActBillQty,a.UnitQty,a.QualityType,a.HuId,a.LotNo,a.TransType,a.IOType,a.PartyFrom,a.PartyTo,a.LocFrom,a.LocTo,a.LocIOReason,a.EffDate,a.CreateUser,a.CreateDate FROM INV_LocTrans_18 AS a
+UNION ALL
+SELECT a.Id,a.OrderNo,a.OrderType,a.OrderSubType,a.OrderDetSeq,a.OrderDetId,a.OrderBomDetId,a.OrderBomDetSeq,a.IpNo,a.IpDetId,a.IpDetSeq,a.RecNo,a.RecDetId,a.RecDetSeq,a.SeqNo,a.TraceCode,a.Item,a.Uom,a.BaseUom,a.Qty,a.IsCS,a.PlanBill,a.PlanBillQty,a.ActBill,a.ActBillQty,a.UnitQty,a.QualityType,a.HuId,a.LotNo,a.TransType,a.IOType,a.PartyFrom,a.PartyTo,a.LocFrom,a.LocTo,a.LocIOReason,a.EffDate,a.CreateUser,a.CreateDate FROM INV_LocTrans_19 AS a
+GO

@@ -1,0 +1,2 @@
+﻿CREATE USER [sconit] WITHOUT LOGIN;
+

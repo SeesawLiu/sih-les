@@ -1,0 +1,587 @@
+﻿@using com.Sconit.Web.Models.ReportModels
+@model com.Sconit.Web.Models.ReportModels.HistoryInventorySearchModel
+<script>
+    function CodeMaster_Change() {
+        var level = $('#Level').val();
+        if (level == 0) {
+            document.getElementById("TheFactoryFromlabel").style.display = 'inline';
+            document.getElementById("TheFactoryFromfield").style.display = 'inline';
+            document.getElementById("TheFactoryTolabel").style.display = 'inline';
+            document.getElementById("TheFactoryTofield").style.display = 'inline';
+            document.getElementById("plantFromlabel").style.display = 'inline';
+            document.getElementById("plantFromfield").style.display = 'inline';
+            document.getElementById("plantTolabel").style.display = 'inline';
+            document.getElementById("plantTofield").style.display = 'inline';
+            document.getElementById("regionFromlabel").style.display = 'inline';
+            document.getElementById("regionFromfield").style.display = 'inline';
+            document.getElementById("regionTolabel").style.display = 'inline';
+            document.getElementById("regionTofield").style.display = 'inline';
+
+            document.getElementById("locationFromlabel").style.display = 'inline'
+            document.getElementById("locationFromfield").style.display = 'inline'
+
+            document.getElementById("locationTolabel").style.display = 'inline'
+            document.getElementById("locationTofield").style.display = 'inline'
+
+            //document.getElementById("divMore").style.display = 'none'
+        }
+        else if (level == 1) {
+
+            document.getElementById("TheFactoryFromlabel").style.display = 'inline';
+            document.getElementById("TheFactoryFromfield").style.display = 'inline';
+            document.getElementById("TheFactoryTolabel").style.display = 'inline';
+            document.getElementById("TheFactoryTofield").style.display = 'inline';
+            document.getElementById("plantFromlabel").style.display = 'inline';
+            document.getElementById("plantFromfield").style.display = 'inline';
+            document.getElementById("plantTolabel").style.display = 'inline';
+            document.getElementById("plantTofield").style.display = 'inline';
+            document.getElementById("regionFromlabel").style.display = 'inline';
+            document.getElementById("regionFromfield").style.display = 'inline';
+            document.getElementById("regionTolabel").style.display = 'inline';
+            document.getElementById("regionTofield").style.display = 'inline';
+
+            document.getElementById("locationFromlabel").style.display = 'none';
+            document.getElementById("locationFromfield").style.display = 'none';
+
+            document.getElementById("locationTolabel").style.display = 'none';
+            document.getElementById("locationTofield").style.display = 'none';
+        }
+        else if (level == 2) {
+
+            document.getElementById("TheFactoryFromlabel").style.display = 'inline';
+            document.getElementById("TheFactoryFromfield").style.display = 'inline';
+            document.getElementById("TheFactoryTolabel").style.display = 'inline';
+            document.getElementById("TheFactoryTofield").style.display = 'inline';
+            document.getElementById("plantFromlabel").style.display = 'inline';
+            document.getElementById("plantFromfield").style.display = 'inline';
+            document.getElementById("plantTolabel").style.display = 'inline';
+            document.getElementById("plantTofield").style.display = 'inline';
+            document.getElementById("regionFromlabel").style.display = 'none';
+            document.getElementById("regionFromfield").style.display = 'none';
+            document.getElementById("regionTolabel").style.display = 'none';
+            document.getElementById("regionTofield").style.display = 'none';
+            document.getElementById("locationFromlabel").style.display = 'none';
+            document.getElementById("locationFromfield").style.display = 'none';
+            document.getElementById("locationTolabel").style.display = 'none';
+            document.getElementById("locationTofield").style.display = 'none';
+        }
+        else if (level == 3) {
+
+            document.getElementById("TheFactoryFromlabel").style.display = 'inline';
+            document.getElementById("TheFactoryFromfield").style.display = 'inline';
+            document.getElementById("TheFactoryTolabel").style.display = 'inline';
+            document.getElementById("TheFactoryTofield").style.display = 'inline';
+
+            document.getElementById("plantFromlabel").style.display = 'none';
+            document.getElementById("plantFromfield").style.display = 'none';
+            document.getElementById("plantTolabel").style.display = 'none';
+            document.getElementById("plantTofield").style.display = 'none';
+            document.getElementById("regionFromlabel").style.display = 'none';
+            document.getElementById("regionFromfield").style.display = 'none';
+            document.getElementById("regionTolabel").style.display = 'none';
+            document.getElementById("regionTofield").style.display = 'none';
+            document.getElementById("locationFromlabel").style.display = 'none';
+            document.getElementById("locationFromfield").style.display = 'none';
+            document.getElementById("locationTolabel").style.display = 'none';
+            document.getElementById("locationTofield").style.display = 'none';
+        }
+
+
+    }
+
+    function TypeLocationclick(ths) {
+        if (ths.value == "0") {
+            document.getElementById("Levellabel").style.display = 'inline';
+            document.getElementById("Levelfield").style.display = 'inline';
+            document.getElementById("TheFactoryFromlabel").style.display = 'inline';
+            document.getElementById("TheFactoryFromfield").style.display = 'inline';
+            document.getElementById("TheFactoryTolabel").style.display = 'inline';
+            document.getElementById("TheFactoryTofield").style.display = 'inline';
+            document.getElementById("plantFromlabel").style.display = 'inline';
+            document.getElementById("plantFromfield").style.display = 'inline';
+            document.getElementById("plantTolabel").style.display = 'inline';
+            document.getElementById("plantTofield").style.display = 'inline';
+            document.getElementById("regionFromlabel").style.display = 'inline';
+            document.getElementById("regionFromfield").style.display = 'inline';
+            document.getElementById("regionTolabel").style.display = 'inline';
+            document.getElementById("regionTofield").style.display = 'inline';
+            document.getElementById("locationFromlabel").style.display = 'inline';
+            document.getElementById("locationFromfield").style.display = 'inline';
+            document.getElementById("locationTolabel").style.display = 'inline';
+            document.getElementById("locationTofield").style.display = 'inline';
+
+            document.getElementById("SAPLocationlabel").style.display = "none";
+            document.getElementById("SAPLocationfield").style.display = "none";
+            
+       
+            
+        }
+        else {
+
+            document.getElementById("Levellabel").style.display = 'none';
+            document.getElementById("Levelfield").style.display = 'none';
+            document.getElementById("TheFactoryFromlabel").style.display = 'none';
+            document.getElementById("TheFactoryFromfield").style.display = 'none';
+            document.getElementById("TheFactoryTolabel").style.display = 'none';
+            document.getElementById("TheFactoryTofield").style.display = 'none';
+            document.getElementById("plantFromlabel").style.display = 'none';
+            document.getElementById("plantFromfield").style.display = 'none';
+            document.getElementById("plantTolabel").style.display = 'none';
+            document.getElementById("plantTofield").style.display = 'none';
+            document.getElementById("regionFromlabel").style.display = 'none';
+            document.getElementById("regionFromfield").style.display = 'none';
+            document.getElementById("regionTolabel").style.display = 'none';
+            document.getElementById("regionTofield").style.display = 'none';
+            document.getElementById("locationFromlabel").style.display = 'none';
+            document.getElementById("locationFromfield").style.display = 'none';
+            document.getElementById("locationTolabel").style.display = 'none';
+            document.getElementById("locationTofield").style.display = 'none';
+            document.getElementById("SAPLocationlabel").style.display = "inline";
+            document.getElementById("SAPLocationfield").style.display = "inline";
+
+          
+        }
+    }
+</script>
+<fieldset>
+    @using (Html.BeginForm("List", "HistoryInventory"))
+    {
+        <div class="search">
+            <div class="search-label">
+                <label>
+                    
+                    @Resources.Report.HistoryInventoryView.HistoryInventoryView_TypeLocation
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.RadioButton("TypeLocation", 0, TempData["HistoryInventorySearchModel"] != null ? (((HistoryInventorySearchModel)TempData["HistoryInventorySearchModel"]).TypeLocation == "0" ? true : false) : false, new { onclick = "TypeLocationclick(this)" })LES库位
+                @Html.RadioButton("TypeLocation", 1, TempData["HistoryInventorySearchModel"] != null ? (((HistoryInventorySearchModel)TempData["HistoryInventorySearchModel"]).TypeLocation == "1" ? true : false) : false, new { onclick = "TypeLocationclick(this)" })SAP库位
+            </div>
+            @{
+        if (((HistoryInventorySearchModel)TempData["HistoryInventorySearchModel"]).TypeLocation == "1")
+           {  
+                <div class="search-label" id="SAPLocationlabel">
+                    <label>
+                     @Resources.Report.HistoryInventoryView.HistoryInventoryView_SAPLocation
+                       
+                    </label>
+                </div>
+                <div class="search-field" id="SAPLocationfield">
+                    @{
+               Html.RenderAction("_SAPLocationComboBox", "Common", new
+               {
+
+                   controlName = "SAPLocation",
+                   isChange = false,
+                   selectedValue = TempData["HistoryInventorySearchModel"] != null ? ((HistoryInventorySearchModel)TempData["HistoryInventorySearchModel"]).SAPLocation : string.Empty
+               });
+                    
+                    }
+                </div>
+           }
+           else
+           {
+                <div class="search-label" style="display:none" id="SAPLocationlabel">
+                    <label>
+                       @Resources.Report.HistoryInventoryView.HistoryInventoryView_SAPLocation
+                    </label>
+                </div>
+                <div class="search-field"  style="display:none"  id="SAPLocationfield">
+                    @{
+               Html.RenderAction("_SAPLocationComboBox", "Common", new
+               {
+
+                   controlName = "SAPLocation",
+                   isChange = false,
+                   selectedValue = TempData["HistoryInventorySearchModel"] != null ? ((HistoryInventorySearchModel)TempData["HistoryInventorySearchModel"]).SAPLocation : string.Empty
+               });
+                    
+                    }
+                </div>
+        
+           }
+          
+            }
+            @{
+        if (((HistoryInventorySearchModel)TempData["HistoryInventorySearchModel"]).TypeLocation == "0")
+           {  
+                <div class="search-label" id="Levellabel">
+                    <label>
+                        @Resources.Report.HistoryInventoryView.HistoryInventoryView_Level
+                    </label>
+                </div>
+                <div class="search-field" id="Levelfield">
+                    @{
+                   Html.RenderAction("_CodeMasterComboBox", "Common", new
+                   {
+                       code = com.Sconit.CodeMaster.CodeMaster.LocationLevel,
+                       controlName = "Level",
+                       isChange = true,
+                       selectedValue = TempData["HistoryInventorySearchModel"] != null ? ((HistoryInventorySearchModel)TempData["HistoryInventorySearchModel"]).Level : string.Empty
+
+                   });
+                    
+                    }
+                </div>
+           }
+           else
+           {
+            
+                <div class="search-label" id="Levellabel" style="display: none">
+                    <label>
+                        @Resources.Report.HistoryInventoryView.HistoryInventoryView_Level
+                    </label>
+                </div>
+                <div class="search-field" id="Levelfield" style="display: none">
+                    @{
+      
+                   Html.RenderAction("_CodeMasterComboBox", "Common", new
+                   {
+                       code = com.Sconit.CodeMaster.CodeMaster.LocationLevel,
+                       controlName = "Level",
+                       isChange = true,
+                       selectedValue = TempData["HistoryInventorySearchModel"] != null ? ((HistoryInventorySearchModel)TempData["HistoryInventorySearchModel"]).Level : string.Empty
+
+                   });
+                    
+                    }
+                </div>
+           }
+            }
+            @{
+           if (((HistoryInventorySearchModel)TempData["HistoryInventorySearchModel"]).TypeLocation == "0")
+           {   
+                <div class="search-label" id="TheFactoryFromlabel">
+                    <label>
+                        @Resources.Report.HistoryInventoryView.HistoryInventoryView_TheFactoryFrom
+                    </label>
+                </div>
+                <div class="search-field" id="TheFactoryFromfield">
+                    @Html.TextBox("TheFactoryFrom", TempData["HistoryInventorySearchModel"] != null ? ((HistoryInventorySearchModel)TempData
+
+["HistoryInventorySearchModel"]).TheFactoryFrom : string.Empty)
+                </div>
+                <div class="search-label" id="TheFactoryTolabel">
+                    <label>
+                        @Resources.Report.HistoryInventoryView.HistoryInventoryView_TheFactoryTo
+                    </label>
+                </div>
+                <div class="search-field" id="TheFactoryTofield">
+                    @Html.TextBox("TheFactoryTo", TempData["HistoryInventorySearchModel"] != null ? ((HistoryInventorySearchModel)TempData
+
+["HistoryInventorySearchModel"]).TheFactoryTo : string.Empty)
+                </div>
+           }
+           else
+           {
+           
+                <div class="search-label" id="TheFactoryFromlabel" style="display: none">
+                    <label>
+                        @Resources.Report.HistoryInventoryView.HistoryInventoryView_TheFactoryFrom
+                    </label>
+                </div>
+                <div class="search-field" id="TheFactoryFromfield" style="display: none">
+                    @Html.TextBox("TheFactoryFrom", TempData["HistoryInventorySearchModel"] != null ? ((HistoryInventorySearchModel)TempData["HistoryInventorySearchModel"]).TheFactoryFrom : string.Empty)
+                </div>
+                <div class="search-label" id="TheFactoryTolabel" style="display: none">
+                    <label>
+                        @Resources.Report.HistoryInventoryView.HistoryInventoryView_TheFactoryTo
+                    </label>
+                </div>
+                <div class="search-field" id="TheFactoryTofield" style="display: none">
+                    @Html.TextBox("TheFactoryTo", TempData["HistoryInventorySearchModel"] != null ? ((HistoryInventorySearchModel)TempData["HistoryInventorySearchModel"]).TheFactoryTo : string.Empty)
+                </div>
+           
+           }
+            }
+            @{
+        if (((HistoryInventorySearchModel)TempData["HistoryInventorySearchModel"]).TypeLocation == "0" && (TempData["Display"] == null || (string)TempData["Display"] == "1" || (string)TempData["Display"] == "0" ||
+          (string)TempData["Display"] == "2"))
+           {   
+                <div class="search-label" id="plantFromlabel">
+                    <label>
+                        @Resources.Report.HistoryInventoryView.HistoryInventoryView_PlantFrom
+                    </label>
+                </div>
+                <div class="search-field" id="plantFromfield">
+                    @{
+                   Html.RenderAction("_RegionWorkShopComboBox", "Common",
+                          new
+                          {
+                              controlName = "plantFrom",
+                              selectedValue = TempData["HistoryInventorySearchModel"] != null ? ((HistoryInventorySearchModel)TempData["HistoryInventorySearchModel"]).plantFrom : string.Empty
+                          });
+                    }
+                </div>
+                <div class="search-label" id="plantTolabel">
+                    <label>
+                        @Resources.Report.HistoryInventoryView.HistoryInventoryView_PlantTo
+                    </label>
+                </div>
+                <div class="search-field" id="plantTofield">
+                    @{
+                   Html.RenderAction("_RegionWorkShopComboBox", "Common",
+                          new
+                          {
+                              controlName = "plantTo",
+                              selectedValue = TempData["HistoryInventorySearchModel"] != null ? ((HistoryInventorySearchModel)TempData["HistoryInventorySearchModel"]).plantTo : string.Empty
+                          });
+                    }
+                </div>
+           }
+           else
+           {
+            
+                <div class="search-label" id="plantFromlabel" style="display: none">
+                    <label>
+                        @Resources.Report.HistoryInventoryView.HistoryInventoryView_PlantFrom
+                    </label>
+                </div>
+                <div class="search-field" id="plantFromfield" style="display: none">
+                    @{
+                   Html.RenderAction("_RegionWorkShopComboBox", "Common",
+                          new
+                          {
+                              controlName = "plantFrom",
+                              selectedValue = TempData["HistoryInventorySearchModel"] != null ? ((HistoryInventorySearchModel)TempData
+
+["HistoryInventorySearchModel"]).plantFrom : string.Empty
+                          });
+                    }
+                </div>
+                <div class="search-label" id="plantTolabel" style="display: none">
+                    <label>
+                        @Resources.Report.HistoryInventoryView.HistoryInventoryView_PlantTo
+                    </label>
+                </div>
+                <div class="search-field" id="plantTofield" style="display: none">
+                    @{
+                   Html.RenderAction("_RegionWorkShopComboBox", "Common",
+                          new
+                          {
+                              controlName = "plantTo",
+
+                              selectedValue = TempData["HistoryInventorySearchModel"] != null ? ((HistoryInventorySearchModel)TempData
+
+["HistoryInventorySearchModel"]).plantTo : string.Empty
+                          });
+                    }
+                </div>
+
+            
+           }
+            }
+            @{
+        if (((HistoryInventorySearchModel)TempData["HistoryInventorySearchModel"]).TypeLocation == "0" && (TempData["Display"] == null || (string)TempData["Display"] == "1" || (string)TempData["Display"] == "0"))
+           {      
+                <div class="search-label" id="regionFromlabel">
+                    <label>
+                        @Resources.Report.HistoryInventoryView.HistoryInventoryView_RegionFrom
+                    </label>
+                </div>
+                <div class="search-field" id="regionFromfield">
+                    @{
+                   Html.RenderAction("_RegionComboBox", "Common",
+                       new
+                       {
+                           controlName = "regionFrom",
+                           selectedValue = TempData["HistoryInventorySearchModel"] != null ? ((HistoryInventorySearchModel)TempData
+
+["HistoryInventorySearchModel"]).regionFrom : string.Empty
+                       });
+                    }
+                </div>
+        
+                <div class="search-label" id="regionTolabel">
+                    <label>
+                        @Resources.Report.HistoryInventoryView.HistoryInventoryView_RegionTo
+                    </label>
+                </div>
+                <div class="search-field" id="regionTofield">
+                    @{
+                   Html.RenderAction("_RegionComboBox", "Common",
+                                 new
+                                 {
+                                     controlName = "regionTo",
+                                     selectedValue = TempData["HistoryInventorySearchModel"] != null ? ((HistoryInventorySearchModel)TempData
+
+["HistoryInventorySearchModel"]).regionTo : string.Empty
+                                 });
+                    }
+                </div>
+           }
+           else
+           {
+                <div class="search-label" id="regionFromlabel" style="display: none">
+                    <label>
+                        @Resources.Report.HistoryInventoryView.HistoryInventoryView_RegionFrom
+                    </label>
+                </div>
+                <div class="search-field" id="regionFromfield" style="display: none">
+                    @{
+                   Html.RenderAction("_RegionComboBox", "Common",
+                       new
+                       {
+                           controlName = "regionFrom",
+                           selectedValue = TempData["HistoryInventorySearchModel"] != null ? ((HistoryInventorySearchModel)TempData
+
+["HistoryInventorySearchModel"]).regionFrom : string.Empty
+                       });
+                    }
+                </div>
+        
+                <div class="search-label" id="regionTolabel" style="display: none">
+                    <label>
+                        @Resources.Report.HistoryInventoryView.HistoryInventoryView_RegionTo
+                    </label>
+                </div>
+                <div class="search-field" id="regionTofield" style="display: none">
+                    @{
+                   Html.RenderAction("_RegionComboBox", "Common",
+                                 new
+                                 {
+                                     controlName = "regionTo",
+                                     selectedValue = TempData["HistoryInventorySearchModel"] != null ? ((HistoryInventorySearchModel)TempData
+
+["HistoryInventorySearchModel"]).regionTo : string.Empty
+                                 });
+                    }
+                </div>
+            
+            
+           }
+            }
+            @{
+        if (((HistoryInventorySearchModel)TempData["HistoryInventorySearchModel"]).TypeLocation == "0" && ((string)TempData["Display"] == "0" || TempData["Display"] == null))
+           {  
+       
+                <div class="search-label" id="locationFromlabel">
+                    <label>
+                        @Resources.Report.HistoryInventoryView.HistoryInventoryView_LocationFrom
+                    </label>
+                </div>
+                <div class="search-field" id="locationFromfield">
+                    @{
+                   Html.RenderAction("_LocationComboBox", "Common", new
+                   {
+                       controlName = "locationFrom",
+                       selectedValue = TempData["HistoryInventorySearchModel"] != null ? ((HistoryInventorySearchModel)TempData
+
+["HistoryInventorySearchModel"]).locationFrom : string.Empty
+
+                   });
+                    }
+                </div>
+                <div class="search-label" id="locationTolabel">
+                    <label for="Hu_HuId">
+                        @Resources.Report.HistoryInventoryView.HistoryInventoryView_LocationTo
+                    </label>
+                </div>
+                <div class="search-field" id="locationTofield">
+                    @{
+                   Html.RenderAction("_LocationComboBox", "Common", new
+                   {
+                       controlName = "locationTo",
+
+                       selectedValue = TempData["HistoryInventorySearchModel"] != null ? ((HistoryInventorySearchModel)TempData
+
+["HistoryInventorySearchModel"]).locationTo : string.Empty
+
+                   });
+                    }
+                </div>
+           }
+           else
+           {
+                <div class="search-label" id="locationFromlabel" style="display: none">
+                    <label>
+                        @Resources.Report.HistoryInventoryView.HistoryInventoryView_LocationFrom
+                    </label>
+                </div>
+                <div class="search-field" id="locationFromfield" style="display: none">
+                    @{
+                   Html.RenderAction("_LocationComboBox", "Common", new
+                   {
+                       controlName = "locationFrom",
+                       selectedValue = TempData["HistoryInventorySearchModel"] != null ? ((HistoryInventorySearchModel)TempData
+
+["HistoryInventorySearchModel"]).locationFrom : string.Empty
+
+                   });
+                    }
+                </div>
+                <div class="search-label" id="locationTolabel" style="display: none">
+                    <label for="Hu_HuId">
+                        @Resources.Report.HistoryInventoryView.HistoryInventoryView_LocationTo
+                    </label>
+                </div>
+                <div class="search-field" id="locationTofield" style="display: none">
+                    @{
+                   Html.RenderAction("_LocationComboBox", "Common", new
+                   {
+                       controlName = "locationTo",
+
+                       selectedValue = TempData["HistoryInventorySearchModel"] != null ? ((HistoryInventorySearchModel)TempData
+
+["HistoryInventorySearchModel"]).locationTo : string.Empty
+
+                   });
+                    }
+                </div>
+           }
+            }
+            <div class="search-label">
+                <label>
+                    @Resources.Report.HistoryInventoryView.HistoryInventoryView_ItemFrom
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+               Html.RenderAction("_ItemComboBox", "Common",
+                   new
+                   {
+                       controlName = "itemFrom",
+                       selectedValue = TempData["HistoryInventorySearchModel"] != null ? ((HistoryInventorySearchModel)TempData["HistoryInventorySearchModel"]).itemFrom : string.Empty
+                   });
+                    
+                }
+            </div>
+            <div class="search-label">
+                <label for="Hu_HuId">
+                    @Resources.Report.HistoryInventoryView.HistoryInventoryView_ItemTo
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+               Html.RenderAction("_ItemComboBox", "Common",
+                   new
+                   {
+                       controlName = "itemTo",
+                       selectedValue = TempData["HistoryInventorySearchModel"] != null ? ((HistoryInventorySearchModel)TempData["HistoryInventorySearchModel"]).itemTo : string.Empty
+                   });
+                    
+                }
+            </div>
+            <div class="search-label">
+                <label>
+                    @Resources.Report.HistoryInventoryView.HistoryInventoryView_HistoryDate
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DatePicker()
+                .Format(com.Sconit.Entity.BusinessConstants.SHORT_DATE_FORMAT)
+                .Name("HistoryDate")
+.Value(TempData["HistoryInventorySearchModel"] != null ? ((HistoryInventorySearchModel)TempData["HistoryInventorySearchModel"]).HistoryDate : System.DateTime.Today)
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+            </div>
+          
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            <button type="submit" id="btnSearch">
+                @Resources.Global.Button_Search</button>
+           
+        </div>
+
+    }
+</fieldset>

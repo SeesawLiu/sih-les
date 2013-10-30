@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://com.Sconit.WebService.FIS.FISService/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://com.Sconit.WebService.FIS.FISService/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://com.Sconit.WebService.FIS.FISService/">
+      <s:element name="CreateLog">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="lesINLog" type="tns:LesINLog" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="LesINLog">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:EntityBase">
+            <s:sequence>
+              <s:element minOccurs="1" maxOccurs="1" name="ShipQty" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="ReceivedQty" type="s:decimal" />
+              <s:element minOccurs="0" maxOccurs="1" name="LocTo" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ReceiptStatus" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="Id" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="Type" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="MoveType" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Sequense" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="PO" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="POLine" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="WMSNo" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="WMSLine" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="HandTime" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Item" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="HandResult" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ErrorCause" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="IsCreateDat" type="s:boolean" />
+              <s:element minOccurs="0" maxOccurs="1" name="FileName" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ASNNo" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ExtNo" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="Qty" nillable="true" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="QtyMark" nillable="true" type="s:boolean" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="EntityBase" />
+      <s:element name="CreateLogResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="SelectLesINLogByWmsNo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="selectSql" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="param" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SelectLesINLogByWmsNoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SelectLesINLogByWmsNoResult" type="tns:LesINLog" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdateLog">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="lesINLog" type="tns:LesINLog" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdateLogResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="Export">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="systemCodeList" type="tns:ArrayOfString" />
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfString">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="ExportResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="TestExport">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="systemCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TestExportResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="Import">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ImportResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="UploadFile">
+        <s:complexType />
+      </s:element>
+      <s:element name="UploadFileResponse">
+        <s:complexType />
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="CreateLogSoapIn">
+    <wsdl:part name="parameters" element="tns:CreateLog" />
+  </wsdl:message>
+  <wsdl:message name="CreateLogSoapOut">
+    <wsdl:part name="parameters" element="tns:CreateLogResponse" />
+  </wsdl:message>
+  <wsdl:message name="SelectLesINLogByWmsNoSoapIn">
+    <wsdl:part name="parameters" element="tns:SelectLesINLogByWmsNo" />
+  </wsdl:message>
+  <wsdl:message name="SelectLesINLogByWmsNoSoapOut">
+    <wsdl:part name="parameters" element="tns:SelectLesINLogByWmsNoResponse" />
+  </wsdl:message>
+  <wsdl:message name="UpdateLogSoapIn">
+    <wsdl:part name="parameters" element="tns:UpdateLog" />
+  </wsdl:message>
+  <wsdl:message name="UpdateLogSoapOut">
+    <wsdl:part name="parameters" element="tns:UpdateLogResponse" />
+  </wsdl:message>
+  <wsdl:message name="ExportSoapIn">
+    <wsdl:part name="parameters" element="tns:Export" />
+  </wsdl:message>
+  <wsdl:message name="ExportSoapOut">
+    <wsdl:part name="parameters" element="tns:ExportResponse" />
+  </wsdl:message>
+  <wsdl:message name="TestExportSoapIn">
+    <wsdl:part name="parameters" element="tns:TestExport" />
+  </wsdl:message>
+  <wsdl:message name="TestExportSoapOut">
+    <wsdl:part name="parameters" element="tns:TestExportResponse" />
+  </wsdl:message>
+  <wsdl:message name="ImportSoapIn">
+    <wsdl:part name="parameters" element="tns:Import" />
+  </wsdl:message>
+  <wsdl:message name="ImportSoapOut">
+    <wsdl:part name="parameters" element="tns:ImportResponse" />
+  </wsdl:message>
+  <wsdl:message name="UploadFileSoapIn">
+    <wsdl:part name="parameters" element="tns:UploadFile" />
+  </wsdl:message>
+  <wsdl:message name="UploadFileSoapOut">
+    <wsdl:part name="parameters" element="tns:UploadFileResponse" />
+  </wsdl:message>
+  <wsdl:portType name="FISServiceSoap">
+    <wsdl:operation name="CreateLog">
+      <wsdl:input message="tns:CreateLogSoapIn" />
+      <wsdl:output message="tns:CreateLogSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SelectLesINLogByWmsNo">
+      <wsdl:input message="tns:SelectLesINLogByWmsNoSoapIn" />
+      <wsdl:output message="tns:SelectLesINLogByWmsNoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateLog">
+      <wsdl:input message="tns:UpdateLogSoapIn" />
+      <wsdl:output message="tns:UpdateLogSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="Export">
+      <wsdl:input message="tns:ExportSoapIn" />
+      <wsdl:output message="tns:ExportSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="TestExport">
+      <wsdl:input message="tns:TestExportSoapIn" />
+      <wsdl:output message="tns:TestExportSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="Import">
+      <wsdl:input message="tns:ImportSoapIn" />
+      <wsdl:output message="tns:ImportSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="UploadFile">
+      <wsdl:input message="tns:UploadFileSoapIn" />
+      <wsdl:output message="tns:UploadFileSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="FISServiceSoap" type="tns:FISServiceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="CreateLog">
+      <soap:operation soapAction="http://com.Sconit.WebService.FIS.FISService/CreateLog" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SelectLesINLogByWmsNo">
+      <soap:operation soapAction="http://com.Sconit.WebService.FIS.FISService/SelectLesINLogByWmsNo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateLog">
+      <soap:operation soapAction="http://com.Sconit.WebService.FIS.FISService/UpdateLog" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Export">
+      <soap:operation soapAction="http://com.Sconit.WebService.FIS.FISService/Export" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TestExport">
+      <soap:operation soapAction="http://com.Sconit.WebService.FIS.FISService/TestExport" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Import">
+      <soap:operation soapAction="http://com.Sconit.WebService.FIS.FISService/Import" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UploadFile">
+      <soap:operation soapAction="http://com.Sconit.WebService.FIS.FISService/UploadFile" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="FISServiceSoap12" type="tns:FISServiceSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="CreateLog">
+      <soap12:operation soapAction="http://com.Sconit.WebService.FIS.FISService/CreateLog" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SelectLesINLogByWmsNo">
+      <soap12:operation soapAction="http://com.Sconit.WebService.FIS.FISService/SelectLesINLogByWmsNo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateLog">
+      <soap12:operation soapAction="http://com.Sconit.WebService.FIS.FISService/UpdateLog" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Export">
+      <soap12:operation soapAction="http://com.Sconit.WebService.FIS.FISService/Export" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TestExport">
+      <soap12:operation soapAction="http://com.Sconit.WebService.FIS.FISService/TestExport" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Import">
+      <soap12:operation soapAction="http://com.Sconit.WebService.FIS.FISService/Import" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UploadFile">
+      <soap12:operation soapAction="http://com.Sconit.WebService.FIS.FISService/UploadFile" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="FISService">
+    <wsdl:port name="FISServiceSoap" binding="tns:FISServiceSoap">
+      <soap:address location="http://localhost:1122/WebService/FISService.asmx" />
+    </wsdl:port>
+    <wsdl:port name="FISServiceSoap12" binding="tns:FISServiceSoap12">
+      <soap12:address location="http://localhost:1122/WebService/FISService.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

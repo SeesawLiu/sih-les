@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://com.Sconit.SDService" elementFormDefault="qualified" targetNamespace="http://com.Sconit.SDService" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:8080/IPService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/com.Sconit.SDEntity" />
+  <xs:element name="ScanOrderNo">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="orderNo" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ScanOrderNoResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/com.Sconit.SDEntity" minOccurs="0" name="ScanOrderNoResult" nillable="true" type="q1:ArrayOfOrderDetail" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ScanHu">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="huId" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ScanHuResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ScanHuResult" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CancelHu">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CancelHuResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="CancelHuResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetHu">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="huId" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetHuResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/com.Sconit.SDEntity" minOccurs="0" name="GetHuResult" nillable="true" type="q2:Hu" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

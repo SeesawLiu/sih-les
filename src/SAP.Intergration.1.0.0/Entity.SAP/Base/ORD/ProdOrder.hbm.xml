@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.SAP.ORD.ProdOrder, com.Sconit.Entity.SAP" table="SAP_ProdOrder" lazy="false">
+        <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+            <generator class="identity" />
+        </id>
+        <property name="AUFNR" column="AUFNR" type="String" length="50"/>
+        <property name="CHARG" column="CHARG" type="String" length="50"/>	
+		<property name="DWERK" column="DWERK" type="String" length="50"/>	
+		<property name="DAUAT" column="DAUAT" type="String" length="50"/>	
+		<property name="MATNR" column="MATNR" type="String" length="50"/>	
+		<property name="MAKTX" column="MAKTX" type="String" length="100"/>	
+		<property name="ZLINE" column="ZLINE" type="String" length="50"/>	
+		<property name="GSTRS" column="GSTRS" type="String" length="10"/>	
+		<property name="CY_SEQNR" column="CY_SEQNR" type="String" length="20"/>	
+		<property name="GMEIN" column="GMEIN" type="String" length="5"/>	
+		<property name="GAMNG" column="GAMNG" type="Decimal"/>	
+		<property name="LGORT" column="LGORT" type="String" length="50"/>	
+		<property name="ERDAT" column="ERDAT" type="String" length="10"/>
+        <property name="AEDAT" column="AEDAT" type="String" length="10"/>
+        <property name="LTEXT" column="LTEXT" type="String" length="100"/>
+        <property name="Status" column="Status"/>	
+		<property name="CreateDate" column="CreateDate" type="DateTime" update="false"/>	
+		<property name="LastModifyDate" column="LastModifyDate" type="DateTime"/>	
+		<property name="ErrorCount" column="ErrorCount" type="Int32"/>
+        <property name="WORKCENTER" column="WORKCENTER" type="String" length="10"/>
+  	</class>
+</hibernate-mapping>

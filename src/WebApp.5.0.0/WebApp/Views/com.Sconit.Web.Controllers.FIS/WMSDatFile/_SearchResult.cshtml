@@ -1,0 +1,70 @@
+﻿@model IEnumerable<com.Sconit.Entity.FIS.WMSDatFile>
+<fieldset>
+   <script type="text/javascript">
+       function WMSDatFileGrid_OnDataBinding(e) {
+           e.data = {
+               OrderNo: $("#OrderNo").val(),
+               WmsPickNo: $("#WmsPickNo").val(),
+               MoveType: $("#MoveType").val(),
+               WMSId: $("#WMSId").val(),
+               Item: $("#Item").val(),
+               LGORT:$("#LGORT").val(),
+               UMLGO: $("#UMLGO").val(),
+               StartDate: $("#StartDate").val(),
+               EndDate: $("#EndDate").val(),
+               IsClsoe: $("#IsClsoe").is(":checked"),
+               IsNoneOut: $("#IsNoneOut").is(":checked"),
+               PartyTo: $("#PartyTo").val(),
+               PartyFrom: $("#PartyFrom").val(),
+               OrderStrategy: $("#OrderStrategy").val()
+           };
+       } 
+    </script>
+    @(Html.Telerik().Grid(Model)
+                        .Name("WMSDatFileGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.OrderNo);
+            columns.Bound(o => o.OrderStrategyDescription);
+            columns.Bound(o => o.PartyFrom).Title("发货区域");
+            columns.Bound(o => o.PartyTo);
+            columns.Bound(o => o.Item);
+            columns.Bound(o => o.ReferenceItemCode);
+            columns.Bound(o => o.ItemDescription);
+            columns.Bound(o => o.Uom);
+            
+            columns.Bound(o => o.OrderQty);
+            columns.Bound(o => o.Qty);
+            columns.Bound(o => o.ReceiveTotal);
+            columns.Bound(o => o.CancelQty);
+            columns.Bound(o => o.WindowTime);
+            columns.Bound(o => o.RequirementDate);
+            columns.Bound(o => o.CreateDateFormat);
+            columns.Bound(o => o.WmsNo);
+            columns.Bound(o => o.MoveType);
+            columns.Bound(o => o.WMSId);
+            columns.Bound(o => o.LGORT);
+            columns.Bound(o => o.UMLGO);
+            
+
+
+        })
+
+        .Scrollable(c => c.Enabled(false))
+        .EnableCustomBinding(true)
+                                .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxList", "WMSDatFile"))
+                                .ClientEvents(events => events.OnDataBinding("WMSDatFileGrid_OnDataBinding"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(ViewBag.PageSize);
+        })
+                .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+    )
+ 
+</fieldset>

@@ -1,0 +1,81 @@
+﻿
+@model IEnumerable<com.Sconit.Entity.KB.KanbanScan>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("KanbanScanGrid")
+                .DataKeys(keys =>
+                {
+                    keys.Add(p => p.Id);
+                })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.CardNo)
+                .ClientTemplate("<input type='checkbox' id='checkedRecords' name='checkedRecords' value='<#= Id #>' onClick='showButtons()'  />")
+                .HeaderTemplate("<input type='checkbox' id='checkAll' name='checkAll' />")
+                .Width(36).HtmlAttributes(new { style = "text-align:center" });
+            columns.Bound(o => o.Id).Hidden();
+            columns.Bound(o => o.CardNo).ClientTemplate(Html.ActionLink("<#= CardNo #>", "Edit", "KanbanScan", new { ID = "<#= Id #>" }, null).ToString()); 
+            columns.Bound(o => o.Sequence);
+            columns.Bound(o => o.Supplier);
+            columns.Bound(o => o.Flow);
+            columns.Bound(o => o.SupplierName);
+            columns.Bound(o => o.Item);
+            columns.Bound(o => o.ReferenceItemCode);
+            columns.Bound(o => o.ItemDescription);
+            columns.Bound(o => o.ScanQty);
+            columns.Bound(o => o.ScanTime);
+            columns.Bound(o => o.ScanUserName);
+            columns.Bound(o => o.OrderTime);
+            columns.Bound(o => o.OrderUserName);
+            columns.Bound(o => o.OrderQty);
+            columns.Bound(o => o.KanbanNo);
+
+        })
+        .Scrollable(c => c.Enabled(false))
+        .EnableCustomBinding(true)
+        .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxList", "KanbanScan"))
+                .ClientEvents(events => events.OnDataBinding("KanbanScanGrid_OnDataBinding"))
+        .Pageable(settings => 
+        {
+            settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+            settings.PageSize(ViewBag.PageSize);
+        })
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+    )
+    <script type="text/javascript">
+        $(function () {
+            $("#checkAll").click(function () {
+                $('input[name="checkedRecords"]').attr("checked", this.checked);
+                $("#btnDel").attr("style", this.checked ? "display:inline" : "display:none");
+            });
+        });
+
+        function showButtons() {
+            var $checkRecords = $("input[name='checkedRecords']");
+            var showButton = false;
+            for (var i = 0; i < $checkRecords.length; i++) {
+                if ($checkRecords[i].checked) {
+                    showButton = true;
+                    break;
+                }
+            }
+            $("#checkAll").attr("checked", $checkRecords.length == $("input[name='checkedRecords']:checked").length ? true : false);
+            $("#btnDel").attr("style", showButton ? "display:inline" : "display:none");
+        };
+
+        function KanbanScanGrid_OnDataBinding(e) {
+            e.data = {
+                CardNo: $('#CardNo').val(),
+                Item: $('#Item').val(),
+                Supplier: $('#Supplier').val(),
+//                LcCode: $('#LcCode').val(),
+                StartDate: $('#StartDate').val(),
+                EndDate: $('#EndDate').val(),
+                IsNotOrdered: $('#IsNotOrdered').is(':checked')
+//                IsTempKanbanCard: $('#IsTempKanbanCard').is(':checked'),
+//                TempKanbanCard: $("#TempKanbanCard").val()
+            };
+        } 
+    </script>
+</fieldset>

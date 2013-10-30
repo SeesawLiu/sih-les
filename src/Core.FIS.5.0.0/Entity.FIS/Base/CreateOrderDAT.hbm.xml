@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.FIS.CreateOrderDAT, com.Sconit.Entity.FIS" table="FIS_CreateOrderDAT" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+    <property name="OrderNo" column="OrderNo" type="String" length="50"/>
+    <property name="MATNR" column="MATNR" type="String" length="50"/>
+    <property name="LIFNR" column="LIFNR" type="String" length="50"/>
+    <property name="ENMNG" column="ENMNG" type="String" length="50"/>
+    <property name="CHARG" column="CHARG" type="String" length="50"/>
+    <property name="COLOR" column="COLOR" type="String" length="50"/>
+    <property name="TIME_STAMP" column="TIME_STAMP" type="String" length="50"/>
+    <property name="CY_SEQNR" column="CY_SEQNR" type="String" length="50"/>
+    <property name="TIME_STAMP1" column="TIME_STAMP1" type="String" length="50"/>
+
+    <property name="AUFNR" column="AUFNR" type="String" length="50"/>
+    <property name="LGORT" column="LGORT" type="String" length="50"/>
+    <property name="UMLGO" column="UMLGO" type="String" length="50"/>
+    <property name="LGPBE" column="LGPBE" type="String" length="50"/>
+    <property name="REQ_TIME_STAMP" column="REQ_TIME_STAMP" type="String" length="50"/>
+    <property name="FLG_SORT" column="FLG_SORT" type="String" length="50"/>
+    <property name="PLNBEZ" column="PLNBEZ" type="String" length="50"/>
+    <property name="KTEXT" column="KTEXT" type="String" length="50"/>
+
+    <property name="ZPLISTNO" column="ZPLISTNO" type="String" length="50"/>
+    <property name="IsCreateDat" column="IsCreateDat" type="Boolean"/>
+    <property name="ErrorCount" column="ErrorCount" type="Int32" />
+    
+    <property name="CreateUserName" column="CreateUserNm" type="String" length="100"/>
+    <property name="FileName" column="FileName" type="String" length="50"/>
+  </class>
+</hibernate-mapping>

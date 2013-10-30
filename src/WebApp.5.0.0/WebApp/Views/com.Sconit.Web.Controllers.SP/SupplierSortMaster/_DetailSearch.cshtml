@@ -1,0 +1,92 @@
+﻿@using com.Sconit.Entity.ACC
+@using com.Sconit.Web.Models.SearchModels.ORD
+@using com.Sconit.Entity.SYS
+@using com.Sconit.Entity.ORD
+<fieldset>
+    @using (Html.BeginForm("DetailList", "SupplierSortMaster"))
+    {   
+        <div class="search">
+            <div class="search-label">
+                <label for="OrderMaster_Flow">
+                    @Resources.ORD.OrderMaster.OrderMaster_Flow
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+               Html.RenderAction("_FlowComboBox", "Common",
+                   new
+                   {
+                       controlName = "Flow",
+                       isSupplier = true,
+                       type = (int)com.Sconit.CodeMaster.OrderType.Procurement,
+                       flowstrategy = (int)com.Sconit.CodeMaster.FlowStrategy.SEQ,
+                       selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).Flow : string.Empty
+                   });
+                }
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_OrderNo">
+                    @Resources.ORD.OrderMaster.OrderMaster_OrderNo
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("OrderNo", TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).OrderNo : string.Empty)
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_DateFrom">
+                    创建日期 从
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DatePicker()
+                .Format(com.Sconit.Entity.BusinessConstants.SHORT_DATE_FORMAT)
+                .Name("DateFrom")
+             .Value(TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).DateFrom : null)
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_DateTo">
+                    至
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DatePicker()
+                .Format(com.Sconit.Entity.BusinessConstants.SHORT_DATE_FORMAT)
+                .Name("DateTo")
+                .Value(TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).DateTo : System.DateTime.Today.AddDays(1))
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_OrderNo">
+                    @Resources.ORD.OrderMaster.OrderMaster_Item
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+               Html.RenderAction("_ItemComboBox", "Common",
+                   new
+                   {
+                       controlName = "Item",
+                       selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).Item : string.Empty
+                   });
+                    
+                }
+            </div>
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            <button type="submit" id="btnSearch">
+                @Resources.Global.Button_Search</button>
+            @*<button type="button" id="btnExport" onclick="Export()">
+                @Resources.Global.Button_SearchExport</button>*@
+        </div>
+
+    }
+</fieldset>
+<script type="text/javascript">
+    function Export(e) {
+        location.href = '/SupplierSortMaster/ExportSupplierDetXLS/?OrderNo=' + $('#OrderNo').val() + '&Flow=' + $('#Flow').val()
+         + '&Item=' + $('#Item').val()
+         + '&DateFrom=' + $('#DateFrom').val() + '&DateTo=' + $('#DateTo').val();
+    }
+</script>

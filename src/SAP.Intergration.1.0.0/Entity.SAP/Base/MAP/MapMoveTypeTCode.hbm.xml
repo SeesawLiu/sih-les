@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="com.Sconit.Entity.SAP.MAP.MapMoveTypeTCode, com.Sconit.Entity.SAP" table="SAP_MapMoveTypeTCode" lazy="false">
+    <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      <generator class="identity" />
+    </id>
+    <property name="BWART" column="BWART" type="String" length="50"/>
+    <property name="SOBKZ" column="SOBKZ" type="String" length="50"/>
+    <property name="TCODE" column="TCODE" type="String" length="50"/>
+    <property name="Description" column="Description" type="String" length="100"/>
+  </class>
+</hibernate-mapping>

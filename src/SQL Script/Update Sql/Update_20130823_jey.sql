@@ -1,0 +1,1 @@
+alter table inv_hu add Bin varchar(50) null

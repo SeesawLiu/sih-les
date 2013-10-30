@@ -1,0 +1,5 @@
+G:\Project\sih-les\src\Core.5.0.0\PrintModel\bin\Debug\com.Sconit.PrintModel.dll
+G:\Project\sih-les\src\Core.5.0.0\PrintModel\bin\Debug\com.Sconit.PrintModel.pdb
+G:\Project\sih-les\src\Core.5.0.0\PrintModel\obj\Debug\ResolveAssemblyReference.cache
+G:\Project\sih-les\src\Core.5.0.0\PrintModel\obj\Debug\com.Sconit.PrintModel.dll
+G:\Project\sih-les\src\Core.5.0.0\PrintModel\obj\Debug\com.Sconit.PrintModel.pdb

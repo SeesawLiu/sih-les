@@ -1,0 +1,7 @@
+﻿@(Html.Telerik().ComboBox()
+      .Name(ViewData.TemplateInfo.GetFullHtmlFieldName(""))
+                      .DataBinding(binding => binding.Ajax().Select("_AssemblyFlowAjaxLoading", "Common").Cache(true))
+      .AutoFill(true)
+      .HighlightFirstMatch(true)
+                   .ClientEvents(events => events.OnChange("onAssemblyFlowChange").OnDataBinding("onAssemblyFlowDataBinding"))
+      )

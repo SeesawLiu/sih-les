@@ -1,0 +1,195 @@
+﻿@using com.Sconit.Web.Models.SearchModels.SCM
+@model IEnumerable<com.Sconit.Entity.SCM.FlowDetail>
+<script type="text/javascript">
+    $(function () {
+        $("#checkAll").click(function () {
+            $('input[name="checkedRecords"]').attr("checked", this.checked);
+            $("#btnPrint").attr("style", this.checked ? "display:inline" : "display:none");
+            $("#btnDelete").attr("style", this.checked ? "display:inline" : "display:none");
+        });
+    });
+
+    function showButtons() {
+        var $checkRecords = $("input[name='checkedRecords']");
+        var showButton = false;
+        for (var i = 0; i < $checkRecords.length; i++) {
+            if ($checkRecords[i].checked) {
+                showButton = true;
+                break;
+            }
+        }
+        $("#checkAll").attr("checked", $checkRecords.length == $("input[name='checkedRecords']:checked").length ? true : false);
+        $("#btnPrint").attr("style", showButton ? "display:inline" : "display:none");
+        $("#btnDelete").attr("style", showButton ? "display:inline" : "display:none");
+    }
+    function CheckedPrint() {
+        var $checkRecords = $("input[name='checkedRecords']");
+        var checkedCardNos = "";
+        if ($("#checkAll").is(':checked') == true) {
+            checkedCardNos = "ALL";
+        }
+        else {
+            for (var i = 0; i < $checkRecords.length; i++) {
+                if ($checkRecords[i].checked) {
+                    if (checkedCardNos == "") {
+                        checkedCardNos = $checkRecords[i].value;
+                    } else {
+                        checkedCardNos += "," + $checkRecords[i].value;
+                    }
+                }
+            }
+        }
+
+        if (checkedCardNos == "") {
+            alert('Must Check One');
+            return;
+        }
+
+        var data = {
+            ids: checkedCardNos,
+            Flow: $('#Flow').val(),
+            Item: $('#Item').val(),
+            BinTo: $('#BinTo').val(),
+            StartDate: $('#StartDate').val(),
+            EndDate: $('#EndDate').val()
+        };
+
+        $.ajax({
+            type: "post",
+            dataType: "text",
+            data: data,
+            async: false,
+            url: "/KanbanFlow/PrintKBLable/",
+            cache: false,
+            success: function (data, textStatus) {
+                DisplayJsonMessages(data);
+                if (data != "") {
+                    var printUrl = data.split(',');
+                    for (var i = 0; i < printUrl.length; i++) {
+                        PrintOrder(printUrl[i]);
+                    }
+
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+
+
+    function CheckedDelete() {
+        var $checkRecords = $("input[name='checkedRecords']");
+        var checkedCardNos = "";
+
+        for (var i = 0; i < $checkRecords.length; i++) {
+            if ($checkRecords[i].checked) {
+                if (checkedCardNos == "") {
+                    checkedCardNos = $checkRecords[i].value;
+                } else {
+                    checkedCardNos += "," + $checkRecords[i].value;
+                }
+            }
+        }
+        
+
+        if (checkedCardNos == "") {
+            alert('Must Check One');
+            return;
+        }
+
+        var data = {
+            ids: checkedCardNos
+        };
+
+        $.ajax({
+            type: "post",
+            dataType: "text",
+            data: data,
+            async: false,
+            url: "/KanbanFlow/FlowDetailDelete/",
+            cache: false,
+            success: function (data, textStatus) {
+                DisplayJsonMessages(data);
+                $.ajax({
+                    type: "get",
+                    dataType: "html",
+                    url: "/KanbanFlow/FlowDetailList/",
+                    data: { Flow: $('#Flow').val(),
+                        Item: $('#Item').val(),
+                        BinTo: $('#BinTo').val(),
+                        StartDate: $('#StartDate').val(),
+                        EndDate: $('#EndDate').val(), isFromList: true
+                    },
+                    cache: false,
+                    success: function (data, textStatus) {
+                        $('#content').html(data);
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        DisplayTextMessages(XMLHttpRequest.responseText);
+                    }
+                });
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+</script>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("FlowDetail")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Id).ClientTemplate("<input type='checkbox' id='checkedRecords' name='checkedRecords' onClick='showButtons();' value='<#= Id #>'   />")
+               .HeaderTemplate("<input type='checkbox' id='checkAll' name='checkAll' />")
+               .Width(36).HtmlAttributes(new { style = "text-align:center" });
+            columns.Bound(o => o.Item).ClientTemplate(Html.ActionLink("<#= Item #>", "FlowDetailEdit", "KanbanFlow", new { ID = "<#= Id #>",Item="<#= Item #>" }, null).ToString());
+            columns.Bound(o => o.Flow);
+
+            columns.Bound(o => o.KanbanNo);
+            //columns.Bound(o => o.Item);
+            columns.Bound(o => o.ReferenceItemCode);
+            columns.Bound(o => o.ItemDescription);
+            columns.Bound(o => o.MinUnitCount);
+            
+            columns.Bound(o => o.Container);
+            columns.Bound(o => o.ContainerDescription);
+            columns.Bound(o => o.BinTo);
+            columns.Bound(o => o.ProductionScan);
+            columns.Bound(o => o.Uom);
+            //columns.Bound(o => o.SafeStock).Title(Resources.SCM.FlowDetail.FlowDetail__Procurement_SafeStock);
+            columns.Bound(o => o.CycloidAmount).Title(Resources.SCM.FlowDetail.FlowDetail_CycloidAmount);
+            //columns.Bound(o => o.IsRejectInspect).Title(Resources.SCM.FlowDetail.FlowDetail_IsNotCalc).ClientTemplate("<input type='checkbox' disabled='disabled' name='IsRejectInspect' <#= IsRejectInspect? checked='checked' : '' #> />");
+            //columns.Bound(o => o.LocationTo);
+
+        })
+
+                .Scrollable(c => c.Enabled(false))
+                .EnableCustomBinding(true)
+                        .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxFlowDetailList", "KanbanFlow"))
+                .ClientEvents(events => events.OnDataBinding("FlowDetailGrid_OnDataBinding"))
+                .Pageable(settings =>
+                {
+                    settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+                    settings.PageSize(ViewBag.PageSize);
+                })
+                .Sortable()
+                .Resizable(resizing => resizing.Columns(true))
+            )
+</fieldset>
+<script type="text/javascript" language="javascript">
+    function FlowDetailGrid_OnDataBinding(e) {
+        e.data = {
+            Flow: $('#Flow').val(),
+            Item: $('#Item').val(),
+            BinTo: $('#BinTo').val(),
+            StartDate: $('#StartDate').val(),
+            EndDate: $('#EndDate').val()
+        };
+    } 
+</script>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:p1="http://www.sih.cq.cn/sap/pp/08" xmlns:rfc="urn:sap-com:document:sap:rfc:functions" name="MI_POCANCLE_LES" targetNamespace="http://www.sih.cq.cn/sap/pp/08" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema xmlns="urn:sap-com:document:sap:rfc:functions" targetNamespace="urn:sap-com:document:sap:rfc:functions" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <xsd:element name="ZSIH_PRODUCTIONCOMFIRECANCLE">
+        <xsd:complexType>
+          <xsd:all>
+            <xsd:element name="INPUT" type="rfc:ZSPOCOMF_YZ" />
+          </xsd:all>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ZSIH_PRODUCTIONCOMFIRECANCLE.Response">
+        <xsd:complexType>
+          <xsd:all>
+            <xsd:element minOccurs="0" name="OUTPUT" type="xsd:string" />
+          </xsd:all>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:complexType name="ZSPOCOMF_YZ">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="AUFNR">
+            <xsd:simpleType>
+              <xsd:restriction base="xsd:string">
+                <xsd:maxLength value="12" />
+              </xsd:restriction>
+            </xsd:simpleType>
+          </xsd:element>
+          <xsd:element minOccurs="0" name="CONF_TEXT">
+            <xsd:simpleType>
+              <xsd:restriction base="xsd:string">
+                <xsd:maxLength value="40" />
+              </xsd:restriction>
+            </xsd:simpleType>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:complexType>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="rfc.ZSIH_PRODUCTIONCOMFIRECANCLE.Input">
+    <wsdl:part name="parameters" element="rfc:ZSIH_PRODUCTIONCOMFIRECANCLE" />
+  </wsdl:message>
+  <wsdl:message name="rfc.ZSIH_PRODUCTIONCOMFIRECANCLE.Output">
+    <wsdl:part name="parameters" element="rfc:ZSIH_PRODUCTIONCOMFIRECANCLE.Response" />
+  </wsdl:message>
+  <wsdl:portType name="MI_POCANCLE_LES">
+    <wsdl:operation name="MI_POCANCLE_LES">
+      <wsdl:input message="p1:rfc.ZSIH_PRODUCTIONCOMFIRECANCLE.Input" />
+      <wsdl:output message="p1:rfc.ZSIH_PRODUCTIONCOMFIRECANCLE.Output" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="MI_POCANCLE_LESBinding" type="p1:MI_POCANCLE_LES">
+    <binding transport="http://schemas.xmlsoap.org/soap/http" xmlns="http://schemas.xmlsoap.org/wsdl/soap/" />
+    <wsdl:operation name="MI_POCANCLE_LES">
+      <operation soapAction="http://sap.com/xi/WebService/soap1.1" xmlns="http://schemas.xmlsoap.org/wsdl/soap/" />
+      <wsdl:input>
+        <body use="literal" xmlns="http://schemas.xmlsoap.org/wsdl/soap/" />
+      </wsdl:input>
+      <wsdl:output>
+        <body use="literal" xmlns="http://schemas.xmlsoap.org/wsdl/soap/" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="MI_POCANCLE_LESService">
+    <wsdl:port name="MI_POCANCLE_LESPort" binding="p1:MI_POCANCLE_LESBinding">
+      <address location="http://10.86.128.31:8000/XISOAPAdapter/MessageServlet?channel=:LES01:CC_SOAPP8&amp;version=3.0&amp;Sender.Service=LES01&amp;Interface=http%3A%2F%2Fwww.sih.cq.cn%2Fsap%2Fpp%2F08%5EMI_POCANCLE_LES" xmlns="http://schemas.xmlsoap.org/wsdl/soap/" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

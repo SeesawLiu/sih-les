@@ -1,0 +1,68 @@
+﻿@using com.Sconit.Entity.ACC
+@using com.Sconit.Web.Models.SearchModels.PRD
+@using com.Sconit.Entity.SYS
+@using com.Sconit.Entity.ORD
+
+<fieldset>
+    @using (Html.BeginForm("List", "ItemConsume"))
+    {   
+        <div class="search">
+            <div class="search-label">
+                <label>
+                    @Resources.PRD.ItemConsume.ItemConsume_Item
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_ItemComboBox", "Common",
+            new
+            {
+                controlName = "ItemCode",
+                selectedValue = TempData["ItemConsumeSearchModel"] != null ? ((ItemConsumeSearchModel)TempData["ItemConsumeSearchModel"]).ItemCode : string.Empty
+            });
+                    
+                }
+            </div>
+            <div class="search-label">
+                <label for="ItemConsume_IsClose">
+                    @Resources.PRD.ItemConsume.ItemConsume_IsClose
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.CheckBox("IsClose", TempData["ItemConsumeSearchModel"] != null ? ((ItemConsumeSearchModel)TempData["ItemConsumeSearchModel"]).IsClose : false)
+            </div>
+            <div class="search-label">
+                <label for="ItemConsume_EffectiveDate">
+                    @Resources.PRD.ItemConsume.ItemConsume_EffectiveDate
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DatePicker().Format(com.Sconit.Entity.BusinessConstants.SHORT_DATE_FORMAT).Name("DateFrom")
+.Value(TempData["ItemConsumeSearchModel"] != null ? ((ItemConsumeSearchModel)TempData["ItemConsumeSearchModel"]).DateFrom : null)
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+            </div>
+            <div class="search-label">
+                <label for="To">
+                    至
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DatePicker().Format(com.Sconit.Entity.BusinessConstants.SHORT_DATE_FORMAT).Name("DateTo")
+.Value(TempData["ItemConsumeSearchModel"] != null ? ((ItemConsumeSearchModel)TempData["ItemConsumeSearchModel"]).DateTo : null)
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+            </div>
+          
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            <button type="submit" id="btnSearch">
+                @Resources.Global.Button_Search</button>
+            @Html.Button(Resources.Global.Button_New, "Url_ItemConsume_Edit", new Dictionary<string, string>()
+	            {
+	                {"type", "button"},
+	                {"id", "btnInsert"},
+                    {"onclick","location.href='"+@Url.Content("~/ItemConsume/New")+"'"}
+	            })
+        </div>
+    }
+</fieldset>

@@ -1,0 +1,32 @@
+﻿@{
+    ViewBag.Title = Resources.PRD.MultiSupplyGroup.MultiSupplyGroup_Group;
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_MultiSupplyGroup_View" });
+}
+<input type="hidden" name="GroupNo" id="GroupNo" value="@Model" />
+@{ Html.Telerik().TabStrip()
+        .Name("TabStrip")
+        .Items(tabstrip =>
+        {
+            tabstrip.Add()
+               .Text(Resources.PRD.MultiSupplyGroup.MultiSupplyGroup_Group)
+                .LoadContentFrom("_Edit", "MultiSupplyGroup", new { id = Model });
+               // .HtmlAttributes(new { onclick = "CleanTabMessage()" });
+
+            tabstrip.Add()
+                .Text(Resources.PRD.MultiSupplyGroup.MultiSupplyGroup_Item)
+                .LoadContentFrom("_Item", "MultiSupplyGroup", new { id = Model, GroupNo = Model });
+               // .HtmlAttributes(new { onclick = "CleanTabMessage()" });
+        })
+        .Render();
+}
+
+@{ Html.Telerik().ScriptRegistrar()
+        .OnDocumentReady(
+            @<text>
+                var tabIndex = "@TempData["TabIndex"]";
+                var tabstrip = $("#TabStrip").data("tTabStrip");
+                var item = $("li", tabstrip.element)[tabIndex != "" ? tabIndex : 0];
+                tabstrip.select(item);
+            </text>
+        );
+}

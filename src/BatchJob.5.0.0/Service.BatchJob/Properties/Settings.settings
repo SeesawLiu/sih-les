@@ -1,0 +1,15 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="com.Sconit.Service.BatchJob.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="com_Sconit_Service_BatchJob_OrderService_OrderService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://localhost:1122/WebService/OrderService.asmx</Value>
+    </Setting>
+    <Setting Name="com_Sconit_Service_BatchJob_SAPService_SAPService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://localhost:1122/Webservice/SAPService.asmx</Value>
+    </Setting>
+    <Setting Name="com_Sconit_Service_BatchJob_FISService_FISService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://localhost:1122/WebService/FISService.asmx</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

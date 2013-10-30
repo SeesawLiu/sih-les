@@ -1,0 +1,133 @@
+﻿@using com.Sconit.Entity.SYS
+@model com.Sconit.Entity.INV.Hu
+
+@using (Html.BeginForm())
+{
+    <fieldset>
+        <legend>@Resources.INV.Hu.Hu_Tab_Hu</legend>
+            <div class="editor">
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.HuId)
+            </div>
+            <div class="editor-field-2">
+                @Html.DisplayFor(model => model.HuId)
+                @Html.HiddenFor(model => model.HuId)
+            </div>
+              <div class="editor-label-2">
+            </div>
+            <div class="editor-field-2">
+            </div>
+             <div class="editor-label-2">
+                @Html.LabelFor(model => model.Item)
+            </div>
+            <div class="editor-field-2">
+            @Html.DisplayFor(model => model.Item)
+            </div>
+            <div class="editor-label-2">
+               @Html.LabelFor(model => model.ReferenceItemCode)
+            </div>
+            <div class="editor-field-2">
+                @Html.DisplayFor(model => model.ReferenceItemCode)
+            </div>
+
+             <div class="editor-label-2">
+                @Html.LabelFor(model => model.Uom)
+            </div>
+            <div class="editor-field-2">
+                @Html.DisplayFor(model => model.Uom)
+            </div>
+
+             <div class="editor-label-2">
+               @Html.LabelFor(model => model.UnitCount)
+            </div>
+            <div class="editor-field-2">
+                @Html.DisplayFor(model => model.UnitCount)
+            </div>
+           
+            <div class="editor-label-2">
+               @Html.LabelFor(model => model.FirstInventoryDate)
+            </div>
+            <div class="editor-field-2">
+               @Html.DisplayFor(model => model.FirstInventoryDate)
+            </div>
+             <div class="editor-label-2">
+               @Html.LabelFor(model => model.LotNo)
+            </div>
+            <div class="editor-field-2">
+               @Html.DisplayFor(model => model.LotNo)
+
+            </div>
+             @*<div class="editor-label-2">
+               @Html.LabelFor(model => model.)
+            </div>
+            <div class="editor-field-2">
+               @Html.DisplayFor(model => model.ManufactureDate)
+            </div>
+             <div class="editor-label-2">
+               @Html.LabelFor(model => model.ManufactureDate)
+            </div>
+            <div class="editor-field-2">
+               @Html.DisplayFor(model => model.ManufactureDate)
+            </div>
+             <div class="editor-label-2">
+               @Html.LabelFor(model => model.)
+            </div>
+            <div class="editor-field-2">
+               @Html.DisplayFor(model => model.ManufactureDate)
+            </div>
+             <div class="editor-label-2">
+               @Html.LabelFor(model => model.ManufactureDate)
+            </div>
+            <div class="editor-field-2">
+               @Html.DisplayFor(model => model.)
+            </div>*@
+           <div class="search-footer">
+            <button type="button" id="btnSearch" onclick="location.href='@Url.Content("~/Hu/List")'">
+                @Resources.Global.Button_Back</button>         
+            <button type="button" id="btnPrint" onclick="Print()">
+                @Resources.Global.Button_Print</button>
+            <button type="button" id="btnExport" onclick="Export()">
+                @Resources.Global.Button_Export</button>
+
+        </div>
+        </div>
+
+      
+    </fieldset>
+}
+@{
+   Html.RenderAction("_Loctrans", "Hu", new { HuId = Model.HuId });
+}
+<form id="hiddenForm" action="/Hu/SaveToClient" target="_blank"
+method="post">
+<input id="huId" name="huId" type="hidden" />
+</form>
+<script type="text/javascript" language="javascript">
+//    function Export(e) {
+//        window.open("/Hu/SaveToClient/?huId=" + $("#HuId").val());
+    //    }
+    function Export(e) {
+        $("#huId").val($("#HuId").val());
+        $("#hiddenForm").submit();
+    }
+
+    function Print(e) {
+        var data = {
+            "huId": $("#HuId").val()
+        };
+        $.ajax({
+            type: "post",
+            dataType: "text",
+            url: "/Hu/Print/",
+            data: data,
+            success: function (data, textStatus) {
+                if (data != "") {
+                    PrintOrder(data);
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+</script>

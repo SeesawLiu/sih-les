@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="com.Sconit.Entity.FIS.ItemStandardPackDAT, com.Sconit.Entity.FIS" table="FIS_ItemStandardPack" lazy="false">
+    <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      <generator class="identity" />
+    </id>
+    <property name="FlowDetId" column="FlowDetId" type="Int32"/>
+    <property name="Item" column="Item" type="String" length="50"/>
+    <property name="Pack" column="Pack" type="String" length="50"/>
+    <property name="UC" column="UC" type="Decimal"  />
+    <property name="IOType" column="IOType" type="String" length="50"/>
+    <property name="Location" column="Location" type="String" length="4"/>
+    <property name="Plant" column="Plant" type="String" length="4"/>
+    <property name="CreateDate" column="CreateDate" type="DateTime" />
+    <property name="CreateDATDate" column="CreateDATDate" type="DateTime" />
+    <property name="DATFileName" column="DATFileName" type="String" length="50"/>
+	<property name="IsCreateDat" column="IsCreateDat" type="Boolean"/>
+  </class>
+</hibernate-mapping>

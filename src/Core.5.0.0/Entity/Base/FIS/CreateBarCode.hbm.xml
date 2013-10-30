@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="com.Sconit.Entity.FIS.CreateBarCode, com.Sconit.Entity" table="FIS_CreateBarCode" lazy="false">
+    <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      <generator class="identity" />
+    </id>
+    <property name="HuId" column="HuId" type="String" length="50"/>
+    <property name="LotNo" column="LotNo" type="String" length="50"/>
+
+    <property name="Item" column="Item" type="String" length="50"/>
+    <property name="Qty" column="Qty" type="Decimal"/>
+    <property name="ManufactureParty" column="ManufactureParty" type="String" length="50"/>
+    <property name="ASN" column="ASN" type="String" length="50"/>
+
+    <property name="CreateDate" column="CreateDate" type="DateTime" />
+    <property name="CreateDATDate" column="CreateDATDate" type="DateTime" />
+    <property name="DATFileName" column="DATFileName" type="String" length="50"/>
+	  <property name="IsCreateDat" column="IsCreateDat" type="Boolean"/>
+  </class>
+</hibernate-mapping>

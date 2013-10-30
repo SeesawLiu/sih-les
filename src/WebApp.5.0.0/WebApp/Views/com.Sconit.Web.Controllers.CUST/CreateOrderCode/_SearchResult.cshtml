@@ -1,0 +1,60 @@
+﻿@model IEnumerable<com.Sconit.Entity.CUST.CreateOrderCode>
+<fieldset>
+<script type="text/javascript">
+    function onEdit(e) {
+        if (e.mode == "edit") {
+            $(e.form).find("#Code").attr("disabled", true);
+        }
+    }
+</script>
+    @(Html.Telerik().Grid(Model)
+               .Name("CreateOrderCodeGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Code);
+        })
+                .ToolBar(commands =>
+                {
+
+                    commands.Insert();
+
+                })
+                .DataBinding(dataBinding => dataBinding.Ajax()
+                                .Select("_AjaxList", "CreateOrderCode")
+                                .Insert("_Insert", "CreateOrderCode")
+                                .Update("_Update", "CreateOrderCode"))
+                                //.Delete("_Delete", "FailCode")
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Code);
+            columns.Bound(o => o.Description);
+            columns.Command(commands =>
+            {
+                commands.Edit();
+            });
+            
+
+        }).ClientEvents(events =>{ events
+                             .OnEdit("onEdit")
+                                    //.OnRowDataBound("ProductLineFacilityGrid_OnRowDataBound");
+        .OnDataBinding("CreateOrderCodeGrid_OnDataBinding").OnComplete("TelerikGridView_OnComplete");
+        })
+        .EnableCustomBinding(true)
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(50);
+        })
+        .Scrollable()
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+    )
+    <script type="text/javascript">
+        function CreateOrderCodeGrid_OnDataBinding(e) {
+            e.data = {
+                Code: $('#Code').val(),
+                Description: $('#Description').val()
+            };
+        } 
+    </script>
+</fieldset>

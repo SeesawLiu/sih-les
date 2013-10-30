@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.SCM.SequenceGroup, com.Sconit.Entity" table="SCM_SeqGroup" lazy="false">
+		<id name="Code" column="Code" type="String" unsaved-value="null" >
+      		<generator class="assigned" />
+        </id>
+		<version name="Version" column="Version" type="Int32" />	
+		<property name="ProductLine" column="ProdLine" type="String" length="50"/>	
+		<property name="SequenceBatch" column="SeqBatch" type="Int32"/>	
+		<property name="PreviousOrderNo" column="PrevOrderNo" type="String" length="50" update="false" />	
+		<property name="PreviousTraceCode" column="PrevTraceCode" type="String" length="50" update="false" />	
+		<property name="PreviousSeq" column="PrevSeq" type="Int64" update="false" />	
+		<property name="PreviousSubSeq" column="PrevSubSeq" type="Int32" update="false" />	
+		<property name="PreviousDeliveryDate" column="PrevDeliveryDate" type="DateTime" update="false"/>	
+		<property name="PreviousDeliveryCount" column="PrevDeliveryCount" type="Int32" update="false" />	
+		<property name="CreateUserId" column="CreateUser" type="Int32" update="false"/>	
+		<property name="CreateUserName" column="CreateUserNm" type="String" length="100" update="false"/>	
+		<property name="CreateDate" column="CreateDate" type="DateTime" update="false"/>	
+		<property name="LastModifyUserId" column="LastModifyUser" type="Int32"/>	
+		<property name="LastModifyUserName" column="LastModifyUserNm" type="String" length="100"/>	
+		<property name="LastModifyDate" column="LastModifyDate" type="DateTime"/>
+        <property name="OpReference" column="OpRef" type="String" length="50"/>
+        <property name="IsActive" column="IsActive" type="Boolean"  />
+    </class>
+</hibernate-mapping>

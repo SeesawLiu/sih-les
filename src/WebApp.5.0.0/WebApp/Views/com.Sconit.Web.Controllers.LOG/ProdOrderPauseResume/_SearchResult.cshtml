@@ -1,0 +1,43 @@
+﻿@model IEnumerable<com.Sconit.Entity.LOG.ProdOrderPauseResume>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+                .Name("ProdOrderPauseResumeGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.ProdLine);
+            columns.Bound(o => o.ProdLineDesc);
+            columns.Bound(o => o.OrderNo); 
+            columns.Bound(o => o.VanCode);
+            columns.Bound(o => o.Seq);
+            columns.Bound(o => o.SubSeq);
+            columns.Bound(o => o.BeforeVanCode);
+            columns.Bound(o => o.OprateTypeDescription);
+            columns.Bound(o => o.CreateDate);
+            columns.Bound(o => o.CreateUserName);
+        })
+        .Scrollable(c => c.Enabled(false))
+                .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxList", "ProdOrderPauseResume"))
+                        .ClientEvents(events => events.OnDataBinding("ProdOrderPauseResumeGrid_OnDataBinding"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+            settings.PageSize(ViewBag.PageSize);
+        })
+        .EnableCustomBinding(true)
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+    )
+    <script type="text/javascript">
+        function ProdOrderPauseResumeGrid_OnDataBinding(e) {
+            e.data = {
+                OrderNo: $('#OrderNo').val(),
+                TraceCode: $('#TraceCode').val(),
+                ProdLine: $('#ProdLine').val()
+            };
+        }
+    </script>
+</fieldset>

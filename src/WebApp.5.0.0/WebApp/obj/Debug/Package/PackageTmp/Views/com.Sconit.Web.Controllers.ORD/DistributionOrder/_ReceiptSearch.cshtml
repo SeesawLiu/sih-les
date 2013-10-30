@@ -1,0 +1,133 @@
+﻿@using com.Sconit.Web.Models.SearchModels.ORD
+@using com.Sconit.Entity.SYS
+<fieldset>
+    @using (Html.BeginForm("ReceiptList", "DistributionOrder"))
+    {   
+        <div class="search">
+            <div class="editor-label-2">
+                <label>
+                    @Resources.ORD.OrderMaster.OrderMaster_ExternalOrderNo_Receipt
+                </label>
+            </div>
+            <div class="editor-field-2">
+                @Html.TextArea("ExternalOrderNo", TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).ExternalOrderNo : string.Empty, new { rows = 3, style = "min-height:0;width:80%" })
+            </div>
+            <div class="editor-label-2">
+                <span style="color: Green">请注意：每个交货单号之间必须以逗号(,)或者按回车进行区分，否则将无法查询出您想要的信息！！</span>
+            </div>
+            <div class="editor-field-2">
+            </div>
+            <div class="editor-label-2">
+                <label>
+                </label>
+            </div>
+            <div class="editor-field-2">
+            </div>
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            <button type="submit" id="btnSearch">
+                @Resources.Global.Button_Search</button>
+            @Html.Button(Resources.Global.Button_Receive_Distrabution, "Url_OrderMstr_Distribution_Receipt", new Dictionary<string, string>()
+	    {
+	        {"type", "button"},
+	        {"id", "btnEdit"},
+            {"style", "display: none"},
+            {"needconfirm","true"},
+            {"onclick","onReceive()"}
+	    })
+        </div>
+
+    }
+    <script type="text/javascript">
+
+        function onReceive() {
+            ClearMessage();
+            var grid = $("#OrderDetail").data("tGrid");
+            var rows = grid.$tbody.children("tr:not(.t-no-data)");
+            var idStr = "";
+            var qtyStr = "";
+            var orderNoStr = "";
+            var errorStr = "";
+            var b = true;
+            for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+                var row = $(rows[rowIndex]);
+                var id = row.find("#Id").val();
+                var orderNo = row.find("#Id").parent().next().text();
+                var currentReceiveQty = row.find("#CurrentReceiveQty").val();
+                if (row.find("#Id").get(0).checked) {
+                    if (currentReceiveQty == null || currentReceiveQty == "") {
+                        // $("#errorsul").html("第" + (rowIndex + 1) + "行过账数为空，请填写。");
+                        $message.error("第" + (rowIndex + 1) + "行过账数为空，请填写。");
+                        b = false;
+                    }
+                    if (isNaN(currentReceiveQty) || parseFloat(currentReceiveQty) <= 0) {
+                        //  $("#errorsul").html("第" + (rowIndex + 1) + "行过账数必须为大于0的数字。");
+                        $message.error("第" + (rowIndex + 1) + "行过账数必须为大于0的数字。");
+                        b = false;
+                    }
+                    if (parseFloat(currentReceiveQty) > parseFloat(row.find("#CurrentReceiveQty").parent().prev().text())) {
+                        // $("#errorsul").html("第" + (rowIndex + 1) + "行过账数不能大于订单数。");
+                        $message.error("第" + (rowIndex + 1) + "行过账数不能大于订单数。");
+                        b = false;
+                    }
+                    if (idStr == "") {
+                        idStr = id;
+                        qtyStr = parseFloat(currentReceiveQty);
+                        orderNoStr = orderNo;
+                    } else {
+                        idStr += "," + id;
+                        qtyStr += "," + parseFloat(currentReceiveQty);
+                        orderNoStr += "," + orderNo;
+                    }
+
+                }
+                else {
+                    continue;
+                }
+            }
+
+            if (!b) {
+                return;
+            }
+
+            if (idStr == "") {
+                $message.error("过账明细不能为空");
+                return;
+            }
+            var data = {
+                "idStr": idStr,
+                "qtyStr": qtyStr,
+                "orderNoStr": orderNoStr
+            }
+            $.ajax({
+                type: "post",
+                dataType: "Json",
+                data: data,
+                url: "/DistributionOrder/ReceiveOrder/",
+                cache: false,
+                success: function (data, textStatus) {
+                    DisplayJsonMessages(data);
+                    if (data != "") {
+                        $.ajax({
+                            type: "get",
+                            dataType: "html",
+                            // data: { orderNoStr: data.orderNoStr },
+                            url: "/DistributionOrder/ReceiptList",
+                            cache: false,
+                            success: function (data, textStatus) {
+                                var $tGrid = $("#content");
+                                $($tGrid).html(data);
+                            }
+                        });
+                    }
+
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    DisplayTextMessages(XMLHttpRequest.responseText);
+                }
+            });
+
+        }
+    </script>
+</fieldset>

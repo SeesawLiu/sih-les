@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="com.Sconit.Entity.SAP.TRANS.TransCallBack, com.Sconit.Entity.SAP" table="SAP_TransCallBack" lazy="false">
+    <id name="Id" column="Id" type="Int64" unsaved-value="0" >
+      <generator class="identity" />
+    </id>
+    <property name="FRBNR" column="FRBNR" type="String"  length="16" />
+    <property name="SGTXT" column="SGTXT" type="String"  length="5" />
+    <property name="MBLNR" column="MBLNR" type="String" length="10"/>
+    <property name="ZEILE" column="ZEILE" type="String" length="4"/>
+    <property name="BUDAT" column="BUDAT" type="String" length="14"/>
+    <property name="CPUDT" column="CPUDT" type="String" length="14"/>
+    <property name="MTYPE" column="MTYPE" type="String" length="4"/>
+    <property name="MSTXT" column="MSTXT" type="String" length="220"/>
+    <property name="CreateDate" column="CreateDate" type="DateTime" update="false"/>
+  </class>
+</hibernate-mapping>

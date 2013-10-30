@@ -1,0 +1,28 @@
+﻿CREATE TABLE [dbo].[ORD_OrderOp] (
+    [Id]               INT             IDENTITY (1, 1) NOT FOR REPLICATION NOT NULL,
+    [OrderNo]          VARCHAR (50)    NOT NULL,
+    [OrderDetId]       INT             NOT NULL,
+    [Op]               INT             NOT NULL,
+    [OpRef]            VARCHAR (50)    NOT NULL,
+    [LeadTime]         FLOAT           NOT NULL,
+    [TimeUnit]         TINYINT         NOT NULL,
+    [Location]         VARCHAR (50)    NULL,
+    [CreateUser]       INT             NOT NULL,
+    [CreateUserNm]     VARCHAR (100)   NOT NULL,
+    [CreateDate]       DATETIME        NOT NULL,
+    [LastModifyUser]   INT             NOT NULL,
+    [LastModifyUserNm] VARCHAR (100)   NOT NULL,
+    [LastModifyDate]   DATETIME        NOT NULL,
+    [Version]          INT             NOT NULL,
+    [WorkCenter]       VARCHAR (50)    NULL,
+    [IsAutoReport]     BIT             NOT NULL,
+    [ReportQty]        DECIMAL (18, 8) NOT NULL,
+    [BackflushQty]     DECIMAL (18, 8) NULL,
+    [AUFPL]            VARCHAR (50)    NULL,
+    [PLNFL]            VARCHAR (50)    NULL,
+    [VORNR]            VARCHAR (50)    NULL,
+    [NeedReport]       BIT             NOT NULL,
+    [IsRecFG]          BIT             NOT NULL,
+    [ScrapQty]         DECIMAL (18, 8) NOT NULL
+);
+

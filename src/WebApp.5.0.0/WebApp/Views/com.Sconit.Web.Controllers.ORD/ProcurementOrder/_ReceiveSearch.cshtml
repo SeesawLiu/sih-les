@@ -1,0 +1,189 @@
+﻿@using com.Sconit.Entity.ORD
+@using com.Sconit.Web.Models.SearchModels.ORD
+<script type="text/javascript">
+
+//    function editCheckedOrders() {
+//        var $checkRecords = $("input[name='checkedRecords']");
+
+//        var checkedOrders = "";
+//        for (var i = 0; i < $checkRecords.length; i++) {
+//            if ($checkRecords[i].checked) {
+//                if (checkedOrders == "") {
+//                    checkedOrders = $checkRecords[i].value;
+//                } else {
+//                    checkedOrders += "," + $checkRecords[i].value;
+//                }
+//            }
+//        }
+//        if (checkedOrders == "") {
+//            alert('Must Check One');
+//            return;
+//        }
+//        var data = {
+//            "checkedOrders": checkedOrders
+//        };
+//        $.ajax({
+//            type: "Post",
+//            dataType: "html",
+//            url: "/ProcurementOrder/ReceiveEdit/",
+//            data: data,
+//            cache: false,
+//            success: function (data, textStatus) {
+//                var $tGrid = $("#content");
+//                $($tGrid).html(data);
+//            }
+//        });
+//    }
+
+
+    function onReceive() {
+        var rows = $("tbody").children();
+        // var rows = grid.$tbody.children("tr:not(.t-no-data)");
+        var idStr = "";
+        var qtyStr = "";
+        for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+            var row = $(rows[rowIndex]);
+            var id = row.find("#Id").val();
+            var qty = row.find("#CurrentReceiveQty").val();
+            if (row.find("#Id").is(":checked")) {
+                if (qty != "" && !isNaN(qty) && parseFloat(qty) > 0) {
+                    if (idStr == "") {
+                        idStr = id;
+                        qtyStr = qty;
+                    } else {
+                        idStr += "," + id;
+                        qtyStr += "," + qty;
+                    }
+                }
+            }
+        }
+        if (idStr == "") {
+            $message.error('请填写数量收货。');
+            return;
+        }
+        var data = {
+            "idStr": idStr,
+            "qtyStr": qtyStr
+        };
+        $.ajax({
+            type: "Post",
+            dataType: "Json",
+            data: data,
+            url: "/ProcurementOrder/ReceiveOrder/",
+            cache: false,
+            success: function (data, textStatus) {
+                DisplayJsonMessages(data);
+                    diSearchClick();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+
+    function diSearchClick() {
+        var data = {
+            OrderNo: $('#OrderNo').val(),
+            Flow: $('#Flow').val(),
+            PartyFrom: $('#PartyFrom').val(),
+            PartyTo: $('#PartyTo').val()
+        };
+        $.ajax({
+            type: "Get",
+            dataType: "html",
+            url: "/ProcurementOrder/_ReceiveOrderDetailList/",
+            data:data,
+            cache: false,
+            success: function (data, textStatus) {
+                var $tDiv = $("#DivReceiveDetails");
+                $($tDiv).html(data);
+            }
+        });
+    
+    }
+</script>
+<fieldset>
+   @* @using (Html.BeginForm("Receive", "ProcurementOrder"))
+    { *@  
+        <div class="search">
+            <div class="search-label">
+                <label for="">
+                    @Resources.ORD.OrderMaster.OrderMaster_OrderNo
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("OrderNo", TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).OrderNo : string.Empty)
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_Flow">
+                    @Resources.ORD.OrderMaster.OrderMaster_Flow
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_FlowComboBox", "Common",
+            new
+            {
+                controlName = "Flow",
+                type = (int)com.Sconit.CodeMaster.OrderType.Procurement,
+                selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).Flow : string.Empty
+            });
+                }
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_PartyFrom">
+                    @Resources.ORD.OrderMaster.OrderMaster_PartyFrom
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_OrderMasterPartyFromComboBox", "Common",
+            new
+            {
+                controlName = "PartyFrom",
+                orderType = (int)com.Sconit.CodeMaster.OrderType.Procurement,
+                selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).PartyFrom : string.Empty
+            });
+                }
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_PartyTo">
+                    @Resources.ORD.OrderMaster.OrderMaster_PartyTo
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_OrderMasterPartyToComboBox", "Common",
+            new
+            {
+                controlName = "PartyTo",
+                orderType = (int)com.Sconit.CodeMaster.OrderType.Procurement,
+                selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).PartyTo : string.Empty
+            });
+                }
+            </div>
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            <button type="button" id="btnSearch" onclick="diSearchClick()">
+                @Resources.Global.Button_Search</button>
+                 @*@Html.Button(Resources.Global.Button_Preview, "Url_OrderMstr_Procurement_Submit", new Dictionary<string, string>()
+	            {
+	                {"type", "button"},
+	                {"id", "btnEdit"},
+                    {"onclick","editCheckedOrders()"},
+                    {"style","display:none"}
+	            })*@
+                @Html.Button(Resources.Global.Button_Receive, "Url_OrderMstr_Procurement_Submit", new Dictionary<string, string>()
+	            {
+	                {"type", "button"},
+	                {"id", "btnReceive"},
+                    {"needconfirm","true"},
+                    {"style","display:none"},
+                    {"onclick","onReceive()"}
+	            })
+       </div>
+   @* }*@
+</fieldset>
+<div id="DivReceiveDetails">
+    </div>

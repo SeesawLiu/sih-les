@@ -1,0 +1,5 @@
+G:\Project\sih-les\src\Core.5.0.0\CodeMaster\bin\Debug\com.Sconit.CodeMaster.dll
+G:\Project\sih-les\src\Core.5.0.0\CodeMaster\bin\Debug\com.Sconit.CodeMaster.pdb
+G:\Project\sih-les\src\Core.5.0.0\CodeMaster\obj\Debug\ResolveAssemblyReference.cache
+G:\Project\sih-les\src\Core.5.0.0\CodeMaster\obj\Debug\com.Sconit.CodeMaster.dll
+G:\Project\sih-les\src\Core.5.0.0\CodeMaster\obj\Debug\com.Sconit.CodeMaster.pdb

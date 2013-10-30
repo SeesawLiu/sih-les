@@ -1,0 +1,37 @@
+﻿@using com.Sconit.Web.Models.SearchModels.CUST
+<fieldset>
+    @using (Html.BeginForm("List", "VanProductLineMap"))
+    {   
+        <div class="search">
+            <div class="search-label">
+                <label for="OrderMaster_OrderNo">
+                    @Resources.CUST.ProductLineMap.ProductLineMap_SAPProductLine
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("SAPProductLine", TempData["ProductLineMapSearchModel"] != null ? ((ProductLineMapSearchModel)TempData["ProductLineMapSearchModel"]).SAPProductLine : string.Empty)
+
+            </div>
+            <div class="search-label">
+                <label for="ProductLineMap_IsActive">
+                    @Resources.CUST.ProductLineMap.ProductLineMap_IsActive
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.CheckBox("SearchIsActive", (TempData["ProductLineMapSearchModel"] != null && (ProductLineMapSearchModel)TempData["ProductLineMapSearchModel"] != null ? ((ProductLineMapSearchModel)TempData["ProductLineMapSearchModel"]).SearchIsActive : true))
+            </div>
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            <button type="submit" id="btnSearch">
+                @Resources.Global.Button_Search</button>
+            @Html.Button(Resources.Global.Button_New, "Url_CUST_VanProductLineMap_Edit", new Dictionary<string, string>()
+	            {
+	                {"type", "button"},
+	                {"id", "btnInsert"},
+                    {"onclick","location.href='"+@Url.Content("~/VanProductLineMap/New")+"'"}
+	            })
+        </div>
+
+    }
+</fieldset>

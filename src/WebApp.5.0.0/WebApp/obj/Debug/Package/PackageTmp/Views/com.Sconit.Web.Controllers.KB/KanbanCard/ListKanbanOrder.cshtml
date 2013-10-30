@@ -1,0 +1,8 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_KanbanCard_Order" });
+}
+
+@Html.Partial("_SearchKanbanOrder")
+
+@Html.Partial("_SearchResultKanbanOrder")

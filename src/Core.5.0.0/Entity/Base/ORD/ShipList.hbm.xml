@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+    <class name="com.Sconit.Entity.ORD.ShipList, com.Sconit.Entity" table="ORD_ShipList" lazy="false">
+        <id name="ShipNo" column="ShipNo" type="String" unsaved-value="null" >
+            <generator class="assigned" />
+        </id>
+        <property name="Vehicle" column="Vehicle" type="String" length="50"/>
+        <property name="Shipper" column="Shipper" type="String" length="50"/>
+        <property name="Status" column="Status" />
+        <property name="CloseUser" column="CloseUser" type="Int32" />
+        <property name="CloseUserNm" column="CloseUserNm" type="String" length="100" />
+        <property name="CloseDate" column="CloseDate" type="DateTime" />
+        <property name="CancelUser" column="CancelUser" type="Int32" />
+        <property name="CancelUserNm" column="CancelUserNm" type="String" length="100" />
+        <property name="CancelDate" column="CancelDate" type="DateTime" />
+        
+        <property name="CreateUserId" column="CreateUser" type="Int32" update="false"/>
+        <property name="CreateUserName" column="CreateUserNm" type="String" length="100" update="false"/>
+        <property name="CreateDate" column="CreateDate" type="DateTime" update="false"/>
+        <property name="LastModifyUserId" column="LastModifyUser" type="Int32"/>
+        <property name="LastModifyUserName" column="LastModifyUserNm" type="String" length="100"/>
+        <property name="LastModifyDate" column="LastModifyDate" type="DateTime"/>
+    </class>
+</hibernate-mapping>

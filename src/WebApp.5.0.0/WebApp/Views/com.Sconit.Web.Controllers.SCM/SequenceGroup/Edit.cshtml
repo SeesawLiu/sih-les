@@ -1,0 +1,145 @@
+﻿@model com.Sconit.Entity.SCM.SequenceGroup
+@{
+    ViewBag.Title = "Index";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_SequenceGroup_View" });
+}
+@using (Html.BeginForm())
+{
+    <fieldset>
+        <legend>@Resources.SCM.SequenceGroup.SequenceGroup_Edit_Title</legend>
+        <div class="search">
+            <div class="search-label">
+                <label>
+                    @Resources.SCM.SequenceGroup.SequenceGroup_Code
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.DisplayFor(model => model.Code)
+                @Html.HiddenFor(model => model.Code)
+            </div>
+            <div class="search-label">
+                <label>
+                    @Resources.SCM.SequenceGroup.SequenceGroup_ProdLine
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+    Html.RenderAction("_FlowComboBox", "Common",
+      new
+      {
+          controlName = "ProductLine",
+          type = (int)com.Sconit.CodeMaster.OrderType.Production,
+          selectedValue = Model != null ? Model.ProductLine : null,
+          enable = false
+      });
+                }
+                @Html.ValidationMessageFor(model => model.ProductLine)
+                @Html.HiddenFor(model => model.ProductLine)
+                <input name="Version" id="Version" type="hidden" value="@Model.Version"/>
+            </div>
+            <div class="search-label">
+                <label>
+                    @Resources.SCM.SequenceGroup.SequenceGroup_SequenceBatch
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.Telerik().NumericTextBoxFor(model => model.SequenceBatch).DecimalDigits(0).MinValue(1)
+                @Html.ValidationMessageFor(model => model.SequenceBatch)
+            </div>
+            <div class="search-label">
+                <label>
+                    @Resources.SCM.SequenceGroup.SequenceGroup_OpReference
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.EditorFor(model => model.OpReference)
+                @Html.ValidationMessageFor(model => model.OpReference)
+                @Resources.SCM.SequenceGroup.SequenceGroup_OpRefRemark
+            </div>
+            <div class="search-label">
+                <label>
+                    @Resources.SCM.SequenceGroup.SequenceGroup_PreviousOrderNo
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.DisplayFor(model => model.PreviousOrderNo)
+                @Html.HiddenFor(model => model.PreviousOrderNo)
+            </div>
+            <div class="search-label">
+                <label>
+                    @Resources.SCM.SequenceGroup.SequenceGroup_PreviousTraceCode
+                </label>
+            </div>
+            <div class="search-field">
+            @if (ViewBag.HaveEditPrevTraceCode)
+            {
+                @Html.EditorFor(model => model.PreviousTraceCode)
+            }
+            else
+            {
+                @Html.DisplayFor(model => model.PreviousTraceCode)
+                @Html.HiddenFor(model => model.PreviousTraceCode)
+            }
+            </div>
+            <div class="search-label">
+                <label>
+                    @Resources.SCM.SequenceGroup.SequenceGroup_PreviousSeq
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.DisplayFor(model => model.PreviousSeq)
+                @Html.HiddenFor(model => model.PreviousSeq)
+            </div>
+            <div class="search-label">
+                <label>
+                    @Resources.SCM.SequenceGroup.SequenceGroup_PreviousSubSeq
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.DisplayFor(model => model.PreviousSubSeq)
+                @Html.HiddenFor(model => model.PreviousSubSeq)
+            </div>
+            <div class="search-label">
+                <label>
+                    @Resources.SCM.SequenceGroup.SequenceGroup_PrevDateCount
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.DisplayFor(model => model.PrevDateCount)
+            </div>
+            <div class="search-label">
+                <label>
+                    @Resources.SCM.SequenceGroup.SequenceGroup_IsActive
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.CheckBox("IsActive", Model.IsActive)
+            </div>
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            @Html.Button(Resources.Global.Button_Save, "Url_SequenceGroup_View", new Dictionary<string, string>()
+                                                                                     {
+                                                                                         {"type", "submit"},
+                                                                                         {"id", "btnsava"},
+                                                                                         {"needconfirm", "true"}
+                                                                                     })
+            @Html.Button(Resources.Global.Button_Delete, "Url_SequenceGroup_View", new Dictionary<string, string>()
+                                                                                       {
+                                                                                           {"type", "button"},
+                                                                                           {"id", "btndelete"},
+                                                                                           {"needconfirm", "true"},
+                                                                                           {"onclick", "butDelete()"}
+                                                                                       })
+            <button type="button" id="btnReturn" onclick="location.href = '@Url.Content("~/SequenceGroup/List")'">
+                @Resources.Global.Button_Back
+            </button>
+        </div>
+        <script type="text/javascript">
+            function butDelete() {
+                location.href = '@Url.Content("~/SequenceGroup/DeleteId/" + @Model.Code)';
+            }
+          
+        </script>
+    </fieldset>
+}

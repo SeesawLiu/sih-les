@@ -1,0 +1,52 @@
+﻿@using com.Sconit.Web.Models.SearchModels.PRD
+<fieldset>
+    @using (Html.BeginForm("List", "ProdLineStandardWorkingCalendar"))
+    {   
+        <div class="search">
+            <div class="search-label">
+                <label for="StandardWorkingCalendar_Region">
+                    @Resources.PRD.StandardWorkingCalendar.StandardWorkingCalendar_ProdLine
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_FlowComboBox", "Common", new
+        {
+            controlName = "SearchRegion",
+            type = (int)com.Sconit.CodeMaster.OrderType.Production,
+            selectedValue = TempData["StandardWorkingCalendarSearchModel"] != null ? ((StandardWorkingCalendarSearchModel)TempData["StandardWorkingCalendarSearchModel"]).SearchRegion : string.Empty
+        });
+                }
+            </div>
+            <div class="search-label">
+                <label for="StandardWorkingCalendar_Shift">
+                    @Resources.PRD.StandardWorkingCalendar.StandardWorkingCalendar_Shift
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_ShiftMasterDropDownList", "Common", new
+                                                                    {
+                                                                        controlName = "SearchShift",
+                                                                        includeBlankOption = true,
+                                                                        selectedValue = TempData["StandardWorkingCalendarSearchModel"] != null ? ((StandardWorkingCalendarSearchModel)TempData["StandardWorkingCalendarSearchModel"]).SearchShift : string.Empty
+                                                                    });
+                }
+            </div>
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            @Html.Button(Resources.Global.Button_Search, "Url_ProdLineStandardWorkingCalendar_View", new Dictionary<string, string>()
+                                                                                                 {
+                                                                                                     {"type", "submit"},
+                                                                                                     {"id", "btnSearch"}
+                                                                                                 })
+            @Html.Button(Resources.Global.Button_New, "Url_ProdLineStandardWorkingCalendar_Edit", new Dictionary<string, string>()
+                                                                                              {
+                                                                                                  {"type", "button"},
+                                                                                                  {"id", "btnNew"},
+                                                                                                  {"onclick","location.href='"+@Url.Content("~/ProdLineStandardWorkingCalendar/New")+"'"}
+                                                                                              })
+        </div>
+    }
+</fieldset>

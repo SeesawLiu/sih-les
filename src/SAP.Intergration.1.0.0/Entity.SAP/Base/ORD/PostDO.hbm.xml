@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="com.Sconit.Entity.SAP.ORD.PostDO, com.Sconit.Entity.SAP" table="SAP_PostDO" lazy="false">
+    <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      <generator class="identity" />
+    </id>
+    <property name="OrderNo" column="OrderNo" type="String" />
+    <property name="ReceiptNo" column="ReceiptNo" type="String" />
+    <property name="Result" column="Result" type="String" />
+    <property name="ZTCODE" column="ZTCODE" type="String" />
+    <property name="Success" column="Success" type="String" />
+    
+    <property name="Status" column="Status" type="Int32"/>
+    <property name="CreateDate" column="CreateDate" type="DateTime" update="false"/>
+    <property name="LastModifyDate" column="LastModifyDate" type="DateTime"/>
+    <property name="ErrorCount" column="ErrorCount" type="Int32"/>
+  </class>
+</hibernate-mapping>

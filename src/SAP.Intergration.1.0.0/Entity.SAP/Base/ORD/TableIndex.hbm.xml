@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
- 	<class name="com.Sconit.Entity.SAP.ORD.TableIndex, com.Sconit.Entity.SAP" table="SAP_TableIndex" lazy="false">
-		<id name="TableName" column="TableName" type="String" unsaved-value="null" >
-      		<generator class="assigned" />
+    <class name="com.Sconit.Entity.SAP.ORD.TableIndex, com.Sconit.Entity.SAP" table="SAP_TableIndex" lazy="false">
+        <id name="TableName" column="TableName" type="String" unsaved-value="null" >
+            <generator class="assigned" />
         </id>
-		<property name="Id" column="Id" type="Int64"/>	
-		<property name="LastModifyDate" column="LastModifyDate" type="DateTime"/>	
-  	</class>
+        <version name="Version" column="Version" type="Int32" />
+        <property name="Id" column="Id" type="Int64"/>
+        <property name="LastModifyDate" column="LastModifyDate" type="DateTime"/>
+    </class>
 </hibernate-mapping>

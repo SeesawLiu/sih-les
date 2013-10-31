@@ -177,6 +177,7 @@ namespace com.Sconit.Entity.SAP.TRANS
 
         public string OrderNo { get; set; }
         public Int32 DetailId { get; set; }
+        public Int32 Version { get; set; }
         #endregion
 
         public override int GetHashCode()

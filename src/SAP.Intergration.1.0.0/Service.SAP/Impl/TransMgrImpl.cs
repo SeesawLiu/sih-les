@@ -49,32 +49,68 @@ namespace com.Sconit.Service.SAP.Impl
             lock (ExchangeMoveTypeLock)
             {
                 var errorMessageList = new List<ErrorMessage>();
+                #region
+                int batchNo = int.Parse(this.numberControlMgr.GetNextSequence(Entity.BusinessConstants.NUMBERCONTROL_SISAPTRANSBATCHNO));
+                #endregion
                 try
                 {
+                    log.Debug(batchNo.ToString() + "-------------------------------无敌的分割线------------------------------------" + batchNo.ToString());
+                    log.Debug("开始导出移动类型" + batchNo.ToString());
+
                     string hql = "select distinct BWART,TCODE from MapMoveTypeTCode group by BWART,TCODE ";
                     IList<object[]> tcodeMoveTypes = this.genericMgr.FindAll<object[]>(hql);
                     IList<Entity.MD.Region> regionList = this.genericMgr.FindAll<Entity.MD.Region>();
                     IList<Entity.MD.Location> locationList = this.genericMgr.FindAll<Entity.MD.Location>();
 
-                    #region
-                    int batchNo = int.Parse(this.numberControlMgr.GetNextSequence(Entity.BusinessConstants.NUMBERCONTROL_SISAPTRANSBATCHNO));
-                    #endregion
-
                     #region 计划外出入库
-                    trans2Mgr.ExchangeSAPMiscOrder(errorMessageList, batchNo, tcodeMoveTypes, regionList, locationList);
+                    try
+                    {
+                        log.Debug("开始导出计划外出入库" + batchNo.ToString());
+                        trans2Mgr.ExchangeSAPMiscOrder(errorMessageList, batchNo, tcodeMoveTypes, regionList, locationList);
+                        log.Debug("完成导出计划外出入库" + batchNo.ToString());
+                    }
+                    catch (Exception ex)
+                    {
+                        this.genericMgr.CleanSession();
+                        log.Debug("导出计划外出入库出现异常" + batchNo.ToString(), ex);
+                        errorMessageList.Add(new ErrorMessage
+                        {
+                            Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_LesError,
+                            Exception = ex
+                        });
+                    }
                     #endregion
 
                     #region 库存事务,过滤和安吉有关的业务
-                    trans1p5Mgr.ExchangeSAPTrans(errorMessageList, batchNo, tcodeMoveTypes, regionList, locationList);
+                    try
+                    {
+                        log.Debug("开始导出库存事务" + batchNo.ToString());
+                        trans1p5Mgr.ExchangeSAPTrans(errorMessageList, batchNo, tcodeMoveTypes, regionList, locationList);
+                        log.Debug("完成导出库存事务" + batchNo.ToString());
+                    }
+                    catch (Exception ex)
+                    {
+                        this.genericMgr.CleanSession();
+                        log.Debug("导出库存事务出现异常" + batchNo.ToString(), ex);
+                        errorMessageList.Add(new ErrorMessage
+                        {
+                            Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_LesError,
+                            Exception = ex
+                        });
+                    }
                     #endregion
 
                     #region 移动类型传SAP
+                    log.Debug("开始同步移动类型至SAP" + batchNo.ToString());
                     ReExchangeMoveType();
+                    log.Debug("完成同步移动类型至SAP" + batchNo.ToString());
                     #endregion
+
+                    log.Debug("完成导出移动类型" + batchNo.ToString());
                 }
                 catch (Exception ex)
                 {
-                    log.Error(NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_LesError, ex);
+                    log.Debug("导出移动类型出现异常" + batchNo.ToString(), ex);
                     errorMessageList.Add(new ErrorMessage
                     {
                         Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_LesError,
@@ -112,7 +148,8 @@ namespace com.Sconit.Service.SAP.Impl
                     }
                     catch (Exception ex)
                     {
-                        log.Error(NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_WebServiceNotAccess, ex);
+                        this.genericMgr.CleanSession();
+                        log.Error("连接SAP导出移动类型出现异常", ex);
                         errorMessageList.Add(new ErrorMessage
                         {
                             Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_WebServiceNotAccess,
@@ -148,7 +185,8 @@ namespace com.Sconit.Service.SAP.Impl
                     }
                     catch (Exception ex)
                     {
-                        log.Error(NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_WebServiceNotAccess, ex);
+                        this.genericMgr.CleanSession();
+                        log.Error("连接SAP导出移动类型出现异常", ex);
                         errorMessageList.Add(new ErrorMessage
                         {
                             Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_WebServiceNotAccess,
@@ -224,29 +262,16 @@ namespace com.Sconit.Service.SAP.Impl
 
         public void ExchangeSAPTrans(List<ErrorMessage> errorMessageList, int batchNo, IList<object[]> tcodeMoveTypes, IList<Entity.MD.Region> regionList, IList<Entity.MD.Location> locationList)
         {
-            try
-            {
-                DateTime dateTimeNow = DateTime.Now;
-                var tableIndex = this.genericMgr.FindById<TableIndex>(Entity.BusinessConstants.TABLEINDEX_LOCATIONTRANSACTION);
-                string sql = "select top " + InBatch + " * from VIEW_LocTrans WITH(NOLOCK) where Id > " + tableIndex.Id + " order by Id ";
-                IList<LocationTransaction> transList = this.genericMgr.FindEntityWithNativeSql<LocationTransaction>(sql);
+            DateTime dateTimeNow = DateTime.Now;
+            var tableIndex = this.genericMgr.FindById<TableIndex>(Entity.BusinessConstants.TABLEINDEX_LOCATIONTRANSACTION);
+            string sql = "select top " + InBatch + " * from VIEW_LocTrans WITH(NOLOCK) where Id > " + tableIndex.Id + " order by Id ";
+            IList<LocationTransaction> transList = this.genericMgr.FindEntityWithNativeSql<LocationTransaction>(sql);
 
-                while (transList != null && transList.Count() > 0)
-                {
-                    trans2Mgr.CreateInvTrans(transList, errorMessageList, batchNo, dateTimeNow, tcodeMoveTypes, regionList, locationList, tableIndex);
-                    sql = "select top " + InBatch + " * from VIEW_LocTrans WITH(NOLOCK) where Id > " + tableIndex.Id + " order by Id ";
-                    transList = this.genericMgr.FindEntityWithNativeSql<LocationTransaction>(sql);
-                }
-            }
-            catch (Exception ex)
+            while (transList != null && transList.Count() > 0)
             {
-                this.genericMgr.CleanSession();
-                log.Error(NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_LesError, ex);
-                errorMessageList.Add(new ErrorMessage
-                {
-                    Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_LesError,
-                    Exception = ex
-                });
+                trans2Mgr.CreateInvTrans(transList, errorMessageList, batchNo, dateTimeNow, tcodeMoveTypes, regionList, locationList, tableIndex);
+                sql = "select top " + InBatch + " * from VIEW_LocTrans WITH(NOLOCK) where Id > " + tableIndex.Id + " order by Id ";
+                transList = this.genericMgr.FindEntityWithNativeSql<LocationTransaction>(sql);
             }
         }
     }
@@ -273,53 +298,26 @@ namespace com.Sconit.Service.SAP.Impl
         [Transaction(TransactionMode.Requires)]
         public void ExchangeSAPMiscOrder(List<ErrorMessage> errorMessageList, int batchNo, IList<object[]> tcodeMoveTypes, IList<Entity.MD.Region> regionList, IList<Entity.MD.Location> locationList)
         {
-            try
+            TableIndex tableIndex = this.genericMgr.FindById<TableIndex>(Entity.BusinessConstants.TABLEINDEX_MISCORDERMASTER);
+
+            //过滤当天冲销的，即状态为Cancel并且关闭日期大于上次更新日期
+            string sql = @"select * from ORD_MiscOrderMstr WITH(NOLOCK) where LastModifyDate > ? and MoveType <> '999' and (Status = ? or (Status = ? and CloseDate <= ? ))";
+            object[] pamaDate = new object[] { tableIndex.LastModifyDate, CodeMaster.MiscOrderStatus.Close, CodeMaster.MiscOrderStatus.Cancel, tableIndex.LastModifyDate, };
+            var miscOrderMasterList = this.genericMgr.FindEntityWithNativeSql<MiscOrderMaster>(sql, pamaDate);
+
+            if (miscOrderMasterList != null && miscOrderMasterList.Count > 0)
             {
-                TableIndex tableIndex = this.genericMgr.FindById<TableIndex>(Entity.BusinessConstants.TABLEINDEX_MISCORDERMASTER);
-
-                //过滤当天冲销的，即状态为Cancel并且关闭日期大于上次更新日期
-                string sql = @"select * from ORD_MiscOrderMstr WITH(NOLOCK) where LastModifyDate > ? and MoveType <> '999' and (Status = ? or (Status = ? and CloseDate <= ? ))";
-                object[] pamaDate = new object[] { tableIndex.LastModifyDate, CodeMaster.MiscOrderStatus.Close, CodeMaster.MiscOrderStatus.Cancel, tableIndex.LastModifyDate, };
-                var miscOrderMasterList = this.genericMgr.FindEntityWithNativeSql<MiscOrderMaster>(sql, pamaDate);
-
-                if (miscOrderMasterList != null && miscOrderMasterList.Count > 0)
+                foreach (var miscOrderMaster in miscOrderMasterList)
                 {
-                    #region 更新TableIndex，记录最后更新日期
-                    tableIndex.LastModifyDate = miscOrderMasterList.Max(m => m.LastModifyDate);
-                    UpdateSiSap<TableIndex>(tableIndex);
-                    #endregion
-
-                    foreach (var miscOrderMaster in miscOrderMasterList)
-                    {
-                        //try
-                        //{
-                        sql = "select * from ORD_MiscOrderLocationDet WITH(NOLOCK) where MiscOrderNo = ?  ";
-                        var miscOrderLocationDetailList = this.genericMgr.FindEntityWithNativeSql<MiscOrderLocationDetail>(sql, miscOrderMaster.MiscOrderNo);
-                        MiscOrder2InvTrans(miscOrderMaster, miscOrderLocationDetailList, errorMessageList, batchNo, tcodeMoveTypes, regionList, locationList);
-                        //}
-                        //catch (Exception ex)
-                        //{
-                        //    log.Error(NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_WebServiceNotAccess, ex);
-                        //    errorMessageList.Add(new ErrorMessage
-                        //    {
-                        //        Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_WebServiceNotAccess,
-                        //        Exception = ex
-                        //    });
-                        //}
-                    }
-
-                    //CallSapTransService(allInvTrans, errorMessageList);
+                    sql = "select * from ORD_MiscOrderDet WITH(NOLOCK) where MiscOrderNo = ?  ";
+                    var miscOrderLocationDetailList = this.genericMgr.FindEntityWithNativeSql<MiscOrderLocationDetail>(sql, miscOrderMaster.MiscOrderNo);
+                    MiscOrder2InvTrans(miscOrderMaster, miscOrderLocationDetailList, errorMessageList, batchNo, tcodeMoveTypes, regionList, locationList);
                 }
-            }
-            catch (Exception ex)
-            {
-                this.genericMgr.CleanSession();
-                log.Error(NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_LesError, ex);
-                errorMessageList.Add(new ErrorMessage
-                {
-                    Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_LesError,
-                    Exception = ex
-                });
+
+                #region 更新TableIndex，记录最后更新日期
+                tableIndex.LastModifyDate = miscOrderMasterList.Max(m => m.LastModifyDate);
+                UpdateSiSap<TableIndex>(tableIndex);
+                #endregion
             }
         }
 
@@ -339,1027 +337,985 @@ namespace com.Sconit.Service.SAP.Impl
                 invTrans.BatchNo = batchNo;
                 invTrans.LocTransId = locTrans.Id;
 
-                try
+                #region 获取工厂/库位
+                string plantFrom = locTrans.PartyFrom != null ? GetPlant(regionList, locTrans.PartyFrom) : null;
+                string plantTo = locTrans.PartyTo != null ? GetPlant(regionList, locTrans.PartyTo) : null;
+                string sapLocationFrom = locTrans.LocationFrom != null ? GetSapLocation(locationList, locTrans.LocationFrom) : null;
+                string sapLocationTo = locTrans.LocationTo != null ? GetSapLocation(locationList, locTrans.LocationTo) : null;
+                #endregion
+
+                #region 采购
+                #region 采购收货
+                //采购收货	101	201	有采购单的 
+                //采购单或计划协议号取ExternalOrderNo
+                //采购单行号取ExternalSequence,计划协议号取ExternalSequence.Split('|')[0]
+
+                //根据配置文件决定是否过滤业务
+                bool isPartyToExchangeMoveType = false;
+                bool isPartyFromExchangeMoveType = false;
+                //由于asn可以更改入库地点，所以要根据实际的地点来取区域进行判断
+                string realRegionTo = locTrans.LocationTo != null ? GetRealRegion(locTrans.LocationTo) : string.Empty;
+                if (createInvTransRegonList != null && createInvTransRegonList.Where(region => string.Equals(region, realRegionTo, StringComparison.OrdinalIgnoreCase)).Count() > 0)
                 {
-                    #region 获取工厂/库位
-                    string plantFrom = locTrans.PartyFrom != null ? GetPlant(regionList, locTrans.PartyFrom) : null;
-                    string plantTo = locTrans.PartyTo != null ? GetPlant(regionList, locTrans.PartyTo) : null;
-                    string sapLocationFrom = locTrans.LocationFrom != null ? GetSapLocation(locationList, locTrans.LocationFrom) : null;
-                    string sapLocationTo = locTrans.LocationTo != null ? GetSapLocation(locationList, locTrans.LocationTo) : null;
-                    #endregion
+                    isPartyToExchangeMoveType = true;
+                }
+                string realRegionFrom = locTrans.LocationFrom != null ? GetRealRegion(locTrans.LocationFrom) : string.Empty;
+                if (createInvTransRegonList != null && createInvTransRegonList.Where(region => string.Equals(region, realRegionFrom, StringComparison.OrdinalIgnoreCase)).Count() > 0)
+                {
+                    isPartyFromExchangeMoveType = true;
+                }
 
-                    #region 采购
-                    #region 采购收货
-                    //采购收货	101	201	有采购单的 
-                    //采购单或计划协议号取ExternalOrderNo
-                    //采购单行号取ExternalSequence,计划协议号取ExternalSequence.Split('|')[0]
+                if (locTrans.TransactionType == CodeMaster.TransactionType.RCT_PO
+                    || locTrans.TransactionType == CodeMaster.TransactionType.RCT_SL)
+                {
+                    if (isPartyToExchangeMoveType)
+                    {
+                        object[] EBELN_EBELP = null;
 
-                    //根据配置文件决定是否过滤业务
-                    bool isPartyToExchangeMoveType = false;
-                    bool isPartyFromExchangeMoveType = false;
-                    //由于asn可以更改入库地点，所以要根据实际的地点来取区域进行判断
-                    string realRegionTo = locTrans.LocationTo != null ? GetRealRegion(locTrans.LocationTo) : string.Empty;
-                    if (createInvTransRegonList != null && createInvTransRegonList.Where(region => string.Equals(region, realRegionTo, StringComparison.OrdinalIgnoreCase)).Count() > 0)
-                    {
-                        isPartyToExchangeMoveType = true;
-                    }
-                    string realRegionFrom = locTrans.LocationFrom != null ? GetRealRegion(locTrans.LocationFrom) : string.Empty;
-                    if (createInvTransRegonList != null && createInvTransRegonList.Where(region => string.Equals(region, realRegionFrom, StringComparison.OrdinalIgnoreCase)).Count() > 0)
-                    {
-                        isPartyFromExchangeMoveType = true;
-                    }
-
-                    if (locTrans.TransactionType == CodeMaster.TransactionType.RCT_PO
-                        || locTrans.TransactionType == CodeMaster.TransactionType.RCT_SL)
-                    {
-                        if (isPartyToExchangeMoveType)
+                        if (locTrans.OrderType == CodeMaster.OrderType.ScheduleLine)
                         {
-                            object[] EBELN_EBELP = null;
-                            try
-                            {
-                                if (locTrans.OrderType == CodeMaster.OrderType.ScheduleLine)
-                                {
-                                    EBELN_EBELP = genericMgr.FindAllWithNativeSql<object[]>(NativeSqlStatement.SELECT_SL_EBELN_AND_EBELP_STATEMENT, locTrans.OrderDetailId).Single();
-                                }
-                                else
-                                {
-                                    EBELN_EBELP = genericMgr.FindAllWithNativeSql<object[]>(NativeSqlStatement.SELECT_PO_EBELN_AND_EBELP_STATEMENT, locTrans.OrderDetailId).Single();
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                invTrans.ErrorId = InvTrans.ErrorIdEnum.E100;
-                                log.Error(NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_CreateInvLocFail, ex);
-                                errorMessageList.Add(new ErrorMessage
-                                {
-                                    Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_CreateInvLocFail,
-                                    Exception = ex
-                                });
-                            }
-
-                            invTrans.BWART = "101";
-                            invTrans.WERKS = plantTo;
-                            invTrans.LIFNR = locTrans.PartyFrom;
-                            invTrans.LGORT = sapLocationTo;
-                            invTrans.SOBKZ = locTrans.ActingBillQty > 0 ? null : "K";  //发生结算为空，不发生结算为K
-                            if (EBELN_EBELP[0] != null)
-                            {
-                                invTrans.EBELN = (string)EBELN_EBELP[0];
-                            }
-                            else
-                            {
-                                invTrans.ErrorId = InvTrans.ErrorIdEnum.E101;
-                                log.Error(string.Format("库存事务{0}的PO单号/计划协议号为空。", locTrans.Id.ToString()));
-                            }
-
-                            if (EBELN_EBELP[1] == null)
-                            {
-                                invTrans.ErrorId = InvTrans.ErrorIdEnum.E102;
-                                log.Error(string.Format("库存事务{0}的PO单号行号/计划协议行号为空。", locTrans.Id.ToString()));
-                            }
-                            //新逻辑：计划协议行号不需要判断分隔符
-                            //else if (locTrans.OrderType == CodeMaster.OrderType.ScheduleLine)
-                            //{
-                            //    if (!((string)EBELN_EBELP[1]).Contains(SplitSymbol))
-                            //    {
-                            //        invTrans.ErrorId = InvTrans.ErrorIdEnum.E103;
-                            //        log.Error(string.Format("交货计划行收货时库存事务{0}的计划协议行号不包含分隔符{1}。", locTrans.Id.ToString(), SplitSymbol));
-                            //    }
-                            //    else
-                            //    {
-                            //        invTrans.EBELP = ((string)EBELN_EBELP[1]).Split(SplitSymbol)[0];
-                            //    }
-                            //}
-                            else
-                            {
-                                invTrans.EBELP = (string)EBELN_EBELP[1];
-                            }
-                            invTrans.GRUND = locTrans.LocationIOReason;
-                            invTrans.XBLNR = locTrans.ReceiptNo;
-                            invTrans.XABLN = locTrans.IpNo;
-                            //2013-10-16以后不再传322了，而是根据收货明细中的IsInspect字段来判断，并记录到INSMK=2
-                            //ReceiptDetail receipDetail = genericMgr.FindEntityWithNativeSql<ReceiptDetail>("select * from ORD_RecDet_1 WITH(NOLOCK) where Id = ?", locTrans.ReceiptDetailId).Single();
-                            //if (receipDetail.IsInspect)
-                            //    invTrans.INSMK = "2";
-                            //else
-                            //    invTrans.INSMK = null;
-                            invTrans.INSMK = locTrans.QualityType == CodeMaster.QualityType.Qualified ? null : "3";
-                            invTrans.OrderNo = locTrans.OrderNo;
-                            invTrans.DetailId = locTrans.OrderDetailId;
-
-                            thisInvTransList.Add(invTrans);
-
-                            #region 寄售物料，采购就发生结算，收货库位补做411K
-                            if (locTrans.ActingBillQty > 0)
-                            {
-                                ActingBill actingBill = genericMgr.FindEntityWithNativeSql<ActingBill>("select * from BIL_ActBill WITH(NOLOCK) where Id = ?", locTrans.ActingBill).Single();
-                                if (actingBill != null && actingBill.BillTerm != CodeMaster.OrderBillTerm.ReceivingSettlement)
-                                {
-
-                                    InvTrans invTrans411K = new InvTrans();
-
-                                    invTrans411K.BWART = "411";
-                                    invTrans411K.LIFNR = actingBill.Party;
-                                    invTrans411K.SOBKZ = "K";
-                                    invTrans411K.XBLNR = actingBill.ReceiptNo;
-                                    invTrans411K.WERKS = plantTo;
-                                    invTrans411K.LGORT = sapLocationTo;
-                                    invTrans411K.UMWRK = plantTo;
-                                    invTrans411K.UMLGO = sapLocationTo;
-                                    invTrans411K.OrderNo = locTrans.OrderNo;
-                                    invTrans411K.DetailId = locTrans.OrderDetailId;
-
-                                    thisInvTransList.Add(invTrans411K);
-
-                                    invTrans.SOBKZ = "K";
-                                }
-                            }
-                            #endregion
-                        }
-                    }
-                    #endregion
-
-                    #region 采购冲销
-                    //采购冲销	102	202	//采购入库冲销
-                    //采购单或计划协议号取ExternalOrderNo
-                    //采购单行号取ExternalSequence,计划协议号取ExternalSequence.Split('|')[0]
-                    else if (locTrans.TransactionType == CodeMaster.TransactionType.RCT_PO_VOID
-                        || locTrans.TransactionType == CodeMaster.TransactionType.RCT_SL_VOID)
-                    {
-                        if (isPartyToExchangeMoveType)
-                        {
-                            object[] EBELN_EBELP = null;
-                            try
-                            {
-                                if (locTrans.OrderType == CodeMaster.OrderType.ScheduleLine)
-                                {
-                                    EBELN_EBELP = genericMgr.FindAllWithNativeSql<object[]>(NativeSqlStatement.SELECT_SL_EBELN_AND_EBELP_STATEMENT, locTrans.OrderDetailId).Single();
-                                }
-                                else
-                                {
-                                    EBELN_EBELP = genericMgr.FindAllWithNativeSql<object[]>(NativeSqlStatement.SELECT_PO_EBELN_AND_EBELP_STATEMENT, locTrans.OrderDetailId).Single();
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                invTrans.ErrorId = InvTrans.ErrorIdEnum.E100;
-                                log.Error(NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_CreateInvLocFail, ex);
-                                errorMessageList.Add(new ErrorMessage
-                                {
-                                    Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_CreateInvLocFail,
-                                    Exception = ex
-                                });
-                            }
-
-                            invTrans.BWART = "102";
-                            invTrans.WERKS = plantTo;
-                            invTrans.LIFNR = locTrans.PartyFrom;
-                            invTrans.LGORT = sapLocationTo;
-                            if (EBELN_EBELP[0] != null)
-                            {
-                                invTrans.EBELN = (string)EBELN_EBELP[0];
-                            }
-                            else
-                            {
-                                invTrans.ErrorId = InvTrans.ErrorIdEnum.E101;
-                                log.Error(string.Format("库存事务{0}的PO单号/计划协议号为空。", locTrans.Id.ToString()));
-                            }
-
-                            if (EBELN_EBELP[1] == null)
-                            {
-                                invTrans.ErrorId = InvTrans.ErrorIdEnum.E102;
-                                log.Error(string.Format("库存事务{0}的PO单号行号/计划协议行号为空。", locTrans.Id.ToString()));
-                            }
-                            //else if (locTrans.OrderType == CodeMaster.OrderType.ScheduleLine)
-                            //{
-                            //    if (!((string)EBELN_EBELP[1]).Contains(SplitSymbol))
-                            //    {
-                            //        invTrans.ErrorId = InvTrans.ErrorIdEnum.E103;
-                            //        log.Error(string.Format("交货计划行收货时库存事务{0}的计划协议行号不包含分隔符{1}。", locTrans.Id.ToString(), SplitSymbol));
-                            //    }
-                            //    else
-                            //    {
-                            //        invTrans.EBELP = ((string)EBELN_EBELP[1]).Split(SplitSymbol)[0];
-                            //    }
-                            //}
-                            else
-                            {
-                                invTrans.EBELP = (string)EBELN_EBELP[1];
-                            }
-                            invTrans.GRUND = locTrans.LocationIOReason;
-                            invTrans.XBLNR = locTrans.ReceiptNo;
-                            invTrans.SOBKZ = locTrans.IsConsignment && locTrans.PlanBillQty < 0 ? "K" : null;    //寄售收货冲销，planbillqty为负数
-                            invTrans.XABLN = locTrans.IpNo;
-                            invTrans.INSMK = locTrans.QualityType == CodeMaster.QualityType.Qualified ? null : "3";
-
-                            #region 寄售物料，采购就发生结算，冲销时先做412K
-                            if (locTrans.ActingBillQty < 0)
-                            {
-                                ActingBill actingBill = genericMgr.FindEntityWithNativeSql<ActingBill>("select * from BIL_ActBill WITH(NOLOCK) where Id = ?", locTrans.ActingBill).Single();
-
-                                if (actingBill != null && actingBill.BillTerm != CodeMaster.OrderBillTerm.ReceivingSettlement)
-                                {
-                                    InvTrans invTrans412K = new InvTrans();
-
-                                    invTrans412K.BWART = "412";
-                                    invTrans412K.LIFNR = actingBill.Party;
-                                    invTrans412K.SOBKZ = "K";
-                                    invTrans412K.XBLNR = actingBill.ReceiptNo;
-                                    invTrans412K.WERKS = plantTo;
-                                    invTrans412K.LGORT = sapLocationTo;
-                                    invTrans412K.UMWRK = plantTo;
-                                    invTrans412K.UMLGO = sapLocationTo;
-
-                                    invTrans412K.OrderNo = locTrans.OrderNo;
-                                    invTrans412K.DetailId = locTrans.OrderDetailId;
-
-                                    thisInvTransList.Add(invTrans412K);
-
-                                    invTrans.SOBKZ = "K";
-                                }
-                            }
-                            #endregion
-
-                            invTrans.OrderNo = locTrans.OrderNo;
-                            invTrans.DetailId = locTrans.OrderDetailId;
-                            thisInvTransList.Add(invTrans);
-                        }
-                    }
-                    #endregion
-
-                    #region 采购退货
-                    //采购退货
-                    /*  1.	寄售MoveType:ZR1K、ZR5K
-                        2.	非寄售MoveType:161
-                    */
-                    else if (locTrans.TransactionType == CodeMaster.TransactionType.ISS_PO
-                        || locTrans.TransactionType == CodeMaster.TransactionType.ISS_SL)
-                    {
-                        if (isPartyFromExchangeMoveType)
-                        {
-                            #region 非寄售MoveType:161
-                            //如果是寄售库存就算有退货单号也不做161
-                            if (!(locTrans.IsConsignment && locTrans.PlanBillQty < 0))//161
-                            {
-                                if (locTrans.QualityType == CodeMaster.QualityType.Qualified)
-                                {
-                                    //采购退货-自有	161	203	//采购退货			0		0
-                                    invTrans.BWART = "161";
-                                    invTrans.WERKS = plantFrom;
-                                    invTrans.LIFNR = locTrans.PartyTo;
-                                    invTrans.LGORT = sapLocationFrom;
-                                    invTrans.GRUND = locTrans.LocationIOReason;
-                                    invTrans.XBLNR = locTrans.ReceiptNo;
-                                }
-                                //其他的不考虑 无162 冲销.无 有订单,冻结的退货
-                            }
-                            #endregion
-
-                            #region 寄售MoveType:ZR1K、ZR5K
-                            else
-                            {
-                                #region 合格品退货做ZR1
-                                //采购退货-寄售	ZR1	203	//采购退货			1		0
-                                if (locTrans.QualityType == CodeMaster.QualityType.Qualified)
-                                {
-                                    invTrans.BWART = "ZR1";
-                                    invTrans.WERKS = plantFrom;
-                                    invTrans.LIFNR = locTrans.PartyTo;
-                                    invTrans.LGORT = sapLocationFrom;
-                                    invTrans.SOBKZ = "K";
-                                }
-                                #endregion
-
-                                #region 不合格品退货做ZR5
-                                //采购退货-寄售-冻结	ZR5	203	//采购退货			1		2
-                                else if (locTrans.QualityType == CodeMaster.QualityType.Reject)
-                                {
-                                    invTrans.BWART = "ZR5";
-                                    invTrans.WERKS = plantFrom;
-                                    invTrans.LIFNR = locTrans.PartyTo;
-                                    invTrans.LGORT = sapLocationFrom;
-                                    invTrans.SOBKZ = "K";
-                                }
-                                #endregion
-
-                                invTrans.OrderNo = locTrans.OrderNo;
-                                invTrans.DetailId = locTrans.OrderDetailId;
-                                thisInvTransList.Add(invTrans);
-                            }
-                            #endregion
-                        }
-                    }
-                    #endregion
-
-                    #region 采购退货冲销
-                    //采购退货冲销-寄售	ZR2/ZR6	204	//采购退货冲销			1		0
-                    else if (locTrans.TransactionType == CodeMaster.TransactionType.ISS_PO_VOID
-                        || locTrans.TransactionType == CodeMaster.TransactionType.ISS_SL_VOID)
-                    {
-                        if (isPartyFromExchangeMoveType)
-                        {
-                            if (locTrans.IsConsignment && locTrans.PlanBillQty > 0)
-                            {
-                                #region 非寄售MoveType:162，没有这种情况
-                                #endregion
-                            }
-                            else
-                            {
-                                #region 合格品退货冲销做ZR2
-                                if (locTrans.QualityType == CodeMaster.QualityType.Qualified)
-                                {
-                                    invTrans.BWART = "ZR2";
-                                    invTrans.WERKS = plantFrom;
-                                    invTrans.LIFNR = locTrans.PartyTo;
-                                    invTrans.LGORT = sapLocationFrom;
-                                    invTrans.SOBKZ = "K";
-                                }
-                                #endregion
-
-                                #region 不合格品退货冲销做ZR6
-                                else if (locTrans.QualityType == CodeMaster.QualityType.Reject)
-                                {
-                                    invTrans.BWART = "ZR6";
-                                    invTrans.WERKS = plantFrom;
-                                    invTrans.LIFNR = locTrans.PartyTo;
-                                    invTrans.LGORT = sapLocationFrom;
-                                    invTrans.SOBKZ = "K";
-                                }
-                                #endregion
-                            }
-
-                            invTrans.OrderNo = locTrans.OrderNo;
-                            invTrans.DetailId = locTrans.OrderDetailId;
-                            thisInvTransList.Add(invTrans);
-                        }
-                    }
-                    #endregion
-                    #endregion
-
-                    #region  移库 只导同一工厂内部的移库,其他的通过计划外出入库
-                    //安吉相关事务只处理buff对安吉的收货/收货冲销/退货
-                    /*
-                    Transtype	     Loc出现位置	   解释	                移动类型接口是否处理
-                    RCT-TR	         PartyFrom	       buff正常收货	        y
-                    RCT-TR	         PartyTo	       buff差异收货	        ?
-                    RCT-TR-Void	     PartyFrom	       buff收货冲销	        y
-                    RCT-TR-Rtn	     PartyTo	       buff向安吉退货       y
-                    RCT-TR-Rtn-Void	 PartyTo	       buff向安吉退货冲销	y
-                    ISS-TR-Void      PartyFrom         安吉发货冲销         n
-                    */
-
-                    /*        IsCs PlanBill  ActingBill    TransType                       解释
-                    * 311      0       /          =0       RCT_TR/RCT_TR_RTN               自有物资移库
-                    * 312      0       /          =0       RCT_TR_VOID/RCT_TR_RTN_VOID     自有物资移库移库冲销
-                    * 311K     1       >0          /       RCT_TR/RCT_TR_RTN               寄售移库不结算
-                    * 312K     1       <0          /       RCT_TR_VOID/RCT_TR_RTN_VOID     寄售移库冲销不结算
-                    * 411K     0       /          >0       RCT_TR/RCT_TR_RTN               寄售移库结算
-                    * 412K     1       /          <0       RCT_TR_VOID/RCT_TR_RTN_VOID     寄售移库结算冲销
-                    * 325                                                                  冻结库存移库
-                    */
-                    #region 移库/移库退货
-                    else if ((locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR
-                        || locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_RTN)
-                        && locTrans.QualityType == CodeMaster.QualityType.Qualified
-                        && plantFrom == plantTo && sapLocationFrom != sapLocationTo)//&& SihLoc.Contains(sapLocationTo)
-                    {
-                        //安吉或双桥-buff的移库事务做特殊处理
-                        if ((locTrans.PartyFrom.ToUpper() == "LOC" || locTrans.PartyFrom.ToUpper() == "SQC") && locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR)
-                        {
-                            IpDetail ipDetail = genericMgr.FindEntityWithNativeSql<IpDetail>("select * from ORD_IpDet_2 WITH(NOLOCK) where Id = ?", locTrans.IpDetailId).Single();
-                            if (ipDetail.BWART == "411K")
-                            {
-                                invTrans.BWART = "411";
-                                invTrans.LIFNR = ipDetail.ManufactureParty;
-                                invTrans.SOBKZ = "K";
-                                invTrans.XBLNR = locTrans.ReceiptNo;
-                                invTrans.WERKS = plantTo;
-                                invTrans.LGORT = sapLocationFrom;
-                                invTrans.UMWRK = plantFrom;
-                                invTrans.UMLGO = sapLocationTo;
-                            }
-                            else if (ipDetail.BWART == "311K")
-                            {
-                                invTrans.BWART = "311";
-                                invTrans.LIFNR = ipDetail.ManufactureParty;
-                                invTrans.SOBKZ = "K";
-                                invTrans.XBLNR = locTrans.ReceiptNo;
-                                invTrans.WERKS = plantTo;
-                                invTrans.LGORT = sapLocationFrom;
-                                invTrans.UMWRK = plantFrom;
-                                invTrans.UMLGO = sapLocationTo;
-                            }
-                            else if (ipDetail.BWART == "311")
-                            {
-                                invTrans.BWART = "311";
-                                invTrans.XBLNR = locTrans.ReceiptNo;
-                                invTrans.WERKS = plantTo;
-                                invTrans.LGORT = sapLocationFrom;
-                                invTrans.UMWRK = plantFrom;
-                                invTrans.UMLGO = sapLocationTo;
-                            }
-
-                            invTrans.OrderNo = locTrans.OrderNo;
-                            invTrans.DetailId = locTrans.OrderDetailId;
-                            thisInvTransList.Add(invTrans);
+                            EBELN_EBELP = genericMgr.FindAllWithNativeSql<object[]>(NativeSqlStatement.SELECT_SL_EBELN_AND_EBELP_STATEMENT, locTrans.OrderDetailId).Single();
                         }
                         else
                         {
-                            if (locTrans.ActingBillQty > 0)
-                            {
-                                //LOC移库(退货)至线旁-寄售结算	411K	303	//移库入库(退货)			
-                                ActingBill actingBill = genericMgr.FindEntityWithNativeSql<ActingBill>("select * from BIL_ActBill WITH(NOLOCK) where Id = ?", locTrans.ActingBill).Single();
-                                invTrans.BWART = "411";
-                                invTrans.LIFNR = actingBill.Party;
-                                invTrans.SOBKZ = "K";
-                                invTrans.XBLNR = actingBill.ReceiptNo;
-                                invTrans.WERKS = plantTo;
-                                invTrans.LGORT = sapLocationFrom;
-                                invTrans.UMWRK = plantFrom;
-                                invTrans.UMLGO = sapLocationTo;
-                            }
-                            else if (locTrans.IsConsignment && locTrans.PlanBillQty > 0)
-                            {
-                                //todo-不考虑差异收货，如buff收安吉的物料产生的退回原库位的收货差异。
-
-                                //LOC移库(退货)至线旁-寄售不结算	311K	303	//移库入库(退货)
-                                PlanBill planBill = genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill WITH(NOLOCK) where Id = ?", locTrans.PlanBill).Single();
-                                invTrans.BWART = "311";
-                                invTrans.LIFNR = planBill.Party;
-                                invTrans.SOBKZ = "K";
-                                invTrans.XBLNR = planBill.ReceiptNo;
-                                invTrans.WERKS = plantTo;
-                                invTrans.LGORT = sapLocationFrom;
-                                invTrans.UMWRK = plantFrom;
-                                invTrans.UMLGO = sapLocationTo;
-                            }
-                            else if (locTrans.ActingBillQty < 0)
-                            {
-                                log.Error(GetTLog(locTrans, "移库/移库退货结算数量小于0。"));
-                                invTrans.ErrorId = InvTrans.ErrorIdEnum.E104;
-                            }
-                            else if (locTrans.IsConsignment && locTrans.PlanBillQty < 0)
-                            {
-                                log.Error(GetTLog(locTrans, "移库/移库退货寄售数量小于0。"));
-                                invTrans.ErrorId = InvTrans.ErrorIdEnum.E105;
-                            }
-                            else
-                            {
-                                //LOC移库(退货)至线旁(自有物资)	311	303	//移库(退货)入库
-                                invTrans.BWART = "311";
-                                if (locTrans.Qty >= 0)
-                                {
-                                    invTrans.XBLNR = locTrans.ReceiptNo;
-                                    invTrans.WERKS = plantTo;
-                                    invTrans.LGORT = sapLocationFrom;
-                                    invTrans.UMWRK = plantFrom;
-                                    invTrans.UMLGO = sapLocationTo;
-                                }
-                                else
-                                {
-                                    invTrans.XBLNR = locTrans.ReceiptNo;
-                                    invTrans.WERKS = plantFrom;
-                                    invTrans.LGORT = sapLocationTo;
-                                    invTrans.UMWRK = plantTo;
-                                    invTrans.UMLGO = sapLocationFrom;
-                                }
-                            }
-
-                            invTrans.OrderNo = locTrans.OrderNo;
-                            invTrans.DetailId = locTrans.OrderDetailId;
-                            thisInvTransList.Add(invTrans);
+                            EBELN_EBELP = genericMgr.FindAllWithNativeSql<object[]>(NativeSqlStatement.SELECT_PO_EBELN_AND_EBELP_STATEMENT, locTrans.OrderDetailId).Single();
                         }
-                    }
-                    #endregion
 
-                    #region 移库冲销/移库退货冲销
-                    else if ((locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_VOID
-                        || locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_RTN_VOID)
-                        //&& !locTrans.IsConsignment && locTrans.ActingBill == 0
-                        && locTrans.QualityType == CodeMaster.QualityType.Qualified
-                        && plantFrom == plantTo && sapLocationFrom != sapLocationTo) //&& SihLoc.Contains(sapLocationTo)
-                    {
-                        //安吉-buff的移库冲销要特殊处理
-                        if ((locTrans.PartyFrom.ToUpper() == "LOC" || locTrans.PartyFrom.ToUpper() == "SQC") && locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_VOID)
+                        invTrans.BWART = "101";
+                        invTrans.WERKS = plantTo;
+                        invTrans.LIFNR = locTrans.PartyFrom;
+                        invTrans.LGORT = sapLocationTo;
+                        invTrans.SOBKZ = locTrans.ActingBillQty > 0 ? null : "K";  //发生结算为空，不发生结算为K
+                        if (EBELN_EBELP[0] != null)
                         {
-                            IpDetail ipDetail = genericMgr.FindEntityWithNativeSql<IpDetail>("select * from ORD_IpDet_2 WITH(NOLOCK) where Id = ?", locTrans.IpDetailId).Single();
-                            if (ipDetail.BWART == "411K")
-                            {
-                                invTrans.BWART = "412";
-                                invTrans.LIFNR = ipDetail.ManufactureParty;
-                                invTrans.SOBKZ = "K";
-                                invTrans.XBLNR = locTrans.ReceiptNo;
-                                invTrans.WERKS = plantTo;
-                                invTrans.LGORT = sapLocationFrom;
-                                invTrans.UMWRK = plantFrom;
-                                invTrans.UMLGO = sapLocationTo;
-                            }
-                            else if (ipDetail.BWART == "311K")
-                            {
-                                invTrans.BWART = "312";
-                                invTrans.LIFNR = ipDetail.ManufactureParty;
-                                invTrans.SOBKZ = "K";
-                                invTrans.XBLNR = locTrans.ReceiptNo;
-                                invTrans.WERKS = plantTo;
-                                invTrans.LGORT = sapLocationFrom;
-                                invTrans.UMWRK = plantFrom;
-                                invTrans.UMLGO = sapLocationTo;
-                            }
-                            else if (ipDetail.BWART == "311")
-                            {
-                                invTrans.BWART = "312";
-                                invTrans.XBLNR = locTrans.ReceiptNo;
-                                invTrans.WERKS = plantTo;
-                                invTrans.LGORT = sapLocationFrom;
-                                invTrans.UMWRK = plantFrom;
-                                invTrans.UMLGO = sapLocationTo;
-                            }
-
-                            invTrans.OrderNo = locTrans.OrderNo;
-                            invTrans.DetailId = locTrans.OrderDetailId;
-                            thisInvTransList.Add(invTrans);
+                            invTrans.EBELN = (string)EBELN_EBELP[0];
                         }
                         else
                         {
-                            if (locTrans.ActingBillQty < 0)
-                            {
-                                //LOC移库(退货)至线旁冲销-寄售	412K	304	//移库入库冲销(退货)	
-                                ActingBill actingBill = genericMgr.FindEntityWithNativeSql<ActingBill>("select * from BIL_ActBill WITH(NOLOCK) where Id = ?", locTrans.ActingBill).Single();
-                                invTrans.BWART = "412";
-                                invTrans.LIFNR = actingBill.Party;
-                                invTrans.SOBKZ = "K";
-                                invTrans.XBLNR = actingBill.ReceiptNo;
-                                invTrans.WERKS = plantTo;
-                                invTrans.LGORT = sapLocationFrom;
-                                invTrans.UMWRK = plantFrom;
-                                invTrans.UMLGO = sapLocationTo;
-                            }
-                            else if (locTrans.IsConsignment && locTrans.PlanBillQty < 0)
-                            {
-                                //LOC移库冲销(退货)至线旁-寄售不结算	312K	303	//移库入库(退货)
-                                PlanBill planBill = genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill WITH(NOLOCK) where Id = ?", locTrans.PlanBill).Single();
-                                invTrans.BWART = "312";
-                                invTrans.LIFNR = planBill.Party;
-                                invTrans.SOBKZ = "K";
-                                invTrans.XBLNR = planBill.ReceiptNo;
-                                invTrans.WERKS = plantTo;
-                                invTrans.LGORT = sapLocationFrom;
-                                invTrans.UMWRK = plantFrom;
-                                invTrans.UMLGO = sapLocationTo;
-                            }
-                            else if (locTrans.ActingBillQty > 0)
-                            {
-                                log.Error(GetTLog(locTrans, "移库/移库退货冲销结算数量小于0。"));
-                                invTrans.ErrorId = InvTrans.ErrorIdEnum.E106;
-                            }
-                            else if (locTrans.IsConsignment && locTrans.PlanBillQty > 0)
-                            {
-                                log.Error(GetTLog(locTrans, "移库/移库退货冲销寄售数量小于0。"));
-                                invTrans.ErrorId = InvTrans.ErrorIdEnum.E107;
-                            }
-                            else
-                            {
-                                //LOC移库(退货)至线旁冲销(自有物资)	312	304	//移库入库冲销(退货)			0	
-                                invTrans.BWART = "312";
-                                if (locTrans.Qty < 0)
-                                {
-                                    invTrans.XBLNR = locTrans.ReceiptNo;
-                                    invTrans.WERKS = plantTo;
-                                    invTrans.LGORT = sapLocationFrom;
-                                    invTrans.UMWRK = plantFrom;
-                                    invTrans.UMLGO = sapLocationTo;
-                                }
-                                else
-                                {
-                                    invTrans.XBLNR = locTrans.ReceiptNo;
-                                    invTrans.WERKS = plantFrom;
-                                    invTrans.LGORT = sapLocationTo;
-                                    invTrans.UMWRK = plantTo;
-                                    invTrans.UMLGO = sapLocationFrom;
-                                }
-                            }
-                            invTrans.OrderNo = locTrans.OrderNo;
-                            invTrans.DetailId = locTrans.OrderDetailId;
-                            thisInvTransList.Add(invTrans);
+                            invTrans.ErrorId = InvTrans.ErrorIdEnum.E101;
+                            log.Error(string.Format("库存事务{0}的PO单号/计划协议号为空。", locTrans.Id.ToString()));
                         }
-                    }
-                    #endregion
 
-                    #region 库内结算
-                    #region 翻箱结算
-                    else if (locTrans.TransactionType == CodeMaster.TransactionType.ISS_REP
-                        && locTrans.QualityType == CodeMaster.QualityType.Qualified
-                        && locTrans.ActingBillQty > 0
-                        && plantFrom == plantTo) //&& SihLoc.Contains(sapLocationTo)
-                    {
-                        ActingBill actingBill = genericMgr.FindEntityWithNativeSql<ActingBill>("select * from BIL_ActBill WITH(NOLOCK) where Id = ?", locTrans.ActingBill).Single();
-                        invTrans.BWART = "411";
-                        invTrans.LIFNR = actingBill.Party;
-                        invTrans.SOBKZ = "K";
-                        invTrans.XBLNR = actingBill.ReceiptNo;
-                        invTrans.WERKS = plantTo;
-                        invTrans.LGORT = sapLocationFrom;
-                        invTrans.UMWRK = plantFrom;
-                        invTrans.UMLGO = sapLocationTo;
-
-                        invTrans.OrderNo = locTrans.OrderNo;
-                        invTrans.DetailId = locTrans.OrderDetailId;
-                        thisInvTransList.Add(invTrans);
-                    }
-                    #endregion
-
-                    #region 内部移库结算
-                    else if ((locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR
-                        || locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_RTN)
-                       && locTrans.QualityType == CodeMaster.QualityType.Qualified
-                       && locTrans.ActingBillQty > 0
-                       && plantFrom == plantTo && sapLocationFrom == sapLocationTo)
-                    {
-                        ActingBill actingBill = genericMgr.FindEntityWithNativeSql<ActingBill>("select * from BIL_ActBill WITH(NOLOCK) where Id = ?", locTrans.ActingBill).Single();
-                        invTrans.BWART = "411";
-                        invTrans.LIFNR = actingBill.Party;
-                        invTrans.SOBKZ = "K";
-                        invTrans.XBLNR = actingBill.ReceiptNo;
-                        invTrans.WERKS = plantTo;
-                        invTrans.LGORT = sapLocationFrom;
-                        invTrans.UMWRK = plantFrom;
-                        invTrans.UMLGO = sapLocationTo;
-
-                        invTrans.OrderNo = locTrans.OrderNo;
-                        invTrans.DetailId = locTrans.OrderDetailId;
-                        thisInvTransList.Add(invTrans);
-                    }
-                    #endregion
-
-                    #region 内部移库结算冲销
-                    else if ((locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_VOID
-                        || locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_RTN_VOID)
-                       && locTrans.QualityType == CodeMaster.QualityType.Qualified
-                       && locTrans.ActingBillQty < 0
-                       && plantFrom == plantTo && sapLocationFrom == sapLocationTo)
-                    {
-                        ActingBill actingBill = genericMgr.FindEntityWithNativeSql<ActingBill>("select * from BIL_ActBill WITH(NOLOCK) where Id = ?", locTrans.ActingBill).Single();
-                        invTrans.BWART = "412";
-                        invTrans.LIFNR = actingBill.Party;
-                        invTrans.SOBKZ = "K";
-                        invTrans.XBLNR = actingBill.ReceiptNo;
-                        invTrans.WERKS = plantTo;
-                        invTrans.LGORT = sapLocationFrom;
-                        invTrans.UMWRK = plantFrom;
-                        invTrans.UMLGO = sapLocationTo;
-
-                        invTrans.OrderNo = locTrans.OrderNo;
-                        invTrans.DetailId = locTrans.OrderDetailId;
-                        thisInvTransList.Add(invTrans);
-                    }
-                    #endregion
-                    #endregion
-
-                    #region 库内结算冲销
-                    else if (locTrans.TransactionType == CodeMaster.TransactionType.ISS_REP
-                       && locTrans.QualityType == CodeMaster.QualityType.Qualified
-                       && locTrans.ActingBillQty < 0
-                       && plantFrom == plantTo) //&& SihLoc.Contains(sapLocationTo)
-                    {
-                        ActingBill actingBill = genericMgr.FindEntityWithNativeSql<ActingBill>("select * from BIL_ActBill WITH(NOLOCK) where Id = ?", locTrans.ActingBill).Single();
-                        invTrans.BWART = "412";
-                        invTrans.LIFNR = actingBill.Party;
-                        invTrans.SOBKZ = "K";
-                        invTrans.XBLNR = actingBill.ReceiptNo;
-                        invTrans.WERKS = plantTo;
-                        invTrans.LGORT = sapLocationFrom;
-                        invTrans.UMWRK = plantFrom;
-                        invTrans.UMLGO = sapLocationTo;
-
-                        invTrans.OrderNo = locTrans.OrderNo;
-                        invTrans.DetailId = locTrans.OrderDetailId;
-                        thisInvTransList.Add(invTrans);
-                    }
-                    #endregion
-
-                    #endregion
-
-                    #region 检验
-                    #region 报验
-                    else if (locTrans.TransactionType == CodeMaster.TransactionType.RCT_INP
-                        || locTrans.TransactionType == CodeMaster.TransactionType.RCT_ISL)
-                    {
-                        invTrans.BWART = "322";
-                        invTrans.WERKS = plantFrom;
-                        invTrans.LGORT = sapLocationFrom;
-                        invTrans.UMLGO = sapLocationTo;
-                        invTrans.XABLN = locTrans.OrderNo;//记录报验单号，防止跨报验单汇总
-                        if (locTrans.IsConsignment && locTrans.PlanBillQty > 0)
+                        if (EBELN_EBELP[1] == null)
                         {
-                            PlanBill planBill = genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill WITH(NOLOCK) where Id = ?", locTrans.PlanBill).Single();
-                            invTrans.LIFNR = planBill.Party;
-                            invTrans.SOBKZ = "K";
-                            invTrans.XBLNR = planBill.ReceiptNo;
+                            invTrans.ErrorId = InvTrans.ErrorIdEnum.E102;
+                            log.Error(string.Format("库存事务{0}的PO单号行号/计划协议行号为空。", locTrans.Id.ToString()));
                         }
-
-                        invTrans.OrderNo = locTrans.OrderNo;
-                        invTrans.DetailId = locTrans.OrderDetailId;
-                        thisInvTransList.Add(invTrans);
-                    }
-                    #endregion
-
-                    #region 待验状态移库
-                    else if ((locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR
-                        || locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_RTN)
-                       && locTrans.QualityType == CodeMaster.QualityType.Inspect
-                       && plantFrom == plantTo && sapLocationFrom != sapLocationTo)//&& SihLoc.Contains(sapLocationTo)
-                    {
-                        if (locTrans.IsConsignment && locTrans.PlanBillQty > 0)
-                        {
-                            PlanBill planBill = genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill WITH(NOLOCK) where Id = ?", locTrans.PlanBill).Single();
-                            invTrans.BWART = "323";
-                            invTrans.LIFNR = planBill.Party;
-                            invTrans.SOBKZ = "K";
-                            invTrans.XBLNR = planBill.ReceiptNo;
-                        }
-                        else
-                        {
-                            invTrans.BWART = "323";
-                        }
-                        invTrans.WERKS = plantTo;
-                        invTrans.LGORT = sapLocationFrom;
-                        invTrans.UMWRK = plantFrom;
-                        invTrans.UMLGO = sapLocationTo;
-
-                        invTrans.OrderNo = locTrans.OrderNo;
-                        invTrans.DetailId = locTrans.OrderDetailId;
-                        thisInvTransList.Add(invTrans);
-                    }
-                    #endregion
-
-                    #region 报验移库冲销
-                    else if (locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_VOID
-                       && locTrans.QualityType == CodeMaster.QualityType.Inspect
-                       && plantFrom == plantTo && sapLocationFrom != sapLocationTo)//&& SihLoc.Contains(sapLocationTo)
-                    {
-                        if (locTrans.IsConsignment && locTrans.PlanBillQty < 0)
-                        {
-                            PlanBill planBill = genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill WITH(NOLOCK) where Id = ?", locTrans.PlanBill).Single();
-                            invTrans.BWART = "324";
-                            invTrans.LIFNR = planBill.Party;
-                            invTrans.SOBKZ = "K";
-                            invTrans.XBLNR = planBill.ReceiptNo;
-                        }
-                        else
-                        {
-                            invTrans.BWART = "324";
-                        }
-                        invTrans.WERKS = plantTo;
-                        invTrans.LGORT = sapLocationFrom;
-                        invTrans.UMWRK = plantFrom;
-                        invTrans.UMLGO = sapLocationTo;
-
-                        invTrans.OrderNo = locTrans.OrderNo;
-                        invTrans.DetailId = locTrans.OrderDetailId;
-                        thisInvTransList.Add(invTrans);
-                    }
-                    #endregion
-
-                    #region 判定合格
-                    ////质检到非限制的转帐	321	506	//检验合格入库			0	
-                    ////质检到非限制的转帐-寄售	321	506	//检验合格入库			1
-                    else if (locTrans.TransactionType == CodeMaster.TransactionType.RCT_INP_QDII)
-                    {
-                        //InspectResult inspectResult = genericMgr.FindEntityWithNativeSql<InspectResult>("select * from INP_InspectResult WITH(NOLOCK) where Id = ?", locTrans.OrderDetailId).Single();
-                        //ReceiptDetail receiptDetail = genericMgr.FindEntityWithNativeSql<ReceiptDetail>("select * from ORD_RecDet_1 WITH(NOLOCK) where RecNo = ? and Seq = ?", new object[] { inspectResult.ReceiptNo, inspectResult.ReceiptDetailSequence }).SingleOrDefault();
-                        //LocationTransaction recLocTrans = genericMgr.FindEntityWithNativeSql<LocationTransaction>("select * from VIEW_LocTrans WITH(NOLOCK) where RecDetId = ? and TransType in (?, ?)", new object[] { receiptDetail.Id, com.Sconit.CodeMaster.TransactionType.RCT_PO, com.Sconit.CodeMaster.TransactionType.RCT_SL })[0];
-                        invTrans.BWART = "321";
-                        invTrans.WERKS = plantFrom;
-                        invTrans.LGORT = sapLocationFrom;
-                        invTrans.UMLGO = sapLocationTo;
-                        invTrans.XABLN = locTrans.OrderNo;//记录报验单号，防止跨报验单汇总
-                        if (locTrans.IsConsignment && locTrans.PlanBillQty > 0)
-                        {
-                            PlanBill planBill = genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill WITH(NOLOCK) where Id = ?", locTrans.PlanBill).Single();
-                            invTrans.LIFNR = planBill.Party;
-                            invTrans.SOBKZ = "K";
-                            invTrans.XBLNR = planBill.ReceiptNo;
-                        }
-
-                        invTrans.OrderNo = locTrans.OrderNo;
-                        invTrans.DetailId = locTrans.OrderDetailId;
-                        thisInvTransList.Add(invTrans);
-                        //因为现在在收货时不再传322，,而是101或101K以后直接sap转待验
-                        //所以入库时如果为寄售或寄售结算时，报验合格需要传321K
-                        //if (recLocTrans.PlanBill != 0 || recLocTrans.ActingBill != 0)
+                        //新逻辑：计划协议行号不需要判断分隔符
+                        //else if (locTrans.OrderType == CodeMaster.OrderType.ScheduleLine)
                         //{
-                        //    PlanBill planBill = recLocTrans.PlanBill != 0 ? genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill WITH(NOLOCK) where Id = ?", recLocTrans.PlanBill).Single() : null;
-                        //    ActingBill actBill = recLocTrans.ActingBill != 0 ? genericMgr.FindEntityWithNativeSql<ActingBill>("select * from BIL_ActBill WITH(NOLOCK) where Id = ?", recLocTrans.ActingBill).Single() : null;
-
-                        //    //对于采购收货来说planbill或actbill一定有且两者中只能有一个存在值
-                        //    if (planBill != null)
+                        //    if (!((string)EBELN_EBELP[1]).Contains(SplitSymbol))
                         //    {
-                        //        invTrans.SOBKZ = "K";
-                        //        invTrans.LIFNR = planBill.Party;
-                        //        invTrans.XBLNR = planBill.ReceiptNo;
+                        //        invTrans.ErrorId = InvTrans.ErrorIdEnum.E103;
+                        //        log.Error(string.Format("交货计划行收货时库存事务{0}的计划协议行号不包含分隔符{1}。", locTrans.Id.ToString(), SplitSymbol));
                         //    }
-                        //    else if (actBill != null && actBill.BillTerm != CodeMaster.OrderBillTerm.ReceivingSettlement)
+                        //    else
                         //    {
-                        //        invTrans.SOBKZ = "K";
-                        //        invTrans.LIFNR = actBill.Party;
-                        //        invTrans.XBLNR = actBill.ReceiptNo;
+                        //        invTrans.EBELP = ((string)EBELN_EBELP[1]).Split(SplitSymbol)[0];
                         //    }
                         //}
-
-                        //invTrans.OrderNo = locTrans.OrderNo;
-                        //invTrans.DetailId = locTrans.OrderDetailId;
-                        //thisInvTransList.Add(invTrans);
-                    }
-                    //质检到冻结	350		//检验不合格入库			0	
-                    //质检到冻结-寄售	350		//检验不合格入库			1
-                    #endregion
-
-                    #region 判定不合格
-                    //有收货单号的报验单判定不合格传350，没有收货单号的表示手工创建的，要传344（非限制到冻结，没有待验状态）
-                    else if (locTrans.TransactionType == CodeMaster.TransactionType.RCT_INP_REJ)
-                    {
-                        InspectResult inspectResult = genericMgr.FindEntityWithNativeSql<InspectResult>("select * from INP_InspectResult WITH(NOLOCK) where Id = ?", locTrans.OrderDetailId).Single();
-                        InspectDetail inspectDetail = genericMgr.FindEntityWithNativeSql<InspectDetail>("select * from INP_InspectDet WITH(NOLOCK) where Id = ?", inspectResult.InspectDetailId).SingleOrDefault();
-
-                        if (inspectDetail.IpDetailSequence == 0 && inspectDetail.ReceiptDetailSequence == 0)
-                            invTrans.BWART = "344";
                         else
-                            invTrans.BWART = "350";
-                        invTrans.WERKS = plantFrom;
-                        invTrans.LGORT = sapLocationFrom;
-                        invTrans.UMLGO = sapLocationTo;
-                        invTrans.XABLN = locTrans.OrderNo;//记录报验单号，防止跨报验单汇总
-                        if (locTrans.IsConsignment && locTrans.PlanBillQty > 0)
                         {
-                            PlanBill planBill = genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill WITH(NOLOCK) where Id = ?", locTrans.PlanBill).Single();
-                            invTrans.LIFNR = planBill.Party;
-                            invTrans.SOBKZ = "K";
-                            invTrans.XBLNR = planBill.ReceiptNo;
+                            invTrans.EBELP = (string)EBELN_EBELP[1];
                         }
-
+                        invTrans.GRUND = locTrans.LocationIOReason;
+                        invTrans.XBLNR = locTrans.ReceiptNo;
+                        invTrans.XABLN = locTrans.IpNo;
+                        //2013-10-16以后不再传322了，而是根据收货明细中的IsInspect字段来判断，并记录到INSMK=2
+                        //ReceiptDetail receipDetail = genericMgr.FindEntityWithNativeSql<ReceiptDetail>("select * from ORD_RecDet_1 WITH(NOLOCK) where Id = ?", locTrans.ReceiptDetailId).Single();
+                        //if (receipDetail.IsInspect)
+                        //    invTrans.INSMK = "2";
+                        //else
+                        //    invTrans.INSMK = null;
+                        invTrans.INSMK = locTrans.QualityType == CodeMaster.QualityType.Qualified ? null : "3";
                         invTrans.OrderNo = locTrans.OrderNo;
                         invTrans.DetailId = locTrans.OrderDetailId;
-                        thisInvTransList.Add(invTrans);
-                    }
-                    #endregion
 
-                    #region 不合格品移库
-                    else if ((locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR
-                        || locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_RTN)
-                       && locTrans.QualityType == CodeMaster.QualityType.Reject
-                       && plantFrom == plantTo && sapLocationFrom != sapLocationTo)//&& SihLoc.Contains(sapLocationTo)
-                    {
-                        if (locTrans.IsConsignment && locTrans.PlanBillQty > 0)
+                        thisInvTransList.Add(invTrans);
+
+                        #region 寄售物料，采购就发生结算，收货库位补做411K
+                        if (locTrans.ActingBillQty > 0)
                         {
-                            PlanBill planBill = genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill WITH(NOLOCK) where Id = ?", locTrans.PlanBill).Single();
-                            invTrans.BWART = "325";
-                            invTrans.LIFNR = planBill.Party;
-                            invTrans.SOBKZ = "K";
-                            invTrans.XBLNR = planBill.ReceiptNo;
+                            ActingBill actingBill = genericMgr.FindEntityWithNativeSql<ActingBill>("select * from BIL_ActBill WITH(NOLOCK) where Id = ?", locTrans.ActingBill).Single();
+                            if (actingBill != null && actingBill.BillTerm != CodeMaster.OrderBillTerm.ReceivingSettlement)
+                            {
+
+                                InvTrans invTrans411K = new InvTrans();
+
+                                invTrans411K.BWART = "411";
+                                invTrans411K.LIFNR = actingBill.Party;
+                                invTrans411K.SOBKZ = "K";
+                                invTrans411K.XBLNR = actingBill.ReceiptNo;
+                                invTrans411K.WERKS = plantTo;
+                                invTrans411K.LGORT = sapLocationTo;
+                                invTrans411K.UMWRK = plantTo;
+                                invTrans411K.UMLGO = sapLocationTo;
+                                invTrans411K.OrderNo = locTrans.OrderNo;
+                                invTrans411K.DetailId = locTrans.OrderDetailId;
+
+                                thisInvTransList.Add(invTrans411K);
+
+                                invTrans.SOBKZ = "K";
+                            }
+                        }
+                        #endregion
+                    }
+                }
+                #endregion
+
+                #region 采购冲销
+                //采购冲销	102	202	//采购入库冲销
+                //采购单或计划协议号取ExternalOrderNo
+                //采购单行号取ExternalSequence,计划协议号取ExternalSequence.Split('|')[0]
+                else if (locTrans.TransactionType == CodeMaster.TransactionType.RCT_PO_VOID
+                    || locTrans.TransactionType == CodeMaster.TransactionType.RCT_SL_VOID)
+                {
+                    if (isPartyToExchangeMoveType)
+                    {
+                        object[] EBELN_EBELP = null;
+                        if (locTrans.OrderType == CodeMaster.OrderType.ScheduleLine)
+                        {
+                            EBELN_EBELP = genericMgr.FindAllWithNativeSql<object[]>(NativeSqlStatement.SELECT_SL_EBELN_AND_EBELP_STATEMENT, locTrans.OrderDetailId).Single();
                         }
                         else
                         {
-                            invTrans.BWART = "325";
+                            EBELN_EBELP = genericMgr.FindAllWithNativeSql<object[]>(NativeSqlStatement.SELECT_PO_EBELN_AND_EBELP_STATEMENT, locTrans.OrderDetailId).Single();
                         }
+
+                        invTrans.BWART = "102";
                         invTrans.WERKS = plantTo;
-                        invTrans.LGORT = sapLocationFrom;
-                        invTrans.UMWRK = plantFrom;
-                        invTrans.UMLGO = sapLocationTo;
-
-                        invTrans.OrderNo = locTrans.OrderNo;
-                        invTrans.DetailId = locTrans.OrderDetailId;
-                        thisInvTransList.Add(invTrans);
-                    }
-                    #endregion
-
-                    #region 不合格品移库冲销
-                    else if (locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_VOID
-                       && locTrans.QualityType == CodeMaster.QualityType.Reject
-                       && plantFrom == plantTo && sapLocationFrom != sapLocationTo)//&& SihLoc.Contains(sapLocationTo)
-                    {
-                        if (locTrans.IsConsignment && locTrans.PlanBillQty < 0)
+                        invTrans.LIFNR = locTrans.PartyFrom;
+                        invTrans.LGORT = sapLocationTo;
+                        if (EBELN_EBELP[0] != null)
                         {
-                            PlanBill planBill = genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill WITH(NOLOCK) where Id = ?", locTrans.PlanBill).Single();
-                            invTrans.BWART = "326";
-                            invTrans.LIFNR = planBill.Party;
-                            invTrans.SOBKZ = "K";
-                            invTrans.XBLNR = planBill.ReceiptNo;
+                            invTrans.EBELN = (string)EBELN_EBELP[0];
                         }
                         else
                         {
-                            invTrans.BWART = "326";
+                            invTrans.ErrorId = InvTrans.ErrorIdEnum.E101;
+                            log.Error(string.Format("库存事务{0}的PO单号/计划协议号为空。", locTrans.Id.ToString()));
                         }
-                        invTrans.WERKS = plantTo;
-                        invTrans.LGORT = sapLocationFrom;
-                        invTrans.UMWRK = plantFrom;
-                        invTrans.UMLGO = sapLocationTo;
+
+                        if (EBELN_EBELP[1] == null)
+                        {
+                            invTrans.ErrorId = InvTrans.ErrorIdEnum.E102;
+                            log.Error(string.Format("库存事务{0}的PO单号行号/计划协议行号为空。", locTrans.Id.ToString()));
+                        }
+                        //else if (locTrans.OrderType == CodeMaster.OrderType.ScheduleLine)
+                        //{
+                        //    if (!((string)EBELN_EBELP[1]).Contains(SplitSymbol))
+                        //    {
+                        //        invTrans.ErrorId = InvTrans.ErrorIdEnum.E103;
+                        //        log.Error(string.Format("交货计划行收货时库存事务{0}的计划协议行号不包含分隔符{1}。", locTrans.Id.ToString(), SplitSymbol));
+                        //    }
+                        //    else
+                        //    {
+                        //        invTrans.EBELP = ((string)EBELN_EBELP[1]).Split(SplitSymbol)[0];
+                        //    }
+                        //}
+                        else
+                        {
+                            invTrans.EBELP = (string)EBELN_EBELP[1];
+                        }
+                        invTrans.GRUND = locTrans.LocationIOReason;
+                        invTrans.XBLNR = locTrans.ReceiptNo;
+                        invTrans.SOBKZ = locTrans.IsConsignment && locTrans.PlanBillQty < 0 ? "K" : null;    //寄售收货冲销，planbillqty为负数
+                        invTrans.XABLN = locTrans.IpNo;
+                        invTrans.INSMK = locTrans.QualityType == CodeMaster.QualityType.Qualified ? null : "3";
+
+                        #region 寄售物料，采购就发生结算，冲销时先做412K
+                        if (locTrans.ActingBillQty < 0)
+                        {
+                            ActingBill actingBill = genericMgr.FindEntityWithNativeSql<ActingBill>("select * from BIL_ActBill WITH(NOLOCK) where Id = ?", locTrans.ActingBill).Single();
+
+                            if (actingBill != null && actingBill.BillTerm != CodeMaster.OrderBillTerm.ReceivingSettlement)
+                            {
+                                InvTrans invTrans412K = new InvTrans();
+
+                                invTrans412K.BWART = "412";
+                                invTrans412K.LIFNR = actingBill.Party;
+                                invTrans412K.SOBKZ = "K";
+                                invTrans412K.XBLNR = actingBill.ReceiptNo;
+                                invTrans412K.WERKS = plantTo;
+                                invTrans412K.LGORT = sapLocationTo;
+                                invTrans412K.UMWRK = plantTo;
+                                invTrans412K.UMLGO = sapLocationTo;
+
+                                invTrans412K.OrderNo = locTrans.OrderNo;
+                                invTrans412K.DetailId = locTrans.OrderDetailId;
+
+                                thisInvTransList.Add(invTrans412K);
+
+                                invTrans.SOBKZ = "K";
+                            }
+                        }
+                        #endregion
 
                         invTrans.OrderNo = locTrans.OrderNo;
                         invTrans.DetailId = locTrans.OrderDetailId;
                         thisInvTransList.Add(invTrans);
                     }
-                    #endregion
+                }
+                #endregion
 
-                    #region 让步使用
-                    //冻结库存到非限制	343	510	//让步使用入库			0	
-                    //冻结库存到非限制-寄售	343	510	//让步使用入库			1		
-                    else if (locTrans.TransactionType == CodeMaster.TransactionType.RCT_INP_CCS)
+                #region 采购退货
+                //采购退货
+                /*  1.	寄售MoveType:ZR1K、ZR5K
+                    2.	非寄售MoveType:161
+                */
+                else if (locTrans.TransactionType == CodeMaster.TransactionType.ISS_PO
+                    || locTrans.TransactionType == CodeMaster.TransactionType.ISS_SL)
+                {
+                    if (isPartyFromExchangeMoveType)
                     {
-                        invTrans.BWART = "343";
-                        invTrans.WERKS = plantFrom;
-                        invTrans.LGORT = sapLocationFrom;
-                        invTrans.UMLGO = sapLocationTo;
+                        #region 非寄售MoveType:161
+                        //如果是寄售库存就算有退货单号也不做161
+                        if (!(locTrans.IsConsignment && locTrans.PlanBillQty < 0))//161
+                        {
+                            if (locTrans.QualityType == CodeMaster.QualityType.Qualified)
+                            {
+                                //采购退货-自有	161	203	//采购退货			0		0
+                                invTrans.BWART = "161";
+                                invTrans.WERKS = plantFrom;
+                                invTrans.LIFNR = locTrans.PartyTo;
+                                invTrans.LGORT = sapLocationFrom;
+                                invTrans.GRUND = locTrans.LocationIOReason;
+                                invTrans.XBLNR = locTrans.ReceiptNo;
+                            }
+                            //其他的不考虑 无162 冲销.无 有订单,冻结的退货
+                        }
+                        #endregion
+
+                        #region 寄售MoveType:ZR1K、ZR5K
+                        else
+                        {
+                            #region 合格品退货做ZR1
+                            //采购退货-寄售	ZR1	203	//采购退货			1		0
+                            if (locTrans.QualityType == CodeMaster.QualityType.Qualified)
+                            {
+                                invTrans.BWART = "ZR1";
+                                invTrans.WERKS = plantFrom;
+                                invTrans.LIFNR = locTrans.PartyTo;
+                                invTrans.LGORT = sapLocationFrom;
+                                invTrans.SOBKZ = "K";
+                            }
+                            #endregion
+
+                            #region 不合格品退货做ZR5
+                            //采购退货-寄售-冻结	ZR5	203	//采购退货			1		2
+                            else if (locTrans.QualityType == CodeMaster.QualityType.Reject)
+                            {
+                                invTrans.BWART = "ZR5";
+                                invTrans.WERKS = plantFrom;
+                                invTrans.LIFNR = locTrans.PartyTo;
+                                invTrans.LGORT = sapLocationFrom;
+                                invTrans.SOBKZ = "K";
+                            }
+                            #endregion
+
+                            invTrans.OrderNo = locTrans.OrderNo;
+                            invTrans.DetailId = locTrans.OrderDetailId;
+                            thisInvTransList.Add(invTrans);
+                        }
+                        #endregion
+                    }
+                }
+                #endregion
+
+                #region 采购退货冲销
+                //采购退货冲销-寄售	ZR2/ZR6	204	//采购退货冲销			1		0
+                else if (locTrans.TransactionType == CodeMaster.TransactionType.ISS_PO_VOID
+                    || locTrans.TransactionType == CodeMaster.TransactionType.ISS_SL_VOID)
+                {
+                    if (isPartyFromExchangeMoveType)
+                    {
                         if (locTrans.IsConsignment && locTrans.PlanBillQty > 0)
                         {
-                            PlanBill planBill = genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill WITH(NOLOCK) where Id = ?", locTrans.PlanBill).Single();
-                            invTrans.LIFNR = planBill.Party;
-                            invTrans.SOBKZ = "K";
-                            invTrans.XBLNR = planBill.ReceiptNo;
+                            #region 非寄售MoveType:162，没有这种情况
+                            #endregion
+                        }
+                        else
+                        {
+                            #region 合格品退货冲销做ZR2
+                            if (locTrans.QualityType == CodeMaster.QualityType.Qualified)
+                            {
+                                invTrans.BWART = "ZR2";
+                                invTrans.WERKS = plantFrom;
+                                invTrans.LIFNR = locTrans.PartyTo;
+                                invTrans.LGORT = sapLocationFrom;
+                                invTrans.SOBKZ = "K";
+                            }
+                            #endregion
+
+                            #region 不合格品退货冲销做ZR6
+                            else if (locTrans.QualityType == CodeMaster.QualityType.Reject)
+                            {
+                                invTrans.BWART = "ZR6";
+                                invTrans.WERKS = plantFrom;
+                                invTrans.LIFNR = locTrans.PartyTo;
+                                invTrans.LGORT = sapLocationFrom;
+                                invTrans.SOBKZ = "K";
+                            }
+                            #endregion
                         }
 
                         invTrans.OrderNo = locTrans.OrderNo;
                         invTrans.DetailId = locTrans.OrderDetailId;
                         thisInvTransList.Add(invTrans);
                     }
-                    #endregion
-                    #endregion
+                }
+                #endregion
+                #endregion
 
-                    #region 寄售物料的销售出库和冲销要传411K/412K
-                    else if (locTrans.TransactionType == CodeMaster.TransactionType.ISS_SO
-                    || locTrans.TransactionType == CodeMaster.TransactionType.ISS_SO_VOID)
+                #region  移库 只导同一工厂内部的移库,其他的通过计划外出入库
+                //安吉相关事务只处理buff对安吉的收货/收货冲销/退货
+                /*
+                Transtype	     Loc出现位置	   解释	                移动类型接口是否处理
+                RCT-TR	         PartyFrom	       buff正常收货	        y
+                RCT-TR	         PartyTo	       buff差异收货	        ?
+                RCT-TR-Void	     PartyFrom	       buff收货冲销	        y
+                RCT-TR-Rtn	     PartyTo	       buff向安吉退货       y
+                RCT-TR-Rtn-Void	 PartyTo	       buff向安吉退货冲销	y
+                ISS-TR-Void      PartyFrom         安吉发货冲销         n
+                */
+
+                /*        IsCs PlanBill  ActingBill    TransType                       解释
+                * 311      0       /          =0       RCT_TR/RCT_TR_RTN               自有物资移库
+                * 312      0       /          =0       RCT_TR_VOID/RCT_TR_RTN_VOID     自有物资移库移库冲销
+                * 311K     1       >0          /       RCT_TR/RCT_TR_RTN               寄售移库不结算
+                * 312K     1       <0          /       RCT_TR_VOID/RCT_TR_RTN_VOID     寄售移库冲销不结算
+                * 411K     0       /          >0       RCT_TR/RCT_TR_RTN               寄售移库结算
+                * 412K     1       /          <0       RCT_TR_VOID/RCT_TR_RTN_VOID     寄售移库结算冲销
+                * 325                                                                  冻结库存移库
+                */
+                #region 移库/移库退货
+                else if ((locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR
+                    || locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_RTN)
+                    && locTrans.QualityType == CodeMaster.QualityType.Qualified
+                    && plantFrom == plantTo && sapLocationFrom != sapLocationTo)//&& SihLoc.Contains(sapLocationTo)
+                {
+                    //安吉或双桥-buff的移库事务做特殊处理
+                    if ((locTrans.PartyFrom.ToUpper() == "LOC" || locTrans.PartyFrom.ToUpper() == "SQC") && locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR)
                     {
-                        if (locTrans.PlanBill != 0)
+                        IpDetail ipDetail = genericMgr.FindEntityWithNativeSql<IpDetail>("select * from ORD_IpDet_2 WITH(NOLOCK) where Id = ?", locTrans.IpDetailId).Single();
+                        if (ipDetail.BWART == "411K")
                         {
-                            PlanBill planBill = genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill WITH(NOLOCK) where Id = ?", locTrans.PlanBill).Single();
-                            invTrans.LIFNR = planBill.Party;
-                            invTrans.XBLNR = planBill.ReceiptNo;
-                            invTrans.WERKS = plantFrom;
+                            invTrans.BWART = "411";
+                            invTrans.LIFNR = ipDetail.ManufactureParty;
+                            invTrans.SOBKZ = "K";
+                            invTrans.XBLNR = locTrans.ReceiptNo;
+                            invTrans.WERKS = plantTo;
                             invTrans.LGORT = sapLocationFrom;
                             invTrans.UMWRK = plantFrom;
                             invTrans.UMLGO = sapLocationTo;
+                        }
+                        else if (ipDetail.BWART == "311K")
+                        {
+                            invTrans.BWART = "311";
+                            invTrans.LIFNR = ipDetail.ManufactureParty;
+                            invTrans.SOBKZ = "K";
+                            invTrans.XBLNR = locTrans.ReceiptNo;
+                            invTrans.WERKS = plantTo;
+                            invTrans.LGORT = sapLocationFrom;
+                            invTrans.UMWRK = plantFrom;
+                            invTrans.UMLGO = sapLocationTo;
+                        }
+                        else if (ipDetail.BWART == "311")
+                        {
+                            invTrans.BWART = "311";
+                            invTrans.XBLNR = locTrans.ReceiptNo;
+                            invTrans.WERKS = plantTo;
+                            invTrans.LGORT = sapLocationFrom;
+                            invTrans.UMWRK = plantFrom;
+                            invTrans.UMLGO = sapLocationTo;
+                        }
 
-                            invTrans.OrderNo = locTrans.OrderNo;
-                            invTrans.DetailId = locTrans.OrderDetailId;
+                        invTrans.OrderNo = locTrans.OrderNo;
+                        invTrans.DetailId = locTrans.OrderDetailId;
+                        thisInvTransList.Add(invTrans);
+                    }
+                    else
+                    {
+                        if (locTrans.ActingBillQty > 0)
+                        {
+                            //LOC移库(退货)至线旁-寄售结算	411K	303	//移库入库(退货)			
+                            ActingBill actingBill = genericMgr.FindEntityWithNativeSql<ActingBill>("select * from BIL_ActBill WITH(NOLOCK) where Id = ?", locTrans.ActingBill).Single();
+                            invTrans.BWART = "411";
+                            invTrans.LIFNR = actingBill.Party;
+                            invTrans.SOBKZ = "K";
+                            invTrans.XBLNR = actingBill.ReceiptNo;
+                            invTrans.WERKS = plantTo;
+                            invTrans.LGORT = sapLocationFrom;
+                            invTrans.UMWRK = plantFrom;
+                            invTrans.UMLGO = sapLocationTo;
+                        }
+                        else if (locTrans.IsConsignment && locTrans.PlanBillQty > 0)
+                        {
+                            //todo-不考虑差异收货，如buff收安吉的物料产生的退回原库位的收货差异。
 
-                            //销售出库PlanBill小于0为结算，大于0为反结算
-                            if (locTrans.PlanBillQty < 0)
+                            //LOC移库(退货)至线旁-寄售不结算	311K	303	//移库入库(退货)
+                            PlanBill planBill = genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill WITH(NOLOCK) where Id = ?", locTrans.PlanBill).Single();
+                            invTrans.BWART = "311";
+                            invTrans.LIFNR = planBill.Party;
+                            invTrans.SOBKZ = "K";
+                            invTrans.XBLNR = planBill.ReceiptNo;
+                            invTrans.WERKS = plantTo;
+                            invTrans.LGORT = sapLocationFrom;
+                            invTrans.UMWRK = plantFrom;
+                            invTrans.UMLGO = sapLocationTo;
+                        }
+                        else if (locTrans.ActingBillQty < 0)
+                        {
+                            log.Error(GetTLog(locTrans, "移库/移库退货结算数量小于0。"));
+                            invTrans.ErrorId = InvTrans.ErrorIdEnum.E104;
+                        }
+                        else if (locTrans.IsConsignment && locTrans.PlanBillQty < 0)
+                        {
+                            log.Error(GetTLog(locTrans, "移库/移库退货寄售数量小于0。"));
+                            invTrans.ErrorId = InvTrans.ErrorIdEnum.E105;
+                        }
+                        else
+                        {
+                            //LOC移库(退货)至线旁(自有物资)	311	303	//移库(退货)入库
+                            invTrans.BWART = "311";
+                            if (locTrans.Qty >= 0)
                             {
-                                invTrans.BWART = "411";
-                                invTrans.SOBKZ = "K";
+                                invTrans.XBLNR = locTrans.ReceiptNo;
+                                invTrans.WERKS = plantTo;
+                                invTrans.LGORT = sapLocationFrom;
+                                invTrans.UMWRK = plantFrom;
+                                invTrans.UMLGO = sapLocationTo;
                             }
                             else
                             {
-                                invTrans.BWART = "412";
-                                invTrans.SOBKZ = "K";
+                                invTrans.XBLNR = locTrans.ReceiptNo;
+                                invTrans.WERKS = plantFrom;
+                                invTrans.LGORT = sapLocationTo;
+                                invTrans.UMWRK = plantTo;
+                                invTrans.UMLGO = sapLocationFrom;
                             }
-                            thisInvTransList.Add(invTrans);
                         }
-                    }
-                    #endregion
 
-                    #region 计划外出库的结算已经考虑，如果还有其他未知的结算
-                    else if (locTrans.ActingBillQty != 0
-                        && locTrans.TransactionType != CodeMaster.TransactionType.ISS_UNP
-                        && locTrans.TransactionType != CodeMaster.TransactionType.ISS_UNP_VOID)
+                        invTrans.OrderNo = locTrans.OrderNo;
+                        invTrans.DetailId = locTrans.OrderDetailId;
+                        thisInvTransList.Add(invTrans);
+                    }
+                }
+                #endregion
+
+                #region 移库冲销/移库退货冲销
+                else if ((locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_VOID
+                    || locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_RTN_VOID)
+                    //&& !locTrans.IsConsignment && locTrans.ActingBill == 0
+                    && locTrans.QualityType == CodeMaster.QualityType.Qualified
+                    && plantFrom == plantTo && sapLocationFrom != sapLocationTo) //&& SihLoc.Contains(sapLocationTo)
+                {
+                    //安吉-buff的移库冲销要特殊处理
+                    if ((locTrans.PartyFrom.ToUpper() == "LOC" || locTrans.PartyFrom.ToUpper() == "SQC") && locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_VOID)
                     {
-                        ActingBill actingBill = genericMgr.FindEntityWithNativeSql<ActingBill>("select * from BIL_ActBill WITH(NOLOCK) where Id = ?", locTrans.ActingBill).Single();
-                        //invTrans.BWART = "411";
-                        invTrans.LIFNR = actingBill.Party;
-                        //invTrans.SOBKZ = "K";
-                        invTrans.XBLNR = actingBill.ReceiptNo;
-                        invTrans.WERKS = plantTo;
+                        IpDetail ipDetail = genericMgr.FindEntityWithNativeSql<IpDetail>("select * from ORD_IpDet_2 WITH(NOLOCK) where Id = ?", locTrans.IpDetailId).Single();
+                        if (ipDetail.BWART == "411K")
+                        {
+                            invTrans.BWART = "412";
+                            invTrans.LIFNR = ipDetail.ManufactureParty;
+                            invTrans.SOBKZ = "K";
+                            invTrans.XBLNR = locTrans.ReceiptNo;
+                            invTrans.WERKS = plantTo;
+                            invTrans.LGORT = sapLocationFrom;
+                            invTrans.UMWRK = plantFrom;
+                            invTrans.UMLGO = sapLocationTo;
+                        }
+                        else if (ipDetail.BWART == "311K")
+                        {
+                            invTrans.BWART = "312";
+                            invTrans.LIFNR = ipDetail.ManufactureParty;
+                            invTrans.SOBKZ = "K";
+                            invTrans.XBLNR = locTrans.ReceiptNo;
+                            invTrans.WERKS = plantTo;
+                            invTrans.LGORT = sapLocationFrom;
+                            invTrans.UMWRK = plantFrom;
+                            invTrans.UMLGO = sapLocationTo;
+                        }
+                        else if (ipDetail.BWART == "311")
+                        {
+                            invTrans.BWART = "312";
+                            invTrans.XBLNR = locTrans.ReceiptNo;
+                            invTrans.WERKS = plantTo;
+                            invTrans.LGORT = sapLocationFrom;
+                            invTrans.UMWRK = plantFrom;
+                            invTrans.UMLGO = sapLocationTo;
+                        }
+
+                        invTrans.OrderNo = locTrans.OrderNo;
+                        invTrans.DetailId = locTrans.OrderDetailId;
+                        thisInvTransList.Add(invTrans);
+                    }
+                    else
+                    {
+                        if (locTrans.ActingBillQty < 0)
+                        {
+                            //LOC移库(退货)至线旁冲销-寄售	412K	304	//移库入库冲销(退货)	
+                            ActingBill actingBill = genericMgr.FindEntityWithNativeSql<ActingBill>("select * from BIL_ActBill WITH(NOLOCK) where Id = ?", locTrans.ActingBill).Single();
+                            invTrans.BWART = "412";
+                            invTrans.LIFNR = actingBill.Party;
+                            invTrans.SOBKZ = "K";
+                            invTrans.XBLNR = actingBill.ReceiptNo;
+                            invTrans.WERKS = plantTo;
+                            invTrans.LGORT = sapLocationFrom;
+                            invTrans.UMWRK = plantFrom;
+                            invTrans.UMLGO = sapLocationTo;
+                        }
+                        else if (locTrans.IsConsignment && locTrans.PlanBillQty < 0)
+                        {
+                            //LOC移库冲销(退货)至线旁-寄售不结算	312K	303	//移库入库(退货)
+                            PlanBill planBill = genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill WITH(NOLOCK) where Id = ?", locTrans.PlanBill).Single();
+                            invTrans.BWART = "312";
+                            invTrans.LIFNR = planBill.Party;
+                            invTrans.SOBKZ = "K";
+                            invTrans.XBLNR = planBill.ReceiptNo;
+                            invTrans.WERKS = plantTo;
+                            invTrans.LGORT = sapLocationFrom;
+                            invTrans.UMWRK = plantFrom;
+                            invTrans.UMLGO = sapLocationTo;
+                        }
+                        else if (locTrans.ActingBillQty > 0)
+                        {
+                            log.Error(GetTLog(locTrans, "移库/移库退货冲销结算数量小于0。"));
+                            invTrans.ErrorId = InvTrans.ErrorIdEnum.E106;
+                        }
+                        else if (locTrans.IsConsignment && locTrans.PlanBillQty > 0)
+                        {
+                            log.Error(GetTLog(locTrans, "移库/移库退货冲销寄售数量小于0。"));
+                            invTrans.ErrorId = InvTrans.ErrorIdEnum.E107;
+                        }
+                        else
+                        {
+                            //LOC移库(退货)至线旁冲销(自有物资)	312	304	//移库入库冲销(退货)			0	
+                            invTrans.BWART = "312";
+                            if (locTrans.Qty < 0)
+                            {
+                                invTrans.XBLNR = locTrans.ReceiptNo;
+                                invTrans.WERKS = plantTo;
+                                invTrans.LGORT = sapLocationFrom;
+                                invTrans.UMWRK = plantFrom;
+                                invTrans.UMLGO = sapLocationTo;
+                            }
+                            else
+                            {
+                                invTrans.XBLNR = locTrans.ReceiptNo;
+                                invTrans.WERKS = plantFrom;
+                                invTrans.LGORT = sapLocationTo;
+                                invTrans.UMWRK = plantTo;
+                                invTrans.UMLGO = sapLocationFrom;
+                            }
+                        }
+                        invTrans.OrderNo = locTrans.OrderNo;
+                        invTrans.DetailId = locTrans.OrderDetailId;
+                        thisInvTransList.Add(invTrans);
+                    }
+                }
+                #endregion
+
+                #region 库内结算
+                #region 翻箱结算
+                else if (locTrans.TransactionType == CodeMaster.TransactionType.ISS_REP
+                    && locTrans.QualityType == CodeMaster.QualityType.Qualified
+                    && locTrans.ActingBillQty > 0
+                    && plantFrom == plantTo) //&& SihLoc.Contains(sapLocationTo)
+                {
+                    ActingBill actingBill = genericMgr.FindEntityWithNativeSql<ActingBill>("select * from BIL_ActBill WITH(NOLOCK) where Id = ?", locTrans.ActingBill).Single();
+                    invTrans.BWART = "411";
+                    invTrans.LIFNR = actingBill.Party;
+                    invTrans.SOBKZ = "K";
+                    invTrans.XBLNR = actingBill.ReceiptNo;
+                    invTrans.WERKS = plantTo;
+                    invTrans.LGORT = sapLocationFrom;
+                    invTrans.UMWRK = plantFrom;
+                    invTrans.UMLGO = sapLocationTo;
+
+                    invTrans.OrderNo = locTrans.OrderNo;
+                    invTrans.DetailId = locTrans.OrderDetailId;
+                    thisInvTransList.Add(invTrans);
+                }
+                #endregion
+
+                #region 内部移库结算
+                else if ((locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR
+                    || locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_RTN)
+                   && locTrans.QualityType == CodeMaster.QualityType.Qualified
+                   && locTrans.ActingBillQty > 0
+                   && plantFrom == plantTo && sapLocationFrom == sapLocationTo)
+                {
+                    ActingBill actingBill = genericMgr.FindEntityWithNativeSql<ActingBill>("select * from BIL_ActBill WITH(NOLOCK) where Id = ?", locTrans.ActingBill).Single();
+                    invTrans.BWART = "411";
+                    invTrans.LIFNR = actingBill.Party;
+                    invTrans.SOBKZ = "K";
+                    invTrans.XBLNR = actingBill.ReceiptNo;
+                    invTrans.WERKS = plantTo;
+                    invTrans.LGORT = sapLocationFrom;
+                    invTrans.UMWRK = plantFrom;
+                    invTrans.UMLGO = sapLocationTo;
+
+                    invTrans.OrderNo = locTrans.OrderNo;
+                    invTrans.DetailId = locTrans.OrderDetailId;
+                    thisInvTransList.Add(invTrans);
+                }
+                #endregion
+
+                #region 内部移库结算冲销
+                else if ((locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_VOID
+                    || locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_RTN_VOID)
+                   && locTrans.QualityType == CodeMaster.QualityType.Qualified
+                   && locTrans.ActingBillQty < 0
+                   && plantFrom == plantTo && sapLocationFrom == sapLocationTo)
+                {
+                    ActingBill actingBill = genericMgr.FindEntityWithNativeSql<ActingBill>("select * from BIL_ActBill WITH(NOLOCK) where Id = ?", locTrans.ActingBill).Single();
+                    invTrans.BWART = "412";
+                    invTrans.LIFNR = actingBill.Party;
+                    invTrans.SOBKZ = "K";
+                    invTrans.XBLNR = actingBill.ReceiptNo;
+                    invTrans.WERKS = plantTo;
+                    invTrans.LGORT = sapLocationFrom;
+                    invTrans.UMWRK = plantFrom;
+                    invTrans.UMLGO = sapLocationTo;
+
+                    invTrans.OrderNo = locTrans.OrderNo;
+                    invTrans.DetailId = locTrans.OrderDetailId;
+                    thisInvTransList.Add(invTrans);
+                }
+                #endregion
+                #endregion
+
+                #region 库内结算冲销
+                else if (locTrans.TransactionType == CodeMaster.TransactionType.ISS_REP
+                   && locTrans.QualityType == CodeMaster.QualityType.Qualified
+                   && locTrans.ActingBillQty < 0
+                   && plantFrom == plantTo) //&& SihLoc.Contains(sapLocationTo)
+                {
+                    ActingBill actingBill = genericMgr.FindEntityWithNativeSql<ActingBill>("select * from BIL_ActBill WITH(NOLOCK) where Id = ?", locTrans.ActingBill).Single();
+                    invTrans.BWART = "412";
+                    invTrans.LIFNR = actingBill.Party;
+                    invTrans.SOBKZ = "K";
+                    invTrans.XBLNR = actingBill.ReceiptNo;
+                    invTrans.WERKS = plantTo;
+                    invTrans.LGORT = sapLocationFrom;
+                    invTrans.UMWRK = plantFrom;
+                    invTrans.UMLGO = sapLocationTo;
+
+                    invTrans.OrderNo = locTrans.OrderNo;
+                    invTrans.DetailId = locTrans.OrderDetailId;
+                    thisInvTransList.Add(invTrans);
+                }
+                #endregion
+
+                #endregion
+
+                #region 检验
+                #region 报验
+                else if (locTrans.TransactionType == CodeMaster.TransactionType.RCT_INP
+                    || locTrans.TransactionType == CodeMaster.TransactionType.RCT_ISL)
+                {
+                    invTrans.BWART = "322";
+                    invTrans.WERKS = plantFrom;
+                    invTrans.LGORT = sapLocationFrom;
+                    invTrans.UMLGO = sapLocationTo;
+                    invTrans.XABLN = locTrans.OrderNo;//记录报验单号，防止跨报验单汇总
+                    if (locTrans.IsConsignment && locTrans.PlanBillQty > 0)
+                    {
+                        PlanBill planBill = genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill WITH(NOLOCK) where Id = ?", locTrans.PlanBill).Single();
+                        invTrans.LIFNR = planBill.Party;
+                        invTrans.SOBKZ = "K";
+                        invTrans.XBLNR = planBill.ReceiptNo;
+                    }
+
+                    invTrans.OrderNo = locTrans.OrderNo;
+                    invTrans.DetailId = locTrans.OrderDetailId;
+                    thisInvTransList.Add(invTrans);
+                }
+                #endregion
+
+                #region 待验状态移库
+                else if ((locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR
+                    || locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_RTN)
+                   && locTrans.QualityType == CodeMaster.QualityType.Inspect
+                   && plantFrom == plantTo && sapLocationFrom != sapLocationTo)//&& SihLoc.Contains(sapLocationTo)
+                {
+                    if (locTrans.IsConsignment && locTrans.PlanBillQty > 0)
+                    {
+                        PlanBill planBill = genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill WITH(NOLOCK) where Id = ?", locTrans.PlanBill).Single();
+                        invTrans.BWART = "323";
+                        invTrans.LIFNR = planBill.Party;
+                        invTrans.SOBKZ = "K";
+                        invTrans.XBLNR = planBill.ReceiptNo;
+                    }
+                    else
+                    {
+                        invTrans.BWART = "323";
+                    }
+                    invTrans.WERKS = plantTo;
+                    invTrans.LGORT = sapLocationFrom;
+                    invTrans.UMWRK = plantFrom;
+                    invTrans.UMLGO = sapLocationTo;
+
+                    invTrans.OrderNo = locTrans.OrderNo;
+                    invTrans.DetailId = locTrans.OrderDetailId;
+                    thisInvTransList.Add(invTrans);
+                }
+                #endregion
+
+                #region 报验移库冲销
+                else if (locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_VOID
+                   && locTrans.QualityType == CodeMaster.QualityType.Inspect
+                   && plantFrom == plantTo && sapLocationFrom != sapLocationTo)//&& SihLoc.Contains(sapLocationTo)
+                {
+                    if (locTrans.IsConsignment && locTrans.PlanBillQty < 0)
+                    {
+                        PlanBill planBill = genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill WITH(NOLOCK) where Id = ?", locTrans.PlanBill).Single();
+                        invTrans.BWART = "324";
+                        invTrans.LIFNR = planBill.Party;
+                        invTrans.SOBKZ = "K";
+                        invTrans.XBLNR = planBill.ReceiptNo;
+                    }
+                    else
+                    {
+                        invTrans.BWART = "324";
+                    }
+                    invTrans.WERKS = plantTo;
+                    invTrans.LGORT = sapLocationFrom;
+                    invTrans.UMWRK = plantFrom;
+                    invTrans.UMLGO = sapLocationTo;
+
+                    invTrans.OrderNo = locTrans.OrderNo;
+                    invTrans.DetailId = locTrans.OrderDetailId;
+                    thisInvTransList.Add(invTrans);
+                }
+                #endregion
+
+                #region 判定合格
+                ////质检到非限制的转帐	321	506	//检验合格入库			0	
+                ////质检到非限制的转帐-寄售	321	506	//检验合格入库			1
+                else if (locTrans.TransactionType == CodeMaster.TransactionType.RCT_INP_QDII)
+                {
+                    //InspectResult inspectResult = genericMgr.FindEntityWithNativeSql<InspectResult>("select * from INP_InspectResult WITH(NOLOCK) where Id = ?", locTrans.OrderDetailId).Single();
+                    //ReceiptDetail receiptDetail = genericMgr.FindEntityWithNativeSql<ReceiptDetail>("select * from ORD_RecDet_1 WITH(NOLOCK) where RecNo = ? and Seq = ?", new object[] { inspectResult.ReceiptNo, inspectResult.ReceiptDetailSequence }).SingleOrDefault();
+                    //LocationTransaction recLocTrans = genericMgr.FindEntityWithNativeSql<LocationTransaction>("select * from VIEW_LocTrans WITH(NOLOCK) where RecDetId = ? and TransType in (?, ?)", new object[] { receiptDetail.Id, com.Sconit.CodeMaster.TransactionType.RCT_PO, com.Sconit.CodeMaster.TransactionType.RCT_SL })[0];
+                    invTrans.BWART = "321";
+                    invTrans.WERKS = plantFrom;
+                    invTrans.LGORT = sapLocationFrom;
+                    invTrans.UMLGO = sapLocationTo;
+                    invTrans.XABLN = locTrans.OrderNo;//记录报验单号，防止跨报验单汇总
+                    if (locTrans.IsConsignment && locTrans.PlanBillQty > 0)
+                    {
+                        PlanBill planBill = genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill WITH(NOLOCK) where Id = ?", locTrans.PlanBill).Single();
+                        invTrans.LIFNR = planBill.Party;
+                        invTrans.SOBKZ = "K";
+                        invTrans.XBLNR = planBill.ReceiptNo;
+                    }
+
+                    invTrans.OrderNo = locTrans.OrderNo;
+                    invTrans.DetailId = locTrans.OrderDetailId;
+                    thisInvTransList.Add(invTrans);
+                    //因为现在在收货时不再传322，,而是101或101K以后直接sap转待验
+                    //所以入库时如果为寄售或寄售结算时，报验合格需要传321K
+                    //if (recLocTrans.PlanBill != 0 || recLocTrans.ActingBill != 0)
+                    //{
+                    //    PlanBill planBill = recLocTrans.PlanBill != 0 ? genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill WITH(NOLOCK) where Id = ?", recLocTrans.PlanBill).Single() : null;
+                    //    ActingBill actBill = recLocTrans.ActingBill != 0 ? genericMgr.FindEntityWithNativeSql<ActingBill>("select * from BIL_ActBill WITH(NOLOCK) where Id = ?", recLocTrans.ActingBill).Single() : null;
+
+                    //    //对于采购收货来说planbill或actbill一定有且两者中只能有一个存在值
+                    //    if (planBill != null)
+                    //    {
+                    //        invTrans.SOBKZ = "K";
+                    //        invTrans.LIFNR = planBill.Party;
+                    //        invTrans.XBLNR = planBill.ReceiptNo;
+                    //    }
+                    //    else if (actBill != null && actBill.BillTerm != CodeMaster.OrderBillTerm.ReceivingSettlement)
+                    //    {
+                    //        invTrans.SOBKZ = "K";
+                    //        invTrans.LIFNR = actBill.Party;
+                    //        invTrans.XBLNR = actBill.ReceiptNo;
+                    //    }
+                    //}
+
+                    //invTrans.OrderNo = locTrans.OrderNo;
+                    //invTrans.DetailId = locTrans.OrderDetailId;
+                    //thisInvTransList.Add(invTrans);
+                }
+                //质检到冻结	350		//检验不合格入库			0	
+                //质检到冻结-寄售	350		//检验不合格入库			1
+                #endregion
+
+                #region 判定不合格
+                else if (locTrans.TransactionType == CodeMaster.TransactionType.RCT_INP_REJ)
+                {
+                    InspectResult inspectResult = genericMgr.FindEntityWithNativeSql<InspectResult>("select * from INP_InspectResult WITH(NOLOCK) where Id = ?", locTrans.OrderDetailId).Single();
+                    InspectDetail inspectDetail = genericMgr.FindEntityWithNativeSql<InspectDetail>("select * from INP_InspectDet WITH(NOLOCK) where Id = ?", inspectResult.InspectDetailId).SingleOrDefault();
+
+                    if (inspectDetail.IpDetailSequence == 0 && inspectDetail.ReceiptDetailSequence == 0)
+                        invTrans.BWART = "344";
+                    else
+                        invTrans.BWART = "350";
+                    invTrans.WERKS = plantFrom;
+                    invTrans.LGORT = sapLocationFrom;
+                    invTrans.UMLGO = sapLocationTo;
+                    invTrans.XABLN = locTrans.OrderNo;//记录报验单号，防止跨报验单汇总
+                    if (locTrans.IsConsignment && locTrans.PlanBillQty > 0)
+                    {
+                        PlanBill planBill = genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill WITH(NOLOCK) where Id = ?", locTrans.PlanBill).Single();
+                        invTrans.LIFNR = planBill.Party;
+                        invTrans.SOBKZ = "K";
+                        invTrans.XBLNR = planBill.ReceiptNo;
+                    }
+
+                    invTrans.OrderNo = locTrans.OrderNo;
+                    invTrans.DetailId = locTrans.OrderDetailId;
+                    thisInvTransList.Add(invTrans);
+                }
+                #endregion
+
+                #region 不合格品移库
+                else if ((locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR
+                    || locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_RTN)
+                   && locTrans.QualityType == CodeMaster.QualityType.Reject
+                   && plantFrom == plantTo && sapLocationFrom != sapLocationTo)//&& SihLoc.Contains(sapLocationTo)
+                {
+                    if (locTrans.IsConsignment && locTrans.PlanBillQty > 0)
+                    {
+                        PlanBill planBill = genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill WITH(NOLOCK) where Id = ?", locTrans.PlanBill).Single();
+                        invTrans.BWART = "325";
+                        invTrans.LIFNR = planBill.Party;
+                        invTrans.SOBKZ = "K";
+                        invTrans.XBLNR = planBill.ReceiptNo;
+                    }
+                    else
+                    {
+                        invTrans.BWART = "325";
+                    }
+                    invTrans.WERKS = plantTo;
+                    invTrans.LGORT = sapLocationFrom;
+                    invTrans.UMWRK = plantFrom;
+                    invTrans.UMLGO = sapLocationTo;
+
+                    invTrans.OrderNo = locTrans.OrderNo;
+                    invTrans.DetailId = locTrans.OrderDetailId;
+                    thisInvTransList.Add(invTrans);
+                }
+                #endregion
+
+                #region 不合格品移库冲销
+                else if (locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_VOID
+                   && locTrans.QualityType == CodeMaster.QualityType.Reject
+                   && plantFrom == plantTo && sapLocationFrom != sapLocationTo)//&& SihLoc.Contains(sapLocationTo)
+                {
+                    if (locTrans.IsConsignment && locTrans.PlanBillQty < 0)
+                    {
+                        PlanBill planBill = genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill WITH(NOLOCK) where Id = ?", locTrans.PlanBill).Single();
+                        invTrans.BWART = "326";
+                        invTrans.LIFNR = planBill.Party;
+                        invTrans.SOBKZ = "K";
+                        invTrans.XBLNR = planBill.ReceiptNo;
+                    }
+                    else
+                    {
+                        invTrans.BWART = "326";
+                    }
+                    invTrans.WERKS = plantTo;
+                    invTrans.LGORT = sapLocationFrom;
+                    invTrans.UMWRK = plantFrom;
+                    invTrans.UMLGO = sapLocationTo;
+
+                    invTrans.OrderNo = locTrans.OrderNo;
+                    invTrans.DetailId = locTrans.OrderDetailId;
+                    thisInvTransList.Add(invTrans);
+                }
+                #endregion
+
+                #region 让步使用
+                //冻结库存到非限制	343	510	//让步使用入库			0	
+                //冻结库存到非限制-寄售	343	510	//让步使用入库			1		
+                else if (locTrans.TransactionType == CodeMaster.TransactionType.RCT_INP_CCS)
+                {
+                    invTrans.BWART = "343";
+                    invTrans.WERKS = plantFrom;
+                    invTrans.LGORT = sapLocationFrom;
+                    invTrans.UMLGO = sapLocationTo;
+                    if (locTrans.IsConsignment && locTrans.PlanBillQty > 0)
+                    {
+                        PlanBill planBill = genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill WITH(NOLOCK) where Id = ?", locTrans.PlanBill).Single();
+                        invTrans.LIFNR = planBill.Party;
+                        invTrans.SOBKZ = "K";
+                        invTrans.XBLNR = planBill.ReceiptNo;
+                    }
+
+                    invTrans.OrderNo = locTrans.OrderNo;
+                    invTrans.DetailId = locTrans.OrderDetailId;
+                    thisInvTransList.Add(invTrans);
+                }
+                #endregion
+                #endregion
+
+                #region 寄售物料的销售出库和冲销要传411K/412K
+                else if (locTrans.TransactionType == CodeMaster.TransactionType.ISS_SO
+                || locTrans.TransactionType == CodeMaster.TransactionType.ISS_SO_VOID)
+                {
+                    if (locTrans.PlanBill != 0)
+                    {
+                        PlanBill planBill = genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill WITH(NOLOCK) where Id = ?", locTrans.PlanBill).Single();
+                        invTrans.LIFNR = planBill.Party;
+                        invTrans.XBLNR = planBill.ReceiptNo;
+                        invTrans.WERKS = plantFrom;
                         invTrans.LGORT = sapLocationFrom;
                         invTrans.UMWRK = plantFrom;
                         invTrans.UMLGO = sapLocationTo;
-                        invTrans.ErrorId = InvTrans.ErrorIdEnum.E108;
 
                         invTrans.OrderNo = locTrans.OrderNo;
                         invTrans.DetailId = locTrans.OrderDetailId;
+
+                        //销售出库PlanBill小于0为结算，大于0为反结算
+                        if (locTrans.PlanBillQty < 0)
+                        {
+                            invTrans.BWART = "411";
+                            invTrans.SOBKZ = "K";
+                        }
+                        else
+                        {
+                            invTrans.BWART = "412";
+                            invTrans.SOBKZ = "K";
+                        }
                         thisInvTransList.Add(invTrans);
                     }
-                    #endregion
-
-                    #region 记录没有导入的库存事务
-                    else
-                    {
-                        //记录不要导入的
-                        //log.Debug(GetTLog(locTrans, "NotNeedExchange"));
-                    }
-                    #endregion
                 }
-                catch (Exception ex)
+                #endregion
+
+                #region 计划外出库的结算已经考虑，如果还有其他未知的结算
+                else if (locTrans.ActingBillQty != 0
+                    && locTrans.TransactionType != CodeMaster.TransactionType.ISS_UNP
+                    && locTrans.TransactionType != CodeMaster.TransactionType.ISS_UNP_VOID)
                 {
-                    //记录错误
-                    log.Error(GetTLog(locTrans, ex.Message));
-                    invTrans.ErrorId = InvTrans.ErrorIdEnum.E199;
+                    ActingBill actingBill = genericMgr.FindEntityWithNativeSql<ActingBill>("select * from BIL_ActBill WITH(NOLOCK) where Id = ?", locTrans.ActingBill).Single();
+                    //invTrans.BWART = "411";
+                    invTrans.LIFNR = actingBill.Party;
+                    //invTrans.SOBKZ = "K";
+                    invTrans.XBLNR = actingBill.ReceiptNo;
+                    invTrans.WERKS = plantTo;
+                    invTrans.LGORT = sapLocationFrom;
+                    invTrans.UMWRK = plantFrom;
+                    invTrans.UMLGO = sapLocationTo;
+                    invTrans.ErrorId = InvTrans.ErrorIdEnum.E108;
 
-                    if (thisInvTransList.Where(trans => trans.LocTransId == invTrans.LocTransId).Count() == 0)
-                    {
-                        invTrans.OrderNo = locTrans.OrderNo;
-                        invTrans.DetailId = locTrans.OrderDetailId;
-                        thisInvTransList.Add(invTrans);
-                    }
+                    invTrans.OrderNo = locTrans.OrderNo;
+                    invTrans.DetailId = locTrans.OrderDetailId;
+                    thisInvTransList.Add(invTrans);
                 }
+                #endregion
+
+                #region 记录没有导入的库存事务
+                else
+                {
+                    //记录不要导入的
+                    //log.Debug(GetTLog(locTrans, "NotNeedExchange"));
+                }
+                #endregion
 
                 #region 其他字段 locTrans=>invTrans
                 foreach (InvTrans thisInvTrans in thisInvTransList)
@@ -1494,88 +1450,79 @@ namespace com.Sconit.Service.SAP.Impl
         [Transaction(TransactionMode.Requires)]
         public void CallSapTransService(IList<InvTrans> invTransList, IList<ErrorMessage> errorMessageList)
         {
-            try
+
+            if (invTransList == null)
             {
-                if (invTransList == null)
+                return;
+            }
+
+            DateTime dateTimeNow = DateTime.Now;
+            List<ZSMIGO> zSMIGOList = new List<ZSMIGO>();
+
+            foreach (var invTrans in invTransList)
+            {
+                var zSMIGO = Mapper.Map<InvTrans, ZSMIGO>(invTrans);
+                zSMIGO.ERFMGSpecified = true;
+                zSMIGOList.Add(zSMIGO);
+            }
+
+            //zSMIGOList.Add(zSMIGO);
+            MI_LESService lesService = new MI_LESService();
+            lesService.Credentials = base.Credentials;
+            lesService.Timeout = base.TimeOut;
+            lesService.Url = ReplaceSAPServiceUrl(lesService.Url);
+
+            ZSMIGORT[] zSMIGORTArray = lesService.MI_LES(zSMIGOList.ToArray());
+
+            if (zSMIGORTArray != null && zSMIGORTArray.Length > 0)
+            {
+                foreach (var zSMIGOR in zSMIGORTArray)
                 {
-                    return;
-                }
-
-                DateTime dateTimeNow = DateTime.Now;
-                List<ZSMIGO> zSMIGOList = new List<ZSMIGO>();
-
-                foreach (var invTrans in invTransList)
-                {
-                    var zSMIGO = Mapper.Map<InvTrans, ZSMIGO>(invTrans);
-                    zSMIGO.ERFMGSpecified = true;
-                    zSMIGOList.Add(zSMIGO);
-                }
-
-                //zSMIGOList.Add(zSMIGO);
-                MI_LESService lesService = new MI_LESService();
-                lesService.Credentials = base.Credentials;
-                lesService.Timeout = base.TimeOut;
-                lesService.Url = ReplaceSAPServiceUrl(lesService.Url);
-
-                ZSMIGORT[] zSMIGORTArray = lesService.MI_LES(zSMIGOList.ToArray());
-
-                if (zSMIGORTArray != null && zSMIGORTArray.Length > 0)
-                {
-                    foreach (var zSMIGOR in zSMIGORTArray)
+                    try
                     {
-                        try
+                        var invTrans = invTransList.Where(i => i.FRBNR == zSMIGOR.FRBNR && i.SGTXT == zSMIGOR.SGTXT).Single();
+                        if (zSMIGOR.MTYPE == "S")
                         {
-                            var invTrans = invTransList.Where(i => i.FRBNR == zSMIGOR.FRBNR && i.SGTXT == zSMIGOR.SGTXT).Single();
-                            if (zSMIGOR.MTYPE == "S")
-                            {
-                                invTrans.Status = Entity.SAP.StatusEnum.Success;
-                                invTrans.ErrorMessage = string.Empty;
-                            }
-                            else
-                            {
-                                invTrans.Status = Entity.SAP.StatusEnum.Fail;
-                                invTrans.ErrorId = InvTrans.ErrorIdEnum.E201;
-                                invTrans.ErrorMessage = zSMIGOR.MSTXT;
-                                invTrans.ErrorCount++;
-                                //string errMessgage = this.GetTLog(zSMIGOR, "移动类型传输失败，" + zSMIGOR.MSTXT + "。");
-                                //log.Error(errMessgage);
-                                //errorMessageList.Add(new ErrorMessage
-                                //{
-                                //    Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_UpdateInvTransFail,
-                                //    Message = errMessgage,
-                                //});
-                            }
-
-                            UpdateSiSap(invTrans);
-
-                            var transCallBack = Mapper.Map<ZSMIGORT, TransCallBack>(zSMIGOR);
-                            transCallBack.CreateDate = dateTimeNow;
-
-                            CreateSiSap(transCallBack);
+                            invTrans.Status = Entity.SAP.StatusEnum.Success;
+                            invTrans.ErrorMessage = string.Empty;
                         }
-                        catch (Exception ex)
+                        else
                         {
-                            string errMessgage = this.GetTLog(zSMIGOR, "更新InvTrans状态失败");
-                            log.Error(errMessgage, ex);
-                            errorMessageList.Add(new ErrorMessage
-                            {
-                                Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_UpdateInvTransFail,
-                                Message = errMessgage,
-                                Exception = ex
-                            });
+                            invTrans.Status = Entity.SAP.StatusEnum.Fail;
+                            invTrans.ErrorId = InvTrans.ErrorIdEnum.E201;
+                            invTrans.ErrorMessage = zSMIGOR.MSTXT;
+                            invTrans.ErrorCount++;
+                            //string errMessgage = this.GetTLog(zSMIGOR, "移动类型传输失败，" + zSMIGOR.MSTXT + "。");
+                            //log.Error(errMessgage);
+                            //errorMessageList.Add(new ErrorMessage
+                            //{
+                            //    Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_UpdateInvTransFail,
+                            //    Message = errMessgage,
+                            //});
                         }
+
+                        UpdateSiSap(invTrans);
+
+                        var transCallBack = Mapper.Map<ZSMIGORT, TransCallBack>(zSMIGOR);
+                        transCallBack.CreateDate = dateTimeNow;
+
+                        CreateSiSap(transCallBack);
+                    }
+                    catch (Exception ex)
+                    {
+                        this.genericMgr.CleanSession();
+                        string errMessgage = this.GetTLog(zSMIGOR, "更新InvTrans状态失败");
+                        log.Error(errMessgage, ex);
+                        errorMessageList.Add(new ErrorMessage
+                        {
+                            Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_UpdateInvTransFail,
+                            Message = errMessgage,
+                            Exception = ex
+                        });
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                log.Error("连接SAP导出移动类型出现异常", ex);
-                errorMessageList.Add(new ErrorMessage
-                {
-                    Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_WebServiceNotAccess,
-                    Exception = ex
-                });
-            }
+
         }
 
         //对于计划外出库如果出库的是寄售库存，那么转换移动类型时要补做411K，冲销则要补做412K
@@ -1590,239 +1537,227 @@ namespace com.Sconit.Service.SAP.Impl
                 string fRBNR = this.GenerateMiscOrderNo();
                 foreach (var miscOrderLocationDetail in miscOrderLocationDetailList)
                 {
-                    try
+                    MiscOrderDetail miscOrderDetail = this.genericMgr.FindEntityWithNativeSql<MiscOrderDetail>("select * from ORD_MiscOrderDet WITH(NOLOCK) where Id = ?", miscOrderLocationDetail.MiscOrderDetailId).Single();
+                    InvTrans invTrans = new InvTrans();
+                    invTrans.BatchNo = batchNo;
+                    invTrans.TCODE = GetTcode(tcodeMoveTypes, miscOrderMaster.MoveType);
+
+                    ////移动类型	
+                    if (miscOrderMaster.Status == CodeMaster.MiscOrderStatus.Cancel)
                     {
-                        MiscOrderDetail miscOrderDetail = this.genericMgr.FindEntityWithNativeSql<MiscOrderDetail>("select * from ORD_MiscOrderDet WITH(NOLOCK) where Id = ?", miscOrderLocationDetail.MiscOrderDetailId).Single();
-                        InvTrans invTrans = new InvTrans();
-                        invTrans.BatchNo = batchNo;
-                        invTrans.TCODE = GetTcode(tcodeMoveTypes, miscOrderMaster.MoveType);
+                        invTrans.BWART = miscOrderMaster.CancelMoveType;
+                    }
+                    else
+                    {
+                        invTrans.BWART = miscOrderMaster.MoveType;
+                    }
+                    ////凭证日期	
+                    invTrans.BLDAT = miscOrderMaster.CreateDate.ToString("yyyyMMdd");
+                    ////过账日期	
+                    invTrans.BUDAT = miscOrderMaster.EffectiveDate.ToString("yyyyMMdd");
+                    ////PO号码	
+                    //invTrans.EBELN = miscOrderMaster.MiscOrderNo;
+                    ////PO行数	
+                    //invTrans.EBELP = miscOrderLocationDetail.MiscOrderDetailId.ToString();
+                    ////DN号码	
+                    //invTrans.VBELN =miscOrderLocationDetail.
+                    ////DN行数	
+                    //invTrans.POSNR =miscOrderLocationDetail.
+                    //string location = miscOrderLocationDetail.
 
-                        ////移动类型	
-                        if (miscOrderMaster.Status == CodeMaster.MiscOrderStatus.Cancel)
+                    if (invTrans.BWART == "301" || invTrans.BWART == "302" ||
+                        invTrans.BWART == "303" || invTrans.BWART == "304" ||
+                        invTrans.BWART == "305" || invTrans.BWART == "306")
+                    {
+                        if (miscOrderMaster.Type == CodeMaster.MiscOrderType.GI)//出库
                         {
-                            invTrans.BWART = miscOrderMaster.CancelMoveType;
-                        }
-                        else
-                        {
-                            invTrans.BWART = miscOrderMaster.MoveType;
-                        }
-                        ////凭证日期	
-                        invTrans.BLDAT = miscOrderMaster.CreateDate.ToString("yyyyMMdd");
-                        ////过账日期	
-                        invTrans.BUDAT = miscOrderMaster.EffectiveDate.ToString("yyyyMMdd");
-                        ////PO号码	
-                        //invTrans.EBELN = miscOrderMaster.MiscOrderNo;
-                        ////PO行数	
-                        //invTrans.EBELP = miscOrderLocationDetail.MiscOrderDetailId.ToString();
-                        ////DN号码	
-                        //invTrans.VBELN =miscOrderLocationDetail.
-                        ////DN行数	
-                        //invTrans.POSNR =miscOrderLocationDetail.
-                        //string location = miscOrderLocationDetail.
-
-                        if (invTrans.BWART == "301" || invTrans.BWART == "302" ||
-                            invTrans.BWART == "303" || invTrans.BWART == "304" ||
-                            invTrans.BWART == "305" || invTrans.BWART == "306")
-                        {
-                            if (miscOrderMaster.Type == CodeMaster.MiscOrderType.GI)//出库
-                            {
-                                //例子
-                                // 301/302 对于从江北发往双桥
-                                // 工厂WERKS:0084,   库位LGORT:1000,  收货工厂UMWRK:0085,   收货地点UMLGO:F80X
-                                // 跨工厂移库 来源工厂
-                                invTrans.WERKS = GetPlant(regionList, miscOrderMaster.Region);//0084
-                                ////库存地点	
-                                invTrans.LGORT = GetSapLocation(locationList, miscOrderMaster.Location);//1000
-                                ////跨工厂移库 收货地点	
-                                invTrans.UMLGO = miscOrderMaster.ReceiveLocation;//0085
-                                ////收货工厂	
-                                invTrans.UMWRK = miscOrderMaster.DeliverRegion;//F80X
-                            }
-                            else
-                            {
-                                //例子:从双桥发往江北的
-                                //计划外入库 区域Region:LOC(0084),发货库位ReceiveLocation:F80X,发货工厂DeliverRegion:0085,库位Loc:LOC(1000)
-                                //SAP字段   工厂WERKS:0085,   库位LGORT:F80X,  收货工厂UMWRK:0084,   收货地点UMLGO:1000
-                                ////跨工厂移库 来源工厂
-                                invTrans.WERKS = miscOrderMaster.DeliverRegion;//0085
-                                ////库存地点	
-                                invTrans.LGORT = miscOrderMaster.ReceiveLocation;//F80X
-                                ////收货工厂	
-                                invTrans.UMWRK = GetPlant(regionList, miscOrderMaster.Region);//0084
-                                ////跨工厂移库 收货地点	
-                                invTrans.UMLGO = GetSapLocation(locationList, miscOrderMaster.Location);//1000
-                            }
-                        }
-                        else
-                        {
-                            ////跨工厂移库 来源工厂
-                            invTrans.WERKS = GetPlant(regionList, miscOrderMaster.Region);
+                            //例子
+                            // 301/302 对于从江北发往双桥
+                            // 工厂WERKS:0084,   库位LGORT:1000,  收货工厂UMWRK:0085,   收货地点UMLGO:F80X
+                            // 跨工厂移库 来源工厂
+                            invTrans.WERKS = GetPlant(regionList, miscOrderMaster.Region);//0084
                             ////库存地点	
-                            invTrans.LGORT = GetSapLocation(locationList, miscOrderMaster.Location);
-                        }
-
-                        ////操作类型	
-                        invTrans.OLD = "I";
-                        ////物料号码	
-                        invTrans.MATNR = miscOrderLocationDetail.Item;
-                        ////数量	
-                        invTrans.ERFMG = Math.Abs(miscOrderLocationDetail.Qty); //取绝对值
-                        ////单位	
-                        invTrans.ERFME = miscOrderLocationDetail.Uom;
-                        ////移动原因	
-                        invTrans.GRUND = miscOrderMaster.Note;
-                        ////成本中心	
-                        invTrans.KOSTL = miscOrderMaster.CostCenter != null ? this.GenerateSapCostCenter(miscOrderMaster.CostCenter) : null;
-                        ////WBS
-                        invTrans.POSID = miscOrderMaster.WBS;
-                        ////根据MiscOrderDetail是否记录供应商来判断是否要记录K
-                        if (miscOrderDetail.ManufactureParty != null && miscOrderDetail.ManufactureParty != string.Empty)
-                        {
-                            invTrans.LIFNR = miscOrderDetail.ManufactureParty;
-                            invTrans.SOBKZ = "K";
+                            invTrans.LGORT = GetSapLocation(locationList, miscOrderMaster.Location);//1000
+                            ////跨工厂移库 收货地点	
+                            invTrans.UMLGO = miscOrderMaster.ReceiveLocation;//0085
+                            ////收货工厂	
+                            invTrans.UMWRK = miscOrderMaster.DeliverRegion;//F80X
                         }
                         else
                         {
-                            invTrans.LIFNR = miscOrderMaster.ManufactureParty;
+                            //例子:从双桥发往江北的
+                            //计划外入库 区域Region:LOC(0084),发货库位ReceiveLocation:F80X,发货工厂DeliverRegion:0085,库位Loc:LOC(1000)
+                            //SAP字段   工厂WERKS:0085,   库位LGORT:F80X,  收货工厂UMWRK:0084,   收货地点UMLGO:1000
+                            ////跨工厂移库 来源工厂
+                            invTrans.WERKS = miscOrderMaster.DeliverRegion;//0085
+                            ////库存地点	
+                            invTrans.LGORT = miscOrderMaster.ReceiveLocation;//F80X
+                            ////收货工厂	
+                            invTrans.UMWRK = GetPlant(regionList, miscOrderMaster.Region);//0084
+                            ////跨工厂移库 收货地点	
+                            invTrans.UMLGO = GetSapLocation(locationList, miscOrderMaster.Location);//1000
                         }
-                        ////WMS号码	
-                        invTrans.FRBNR = fRBNR; //如果是联合主键
-                        ////WMS行数	
-                        invTrans.SGTXT = miscOrderLocationDetail.Id.ToString();
-                        ////库存类型	
-                        //invTrans.INSMK =miscOrderLocationDetail.
-                        ////送货单号	
-                        //invTrans.XABLN = miscOrderLocationDetail.IpNo;
-                        ////内部订单
-                        if (invTrans.BWART == "261" || invTrans.BWART == "262")
-                            invTrans.AUFNR = miscOrderDetail.SapOrderNo;
-                        else
-                            invTrans.AUFNR = miscOrderMaster.ReferenceNo;
-                        ////收货物料	
-                        //invTrans.UMMAT =miscOrderLocationDetail.
-                        invTrans.XBLNR = miscOrderMaster.MiscOrderNo;
+                    }
+                    else
+                    {
+                        ////跨工厂移库 来源工厂
+                        invTrans.WERKS = GetPlant(regionList, miscOrderMaster.Region);
+                        ////库存地点	
+                        invTrans.LGORT = GetSapLocation(locationList, miscOrderMaster.Location);
+                    }
 
-                        invTrans.OrderNo = miscOrderMaster.MiscOrderNo;
-                        invTrans.DetailId = miscOrderLocationDetail.Id;
+                    ////操作类型	
+                    invTrans.OLD = "I";
+                    ////物料号码	
+                    invTrans.MATNR = miscOrderLocationDetail.Item;
+                    ////数量	
+                    invTrans.ERFMG = Math.Abs(miscOrderLocationDetail.Qty); //取绝对值
+                    ////单位	
+                    invTrans.ERFME = miscOrderLocationDetail.Uom;
+                    ////移动原因	
+                    invTrans.GRUND = miscOrderMaster.Note;
+                    ////成本中心	
+                    invTrans.KOSTL = miscOrderMaster.CostCenter != null ? this.GenerateSapCostCenter(miscOrderMaster.CostCenter) : null;
+                    ////WBS
+                    invTrans.POSID = miscOrderMaster.WBS;
+                    ////根据MiscOrderDetail是否记录供应商来判断是否要记录K
+                    if (miscOrderDetail.ManufactureParty != null && miscOrderDetail.ManufactureParty != string.Empty)
+                    {
+                        invTrans.LIFNR = miscOrderDetail.ManufactureParty;
+                        invTrans.SOBKZ = "K";
+                    }
+                    else
+                    {
+                        invTrans.LIFNR = miscOrderMaster.ManufactureParty;
+                    }
+                    ////WMS号码	
+                    invTrans.FRBNR = fRBNR; //如果是联合主键
+                    ////WMS行数	
+                    invTrans.SGTXT = miscOrderLocationDetail.Id.ToString();
+                    ////库存类型	
+                    //invTrans.INSMK =miscOrderLocationDetail.
+                    ////送货单号	
+                    //invTrans.XABLN = miscOrderLocationDetail.IpNo;
+                    ////内部订单
+                    if (invTrans.BWART == "261" || invTrans.BWART == "262")
+                        invTrans.AUFNR = miscOrderDetail.SapOrderNo;
+                    else
+                        invTrans.AUFNR = miscOrderMaster.ReferenceNo;
+                    ////收货物料	
+                    //invTrans.UMMAT =miscOrderLocationDetail.
+                    invTrans.XBLNR = miscOrderMaster.MiscOrderNo;
 
-                        invTransList.Add(invTrans);
-                        CreateSiSap(invTrans);
+                    invTrans.OrderNo = miscOrderMaster.MiscOrderNo;
+                    invTrans.DetailId = miscOrderLocationDetail.Id;
 
-                        #region 计划外出库产生结算
-                        if (miscOrderLocationDetail.ActingBill > 0
-                            //退货类的寄售出库（zr1,zr2,zr5,zr6）不应该产生或者冲销结算
-                            && !NotSettleBillBWARTArray.Contains(invTrans.BWART.ToUpper()))
+                    invTransList.Add(invTrans);
+                    CreateSiSap(invTrans);
+
+                    #region 计划外出库产生结算
+                    if (miscOrderLocationDetail.ActingBill > 0
+                        //退货类的寄售出库（zr1,zr2,zr5,zr6）不应该产生或者冲销结算
+                        && !NotSettleBillBWARTArray.Contains(invTrans.BWART.ToUpper()))
+                    {
+                        #region 计划外出库，补做411K
+                        if (miscOrderMaster.Status == CodeMaster.MiscOrderStatus.Close)
                         {
-                            #region 计划外出库，补做411K
-                            if (miscOrderMaster.Status == CodeMaster.MiscOrderStatus.Close)
-                            {
-                                ActingBill actingBill = genericMgr.FindEntityWithNativeSql<ActingBill>("select * from BIL_ActBill WITH(NOLOCK) where Id = ?", miscOrderLocationDetail.ActingBill).Single();
+                            ActingBill actingBill = genericMgr.FindEntityWithNativeSql<ActingBill>("select * from BIL_ActBill WITH(NOLOCK) where Id = ?", miscOrderLocationDetail.ActingBill).Single();
 
-                                var invTrans411 = Mapper.Map<InvTrans, InvTrans>(invTrans);
-                                invTrans411.BWART = "411";
-                                invTrans411.SOBKZ = "K";
-                                invTrans411.LIFNR = actingBill.Party;
-                                invTrans411.XBLNR = actingBill.ReceiptNo;
-                                invTrans411.SGTXT = invTrans411.SGTXT + "K";
+                            var invTrans411 = Mapper.Map<InvTrans, InvTrans>(invTrans);
+                            invTrans411.BWART = "411";
+                            invTrans411.SOBKZ = "K";
+                            invTrans411.LIFNR = actingBill.Party;
+                            invTrans411.XBLNR = actingBill.ReceiptNo;
+                            invTrans411.SGTXT = invTrans411.SGTXT + "K";
 
-                                CreateSiSap(invTrans411);
+                            CreateSiSap(invTrans411);
 
-                                invTransList.Add(invTrans411);
-                                invTransList.Add(invTrans);
-                            }
-                            #endregion
-
-                            #region 计划外出库冲销，补做412K
-                            else
-                            {
-                                ActingBill actingBill = genericMgr.FindEntityWithNativeSql<ActingBill>("select * from BIL_ActBill WITH(NOLOCK) where Id = ?", miscOrderLocationDetail.ActingBill).Single();
-
-                                var invTrans412 = Mapper.Map<InvTrans, InvTrans>(invTrans);
-                                invTrans412.BWART = "412";
-                                invTrans412.SOBKZ = "K";
-                                invTrans412.LIFNR = actingBill.Party;
-                                invTrans412.XBLNR = actingBill.ReceiptNo;
-                                invTrans412.SGTXT = invTrans412.SGTXT + "K";
-
-                                CreateSiSap(invTrans412);
-
-                                invTransList.Add(invTrans);
-                                invTransList.Add(invTrans412);
-                            }
-                            #endregion
+                            invTransList.Add(invTrans411);
+                            invTransList.Add(invTrans);
                         }
                         #endregion
 
-                        #region 101/102
-                        //302 301 工厂WERKS:0085,   库位LGORT:F80X,  收货工厂UMWRK:0084,   收货地点UMLGO:1000
-                        if (invTrans.LGORT == "F80X" && (invTrans.BWART == "301" || invTrans.BWART == "302")
-                            && invTrans.UMWRK == "0084" && invTrans.WERKS == "0085")
+                        #region 计划外出库冲销，补做412K
+                        else
+                        {
+                            ActingBill actingBill = genericMgr.FindEntityWithNativeSql<ActingBill>("select * from BIL_ActBill WITH(NOLOCK) where Id = ?", miscOrderLocationDetail.ActingBill).Single();
+
+                            var invTrans412 = Mapper.Map<InvTrans, InvTrans>(invTrans);
+                            invTrans412.BWART = "412";
+                            invTrans412.SOBKZ = "K";
+                            invTrans412.LIFNR = actingBill.Party;
+                            invTrans412.XBLNR = actingBill.ReceiptNo;
+                            invTrans412.SGTXT = invTrans412.SGTXT + "K";
+
+                            CreateSiSap(invTrans412);
+
+                            invTransList.Add(invTrans);
+                            invTransList.Add(invTrans412);
+                        }
+                        #endregion
+                    }
+                    #endregion
+
+                    #region 101/102
+                    //302 301 工厂WERKS:0085,   库位LGORT:F80X,  收货工厂UMWRK:0084,   收货地点UMLGO:1000
+                    if (invTrans.LGORT == "F80X" && (invTrans.BWART == "301" || invTrans.BWART == "302")
+                        && invTrans.UMWRK == "0084" && invTrans.WERKS == "0085")
+                    {
+                        /*
+                        对于101 收货，需要进行判断，如果ASN中的特殊字符标示 F80XBJ=’X’ 则在收货传接口时候，需要传递如下两条接口信息。
+                        1）基于ASN的101收货
+                        2）跨工厂转储：移动类型301 收货工厂（新增的接口字段）字段为0085。出货通知字段维护ASN，以便于追踪。
+                        对于F80XBJ=空的，与原接口操作保持一致
+                        301/302 工厂WERKS:0085,   库位LGORT:F80X,  收货工厂UMWRK:0084,   收货地点UMLGO:1000
+                         */
+                        //todo加101双桥收货
+                        //var miscOrderDetail = genericMgr.FindById<MiscOrderDetail>(miscOrderLocationDetail.MiscOrderDetailId);
+                        InvTrans newInvTrans = Mapper.Map<InvTrans, InvTrans>(invTrans);
+                        //预留号码	
+                        newInvTrans.EBELN = miscOrderDetail.ReserveNo;
+                        //预留行数	
+                        newInvTrans.EBELP = miscOrderDetail.ReserveLine;
+
+                        newInvTrans.LIFNR = miscOrderDetail.ManufactureParty;
+                        newInvTrans.UMWRK = null;
+                        newInvTrans.XBLNR = miscOrderMaster.MiscOrderNo;
+                        newInvTrans.SGTXT = "0" + miscOrderLocationDetail.Id.ToString();
+                        newInvTrans.OrderNo = miscOrderMaster.MiscOrderNo;
+                        newInvTrans.DetailId = miscOrderLocationDetail.Id;
+                        //invTrans
+                        if (invTrans.BWART == "301")
                         {
                             /*
-                            对于101 收货，需要进行判断，如果ASN中的特殊字符标示 F80XBJ=’X’ 则在收货传接口时候，需要传递如下两条接口信息。
-                            1）基于ASN的101收货
-                            2）跨工厂转储：移动类型301 收货工厂（新增的接口字段）字段为0085。出货通知字段维护ASN，以便于追踪。
-                            对于F80XBJ=空的，与原接口操作保持一致
-                            301/302 工厂WERKS:0085,   库位LGORT:F80X,  收货工厂UMWRK:0084,   收货地点UMLGO:1000
+                              移动类型	凭证日期	过账日期	PO号码	PO行数	DN号码	DN行数	厂商代码	工厂代码	库存地点	特殊标志	物料号码	数量	单位	收货地点	移动原因	成本中心	出货通知	预留号码	预留行数	WMS号码	WMS行号	操作类型	库存类型	送货单号	内部订单	收货物料	收货工厂
+                              301	20111227	20111227						0085	F80X		99	3	ST	1000			10048151			16674261	10048151						0084
                              */
-                            //todo加101双桥收货
-                            //var miscOrderDetail = genericMgr.FindById<MiscOrderDetail>(miscOrderLocationDetail.MiscOrderDetailId);
-                            InvTrans newInvTrans = Mapper.Map<InvTrans, InvTrans>(invTrans);
-                            //预留号码	
-                            newInvTrans.EBELN = miscOrderDetail.ReserveNo;
-                            //预留行数	
-                            newInvTrans.EBELP = miscOrderDetail.ReserveLine;
-
-                            newInvTrans.LIFNR = miscOrderDetail.ManufactureParty;
-                            newInvTrans.UMWRK = null;
-                            newInvTrans.XBLNR = miscOrderMaster.MiscOrderNo;
-                            newInvTrans.SGTXT = "0" + miscOrderLocationDetail.Id.ToString();
-                            newInvTrans.OrderNo = miscOrderMaster.MiscOrderNo;
-                            newInvTrans.DetailId = miscOrderLocationDetail.Id;
-                            //invTrans
-                            if (invTrans.BWART == "301")
-                            {
-                                /*
-                                  移动类型	凭证日期	过账日期	PO号码	PO行数	DN号码	DN行数	厂商代码	工厂代码	库存地点	特殊标志	物料号码	数量	单位	收货地点	移动原因	成本中心	出货通知	预留号码	预留行数	WMS号码	WMS行号	操作类型	库存类型	送货单号	内部订单	收货物料	收货工厂
-                                  301	20111227	20111227						0085	F80X		99	3	ST	1000			10048151			16674261	10048151						0084
-                                 */
-                                newInvTrans.BWART = "101";
-                                invTransList.Insert(0, newInvTrans);//注意顺序
-                            }
-                            else
-                            {
-                                /*
-                                WMS号码	移动类型	凭证日期	过账日期	PO号码	PO行数	DN号码	DN行数	厂商代码	工厂代码	库存地点	特殊标志	物料号码	数量	单位	收货地点	移动原因	成本中心	出货通知	预留号码	预留行数	WMS号码	WMS行号	操作类型	库存类型	送货单号	内部订单	收货物料	收货工厂
-                                16674271	302	20111228	20111228						0085	F80X		99	3	ST	1000			10048151			16674271	10048151						0084
-                                16674272	102	20111228	20111228	5500004144	10			1000000645	0085	F80X		99	3	ST	F80X			10048151			16674272	10048151	O		10048151			
-                                */
-                                newInvTrans.BWART = "102";
-                                invTransList.Add(newInvTrans);
-                            }
-                            CreateSiSap(newInvTrans);
+                            newInvTrans.BWART = "101";
+                            invTransList.Insert(0, newInvTrans);//注意顺序
                         }
-                        #endregion
-
-                        #region 记录数据关系
-                        InvLoc invLoc = new InvLoc();
-                        invLoc.SourceType = (int)InvLoc.SourceTypeEnum.MiscOrder;
-                        invLoc.SourceId = miscOrderLocationDetail.Id;
-                        invLoc.FRBNR = invTrans.FRBNR;
-                        invLoc.SGTXT = invTrans.SGTXT;
-                        invLoc.CreateDate = DateTime.Now;
-                        invLoc.CreateUser = SecurityContextHolder.Get().Code;
-                        CreateSiSap(invLoc);
-                        #endregion
-                    }
-                    catch (Exception ex)
-                    {
-                        log.Error(NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_CreateInvTransFail, ex);
-                        errorMessageList.Add(new ErrorMessage
+                        else
                         {
-                            Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_CreateInvTransFail,
-                            Exception = ex
-                        });
+                            /*
+                            WMS号码	移动类型	凭证日期	过账日期	PO号码	PO行数	DN号码	DN行数	厂商代码	工厂代码	库存地点	特殊标志	物料号码	数量	单位	收货地点	移动原因	成本中心	出货通知	预留号码	预留行数	WMS号码	WMS行号	操作类型	库存类型	送货单号	内部订单	收货物料	收货工厂
+                            16674271	302	20111228	20111228						0085	F80X		99	3	ST	1000			10048151			16674271	10048151						0084
+                            16674272	102	20111228	20111228	5500004144	10			1000000645	0085	F80X		99	3	ST	F80X			10048151			16674272	10048151	O		10048151			
+                            */
+                            newInvTrans.BWART = "102";
+                            invTransList.Add(newInvTrans);
+                        }
+                        CreateSiSap(newInvTrans);
                     }
+                    #endregion
+
+                    #region 记录数据关系
+                    InvLoc invLoc = new InvLoc();
+                    invLoc.SourceType = (int)InvLoc.SourceTypeEnum.MiscOrder;
+                    invLoc.SourceId = miscOrderLocationDetail.Id;
+                    invLoc.FRBNR = invTrans.FRBNR;
+                    invLoc.SGTXT = invTrans.SGTXT;
+                    invLoc.CreateDate = DateTime.Now;
+                    invLoc.CreateUser = SecurityContextHolder.Get().Code;
+                    CreateSiSap(invLoc);
+                    #endregion
                 }
             }
             return invTransList;

@@ -1,48 +1,49 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
-  <class name="com.Sconit.Entity.SAP.TRANS.InvTrans, com.Sconit.Entity.SAP" table="SAP_InvTrans" lazy="false">
-    <composite-id>
-      <key-property name="FRBNR" column="FRBNR" type="String"  length="16" />
-      <key-property name="SGTXT" column="SGTXT" type="String"  length="5" />
-    </composite-id>
-    <property name="TCODE" column="TCODE" type="String" length="20"/>
-    <property name="BWART" column="BWART" type="String" length="3"/>
-    <property name="BLDAT" column="BLDAT" type="String" length="8"/>
-    <property name="BUDAT" column="BUDAT" type="String" length="8"/>
-    <property name="EBELN" column="EBELN" type="String" length="50"/>
-    <property name="EBELP" column="EBELP" type="String" length="5"/>
-    <property name="VBELN" column="VBELN" type="String" length="10"/>
-    <property name="POSNR" column="POSNR" type="String" length="6"/>
-    <property name="LIFNR" column="LIFNR" type="String" length="10"/>
-    <property name="WERKS" column="WERKS" type="String" length="4"/>
-    <property name="LGORT" column="LGORT" type="String" length="4"/>
-    <property name="SOBKZ" column="SOBKZ" type="String" length="1"/>
-    <property name="OLD" column="OLD" type="String" length="3"/>
-    <property name="MATNR" column="MATNR" type="String" length="18"/>
-    <property name="ERFMG" column="ERFMG" type="Decimal"/>
-    <property name="ERFME" column="ERFME" type="String" length="3"/>
-    <property name="UMLGO" column="UMLGO" type="String" length="4"/>
-    <property name="GRUND" column="GRUND" type="String" length="4"/>
-    <property name="KOSTL" column="KOSTL" type="String" length="10"/>
-    <property name="XBLNR" column="XBLNR" type="String" length="50"/>
-    <property name="RSNUM" column="RSNUM" type="String" length="10"/>
-    <property name="RSPOS" column="RSPOS" type="String" length="4"/>
-    <property name="INSMK" column="INSMK" type="String" length="1"/>
-    <property name="XABLN" column="XABLN" type="String" length="10"/>
-    <property name="AUFNR" column="AUFNR" type="String" length="50"/>
-    <property name="UMMAT" column="UMMAT" type="String" length="18"/>
-    <property name="UMWRK" column="UMWRK" type="String" length="4"/>
-    <property name="POSID" column="POSID" type="String" length="24"/>
-    <property name="CHARG" column="CHARG" type="String" length="50"/>
-    <property name="KZEAR" column="KZEAR" type="String" length="1"/>
-    <property name="Status" column="Status"/>
-    <property name="CreateDate" column="CreateDate" type="DateTime" update="false"/>
-    <property name="LastModifyDate" column="LastModifyDate" type="DateTime"/>
-    <property name="ErrorCount" column="ErrorCount" type="Int32"/>
-    <property name="BatchNo" column="BatchNo" type="Int32"/>
-    <property name="ErrorId" column="ErrorId" type="Int32"/>
-    <property name="ErrorMessage" column="ErrorMessage" type="String" length="256"/>
-    <property name="OrderNo" column="OrderNo" type="String" length="50"/>
-    <property name="DetailId" column="DetailId" type="Int32"/>
-  </class>
+    <class name="com.Sconit.Entity.SAP.TRANS.InvTrans, com.Sconit.Entity.SAP" table="SAP_InvTrans" lazy="false">
+        <composite-id>
+            <key-property name="FRBNR" column="FRBNR" type="String"  length="16" />
+            <key-property name="SGTXT" column="SGTXT" type="String"  length="5" />
+        </composite-id>
+        <version name="Version" column="Version" type="Int32" />
+        <property name="TCODE" column="TCODE" type="String" length="20"/>
+        <property name="BWART" column="BWART" type="String" length="3"/>
+        <property name="BLDAT" column="BLDAT" type="String" length="8"/>
+        <property name="BUDAT" column="BUDAT" type="String" length="8"/>
+        <property name="EBELN" column="EBELN" type="String" length="50"/>
+        <property name="EBELP" column="EBELP" type="String" length="5"/>
+        <property name="VBELN" column="VBELN" type="String" length="10"/>
+        <property name="POSNR" column="POSNR" type="String" length="6"/>
+        <property name="LIFNR" column="LIFNR" type="String" length="10"/>
+        <property name="WERKS" column="WERKS" type="String" length="4"/>
+        <property name="LGORT" column="LGORT" type="String" length="4"/>
+        <property name="SOBKZ" column="SOBKZ" type="String" length="1"/>
+        <property name="OLD" column="OLD" type="String" length="3"/>
+        <property name="MATNR" column="MATNR" type="String" length="18"/>
+        <property name="ERFMG" column="ERFMG" type="Decimal"/>
+        <property name="ERFME" column="ERFME" type="String" length="3"/>
+        <property name="UMLGO" column="UMLGO" type="String" length="4"/>
+        <property name="GRUND" column="GRUND" type="String" length="4"/>
+        <property name="KOSTL" column="KOSTL" type="String" length="10"/>
+        <property name="XBLNR" column="XBLNR" type="String" length="50"/>
+        <property name="RSNUM" column="RSNUM" type="String" length="10"/>
+        <property name="RSPOS" column="RSPOS" type="String" length="4"/>
+        <property name="INSMK" column="INSMK" type="String" length="1"/>
+        <property name="XABLN" column="XABLN" type="String" length="10"/>
+        <property name="AUFNR" column="AUFNR" type="String" length="50"/>
+        <property name="UMMAT" column="UMMAT" type="String" length="18"/>
+        <property name="UMWRK" column="UMWRK" type="String" length="4"/>
+        <property name="POSID" column="POSID" type="String" length="24"/>
+        <property name="CHARG" column="CHARG" type="String" length="50"/>
+        <property name="KZEAR" column="KZEAR" type="String" length="1"/>
+        <property name="Status" column="Status"/>
+        <property name="CreateDate" column="CreateDate" type="DateTime" update="false"/>
+        <property name="LastModifyDate" column="LastModifyDate" type="DateTime"/>
+        <property name="ErrorCount" column="ErrorCount" type="Int32"/>
+        <property name="BatchNo" column="BatchNo" type="Int32"/>
+        <property name="ErrorId" column="ErrorId" type="Int32"/>
+        <property name="ErrorMessage" column="ErrorMessage" type="String" length="256"/>
+        <property name="OrderNo" column="OrderNo" type="String" length="50"/>
+        <property name="DetailId" column="DetailId" type="Int32"/>
+    </class>
 </hibernate-mapping>

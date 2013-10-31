@@ -66,7 +66,7 @@ namespace com.Sconit.Service.SAP.Impl
                     try
                     {
                         log.Debug("开始导出计划外出入库 " + batchNo.ToString());
-                        trans2Mgr.ExchangeSAPMiscOrder(errorMessageList, batchNo, tcodeMoveTypes, regionList, locationList);
+                        trans1p5Mgr.ExchangeSAPMiscOrder(errorMessageList, batchNo, tcodeMoveTypes, regionList, locationList);
                         log.Debug("完成导出计划外出入库 " + batchNo.ToString());
                     }
                     catch (Exception ex)
@@ -260,6 +260,29 @@ namespace com.Sconit.Service.SAP.Impl
             }
         }
 
+        public void ExchangeSAPMiscOrder(List<ErrorMessage> errorMessageList, int batchNo, IList<object[]> tcodeMoveTypes, IList<Entity.MD.Region> regionList, IList<Entity.MD.Location> locationList)
+        {
+            TableIndex tableIndex = this.genericMgr.FindById<TableIndex>(Entity.BusinessConstants.TABLEINDEX_MISCORDERMASTER);
+
+            //过滤当天冲销的，即状态为Cancel并且关闭日期大于上次更新日期
+            string sql = @"select top 1 * from ORD_MiscOrderMstr WITH(NOLOCK) where LastModifyDate > ? and MoveType <> '999' and (Status = ? or (Status = ? and CloseDate <= ? )) order by LastModifyDate";
+            object[] pamaDate = new object[] { tableIndex.LastModifyDate, CodeMaster.MiscOrderStatus.Close, CodeMaster.MiscOrderStatus.Cancel, tableIndex.LastModifyDate };
+            MiscOrderMaster miscOrderMaster = this.genericMgr.FindEntityWithNativeSql<MiscOrderMaster>(sql, pamaDate).SingleOrDefault();
+
+            while (miscOrderMaster != null)
+            {
+                sql = "select * from ORD_MiscOrderDet WITH(NOLOCK) where MiscOrderNo = ?  ";
+                IList<MiscOrderDetail> miscOrderDetailList = this.genericMgr.FindEntityWithNativeSql<MiscOrderDetail>(sql, miscOrderMaster.MiscOrderNo);
+
+                sql = "select * from ORD_MiscOrderLocationDet WITH(NOLOCK) where MiscOrderNo = ?  ";
+                IList<MiscOrderLocationDetail> miscOrderLocationDetailList = this.genericMgr.FindEntityWithNativeSql<MiscOrderLocationDetail>(sql, miscOrderMaster.MiscOrderNo);
+                trans2Mgr.MiscOrder2InvTrans(tableIndex, miscOrderMaster, miscOrderDetailList, miscOrderLocationDetailList, errorMessageList, batchNo, tcodeMoveTypes, regionList, locationList);
+
+                pamaDate = new object[] { tableIndex.LastModifyDate, CodeMaster.MiscOrderStatus.Close, CodeMaster.MiscOrderStatus.Cancel, tableIndex.LastModifyDate };
+                miscOrderMaster = this.genericMgr.FindEntityWithNativeSql<MiscOrderMaster>(sql, pamaDate).SingleOrDefault();
+            }
+        }
+
         public void ExchangeSAPTrans(List<ErrorMessage> errorMessageList, int batchNo, IList<object[]> tcodeMoveTypes, IList<Entity.MD.Region> regionList, IList<Entity.MD.Location> locationList)
         {
             DateTime dateTimeNow = DateTime.Now;
@@ -270,6 +293,7 @@ namespace com.Sconit.Service.SAP.Impl
             while (transList != null && transList.Count() > 0)
             {
                 trans2Mgr.CreateInvTrans(transList, errorMessageList, batchNo, dateTimeNow, tcodeMoveTypes, regionList, locationList, tableIndex);
+                
                 sql = "select top " + InBatch + " * from VIEW_LocTrans WITH(NOLOCK) where Id > " + tableIndex.Id + " order by Id ";
                 transList = this.genericMgr.FindEntityWithNativeSql<LocationTransaction>(sql);
             }
@@ -292,35 +316,6 @@ namespace com.Sconit.Service.SAP.Impl
                     );
                 }
                 return SAPTranSi2SapBatch.Value;
-            }
-        }
-
-        [Transaction(TransactionMode.Requires)]
-        public void ExchangeSAPMiscOrder(List<ErrorMessage> errorMessageList, int batchNo, IList<object[]> tcodeMoveTypes, IList<Entity.MD.Region> regionList, IList<Entity.MD.Location> locationList)
-        {
-            TableIndex tableIndex = this.genericMgr.FindById<TableIndex>(Entity.BusinessConstants.TABLEINDEX_MISCORDERMASTER);
-
-            //过滤当天冲销的，即状态为Cancel并且关闭日期大于上次更新日期
-            string sql = @"select * from ORD_MiscOrderMstr WITH(NOLOCK) where LastModifyDate > ? and MoveType <> '999' and (Status = ? or (Status = ? and CloseDate <= ? ))";
-            object[] pamaDate = new object[] { tableIndex.LastModifyDate, CodeMaster.MiscOrderStatus.Close, CodeMaster.MiscOrderStatus.Cancel, tableIndex.LastModifyDate, };
-            var miscOrderMasterList = this.genericMgr.FindEntityWithNativeSql<MiscOrderMaster>(sql, pamaDate);
-
-            if (miscOrderMasterList != null && miscOrderMasterList.Count > 0)
-            {
-                foreach (var miscOrderMaster in miscOrderMasterList)
-                {
-                    sql = "select * from ORD_MiscOrderDet WITH(NOLOCK) where MiscOrderNo = ?  ";
-                    IList<MiscOrderDetail> miscOrderDetailList = this.genericMgr.FindEntityWithNativeSql<MiscOrderDetail>(sql, miscOrderMaster.MiscOrderNo);
-
-                    sql = "select * from ORD_MiscOrderLocationDet WITH(NOLOCK) where MiscOrderNo = ?  ";
-                    IList<MiscOrderLocationDetail> miscOrderLocationDetailList = this.genericMgr.FindEntityWithNativeSql<MiscOrderLocationDetail>(sql, miscOrderMaster.MiscOrderNo);
-                    MiscOrder2InvTrans(miscOrderMaster, miscOrderDetailList, miscOrderLocationDetailList, errorMessageList, batchNo, tcodeMoveTypes, regionList, locationList);
-                }
-
-                #region 更新TableIndex，记录最后更新日期
-                tableIndex.LastModifyDate = miscOrderMasterList.Max(m => m.LastModifyDate);
-                UpdateSiSap<TableIndex>(tableIndex);
-                #endregion
             }
         }
 
@@ -1530,7 +1525,8 @@ namespace com.Sconit.Service.SAP.Impl
         }
 
         //对于计划外出库如果出库的是寄售库存，那么转换移动类型时要补做411K，冲销则要补做412K
-        private List<InvTrans> MiscOrder2InvTrans(MiscOrderMaster miscOrderMaster,
+        [Transaction(TransactionMode.Requires)]
+        public void MiscOrder2InvTrans(TableIndex tableIndex, MiscOrderMaster miscOrderMaster,
             IList<MiscOrderDetail> miscOrderDetailList, IList<MiscOrderLocationDetail> miscOrderLocationDetailList,
             List<ErrorMessage> errorMessageList, int batchNo, IList<object[]> tcodeMoveTypes, IList<Entity.MD.Region> regionList, IList<Entity.MD.Location> locationList)
         {
@@ -1765,7 +1761,12 @@ namespace com.Sconit.Service.SAP.Impl
                     #endregion
                 }
             }
-            return invTransList;
+
+            #region 更新TableIndex，记录最后更新日期
+            tableIndex.LastModifyDate = miscOrderMaster.LastModifyDate;
+            UpdateSiSap<TableIndex>(tableIndex);
+            this.genericMgr.FlushSession();
+            #endregion
         }
 
         private string GetSapLocation(IList<Entity.MD.Location> locationList, string location)

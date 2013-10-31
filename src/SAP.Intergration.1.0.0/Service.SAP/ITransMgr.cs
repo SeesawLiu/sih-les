@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using com.Sconit.Entity.SAP.TRANS;
 using com.Sconit.Utility;
+using com.Sconit.Entity.ORD;
 
 namespace com.Sconit.Service.SAP
 {
@@ -19,12 +20,16 @@ namespace com.Sconit.Service.SAP
 
     public interface ITrans1p5Mgr
     {
+        void ExchangeSAPMiscOrder(List<ErrorMessage> errorMessageList, int batchNo, IList<object[]> tcodeMoveTypes, IList<Entity.MD.Region> regionList, IList<Entity.MD.Location> locationList);
+        
         void ExchangeSAPTrans(List<ErrorMessage> errorMessageList, int batchNo, IList<object[]> tcodeMoveTypes, IList<Entity.MD.Region> regionList, IList<Entity.MD.Location> locationList);
     }
 
     public interface ITrans2Mgr
     {
-        void ExchangeSAPMiscOrder(List<ErrorMessage> errorMessageList, int batchNo, IList<object[]> tcodeMoveTypes, IList<Entity.MD.Region> regionList, IList<Entity.MD.Location> locationList);
+        void MiscOrder2InvTrans(com.Sconit.Entity.SAP.ORD.TableIndex tableIndex, MiscOrderMaster miscOrderMaster,
+           IList<MiscOrderDetail> miscOrderDetailList, IList<MiscOrderLocationDetail> miscOrderLocationDetailList,
+           List<ErrorMessage> errorMessageList, int batchNo, IList<object[]> tcodeMoveTypes, IList<Entity.MD.Region> regionList, IList<Entity.MD.Location> locationList);
 
         void CreateInvTrans(IList<com.Sconit.Entity.INV.LocationTransaction> transList, List<ErrorMessage> errorMessageList, int batchNo, DateTime dateTimeNow, IList<object[]> tcodeMoveTypes, IList<Entity.MD.Region> regionList, IList<Entity.MD.Location> locationList, com.Sconit.Entity.SAP.ORD.TableIndex tableIndex);
 

@@ -66,13 +66,13 @@
             transMgr.ExchangeMoveType();
         }
 
-        //[WebMethod]
-        //public void ReExchangeMoveType(string userCode, int batchNo)
-        //{
-        //    SecurityContextHolder.Set(securityMgr.GetUser(userCode));
+        [WebMethod]
+        public void ReExchangeMoveType(string userCode)
+        {
+            SecurityContextHolder.Set(securityMgr.GetUser(userCode));
 
-        //    transMgr.ReExchangeMoveType(batchNo);
-        //}
+            transMgr.ReExchangeMoveType();
+        }
 
         //[WebMethod]
         //void ExchangeStockTake(string stNo, string userCode)

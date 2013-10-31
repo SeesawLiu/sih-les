@@ -14,6 +14,7 @@ namespace com.Sconit.Entity.SAP.TRANS
 		public string SGTXT { get; set; }
         public string CreateUser { get; set; }
 		public DateTime CreateDate { get; set; }
+        public string BWART { get; set; }
         
         #endregion
 

@@ -1430,6 +1430,7 @@ namespace com.Sconit.Service.SAP.Impl
                     invLoc.SGTXT = groupedInvTrans.SGTXT;
                     invLoc.CreateDate = dateTimeNow;
                     invLoc.CreateUser = SecurityContextHolder.Get().Code;
+                    invLoc.BWART = groupedInvTrans.BWART;
                     CreateSiSap(invLoc);
                 }
                 #endregion
@@ -1756,6 +1757,7 @@ namespace com.Sconit.Service.SAP.Impl
                     invLoc.SGTXT = invTrans.SGTXT;
                     invLoc.CreateDate = DateTime.Now;
                     invLoc.CreateUser = SecurityContextHolder.Get().Code;
+                    invLoc.BWART = invTrans.BWART;
                     CreateSiSap(invLoc);
                     #endregion
                 }

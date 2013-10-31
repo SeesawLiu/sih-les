@@ -10,8 +10,9 @@
         <property name="SGTXT" column="SGTXT" type="String" length="5"/>
         <property name="CreateUser" column="CreateUser" type="String" length="50" update="false"/>
         <property name="CreateDate" column="CreateDate" type="DateTime" update="false"/>
+        <property name="BWART" column="BWART" type="String" length="3"/>
         <sql-insert>
-            EXEC USP_InvLoc_Insert ?,?,?,?,?,?
+            EXEC USP_InvLoc_Insert ?,?,?,?,?,?,?
         </sql-insert>
     </class>
 </hibernate-mapping>

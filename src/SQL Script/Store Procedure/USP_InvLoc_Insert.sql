@@ -18,11 +18,12 @@ CREATE PROCEDURE USP_InvLoc_Insert
 	@FRBNR varchar(16),
 	@SGTXT varchar(5),
 	@CreateUser varchar(50),
-	@CreateDate datetime
+	@CreateDate datetime,
+	@BWART varchar(3)
 )
 AS
 BEGIN
-	IF @SourceId > 0 AND EXISTS(SELECT TOP 1 1 FROM SAP_InvLoc WHERE SourceId = @SourceId and SourceType = @SourceType)
+	IF @SourceId > 0 AND EXISTS(SELECT TOP 1 1 FROM SAP_InvLoc WHERE SourceId = @SourceId and SourceType = @SourceType and BWART = @BWART)
 	BEGIN
 		RAISERROR('SourceId÷ÿ∏¥', 16, 1)
 		RETURN

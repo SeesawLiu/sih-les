@@ -17,7 +17,7 @@ CREATE PROCEDURE USP_InvLoc_Insert
 	@SourceId bigint,
 	@FRBNR varchar(16),
 	@SGTXT varchar(5),
-	@CreateUser int,
+	@CreateUser varchar(50),
 	@CreateDate datetime
 )
 AS

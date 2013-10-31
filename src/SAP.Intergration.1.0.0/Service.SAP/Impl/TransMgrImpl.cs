@@ -54,8 +54,8 @@ namespace com.Sconit.Service.SAP.Impl
                 #endregion
                 try
                 {
-                    log.Debug(batchNo.ToString() + "-------------------------------无敌的分割线------------------------------------" + batchNo.ToString());
-                    log.Debug("开始导出移动类型" + batchNo.ToString());
+                    log.Debug(batchNo.ToString() + " -------------------------------无敌的分割线------------------------------------ " + batchNo.ToString());
+                    log.Debug("开始导出移动类型 " + batchNo.ToString());
 
                     string hql = "select distinct BWART,TCODE from MapMoveTypeTCode group by BWART,TCODE ";
                     IList<object[]> tcodeMoveTypes = this.genericMgr.FindAll<object[]>(hql);
@@ -65,14 +65,14 @@ namespace com.Sconit.Service.SAP.Impl
                     #region 计划外出入库
                     try
                     {
-                        log.Debug("开始导出计划外出入库" + batchNo.ToString());
+                        log.Debug("开始导出计划外出入库 " + batchNo.ToString());
                         trans2Mgr.ExchangeSAPMiscOrder(errorMessageList, batchNo, tcodeMoveTypes, regionList, locationList);
-                        log.Debug("完成导出计划外出入库" + batchNo.ToString());
+                        log.Debug("完成导出计划外出入库 " + batchNo.ToString());
                     }
                     catch (Exception ex)
                     {
                         this.genericMgr.CleanSession();
-                        log.Debug("导出计划外出入库出现异常" + batchNo.ToString(), ex);
+                        log.Debug("导出计划外出入库出现异常 " + batchNo.ToString(), ex);
                         errorMessageList.Add(new ErrorMessage
                         {
                             Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_LesError,
@@ -84,14 +84,14 @@ namespace com.Sconit.Service.SAP.Impl
                     #region 库存事务,过滤和安吉有关的业务
                     try
                     {
-                        log.Debug("开始导出库存事务" + batchNo.ToString());
+                        log.Debug("开始导出库存事务 " + batchNo.ToString());
                         trans1p5Mgr.ExchangeSAPTrans(errorMessageList, batchNo, tcodeMoveTypes, regionList, locationList);
-                        log.Debug("完成导出库存事务" + batchNo.ToString());
+                        log.Debug("完成导出库存事务 " + batchNo.ToString());
                     }
                     catch (Exception ex)
                     {
                         this.genericMgr.CleanSession();
-                        log.Debug("导出库存事务出现异常" + batchNo.ToString(), ex);
+                        log.Debug("导出库存事务出现异常 " + batchNo.ToString(), ex);
                         errorMessageList.Add(new ErrorMessage
                         {
                             Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_LesError,
@@ -101,16 +101,16 @@ namespace com.Sconit.Service.SAP.Impl
                     #endregion
 
                     #region 移动类型传SAP
-                    log.Debug("开始同步移动类型至SAP" + batchNo.ToString());
+                    log.Debug("开始同步移动类型至SAP " + batchNo.ToString());
                     ReExchangeMoveType();
-                    log.Debug("完成同步移动类型至SAP" + batchNo.ToString());
+                    log.Debug("完成同步移动类型至SAP " + batchNo.ToString());
                     #endregion
 
-                    log.Debug("完成导出移动类型" + batchNo.ToString());
+                    log.Debug("完成导出移动类型 " + batchNo.ToString());
                 }
                 catch (Exception ex)
                 {
-                    log.Debug("导出移动类型出现异常" + batchNo.ToString(), ex);
+                    log.Debug("导出移动类型出现异常 " + batchNo.ToString(), ex);
                     errorMessageList.Add(new ErrorMessage
                     {
                         Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_LesError,
@@ -309,7 +309,7 @@ namespace com.Sconit.Service.SAP.Impl
             {
                 foreach (var miscOrderMaster in miscOrderMasterList)
                 {
-                    sql = "select * from ORD_MiscOrderDet WITH(NOLOCK) where MiscOrderNo = ?  ";
+                    sql = "select * from ORD_MiscOrderLocationDet WITH(NOLOCK) where MiscOrderNo = ?  ";
                     var miscOrderLocationDetailList = this.genericMgr.FindEntityWithNativeSql<MiscOrderLocationDetail>(sql, miscOrderMaster.MiscOrderNo);
                     MiscOrder2InvTrans(miscOrderMaster, miscOrderLocationDetailList, errorMessageList, batchNo, tcodeMoveTypes, regionList, locationList);
                 }

@@ -8220,7 +8220,8 @@ namespace com.Sconit.Service.Impl
                 orderDetailInput.WMSIpNo = wMSDatFile.WMSId;//先记录WMSId号，目前安吉拣货单号只用在接口日志查询中
                 orderDetailInput.WMSIpSeq = wMSDatFile.HuId;//WMS行
                 orderDetailInput.MoveType = wMSDatFile.MoveType + wMSDatFile.SOBKZ;//移动类型
-                if (wMSDatFile.SOBKZ.ToUpper() == "K")
+                //只有311K才传寄售供应商，如果是411K也不传，防止两边库位结算方式设置不一致造成差异
+                if (wMSDatFile.SOBKZ.ToUpper() == "K" && wMSDatFile.MoveType == "311")
                     orderDetailInput.ConsignmentParty = wMSDatFile.LIFNR;//厂商代码
                 orderDetail.AddOrderDetailInput(orderDetailInput);
                 orderDetailList.Add(orderDetail);

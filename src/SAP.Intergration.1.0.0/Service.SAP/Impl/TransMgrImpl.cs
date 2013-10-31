@@ -1448,6 +1448,7 @@ namespace com.Sconit.Service.SAP.Impl
                 {
                     return;
                 }
+
                 DateTime dateTimeNow = DateTime.Now;
                 List<ZSMIGO> zSMIGOList = new List<ZSMIGO>();
 
@@ -1472,44 +1473,28 @@ namespace com.Sconit.Service.SAP.Impl
                     {
                         try
                         {
-                            var q_invTrans = invTransList.Where(i => i.FRBNR == zSMIGOR.FRBNR && i.SGTXT == zSMIGOR.SGTXT);
-
-                            try
+                            var invTrans = invTransList.Where(i => i.FRBNR == zSMIGOR.FRBNR && i.SGTXT == zSMIGOR.SGTXT).Single();
+                            if (zSMIGOR.MTYPE == "S")
                             {
-                                var invTrans = q_invTrans.Single();
-                                if (zSMIGOR.MTYPE == "S")
-                                {
-                                    invTrans.Status = Entity.SAP.StatusEnum.Success;
-                                    invTrans.ErrorMessage = string.Empty;
-                                }
-                                else
-                                {
-                                    invTrans.Status = Entity.SAP.StatusEnum.Fail;
-                                    invTrans.ErrorId = InvTrans.ErrorIdEnum.E201;
-                                    invTrans.ErrorMessage = zSMIGOR.MSTXT;
-                                    invTrans.ErrorCount++;
-
-                                    string errMessgage = this.GetTLog(zSMIGOR, "移动类型传输失败，" + zSMIGOR.MSTXT + "。");
-                                    log.Error(errMessgage);
-                                    errorMessageList.Add(new ErrorMessage
-                                    {
-                                        Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_UpdateInvTransFail,
-                                        Message = errMessgage,
-                                    });
-                                }
-                                UpdateSiSap(invTrans);
+                                invTrans.Status = Entity.SAP.StatusEnum.Success;
+                                invTrans.ErrorMessage = string.Empty;
                             }
-                            catch (Exception ex)
+                            else
                             {
-                                string errMessgage = this.GetTLog(zSMIGOR, "更新InvTrans状态失败!");
-                                log.Error(errMessgage, ex);
-                                errorMessageList.Add(new ErrorMessage
-                                {
-                                    Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_UpdateInvTransFail,
-                                    Message = errMessgage,
-                                    Exception = ex
-                                });
+                                invTrans.Status = Entity.SAP.StatusEnum.Fail;
+                                invTrans.ErrorId = InvTrans.ErrorIdEnum.E201;
+                                invTrans.ErrorMessage = zSMIGOR.MSTXT;
+                                invTrans.ErrorCount++;
+                                //string errMessgage = this.GetTLog(zSMIGOR, "移动类型传输失败，" + zSMIGOR.MSTXT + "。");
+                                //log.Error(errMessgage);
+                                //errorMessageList.Add(new ErrorMessage
+                                //{
+                                //    Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_UpdateInvTransFail,
+                                //    Message = errMessgage,
+                                //});
                             }
+
+                            UpdateSiSap(invTrans);
 
                             var transCallBack = Mapper.Map<ZSMIGORT, TransCallBack>(zSMIGOR);
                             transCallBack.CreateDate = dateTimeNow;
@@ -1518,10 +1503,12 @@ namespace com.Sconit.Service.SAP.Impl
                         }
                         catch (Exception ex)
                         {
-                            log.Error(NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_CreateTransCallBackFail, ex);
+                            string errMessgage = this.GetTLog(zSMIGOR, "更新InvTrans状态失败");
+                            log.Error(errMessgage, ex);
                             errorMessageList.Add(new ErrorMessage
                             {
-                                Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_CreateTransCallBackFail,
+                                Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_UpdateInvTransFail,
+                                Message = errMessgage,
                                 Exception = ex
                             });
                         }
@@ -1530,29 +1517,7 @@ namespace com.Sconit.Service.SAP.Impl
             }
             catch (Exception ex)
             {
-                foreach (var invTrans in invTransList)
-                {
-                    try
-                    {
-                        //如果SAP没有处理异常，
-                        invTrans.Status = Entity.SAP.StatusEnum.Exception;
-                        invTrans.ErrorId = InvTrans.ErrorIdEnum.E202;
-                        invTrans.ErrorMessage = ex.Message.Substring(0, 100);
-                        //invTrans.ErrorCount++;
-                        this.UpdateSiSap(invTrans);
-                    }
-                    catch (Exception ex1)
-                    {
-                        log.Error(NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_UpdateInvTransFail, ex);
-                        errorMessageList.Add(new ErrorMessage
-                        {
-                            Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_UpdateInvTransFail,
-                            Exception = ex1
-                        });
-                    }
-                }
-
-                log.Error(NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_WebServiceNotAccess, ex);
+                log.Error("连接SAP导出移动类型出现异常", ex);
                 errorMessageList.Add(new ErrorMessage
                 {
                     Template = NVelocityTemplateRepository.TemplateEnum.ImportSapMoveType_WebServiceNotAccess,

@@ -22,7 +22,7 @@ CREATE PROCEDURE USP_InvLoc_Insert
 )
 AS
 BEGIN
-	IF @SourceId > 0 AND EXISTS(SELECT TOP 1 1 FROM SAP_InvLoc WHERE SourceId = @SourceId)
+	IF @SourceId > 0 AND EXISTS(SELECT TOP 1 1 FROM SAP_InvLoc WHERE SourceId = @SourceId and SourceType = @SourceType)
 	BEGIN
 		RAISERROR('SourceId÷ÿ∏¥', 16, 1)
 		RETURN

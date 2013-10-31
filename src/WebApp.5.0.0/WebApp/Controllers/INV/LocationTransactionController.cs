@@ -146,7 +146,7 @@ namespace com.Sconit.Web.Controllers.INV
                                                CreateUserName = (string)tak[15],
                                                CreateDate = (DateTime)tak[16],
                                                SapOrderNo = (string)tak[17],
-                                               Supplier = tak[18] != null ? (string)tak[18] : (tak[19] != null ? (string)tak[19] : string.Empty),
+                                               Supplier = tak[18] != null ? (string)tak[18] : string.Empty,
                                            }).ToList();
                 #endregion
             }
@@ -193,7 +193,7 @@ namespace com.Sconit.Web.Controllers.INV
                                                CreateUserName = (string)tak[14],
                                                CreateDate = (DateTime)tak[15],
                                                SapOrderNo = (string)tak[16],
-                                               Supplier = tak[17] != null ? (string)tak[17] : (tak[18] != null ? (string)tak[18] : string.Empty),
+                                               Supplier = tak[17] != null ? (string)tak[17] : string.Empty,
                                            }).ToList();
                 #endregion
             }
@@ -261,10 +261,9 @@ namespace com.Sconit.Web.Controllers.INV
         private string PrepareSqlSearchStatement(LocationTransactionSearchModel searchModel)
         {
             string whereStatement = @"select lt.TransType,lt.EffDate,lt.OrderNo,lt.IpNo,lt.RecNo,lt.PartyFrom,lt.PartyTo,lt.LocFrom,lt.LocTo,
-lt.Item,lt.IOType,lt.HuId,lt.LotNo,lt.Qty,au.CreateUserNm,lt.CreateDate,om.ExtOrderNo,bp.Party,ba.Party as p2 ,lt.Id
+lt.Item,lt.IOType,lt.HuId,lt.LotNo,lt.Qty,(au.FirstName+au.LastName) as CreateUserNm,lt.CreateDate,om.ExtOrderNo,bp.Party ,lt.Id
 from VIEW_LocTrans as lt with(nolock)
 left join BIL_PlanBill as bp with(nolock) on lt.PlanBill=bp.Id
-left join BIL_ActBill as ba with(nolock) on lt.ActBill=ba.Id
 left join ORD_OrderMstr_4 as om with(nolock) on lt.OrderNo=om.OrderNo
 left join ACC_User as au with(nolock) on lt.CreateUser=au.Id 
 where 1=1  ";

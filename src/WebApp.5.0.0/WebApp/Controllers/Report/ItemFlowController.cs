@@ -72,7 +72,7 @@ namespace com.Sconit.Web.Controllers.Report
         public void ExportXLS(FlowDetailSearchModel searchModel)
         {
             string sql = @"select d.Flow,d.Item,d.RefItemCode,d.IsChangeUC,d.IsActive,d.Uom,d.UC,d.UCDesc,d.MinUC,m.LocFrom,m.LocTo ,m.PartyFrom,m.PartyTo,
-                            isnull(fs.Strategy,m.FlowStrategy) as flowStrategy,m.Type,i.Desc1,d.RoundUpOpt  
+                            isnull(fs.Strategy,m.FlowStrategy) as flowStrategy,m.Type,i.Desc1,d.RoundUpOpt,d.Container,d.ContainerDesc  
                             from SCM_FlowDet as d inner join SCM_FlowMstr as m on d.Flow=m.Code 
                                                   inner join MD_Item as i on d.Item=i.Code 
                                                   inner join SCM_FlowStrategy as fs on m.Code=fs.Flow where 1=1 ";
@@ -130,6 +130,8 @@ namespace com.Sconit.Web.Controllers.Report
                                                 Type = systemMgr.GetCodeDetailDescription(CodeMaster.CodeMaster.OrderType, Convert.ToInt32(((object)tak[14]).ToString())),
                                                 ItemDescription = (string)tak[15],
                                                 RoundUpOptionDescription = systemMgr.GetCodeDetailDescription(CodeMaster.CodeMaster.RoundUpOption, Convert.ToInt32(((object)tak[16]).ToString())),
+                                                Container = (string)tak[17],
+                                                ContainerDescription = (string)tak[18],
                                             }).ToList();
             ExportToXLS<FlowDetail>("ExportList", "xls", exportList);
         }

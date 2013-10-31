@@ -1175,9 +1175,16 @@ namespace com.Sconit.Service.SAP.Impl
                     #endregion
 
                     #region 判定不合格
+                    //有收货单号的报验单判定不合格传350，没有收货单号的表示手工创建的，要传344（非限制到冻结，没有待验状态）
                     else if (locTrans.TransactionType == CodeMaster.TransactionType.RCT_INP_REJ)
                     {
-                        invTrans.BWART = "350";
+                        InspectResult inspectResult = genericMgr.FindEntityWithNativeSql<InspectResult>("select * from INP_InspectResult WITH(NOLOCK) where Id = ?", locTrans.OrderDetailId).Single();
+                        InspectDetail inspectDetail = genericMgr.FindEntityWithNativeSql<InspectDetail>("select * from INP_InspectDet WITH(NOLOCK) where Id = ?", inspectResult.InspectDetailId).SingleOrDefault();
+
+                        if (inspectDetail.IpDetailSequence == 0 && inspectDetail.ReceiptDetailSequence == 0)
+                            invTrans.BWART = "344";
+                        else
+                            invTrans.BWART = "350";
                         invTrans.WERKS = plantFrom;
                         invTrans.LGORT = sapLocationFrom;
                         invTrans.UMLGO = sapLocationTo;

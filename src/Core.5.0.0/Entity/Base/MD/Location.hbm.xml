@@ -23,5 +23,6 @@
         <property name="SAPLocation" column="SAPLocation" type="String" length="50" />
         <property name="AllowNegativeConsignment" column="AllowNegaCSInv" type="Boolean"  />
         <property name="IsSource" column="IsSource" type="Boolean"  />
+        <property name="MergeLocationLotDet" column="MergeLocLotDet" type="Boolean"  />
     </class>
 </hibernate-mapping>

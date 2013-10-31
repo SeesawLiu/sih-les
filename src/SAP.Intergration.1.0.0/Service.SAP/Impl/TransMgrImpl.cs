@@ -309,9 +309,12 @@ namespace com.Sconit.Service.SAP.Impl
             {
                 foreach (var miscOrderMaster in miscOrderMasterList)
                 {
+                    sql = "select * from ORD_MiscOrderDet WITH(NOLOCK) where MiscOrderNo = ?  ";
+                    IList<MiscOrderDetail> miscOrderDetailList = this.genericMgr.FindEntityWithNativeSql<MiscOrderDetail>(sql, miscOrderMaster.MiscOrderNo);
+
                     sql = "select * from ORD_MiscOrderLocationDet WITH(NOLOCK) where MiscOrderNo = ?  ";
-                    var miscOrderLocationDetailList = this.genericMgr.FindEntityWithNativeSql<MiscOrderLocationDetail>(sql, miscOrderMaster.MiscOrderNo);
-                    MiscOrder2InvTrans(miscOrderMaster, miscOrderLocationDetailList, errorMessageList, batchNo, tcodeMoveTypes, regionList, locationList);
+                    IList<MiscOrderLocationDetail> miscOrderLocationDetailList = this.genericMgr.FindEntityWithNativeSql<MiscOrderLocationDetail>(sql, miscOrderMaster.MiscOrderNo);
+                    MiscOrder2InvTrans(miscOrderMaster, miscOrderDetailList, miscOrderLocationDetailList, errorMessageList, batchNo, tcodeMoveTypes, regionList, locationList);
                 }
 
                 #region 更新TableIndex，记录最后更新日期
@@ -1528,7 +1531,7 @@ namespace com.Sconit.Service.SAP.Impl
 
         //对于计划外出库如果出库的是寄售库存，那么转换移动类型时要补做411K，冲销则要补做412K
         private List<InvTrans> MiscOrder2InvTrans(MiscOrderMaster miscOrderMaster,
-            IList<MiscOrderLocationDetail> miscOrderLocationDetailList,
+            IList<MiscOrderDetail> miscOrderDetailList, IList<MiscOrderLocationDetail> miscOrderLocationDetailList,
             List<ErrorMessage> errorMessageList, int batchNo, IList<object[]> tcodeMoveTypes, IList<Entity.MD.Region> regionList, IList<Entity.MD.Location> locationList)
         {
             List<InvTrans> invTransList = new List<InvTrans>();
@@ -1538,7 +1541,7 @@ namespace com.Sconit.Service.SAP.Impl
                 string fRBNR = this.GenerateMiscOrderNo();
                 foreach (var miscOrderLocationDetail in miscOrderLocationDetailList)
                 {
-                    MiscOrderDetail miscOrderDetail = this.genericMgr.FindEntityWithNativeSql<MiscOrderDetail>("select * from ORD_MiscOrderDet WITH(NOLOCK) where Id = ?", miscOrderLocationDetail.MiscOrderDetailId).Single();
+                    MiscOrderDetail miscOrderDetail = miscOrderDetailList.Where(det => det.Id == miscOrderLocationDetail.MiscOrderDetailId).Single();
                     InvTrans invTrans = new InvTrans();
                     invTrans.BatchNo = batchNo;
                     invTrans.TCODE = GetTcode(tcodeMoveTypes, miscOrderMaster.MoveType);

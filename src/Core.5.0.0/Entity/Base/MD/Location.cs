@@ -52,6 +52,7 @@ namespace com.Sconit.Entity.MD
         public Boolean AllowNegativeConsignment { get; set; }
         [Display(Name = "Location_IsSource", ResourceType = typeof(Resources.MD.Location))]
         public Boolean IsSource { get; set; }
+        public Boolean MergeLocationLotDet { get; set; }
         
         #endregion
 

@@ -333,7 +333,7 @@ namespace com.Sconit.Web.Controllers.INV
                 }
             }
 
-            SqlParameter[] parameters = new SqlParameter[9];
+             SqlParameter[] parameters = new SqlParameter[10];
             parameters[0] = new SqlParameter("@LocationArrayTable", System.Data.SqlDbType.Structured);
             parameters[0].Value = locationArrayTable;
 
@@ -343,23 +343,26 @@ namespace com.Sconit.Web.Controllers.INV
             parameters[2] = new SqlParameter("@ItemArrayTable", System.Data.SqlDbType.Structured);
             parameters[2].Value = itemArrayTable;
 
-            parameters[3] = new SqlParameter("@SortCloumn", System.Data.SqlDbType.VarChar, 50);
-            parameters[3].Value =  string.Empty;
+            parameters[3] = new SqlParameter("@IsShowCSSupplier", System.Data.SqlDbType.Bit);
+            parameters[3].Value = searchModel.IsShowCSSupplier;
 
-            parameters[4] = new SqlParameter("@SortRule", System.Data.SqlDbType.VarChar, 50);
+            parameters[4] = new SqlParameter("@SortCloumn", System.Data.SqlDbType.VarChar,50);
             parameters[4].Value =string.Empty;
 
-            parameters[5] = new SqlParameter("@PageSize", SqlDbType.Int);
-            parameters[5].Value = 65530;
+            parameters[5] = new SqlParameter("@SortRule", System.Data.SqlDbType.VarChar, 50);
+            parameters[5].Value =string.Empty;
 
-            parameters[6] = new SqlParameter("@Pager", SqlDbType.Int);
-            parameters[6].Value = 1;
+            parameters[6] = new SqlParameter("@PageSize", SqlDbType.Int);
+            parameters[6].Value = 65530;
 
-            parameters[7] = new SqlParameter("@UserId", SqlDbType.Int);
-            parameters[7].Value = CurrentUser.Id;
+            parameters[7] = new SqlParameter("@Pager", SqlDbType.Int);
+            parameters[7].Value = 1;
 
-            parameters[8] = new SqlParameter("@RowCount", System.Data.SqlDbType.VarChar, 50);
-            parameters[8].Direction = ParameterDirection.Output;
+            parameters[8] = new SqlParameter("@UserId", SqlDbType.Int);
+            parameters[8].Value = CurrentUser.Id;
+
+            parameters[9] = new SqlParameter("@RowCount", System.Data.SqlDbType.VarChar, 50);
+            parameters[9].Direction = ParameterDirection.Output;
 
             IList<LocationDetailView> locationDetailView = new List<LocationDetailView>();
             try
@@ -367,11 +370,12 @@ namespace com.Sconit.Web.Controllers.INV
                 DataSet dataSet = sqlDao.GetDatasetByStoredProcedure("USP_Search_LocationLotDet", parameters, false);
 
                 //Item, Desc1, RefCode, Uom, Location, Qty, CSQty, QulifiedQty, InspectedQty, RejectedQty 
+                //Item, Desc1, RefCode, Uom, Location, Qty, CSSupplier, QulifiedQty, InspectedQty, RejectedQty
                 if (dataSet.Tables[0] != null && dataSet.Tables[0].Rows.Count > 0)
                 {
                     foreach (DataRow row in dataSet.Tables[0].Rows)
                     {
-                        //row.ItemArray[0].ToString()
+                       //row.ItemArray[0].ToString()
                         LocationDetailView lotDet = new LocationDetailView();
                         lotDet.Item = row.ItemArray[0].ToString();
                         lotDet.ItemDescription = row.ItemArray[1].ToString();
@@ -379,7 +383,14 @@ namespace com.Sconit.Web.Controllers.INV
                         lotDet.Uom = row.ItemArray[3].ToString();
                         lotDet.Location = row.ItemArray[4].ToString();
                         lotDet.Qty = Convert.ToDecimal(row.ItemArray[5]);
-                        lotDet.ConsignmentQty = Convert.ToDecimal(row.ItemArray[6]);
+                        if (searchModel.IsShowCSSupplier)
+                        {
+                            lotDet.suppliers = row.ItemArray[6].ToString();
+                        }
+                        else
+                        {
+                            lotDet.ConsignmentQty = Convert.ToDecimal(row.ItemArray[6]);
+                        }
                         lotDet.QualifyQty = Convert.ToDecimal(row.ItemArray[7]);
                         lotDet.InspectQty = Convert.ToDecimal(row.ItemArray[8]);
                         lotDet.RejectQty = Convert.ToDecimal(row.ItemArray[9]);
@@ -550,7 +561,7 @@ namespace com.Sconit.Web.Controllers.INV
                 }
             }
             GridModel<LocationDetailView> gridModel = new GridModel<LocationDetailView>();
-            gridModel.Total = string.IsNullOrWhiteSpace(parameters[8].Value.ToString()) ? 0 : Convert.ToInt32(parameters[8].Value);
+            gridModel.Total = string.IsNullOrWhiteSpace(parameters[9].Value.ToString()) ? 0 : Convert.ToInt32(parameters[9].Value);
             gridModel.Data = locationDetailView;
             return PartialView(gridModel);
         }

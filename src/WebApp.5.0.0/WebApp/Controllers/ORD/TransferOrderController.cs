@@ -226,7 +226,7 @@ namespace com.Sconit.Web.Controllers.ORD
                     {
                         if (manuCode == "Url_OrderMstr_Procurement_Import")
                         {
-                           string hql= " select fd from FlowDetail as fd where Item=? and exists( select 1 from FlowMaster as fm where fm.Code=fd.Flow and fm.PartyFrom=? and fm.PartyTo=? ) ";
+                           string hql= " select fd from FlowDetail as fd where Item=? and exists( select 1 from FlowMaster as fm where fm.Code=fd.Flow and fm.PartyFrom=? and fm.PartyTo=? and fm.Type=2 ) ";
                            var flowDetails = this.genericMgr.FindAll<FlowDetail>(hql, new object[] { orderDetail.Item, PartyFrom, PartyTo }, new IType[] { NHibernateUtil.String, NHibernateUtil.String, NHibernateUtil.String });
                            if (flowDetails != null && flowDetails.Count > 0)
                            {

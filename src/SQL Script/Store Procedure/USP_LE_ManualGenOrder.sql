@@ -203,8 +203,47 @@ BEGIN
 	)
 	
 	declare @ProdOrderStartTime datetime
-	select @ProdOrderStartTime = StartTime from ORD_OrderMstr_4 where OrderNo = @ProdOrderNo
-
+	declare @DAUAT varchar(50)
+	declare @OrderStrategy tinyint
+	select @ProdOrderStartTime = StartTime, @DAUAT = ShipFromTel from ORD_OrderMstr_4 where OrderNo = @ProdOrderNo
+	
+	--Z901	10	整车生产订单
+	--Z902	10	MTS生产订单
+	--Z903	10	备品备件生产订单
+	--Z904	10	CKD生产订单
+	--Z90R	10	返工生产订单
+	--ZP01	10	研发车生产订单 
+	--ZP02	10	试制车生产订单 
+	if (@DAUAT = 'Z902')
+	begin
+		--自制件
+		set @OrderStrategy = 12
+	end
+	else if (@DAUAT = 'Z903')
+	begin
+		--备品备件
+		set @OrderStrategy = 9
+	end
+	else if (@DAUAT = 'Z904')
+	begin
+		--CKD
+		set @OrderStrategy = 11
+	end
+	else if (@DAUAT = 'Z90R')
+	begin
+		--返工
+		set @OrderStrategy = 10
+	end
+	else if (@DAUAT = 'ZP01' or @DAUAT = 'ZP02')
+	begin
+		--试制
+		set @OrderStrategy = 8
+	end
+	else
+	begin
+		--手工
+		set @OrderStrategy = 1
+	end
 	-------------------↓获取订单Bom用量-----------------------
 	insert into #tempOrderBomDetTotal(Item, Location, OpRef, OrderQty, ManufactureParty)
 	select bom.Item, bom.Location, ISNULL(bom.OpRef, ''), SUM(bom.OrderQty) as OrderQty, bom.ManufactureParty 
@@ -628,7 +667,7 @@ BEGIN
 					select 
 					@OrderNo,			  --订单号
 					mstr.Code,            --路线
-					1,					  --策略
+					@OrderStrategy,		  --策略
 					@ProdOrderNo,          --参考订单号，生产单号
 					@FlowType,			  --类型
 					0,					  --子类型，0正常
@@ -780,7 +819,7 @@ BEGIN
 					select
 					@OrderNo,			  --订单号
 					mstr.Code,                 --路线
-					1,					  --策略
+					@OrderStrategy,		 --策略
 					@ProdOrderNo,          --参考订单号，生产单号
 					@FlowType,			  --类型
 					0,					  --子类型，0正常

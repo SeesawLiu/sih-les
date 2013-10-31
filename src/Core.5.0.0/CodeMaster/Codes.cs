@@ -636,7 +636,17 @@ namespace com.Sconit.CodeMaster
         [EnumMember]
         SEQ = 4,
         [EnumMember]
-        ANDON = 7
+        ANDON = 7,
+        [EnumMember]
+        TRIAL = 8,     //试制
+        [EnumMember]
+        SPARTPART = 9,  //备件
+        [EnumMember]
+        REPAIR = 10,     //返修
+        [EnumMember]
+        CKD = 11,    //CKD
+        [EnumMember]
+        Semi = 12,      //自制件
     }
 
     //public enum SpecialValue
@@ -970,7 +980,8 @@ namespace com.Sconit.CodeMaster
         Repair = 6,     //返修
         Trial = 7,     //试制
         Subassembly = 8, //分装生产线
-        Check = 9    //检测生产线
+        Check = 9,    //检测生产线
+        CKD = 10    //CKD
     }
 
     public enum PauseStatus

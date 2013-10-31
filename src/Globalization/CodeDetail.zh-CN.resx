@@ -1357,4 +1357,22 @@
   <data name="CodeDetail_TransactionType_LOC_INI_VOID" xml:space="preserve">
     <value>库存初始化冲销</value>
   </data>
+  <data name="CodeDetail_FlowStrategy_CKD" xml:space="preserve">
+    <value>CKD</value>
+  </data>
+  <data name="CodeDetail_FlowStrategy_REPAIR" xml:space="preserve">
+    <value>返修</value>
+  </data>
+  <data name="CodeDetail_FlowStrategy_SEMI" xml:space="preserve">
+    <value>自制件</value>
+  </data>
+  <data name="CodeDetail_FlowStrategy_SPARTPART" xml:space="preserve">
+    <value>备件</value>
+  </data>
+  <data name="CodeDetail_FlowStrategy_TRIAL" xml:space="preserve">
+    <value>试制</value>
+  </data>
+  <data name="CodeDetail_ProdLineType_CKD" xml:space="preserve">
+    <value>CKD</value>
+  </data>
 </root>

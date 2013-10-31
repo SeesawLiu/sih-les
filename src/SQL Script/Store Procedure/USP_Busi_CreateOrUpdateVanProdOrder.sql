@@ -39,9 +39,11 @@ BEGIN
 		declare @SapProdItemUom varchar(5)	--SAP整车物料单位
 		declare @IsOrderExists bit = 0
 		declare @OrderVersion int
+		declare @DAUAT varchar(50)
 		
 		select @SapProdLine = ZLINE, @SapOrderNo = AUFNR, @SapVAN = CHARG, @SapStartTime = GSTRS, 
-		@SapProdItem = MATNR, @SapProdItemDesc = MAKTX, @SapProdItemUom = GMEIN, @SapSeq = Convert(bigint, CY_SEQNR)
+		@SapProdItem = MATNR, @SapProdItemDesc = MAKTX, @SapProdItemUom = GMEIN, @SapSeq = Convert(bigint, CY_SEQNR),
+		@DAUAT = DAUAT
 		from SAP_ProdOrder WITH(NOLOCK) where BatchNo = @BatchNo
 		
 		select @OrderNo = OrderNo, @OrderVersion = [Version] from ORD_OrderMstr_4 with(NOLOCK) where Flow = @VanProdLine and TraceCode = @SapVAN
@@ -335,7 +337,8 @@ BEGIN
 			PauseStatus,          --暂停状态，0
 			ShipFromContact,      --存放整车物料号，
 			ShipFromAddr,         --存放整车物料描述
-			ShipFromFax           --存放整车物料单位
+			ShipFromFax,          --存放整车物料单位
+			ShipFromTel			  --存放SAP生产单类型DAUAT
 			)
 			select 
 			@OrderNo,                    --生产单号
@@ -402,7 +405,8 @@ BEGIN
 			0,                           --暂停状态，0
 			@SapProdItem,				 --存放整车物料号，
 			@SapProdItemDesc,            --存放整车物料描述
-			@SapProdItemUom              --存放整车物料单位
+			@SapProdItemUom,             --存放整车物料单位
+			@DAUAT						 --SAP生产单类型
 		end
 		-----------------------------↑新增生产单头-----------------------------
 		

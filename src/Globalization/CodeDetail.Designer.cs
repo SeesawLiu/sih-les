@@ -898,6 +898,15 @@ namespace Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to CKD.
+        /// </summary>
+        public static string CodeDetail_FlowStrategy_CKD {
+            get {
+                return ResourceManager.GetString("CodeDetail_FlowStrategy_CKD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to JIT.
         /// </summary>
         public static string CodeDetail_FlowStrategy_JIT {
@@ -961,11 +970,47 @@ namespace Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Repair.
+        /// </summary>
+        public static string CodeDetail_FlowStrategy_REPAIR {
+            get {
+                return ResourceManager.GetString("CodeDetail_FlowStrategy_REPAIR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Semi-product.
+        /// </summary>
+        public static string CodeDetail_FlowStrategy_SEMI {
+            get {
+                return ResourceManager.GetString("CodeDetail_FlowStrategy_SEMI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to SEQ.
         /// </summary>
         public static string CodeDetail_FlowStrategy_SEQ {
             get {
                 return ResourceManager.GetString("CodeDetail_FlowStrategy_SEQ", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SpartPart.
+        /// </summary>
+        public static string CodeDetail_FlowStrategy_SPARTPART {
+            get {
+                return ResourceManager.GetString("CodeDetail_FlowStrategy_SPARTPART", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Trail.
+        /// </summary>
+        public static string CodeDetail_FlowStrategy_TRIAL {
+            get {
+                return ResourceManager.GetString("CodeDetail_FlowStrategy_TRIAL", resourceCulture);
             }
         }
         
@@ -2109,6 +2154,15 @@ namespace Resources {
         public static string CodeDetail_ProdLineType_Check {
             get {
                 return ResourceManager.GetString("CodeDetail_ProdLineType_Check", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CKD.
+        /// </summary>
+        public static string CodeDetail_ProdLineType_CKD {
+            get {
+                return ResourceManager.GetString("CodeDetail_ProdLineType_CKD", resourceCulture);
             }
         }
         

@@ -27,6 +27,7 @@ using NHibernate.Type;
 using NHibernate;
 using com.Sconit.Entity.SCM;
 using com.Sconit.Entity.CUST;
+using com.Sconit.Entity.VIEW;
 
 namespace com.Sconit.Web.Controllers.ORD
 {
@@ -475,6 +476,46 @@ namespace com.Sconit.Web.Controllers.ORD
             return View("Edit",orderMaster);
         }
 
+        #endregion
+
+        #region 检查库存
+        [SconitAuthorize(Permissions = "Url_SequenceMaster_Ship")]
+        public ActionResult CheckInventory(string orderNo)
+        {
+            string hql = " select d from OrderDetail as d where d.OrderNo=? ";
+            IList<OrderDetail> orderDetailList = base.genericMgr.FindAll<OrderDetail>(hql, orderNo);
+            try
+            {
+                foreach (var det in orderDetailList)
+                {
+                    if (!string.IsNullOrWhiteSpace(det.ICHARG))
+                    {
+                        IList<LocationDetailView> locationDetails = this.genericMgr.FindEntityWithNativeSql<LocationDetailView>("select * from VIEW_LocationDet with(nolock) where Item=? and ManufactureParty=? ", new object[] { det.Item, det.ICHARG });
+                        if (locationDetails != null && locationDetails.Count > 0)
+                        {
+                            if (locationDetails.First().CsQty < det.OrderedQty)
+                            {
+                                SaveErrorMessage(string.Format("物料号{0}，寄售供应商{1}的寄售库存数为{2}小于当前订单数{3}。", det.Item, det.ICHARG, locationDetails.First().CsQty, det.OrderedQty));
+                            }
+                        }
+                        else
+                        {
+                            SaveErrorMessage(string.Format("物料号{0}，寄售供应商{1}没有找到对应的库存。", det.Item, det.ICHARG));
+                        }
+                    }
+                }
+                return Json(new{ });
+            }
+            catch (BusinessException ex)
+            {
+                SaveBusinessExceptionMessage(ex);
+            }
+            catch (Exception ex)
+            {
+                SaveErrorMessage(ex);
+            }
+            return Json(null);
+        }
         #endregion
 
         #region Kit单修改

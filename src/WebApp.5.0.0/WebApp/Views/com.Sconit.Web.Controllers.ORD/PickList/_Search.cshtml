@@ -61,13 +61,21 @@
             });
                 }
             </div>
+           
             <div class="search-label">
-                <label for="PickListMaster_PickListNo">
-                    是否已打印
+                <label>
+                    @Resources.ORD.PickListDetail.PickListDetail_Item
                 </label>
             </div>
             <div class="search-field">
-                @Html.CheckBox("IsPrintAsn", TempData["PickListSearchModel"] != null ? ((PickListSearchModel)TempData["PickListSearchModel"]).IsPrint : false)
+                @{
+               Html.RenderAction("_ItemComboBox", "Common", new
+               {
+                   controlName = "Item",
+                   selectedValue = TempData["PickListSearchModel"] != null ? ((PickListSearchModel)TempData["PickListSearchModel"]).Item : string.Empty
+
+               });
+                }
             </div>
             <div class="editor-label-2">
                <label for="PickListMaster_PickListNo">
@@ -76,15 +84,15 @@
             </div>
             <div class="editor-field-2">
                 @{
-                    Html.RenderAction("_CodeMasterDropDownList", "Common", new
-                    {
-                        code = com.Sconit.CodeMaster.CodeMaster.PickListStatus,
-                        controlName = "Status",
-                        includeBlankOption = true,
-                        blankOptionDescription = CodeDetail.SpecialValueEnum.BlankValue,
-                        blankOptionValue = "",
-                        selectedValue = TempData["PickListSearchModel"] != null ? ((PickListSearchModel)TempData["PickListSearchModel"]).Status : null
-                    });
+               Html.RenderAction("_CodeMasterDropDownList", "Common", new
+               {
+                   code = com.Sconit.CodeMaster.CodeMaster.PickListStatus,
+                   controlName = "Status",
+                   includeBlankOption = true,
+                   blankOptionDescription = CodeDetail.SpecialValueEnum.BlankValue,
+                   blankOptionValue = "",
+                   selectedValue = TempData["PickListSearchModel"] != null ? ((PickListSearchModel)TempData["PickListSearchModel"]).Status : null
+               });
                 }
             </div>
           <div class="search-label">
@@ -112,7 +120,14 @@
             .Value(TempData["PickListSearchModel"] != null ? ((PickListSearchModel)TempData["PickListSearchModel"]).EndTime : System.DateTime.Today.AddDays(1))
             .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
             </div>
-
+             <div class="search-label">
+                <label for="PickListMaster_PickListNo">
+                    是否已打印
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.CheckBox("IsPrintAsn", TempData["PickListSearchModel"] != null ? ((PickListSearchModel)TempData["PickListSearchModel"]).IsPrint : false)
+            </div>
             
            
 

@@ -544,7 +544,7 @@ BEGIN
 							
 							--获取提前期
 							select @LeadTime = -LeadTime * 60 * 60, @EMLeadTime = -EMLeadTime * 60 * 60, @WinTimeDiff = -WinTimeDiff * 60 * 60 from #tempSeqFlow where Flow = @SeqFlow
-							select @WindowTime = MIN(CPTime) from #tempOrderBom where CPTime is not null
+							select @WindowTime = MIN(CPTime) from #tempOrderBom where Flow = @SeqFlow and CPTime is not null
 							
 							if @WindowTime is null
 							begin
@@ -913,7 +913,7 @@ BEGIN
 							select ROW_NUMBER() over(order by bom.Item) as Seq, @TraceCode as ExtNo, (convert(varchar, (@Seq * 100 + @SubSeq))) as ExtSeq,
 							bom.Item, bom.ItemDesc, bom.RefItemCode, bom.OrderQty, bom.OrderQty, bom.Uom, bom.UC, bom.MinUC, bom.UCDesc, bom.Container, bom.ContainerDesc, bom.ManufactureParty, bom.OpRef, bom.CPTime, bom.ZOPWZ, bom.ZOPID, bom.ZOPDS, 0
 							from #tempOrderBom as bom
-							
+							where bom.Flow = @SeqFlow
 							
 							-----------------------------↓处理厂内消化-----------------------------
 							truncate table #tempItemConsume

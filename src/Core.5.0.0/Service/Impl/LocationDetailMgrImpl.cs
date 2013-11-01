@@ -6670,9 +6670,9 @@ namespace com.Sconit.Service.Impl
 
             //入库
             LocationLotDetail mergeLocationLotDetail = null;
-            if (string.IsNullOrWhiteSpace(newLocationLotDetail.HuId))
+            if (string.IsNullOrWhiteSpace(newLocationLotDetail.HuId) && TryLoadLocation(inventoryIO).MergeLocationLotDet)
             {
-                #region 查找库存明细是否可以合并，有条码的不能合并
+                //#region 查找库存明细是否可以合并，有条码的不能合并
                 //mergeLocationLotDetail = this.genericMgr.FindEntityWithNativeSql<LocationLotDetail>("exec USP_Busi_GetMergeInventory ?,?,?,?,?,?,?,?,?,?"
                 //    , new object[] { newLocationLotDetail.Location, newLocationLotDetail.Item, newLocationLotDetail.Qty,
                 //                    newLocationLotDetail.PlanBill, newLocationLotDetail.QualityType, newLocationLotDetail.IsFreeze,
@@ -6682,7 +6682,7 @@ namespace com.Sconit.Service.Impl
                 //                    NHibernate.NHibernateUtil.Int32, NHibernate.NHibernateUtil.Int16, NHibernate.NHibernateUtil.Boolean,
                 //                    NHibernate.NHibernateUtil.Boolean, NHibernate.NHibernateUtil.Int16, NHibernate.NHibernateUtil.String,
                 //                    NHibernate.NHibernateUtil.String }).FirstOrDefault();
-                #endregion
+                //#endregion
             }
 
             if (mergeLocationLotDetail != null)

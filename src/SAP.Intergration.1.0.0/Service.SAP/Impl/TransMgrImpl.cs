@@ -13,6 +13,8 @@ using com.Sconit.Entity.SAP.TRANS;
 using com.Sconit.Service.SAP.MI_LES;
 using com.Sconit.Utility;
 using com.Sconit.Entity.MD;
+using System.Text;
+using com.Sconit.Entity.ACC;
 
 namespace com.Sconit.Service.SAP.Impl
 {
@@ -66,7 +68,7 @@ namespace com.Sconit.Service.SAP.Impl
                     try
                     {
                         log.Debug("开始导出计划外出入库 " + batchNo.ToString());
-                        trans2Mgr.ExchangeSAPMiscOrder(errorMessageList, batchNo, tcodeMoveTypes, regionList, locationList);
+                        trans1p5Mgr.ExchangeSAPMiscOrder(errorMessageList, batchNo, tcodeMoveTypes, regionList, locationList);
                         log.Debug("完成导出计划外出入库 " + batchNo.ToString());
                     }
                     catch (Exception ex)
@@ -260,18 +262,41 @@ namespace com.Sconit.Service.SAP.Impl
             }
         }
 
+        public void ExchangeSAPMiscOrder(List<ErrorMessage> errorMessageList, int batchNo, IList<object[]> tcodeMoveTypes, IList<Entity.MD.Region> regionList, IList<Entity.MD.Location> locationList)
+        {
+            TableIndex tableIndex = this.genericMgr.FindById<TableIndex>(Entity.BusinessConstants.TABLEINDEX_MISCORDERMASTER);
+
+            //过滤当天冲销的，即状态为Cancel并且关闭日期大于上次更新日期
+            string selectMiscOrderMstrSql = "select top 1 * from ORD_MiscOrderMstr WITH(NOLOCK) where LastModifyDate > ? and MoveType <> '999' and (Status = ? or (Status = ? and CloseDate <= ? )) order by LastModifyDate";
+            string selectMiscOrderDetSql = "select * from ORD_MiscOrderDet WITH(NOLOCK) where MiscOrderNo = ?";
+            string selectMiscOrderLocationDetSql = "select * from ORD_MiscOrderLocationDet WITH(NOLOCK) where MiscOrderNo = ?";
+            
+            object[] pamaDate = new object[] { tableIndex.LastModifyDate, CodeMaster.MiscOrderStatus.Close, CodeMaster.MiscOrderStatus.Cancel, tableIndex.LastModifyDate };
+            MiscOrderMaster miscOrderMaster = this.genericMgr.FindEntityWithNativeSql<MiscOrderMaster>(selectMiscOrderMstrSql, pamaDate).SingleOrDefault();
+
+            while (miscOrderMaster != null)
+            {
+                IList<MiscOrderDetail> miscOrderDetailList = this.genericMgr.FindEntityWithNativeSql<MiscOrderDetail>(selectMiscOrderDetSql, miscOrderMaster.MiscOrderNo);
+                IList<MiscOrderLocationDetail> miscOrderLocationDetailList = this.genericMgr.FindEntityWithNativeSql<MiscOrderLocationDetail>(selectMiscOrderLocationDetSql, miscOrderMaster.MiscOrderNo);
+                trans2Mgr.MiscOrder2InvTrans(tableIndex, miscOrderMaster, miscOrderDetailList, miscOrderLocationDetailList, errorMessageList, batchNo, tcodeMoveTypes, regionList, locationList);
+
+                pamaDate = new object[] { tableIndex.LastModifyDate, CodeMaster.MiscOrderStatus.Close, CodeMaster.MiscOrderStatus.Cancel, tableIndex.LastModifyDate };
+                miscOrderMaster = this.genericMgr.FindEntityWithNativeSql<MiscOrderMaster>(selectMiscOrderMstrSql, pamaDate).SingleOrDefault();
+            }
+        }
+
         public void ExchangeSAPTrans(List<ErrorMessage> errorMessageList, int batchNo, IList<object[]> tcodeMoveTypes, IList<Entity.MD.Region> regionList, IList<Entity.MD.Location> locationList)
         {
             DateTime dateTimeNow = DateTime.Now;
             var tableIndex = this.genericMgr.FindById<TableIndex>(Entity.BusinessConstants.TABLEINDEX_LOCATIONTRANSACTION);
-            string sql = "select top " + InBatch + " * from VIEW_LocTrans WITH(NOLOCK) where Id > " + tableIndex.Id + " order by Id ";
-            IList<LocationTransaction> transList = this.genericMgr.FindEntityWithNativeSql<LocationTransaction>(sql);
+            string sql = "select top " + InBatch + " * from VIEW_LocTrans WITH(NOLOCK) where Id > ? order by Id ";
+            IList<LocationTransaction> transList = this.genericMgr.FindEntityWithNativeSql<LocationTransaction>(sql, tableIndex.Id);
 
             while (transList != null && transList.Count() > 0)
             {
                 trans2Mgr.CreateInvTrans(transList, errorMessageList, batchNo, dateTimeNow, tcodeMoveTypes, regionList, locationList, tableIndex);
-                sql = "select top " + InBatch + " * from VIEW_LocTrans WITH(NOLOCK) where Id > " + tableIndex.Id + " order by Id ";
-                transList = this.genericMgr.FindEntityWithNativeSql<LocationTransaction>(sql);
+
+                transList = this.genericMgr.FindEntityWithNativeSql<LocationTransaction>(sql, tableIndex.Id);
             }
         }
     }
@@ -292,35 +317,6 @@ namespace com.Sconit.Service.SAP.Impl
                     );
                 }
                 return SAPTranSi2SapBatch.Value;
-            }
-        }
-
-        [Transaction(TransactionMode.Requires)]
-        public void ExchangeSAPMiscOrder(List<ErrorMessage> errorMessageList, int batchNo, IList<object[]> tcodeMoveTypes, IList<Entity.MD.Region> regionList, IList<Entity.MD.Location> locationList)
-        {
-            TableIndex tableIndex = this.genericMgr.FindById<TableIndex>(Entity.BusinessConstants.TABLEINDEX_MISCORDERMASTER);
-
-            //过滤当天冲销的，即状态为Cancel并且关闭日期大于上次更新日期
-            string sql = @"select * from ORD_MiscOrderMstr WITH(NOLOCK) where LastModifyDate > ? and MoveType <> '999' and (Status = ? or (Status = ? and CloseDate <= ? ))";
-            object[] pamaDate = new object[] { tableIndex.LastModifyDate, CodeMaster.MiscOrderStatus.Close, CodeMaster.MiscOrderStatus.Cancel, tableIndex.LastModifyDate, };
-            var miscOrderMasterList = this.genericMgr.FindEntityWithNativeSql<MiscOrderMaster>(sql, pamaDate);
-
-            if (miscOrderMasterList != null && miscOrderMasterList.Count > 0)
-            {
-                foreach (var miscOrderMaster in miscOrderMasterList)
-                {
-                    sql = "select * from ORD_MiscOrderDet WITH(NOLOCK) where MiscOrderNo = ?  ";
-                    IList<MiscOrderDetail> miscOrderDetailList = this.genericMgr.FindEntityWithNativeSql<MiscOrderDetail>(sql, miscOrderMaster.MiscOrderNo);
-
-                    sql = "select * from ORD_MiscOrderLocationDet WITH(NOLOCK) where MiscOrderNo = ?  ";
-                    IList<MiscOrderLocationDetail> miscOrderLocationDetailList = this.genericMgr.FindEntityWithNativeSql<MiscOrderLocationDetail>(sql, miscOrderMaster.MiscOrderNo);
-                    MiscOrder2InvTrans(miscOrderMaster, miscOrderDetailList, miscOrderLocationDetailList, errorMessageList, batchNo, tcodeMoveTypes, regionList, locationList);
-                }
-
-                #region 更新TableIndex，记录最后更新日期
-                tableIndex.LastModifyDate = miscOrderMasterList.Max(m => m.LastModifyDate);
-                UpdateSiSap<TableIndex>(tableIndex);
-                #endregion
             }
         }
 
@@ -698,7 +694,9 @@ namespace com.Sconit.Service.SAP.Impl
                     && plantFrom == plantTo && sapLocationFrom != sapLocationTo)//&& SihLoc.Contains(sapLocationTo)
                 {
                     //安吉或双桥-buff的移库事务做特殊处理
-                    if ((locTrans.PartyFrom.ToUpper() == "LOC" || locTrans.PartyFrom.ToUpper() == "SQC") && locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR)
+                    if ((locTrans.PartyFrom.ToUpper() == "LOC" || locTrans.PartyFrom.ToUpper() == "SQC") 
+                        && locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR
+                        && locTrans.IpDetailId != 0)
                     {
                         IpDetail ipDetail = genericMgr.FindEntityWithNativeSql<IpDetail>("select * from ORD_IpDet_2 WITH(NOLOCK) where Id = ?", locTrans.IpDetailId).Single();
                         if (ipDetail.BWART == "411K")
@@ -814,7 +812,9 @@ namespace com.Sconit.Service.SAP.Impl
                     && plantFrom == plantTo && sapLocationFrom != sapLocationTo) //&& SihLoc.Contains(sapLocationTo)
                 {
                     //安吉-buff的移库冲销要特殊处理
-                    if ((locTrans.PartyFrom.ToUpper() == "LOC" || locTrans.PartyFrom.ToUpper() == "SQC") && locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_VOID)
+                    if ((locTrans.PartyFrom.ToUpper() == "LOC" || locTrans.PartyFrom.ToUpper() == "SQC") 
+                        && locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_VOID
+                        && locTrans.IpDetailId > 0)
                     {
                         IpDetail ipDetail = genericMgr.FindEntityWithNativeSql<IpDetail>("select * from ORD_IpDet_2 WITH(NOLOCK) where Id = ?", locTrans.IpDetailId).Single();
                         if (ipDetail.BWART == "411K")
@@ -1417,6 +1417,7 @@ namespace com.Sconit.Service.SAP.Impl
             string fRBNR = this.GenerateLocTransNo();  //WMS号
             int sGTXT = 1;                             //WMS行号
 
+            IList<InvLoc> invLocList = new List<InvLoc>();
             foreach (InvTrans groupedInvTrans in groupedInvTransList)
             {
                 groupedInvTrans.FRBNR = fRBNR;
@@ -1434,13 +1435,13 @@ namespace com.Sconit.Service.SAP.Impl
                     invLoc.CreateDate = dateTimeNow;
                     invLoc.CreateUser = SecurityContextHolder.Get().Code;
                     invLoc.BWART = groupedInvTrans.BWART;
-                    CreateSiSap(invLoc);
+
+                    invLocList.Add(invLoc);
                 }
                 #endregion
-
-                //记录移动类型
-                CreateSiSap(groupedInvTrans);
             }
+
+            InsertInvTrans(groupedInvTransList, invLocList, false);
             #endregion
 
             #region 更新tableIndex
@@ -1530,11 +1531,13 @@ namespace com.Sconit.Service.SAP.Impl
         }
 
         //对于计划外出库如果出库的是寄售库存，那么转换移动类型时要补做411K，冲销则要补做412K
-        private List<InvTrans> MiscOrder2InvTrans(MiscOrderMaster miscOrderMaster,
+        [Transaction(TransactionMode.Requires)]
+        public void MiscOrder2InvTrans(TableIndex tableIndex, MiscOrderMaster miscOrderMaster,
             IList<MiscOrderDetail> miscOrderDetailList, IList<MiscOrderLocationDetail> miscOrderLocationDetailList,
             List<ErrorMessage> errorMessageList, int batchNo, IList<object[]> tcodeMoveTypes, IList<Entity.MD.Region> regionList, IList<Entity.MD.Location> locationList)
         {
-            List<InvTrans> invTransList = new List<InvTrans>();
+            IList<InvTrans> invTransList = new List<InvTrans>();
+            IList<InvLoc> invLocList = new List<InvLoc>();
 
             if (miscOrderLocationDetailList != null)
             {
@@ -1655,7 +1658,6 @@ namespace com.Sconit.Service.SAP.Impl
                     invTrans.DetailId = miscOrderLocationDetail.Id;
 
                     invTransList.Add(invTrans);
-                    CreateSiSap(invTrans);
 
                     #region 计划外出库产生结算
                     if (miscOrderLocationDetail.ActingBill > 0
@@ -1761,11 +1763,226 @@ namespace com.Sconit.Service.SAP.Impl
                     invLoc.CreateDate = DateTime.Now;
                     invLoc.CreateUser = SecurityContextHolder.Get().Code;
                     invLoc.BWART = invTrans.BWART;
-                    CreateSiSap(invLoc);
+                    invLocList.Add(invLoc);
                     #endregion
                 }
+
+                InsertInvTrans(invTransList, invLocList, true);
             }
-            return invTransList;
+
+            #region 更新TableIndex，记录最后更新日期
+            tableIndex.LastModifyDate = miscOrderMaster.LastModifyDate;
+            UpdateSiSap<TableIndex>(tableIndex);
+            this.genericMgr.FlushSession();
+            #endregion
+        }
+
+        private void InsertInvTrans(IList<InvTrans> invTransList, IList<InvLoc> invLocList, bool isMiscOrder)
+        {
+            if (invLocList != null && invLocList.Count > 0)
+            {
+                User user = SecurityContextHolder.Get();
+                StringBuilder sql = new StringBuilder();
+                sql.Append("Create table #tempInvLoc(SourceType int,SourceId bigint,FRBNR varchar(16),SGTXT varchar(50),BWART varchar(3));");
+                int count = 1;
+                foreach (InvLoc invLoc in invLocList)
+                {
+                    if (count == 1)
+                    {
+                        sql.Append("insert into #tempInvLoc(SourceType,SourceId,FRBNR,SGTXT,BWART)");
+                        sql.Append("values(" + invLoc.SourceType + "," + invLoc.SourceId + ",'" + invLoc.FRBNR + "','" + invLoc.SGTXT + "','" + invLoc.BWART + "')");
+                    }
+                    else
+                    {
+                        sql.Append(",(" + invLoc.SourceType + "," + invLoc.SourceId + ",'" + invLoc.FRBNR + "','" + invLoc.SGTXT + "','" + invLoc.BWART + "')");
+                    }
+
+                    count++;
+                    if (count == 1000)
+                    {
+                        sql.Append(";");
+                        count = 1;
+                    }
+                }
+
+                if (count < 1000)
+                {
+                    sql.Append(";");
+                }
+
+                if (isMiscOrder)
+                {
+                    sql.Append(" IF EXISTS(SELECT TOP 1 1 FROM SAP_InvLoc as a inner join #tempInvLoc as b on a.SourceId = b.SourceId and a.SourceType = b.SourceType and a.BWART = b.BWART where b.SourceId > 0)");
+                    sql.Append(" BEGIN");
+                    sql.Append(" RAISERROR('SourceId重复', 16, 1)");
+                    sql.Append(" RETURN");
+                    sql.Append(" END;");
+                }
+                else
+                {
+                    sql.Append(" IF EXISTS(SELECT TOP 1 1 FROM SAP_InvLoc as a inner join #tempInvLoc as b on a.SourceId = b.SourceId and a.SourceType = b.SourceType where b.SourceId > 0)");
+                    sql.Append(" BEGIN");
+                    sql.Append(" RAISERROR('SourceId重复', 16, 1)");
+                    sql.Append(" RETURN");
+                    sql.Append(" END;");
+                }
+
+                sql.Append("insert into SAP_InvLoc(SourceType,SourceId,FRBNR,SGTXT,BWART,CreateUser,CreateDate) select SourceType,SourceId,FRBNR,SGTXT,BWART,'" + user.FullName + "',GETDATE() from #tempInvLoc;drop table #tempInvLoc;");
+                
+                count = 1;
+                foreach (InvTrans invTrans in invTransList)
+                {
+                    if (count == 1)
+                    {
+                        sql.Append("INSERT INTO SAP_InvTrans(");
+                        sql.Append("TCODE,"); // 1
+                        sql.Append("BWART,"); // 2
+                        sql.Append("BLDAT,"); // 3
+                        sql.Append("BUDAT,"); // 4
+                        sql.Append("EBELN,"); // 5
+                        sql.Append("EBELP,"); // 6
+                        sql.Append("VBELN,"); // 7
+                        sql.Append("POSNR,"); // 8
+                        sql.Append("LIFNR,"); // 9
+                        sql.Append("WERKS,"); // 10
+                        sql.Append("LGORT,"); // 11
+                        sql.Append("SOBKZ,"); // 12
+                        sql.Append("MATNR,"); // 13
+                        sql.Append("ERFMG,"); // 14
+                        sql.Append("ERFME,"); // 15
+                        sql.Append("UMLGO,"); // 16
+                        sql.Append("GRUND,"); // 17
+                        sql.Append("KOSTL,"); // 18
+                        sql.Append("XBLNR,"); // 19
+                        sql.Append("RSNUM,"); // 20
+                        sql.Append("RSPOS,"); // 21
+                        sql.Append("FRBNR,"); // 22
+                        sql.Append("SGTXT,"); // 23
+                        sql.Append("OLD,");   // 24
+                        sql.Append("INSMK,"); // 26
+                        sql.Append("XABLN,"); // 27
+                        sql.Append("AUFNR,"); // 28
+                        sql.Append("UMMAT,"); // 29
+                        sql.Append("UMWRK,"); // 30
+                        sql.Append("POSID,"); // 31
+                        sql.Append("CreateDate,");  // 32
+                        sql.Append("LastModifyDate,");  // 33
+                        sql.Append("Status,"); // 34
+                        sql.Append("ErrorCount,"); // 35
+                        sql.Append("BatchNo,"); // 36
+                        sql.Append("CHARG,");  // 37
+                        sql.Append("KZEAR,");  // 38
+                        sql.Append("ErrorId,"); // 39
+                        sql.Append("ErrorMessage,"); //40
+                        sql.Append("OrderNo,"); //41
+                        sql.Append("DetailId,"); //42
+                        sql.Append("[Version])");//43
+                        sql.Append("values(");
+                        sql.Append("'" + (invTrans.TCODE != null ? invTrans.TCODE : string.Empty) + "',"); // 1
+                        sql.Append("'" + (invTrans.BWART != null ? invTrans.BWART : string.Empty) + "',"); // 2
+                        sql.Append("'" + (invTrans.BLDAT != null ? invTrans.BLDAT : string.Empty) + "',"); // 3
+                        sql.Append("'" + (invTrans.BUDAT != null ? invTrans.BUDAT : string.Empty) + "',"); // 4
+                        sql.Append("'" + (invTrans.EBELN != null ? invTrans.EBELN : string.Empty) + "',"); // 5
+                        sql.Append("'" + (invTrans.EBELP != null ? invTrans.EBELP : string.Empty) + "',"); // 6
+                        sql.Append("'" + (invTrans.VBELN != null ? invTrans.VBELN : string.Empty) + "',"); // 7
+                        sql.Append("'" + (invTrans.POSNR != null ? invTrans.POSNR : string.Empty) + "',"); // 8
+                        sql.Append("'" + (invTrans.LIFNR != null ? invTrans.LIFNR : string.Empty) + "',"); // 9
+                        sql.Append("'" + (invTrans.WERKS != null ? invTrans.WERKS : string.Empty) + "',"); // 10
+                        sql.Append("'" + (invTrans.LGORT != null ? invTrans.LGORT : string.Empty) + "',"); // 11
+                        sql.Append("'" + (invTrans.SOBKZ != null ? invTrans.SOBKZ : string.Empty) + "',"); // 12
+                        sql.Append("'" + (invTrans.MATNR != null ? invTrans.MATNR : string.Empty) + "',"); // 13
+                        sql.Append(invTrans.ERFMG + ","); // 14
+                        sql.Append("'" + (invTrans.ERFME != null ? invTrans.ERFME : string.Empty) + "',"); // 15
+                        sql.Append("'" + (invTrans.UMLGO != null ? invTrans.UMLGO : string.Empty) + "',"); // 16
+                        sql.Append("'" + (invTrans.GRUND != null ? invTrans.GRUND : string.Empty) + "',"); // 17
+                        sql.Append("'" + (invTrans.KOSTL != null ? (invTrans.KOSTL.Length > 10 ? invTrans.KOSTL.Substring(0, 10) : invTrans.KOSTL) : string.Empty) + "',"); // 18
+                        sql.Append("'" + (invTrans.XBLNR != null ? invTrans.XBLNR : string.Empty) + "',"); // 19
+                        sql.Append("'" + (invTrans.RSNUM != null ? invTrans.RSNUM : string.Empty) + "',"); // 20
+                        sql.Append("'" + (invTrans.RSPOS != null ? invTrans.RSPOS : string.Empty) + "',"); // 21
+                        sql.Append("'" + (invTrans.FRBNR != null ? invTrans.FRBNR : string.Empty) + "',"); // 22
+                        sql.Append("'" + (invTrans.SGTXT != null ? invTrans.SGTXT : string.Empty) + "',"); // 23
+                        sql.Append("'" + (invTrans.OLD != null ? invTrans.OLD : string.Empty) + "',");   // 24
+                        sql.Append("'" + (invTrans.INSMK != null ? invTrans.INSMK : string.Empty) + "',"); // 26
+                        sql.Append("'" + (invTrans.XABLN != null ? invTrans.XABLN : string.Empty) + "',"); // 27
+                        sql.Append("'" + (invTrans.AUFNR != null ? invTrans.AUFNR : string.Empty) + "',"); // 28
+                        sql.Append("'" + (invTrans.UMMAT != null ? invTrans.UMMAT : string.Empty) + "',"); // 29
+                        sql.Append("'" + (invTrans.UMWRK != null ? invTrans.UMWRK : string.Empty) + "',"); // 30
+                        sql.Append("'" + (invTrans.POSID != null ? invTrans.POSID : string.Empty) + "',"); // 31
+                        sql.Append("GETDATE(),");  // 32
+                        sql.Append("GETDATE(),");  // 33
+                        sql.Append((int)invTrans.Status + ","); // 34
+                        sql.Append(invTrans.ErrorCount + ","); // 35
+                        sql.Append(invTrans.BatchNo + ","); // 36
+                        sql.Append("'" + (invTrans.CHARG != null ? invTrans.CHARG : string.Empty) + "',");  // 37
+                        sql.Append("'" + (invTrans.KZEAR != null ? invTrans.KZEAR : string.Empty) + "',");  // 38
+                        sql.Append((int)invTrans.ErrorId + ","); // 39
+                        sql.Append("'" + (invTrans.ErrorMessage != null ? invTrans.ErrorMessage : string.Empty) + "',"); //40
+                        sql.Append("'" + (invTrans.OrderNo != null ? invTrans.OrderNo : string.Empty) + "',"); //41
+                        sql.Append(invTrans.DetailId + ","); //42
+                        sql.Append("1)");//43
+                    }
+                    else
+                    {
+                        sql.Append(",(");
+                        sql.Append("'" + (invTrans.TCODE != null ? invTrans.TCODE : string.Empty) + "',"); // 1
+                        sql.Append("'" + (invTrans.BWART != null ? invTrans.BWART : string.Empty) + "',"); // 2
+                        sql.Append("'" + (invTrans.BLDAT != null ? invTrans.BLDAT : string.Empty) + "',"); // 3
+                        sql.Append("'" + (invTrans.BUDAT != null ? invTrans.BUDAT : string.Empty) + "',"); // 4
+                        sql.Append("'" + (invTrans.EBELN != null ? invTrans.EBELN : string.Empty) + "',"); // 5
+                        sql.Append("'" + (invTrans.EBELP != null ? invTrans.EBELP : string.Empty) + "',"); // 6
+                        sql.Append("'" + (invTrans.VBELN != null ? invTrans.VBELN : string.Empty) + "',"); // 7
+                        sql.Append("'" + (invTrans.POSNR != null ? invTrans.POSNR : string.Empty) + "',"); // 8
+                        sql.Append("'" + (invTrans.LIFNR != null ? invTrans.LIFNR : string.Empty) + "',"); // 9
+                        sql.Append("'" + (invTrans.WERKS != null ? invTrans.WERKS : string.Empty) + "',"); // 10
+                        sql.Append("'" + (invTrans.LGORT != null ? invTrans.LGORT : string.Empty) + "',"); // 11
+                        sql.Append("'" + (invTrans.SOBKZ != null ? invTrans.SOBKZ : string.Empty) + "',"); // 12
+                        sql.Append("'" + (invTrans.MATNR != null ? invTrans.MATNR : string.Empty) + "',"); // 13
+                        sql.Append(invTrans.ERFMG + ","); // 14
+                        sql.Append("'" + (invTrans.ERFME != null ? invTrans.ERFME : string.Empty) + "',"); // 15
+                        sql.Append("'" + (invTrans.UMLGO != null ? invTrans.UMLGO : string.Empty) + "',"); // 16
+                        sql.Append("'" + (invTrans.GRUND != null ? invTrans.GRUND : string.Empty) + "',"); // 17
+                        sql.Append("'" + (invTrans.KOSTL != null ? (invTrans.KOSTL.Length > 10 ? invTrans.KOSTL.Substring(0, 10) : invTrans.KOSTL) : string.Empty) + "',"); // 18
+                        sql.Append("'" + (invTrans.XBLNR != null ? invTrans.XBLNR : string.Empty) + "',"); // 19
+                        sql.Append("'" + (invTrans.RSNUM != null ? invTrans.RSNUM : string.Empty) + "',"); // 20
+                        sql.Append("'" + (invTrans.RSPOS != null ? invTrans.RSPOS : string.Empty) + "',"); // 21
+                        sql.Append("'" + (invTrans.FRBNR != null ? invTrans.FRBNR : string.Empty) + "',"); // 22
+                        sql.Append("'" + (invTrans.SGTXT != null ? invTrans.SGTXT : string.Empty) + "',"); // 23
+                        sql.Append("'" + (invTrans.OLD != null ? invTrans.OLD : string.Empty) + "',");   // 24
+                        sql.Append("'" + (invTrans.INSMK != null ? invTrans.INSMK : string.Empty) + "',"); // 26
+                        sql.Append("'" + (invTrans.XABLN != null ? invTrans.XABLN : string.Empty) + "',"); // 27
+                        sql.Append("'" + (invTrans.AUFNR != null ? invTrans.AUFNR : string.Empty) + "',"); // 28
+                        sql.Append("'" + (invTrans.UMMAT != null ? invTrans.UMMAT : string.Empty) + "',"); // 29
+                        sql.Append("'" + (invTrans.UMWRK != null ? invTrans.UMWRK : string.Empty) + "',"); // 30
+                        sql.Append("'" + (invTrans.POSID != null ? invTrans.POSID : string.Empty) + "',"); // 31
+                        sql.Append("GETDATE(),");  // 32
+                        sql.Append("GETDATE(),");  // 33
+                        sql.Append((int)invTrans.Status + ","); // 34
+                        sql.Append(invTrans.ErrorCount + ","); // 35
+                        sql.Append(invTrans.BatchNo + ","); // 36
+                        sql.Append("'" + (invTrans.CHARG != null ? invTrans.CHARG : string.Empty) + "',");  // 37
+                        sql.Append("'" + (invTrans.KZEAR != null ? invTrans.KZEAR : string.Empty) + "',");  // 38
+                        sql.Append((int)invTrans.ErrorId + ","); // 39
+                        sql.Append("'" + (invTrans.ErrorMessage != null ? invTrans.ErrorMessage : string.Empty) + "',"); //40
+                        sql.Append("'" + (invTrans.OrderNo != null ? invTrans.OrderNo : string.Empty) + "',"); //41
+                        sql.Append(invTrans.DetailId + ","); //42
+                        sql.Append("1)");//43
+                    }
+
+                    count++;
+                    if (count == 1000)
+                    {
+                        sql.Append(";");
+                        count = 1;
+                    }
+                }
+
+                if (count < 1000)
+                {
+                    sql.Append(";");
+                }
+
+                this.genericMgr.UpdateWithNativeQuery(sql.ToString());
+            }
         }
 
         private string GetSapLocation(IList<Entity.MD.Location> locationList, string location)

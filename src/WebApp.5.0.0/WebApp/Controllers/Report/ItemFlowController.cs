@@ -222,17 +222,59 @@ inner join SCM_FlowStrategy as fs on m.Code=fs.Flow
 inner join MD_Item as i on i.Code=d.Item
 where m.Type=2 ) as t3 on t1.Item=t3.Item
 where  
-(( t2.Item is null  or t1.PartyFrom<>t2.PartyTo or t1.LocFrom<>t2.LocTo  ) and t1.PartyFrom not in('240','230','HB1','280','TB2') ) or t1.MinUC=0 or 
+(( t2.Item is null  or t1.PartyFrom<>t2.PartyTo or t1.LocFrom<>t2.LocTo  ) and t1.PartyFrom not in('240','230','HB1','280','TB2','TB1','CB1') ) or t1.MinUC=0 or 
 (t1.Item=t3.Item and t1.PartyFrom=t3.PartyFrom and t1.PartyTo=t3.PartyTo and t1.Strategy<>t3.Strategy)
-) as rr group by rr.Code,rr.flowDesc,rr.PartyFrom,rr.PartyTo,rr.LocFrom,rr.LocTo,rr.Strategy,rr.Item,rr.RefItemCode,rr.Desc1,rr.MinUC,rr.errorType ";
-            if (command.SortDescriptors.Count == 0)
-            {
-                searchSql += " order by Code asc";
-            }
-            else
-            {
-                searchSql += HqlStatementHelper.GetSortingStatement(command.SortDescriptors);
-            }
+) as rr group by rr.Code,rr.flowDesc,rr.PartyFrom,rr.PartyTo,rr.LocFrom,rr.LocTo,rr.Strategy,rr.Item,rr.RefItemCode,rr.Desc1,rr.MinUC,rr.errorType 
+
+union all
+select m.Code,m.Desc1 as flowDesc,m.PartyFrom,m.PartyTo,m.LocFrom,m.LocTo,fs.Strategy,d.Item,d.RefItemCode,i.Desc1,d.MinUC,6 as errorType  from SCM_FlowDet as d 
+inner join SCM_FlowMstr as m  on d.Flow=m.Code
+inner join SCM_FlowStrategy as fs on m.Code=fs.Flow
+inner join MD_Item as i on i.Code=d.Item
+where m.LocTo in('2300L','2400L','2700L') and m.LocFrom<>m.LocTo and m.PartyFrom<>'280'
+and not exists (
+select * from (
+select m.Code,m.Desc1 as flowDesc,m.PartyFrom,m.PartyTo,m.LocFrom,m.LocTo,fs.Strategy,d.Item,d.RefItemCode,i.Desc1,d.MinUC from SCM_FlowDet as d 
+inner join SCM_FlowMstr as m  on d.Flow=m.Code
+inner join SCM_FlowStrategy as fs on m.Code=fs.Flow
+inner join MD_Item as i on i.Code=d.Item
+where  isnull(m.LocFrom,'')<>isnull(m.LocTo,'') and m.LocTo in(select isnull(m1.LocFrom,'') from SCM_FlowMstr as m1 where m1.LocTo in('2300L','2400L','2700L')and isnull(m1.LocFrom,'')<>isnull(m1.LocTo,''))
+) as r1 where r1.Item=d.Item and r1.LocTo=m.LocFrom
+)
+union all
+select m.Code,m.Desc1 as flowDesc,m.PartyFrom,m.PartyTo,m.LocFrom,m.LocTo,fs.Strategy,d.Item,d.RefItemCode,i.Desc1,d.MinUC,6 as errorType  from SCM_FlowDet as d 
+inner join SCM_FlowMstr as m  on d.Flow=m.Code
+inner join SCM_FlowStrategy as fs on m.Code=fs.Flow
+inner join MD_Item as i on i.Code=d.Item
+where  isnull(m.LocFrom,'')<>isnull(m.LocTo,'') and m.LocTo in(select isnull(m1.LocFrom,'') from SCM_FlowMstr as m1 where m1.LocTo in('2300L','2400L','2700L')and isnull(m1.LocFrom,'')<>isnull(m1.LocTo,'')) and m.PartyFrom<>'280' and m.PartyTo<>'280' and m.Type=2
+and not exists (
+select * from (
+select m.Code,m.Desc1 as flowDesc,m.PartyFrom,m.PartyTo,m.LocFrom,m.LocTo,fs.Strategy,d.Item,d.RefItemCode,i.Desc1,d.MinUC from SCM_FlowDet as d 
+inner join SCM_FlowMstr as m  on d.Flow=m.Code
+inner join SCM_FlowStrategy as fs on m.Code=fs.Flow
+inner join MD_Item as i on i.Code=d.Item
+where  isnull(m.LocFrom,'')<>isnull(m.LocTo,'') and m.LocTo in( select isnull(m2.LocFrom,'') from SCM_FlowMstr as m2 where  m2.LocTo in(
+ select isnull(m1.LocFrom,'') from SCM_FlowMstr as m1 where m1.LocTo in('2300L','2400L','2700L') and isnull(m1.LocFrom,'')<>isnull(m1.LocTo,''))  and isnull(m2.LocFrom,'')<>isnull(m2.LocTo,'')) 
+ )as r1 where r1.Item=d.Item and r1.LocTo=m.LocFrom
+)
+union all
+select * from (
+select m.Code,m.Desc1 as flowDesc,m.PartyFrom,m.PartyTo,m.LocFrom,m.LocTo,fs.Strategy,d.Item,d.RefItemCode,i.Desc1,d.MinUC,7 as errorType  from SCM_FlowDet as d 
+inner join SCM_FlowMstr as m  on d.Flow=m.Code
+inner join SCM_FlowStrategy as fs on m.Code=fs.Flow
+inner join MD_Item as i on i.Code=d.Item 
+inner join INV_LocationDetPref as il on il.Item=d.Item
+inner join MD_Location as l on il.Location=l.Code and l.Region=m.PartyTo
+where fs.Strategy=2 and il.SafeStock=0  
+union all
+select m.Code,m.Desc1 as flowDesc,m.PartyFrom,m.PartyTo,m.LocFrom,m.LocTo,fs.Strategy,d.Item,d.RefItemCode,i.Desc1,d.MinUC,8 as errorType  from SCM_FlowDet as d 
+inner join SCM_FlowMstr as m  on d.Flow=m.Code
+inner join SCM_FlowStrategy as fs on m.Code=fs.Flow
+inner join MD_Item as i on i.Code=d.Item 
+inner join INV_LocationDetPref as il on il.Item=d.Item 
+inner join MD_Location as l on il.Location=l.Code and l.Region=m.PartyTo
+where fs.Strategy=3 and il.SafeStock>0 ) rr group by rr.Code,rr.flowDesc,rr.PartyFrom,rr.PartyTo,rr.LocFrom,rr.LocTo,rr.Strategy,rr.Item,rr.RefItemCode,rr.Desc1,rr.MinUC,rr.errorType   ";
+          
             TempData["searchSql"] = searchSql;
             IList<object[]> searchResult = this.genericMgr.FindAllWithNativeSql<object[]>(searchSql);
             var returnResult = new List<FlowDetail>();
@@ -290,10 +332,58 @@ inner join SCM_FlowStrategy as fs on m.Code=fs.Flow
 inner join MD_Item as i on i.Code=d.Item
 where m.Type=2 ) as t3 on t1.Item=t3.Item
 where  
-(( t2.Item is null  or t1.PartyFrom<>t2.PartyTo or t1.LocFrom<>t2.LocTo  ) and t1.PartyFrom not in('240','230','HB1','280','TB2') ) or t1.MinUC=0 or 
+(( t2.Item is null  or t1.PartyFrom<>t2.PartyTo or t1.LocFrom<>t2.LocTo  ) and t1.PartyFrom not in('240','230','HB1','280','TB2','TB1','CB1') ) or t1.MinUC=0 or 
 (t1.Item=t3.Item and t1.PartyFrom=t3.PartyFrom and t1.PartyTo=t3.PartyTo and t1.Strategy<>t3.Strategy)
-) as rr group by rr.Code,rr.flowDesc,rr.PartyFrom,rr.PartyTo,rr.LocFrom,rr.LocTo,rr.Strategy,rr.Item,rr.RefItemCode,rr.Desc1,rr.MinUC,rr.errorType
- order by Code asc";
+) as rr group by rr.Code,rr.flowDesc,rr.PartyFrom,rr.PartyTo,rr.LocFrom,rr.LocTo,rr.Strategy,rr.Item,rr.RefItemCode,rr.Desc1,rr.MinUC,rr.errorType 
+
+union all
+select m.Code,m.Desc1 as flowDesc,m.PartyFrom,m.PartyTo,m.LocFrom,m.LocTo,fs.Strategy,d.Item,d.RefItemCode,i.Desc1,d.MinUC,6 as errorType  from SCM_FlowDet as d 
+inner join SCM_FlowMstr as m  on d.Flow=m.Code
+inner join SCM_FlowStrategy as fs on m.Code=fs.Flow
+inner join MD_Item as i on i.Code=d.Item
+where m.LocTo in('2300L','2400L','2700L') and m.LocFrom<>m.LocTo and m.PartyFrom<>'280'
+and not exists (
+select * from (
+select m.Code,m.Desc1 as flowDesc,m.PartyFrom,m.PartyTo,m.LocFrom,m.LocTo,fs.Strategy,d.Item,d.RefItemCode,i.Desc1,d.MinUC from SCM_FlowDet as d 
+inner join SCM_FlowMstr as m  on d.Flow=m.Code
+inner join SCM_FlowStrategy as fs on m.Code=fs.Flow
+inner join MD_Item as i on i.Code=d.Item
+where  isnull(m.LocFrom,'')<>isnull(m.LocTo,'') and m.LocTo in(select isnull(m1.LocFrom,'') from SCM_FlowMstr as m1 where m1.LocTo in('2300L','2400L','2700L')and isnull(m1.LocFrom,'')<>isnull(m1.LocTo,''))
+) as r1 where r1.Item=d.Item and r1.LocTo=m.LocFrom
+)
+union all
+select m.Code,m.Desc1 as flowDesc,m.PartyFrom,m.PartyTo,m.LocFrom,m.LocTo,fs.Strategy,d.Item,d.RefItemCode,i.Desc1,d.MinUC,6 as errorType  from SCM_FlowDet as d 
+inner join SCM_FlowMstr as m  on d.Flow=m.Code
+inner join SCM_FlowStrategy as fs on m.Code=fs.Flow
+inner join MD_Item as i on i.Code=d.Item
+where  isnull(m.LocFrom,'')<>isnull(m.LocTo,'') and m.LocTo in(select isnull(m1.LocFrom,'') from SCM_FlowMstr as m1 where m1.LocTo in('2300L','2400L','2700L')and isnull(m1.LocFrom,'')<>isnull(m1.LocTo,'')) and m.PartyFrom<>'280' and m.PartyTo<>'280' and m.Type=2
+and not exists (
+select * from (
+select m.Code,m.Desc1 as flowDesc,m.PartyFrom,m.PartyTo,m.LocFrom,m.LocTo,fs.Strategy,d.Item,d.RefItemCode,i.Desc1,d.MinUC from SCM_FlowDet as d 
+inner join SCM_FlowMstr as m  on d.Flow=m.Code
+inner join SCM_FlowStrategy as fs on m.Code=fs.Flow
+inner join MD_Item as i on i.Code=d.Item
+where  isnull(m.LocFrom,'')<>isnull(m.LocTo,'') and m.LocTo in( select isnull(m2.LocFrom,'') from SCM_FlowMstr as m2 where  m2.LocTo in(
+ select isnull(m1.LocFrom,'') from SCM_FlowMstr as m1 where m1.LocTo in('2300L','2400L','2700L') and isnull(m1.LocFrom,'')<>isnull(m1.LocTo,''))  and isnull(m2.LocFrom,'')<>isnull(m2.LocTo,'')) 
+ )as r1 where r1.Item=d.Item and r1.LocTo=m.LocFrom
+)
+union all
+select * from (
+select m.Code,m.Desc1 as flowDesc,m.PartyFrom,m.PartyTo,m.LocFrom,m.LocTo,fs.Strategy,d.Item,d.RefItemCode,i.Desc1,d.MinUC,7 as errorType  from SCM_FlowDet as d 
+inner join SCM_FlowMstr as m  on d.Flow=m.Code
+inner join SCM_FlowStrategy as fs on m.Code=fs.Flow
+inner join MD_Item as i on i.Code=d.Item 
+inner join INV_LocationDetPref as il on il.Item=d.Item
+inner join MD_Location as l on il.Location=l.Code and l.Region=m.PartyTo
+where fs.Strategy=2 and il.SafeStock=0  
+union all
+select m.Code,m.Desc1 as flowDesc,m.PartyFrom,m.PartyTo,m.LocFrom,m.LocTo,fs.Strategy,d.Item,d.RefItemCode,i.Desc1,d.MinUC,8 as errorType  from SCM_FlowDet as d 
+inner join SCM_FlowMstr as m  on d.Flow=m.Code
+inner join SCM_FlowStrategy as fs on m.Code=fs.Flow
+inner join MD_Item as i on i.Code=d.Item 
+inner join INV_LocationDetPref as il on il.Item=d.Item 
+inner join MD_Location as l on il.Location=l.Code and l.Region=m.PartyTo
+where fs.Strategy=3 and il.SafeStock>0 ) rr group by rr.Code,rr.flowDesc,rr.PartyFrom,rr.PartyTo,rr.LocFrom,rr.LocTo,rr.Strategy,rr.Item,rr.RefItemCode,rr.Desc1,rr.MinUC,rr.errorType  ";
             }
                 IList<object[]> searchResult = this.genericMgr.FindAllWithNativeSql<object[]>(searchSql);
                 var returnResult = new List<FlowDetail>();

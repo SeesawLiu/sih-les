@@ -1125,16 +1125,16 @@ namespace com.Sconit.Service.Impl
                     //}
 
                     #region 来源区域 目的库位 物料 不能在移库路线中存在
-                    int checkeSame = this.genericMgr.FindAllWithNativeSql<int>(" select COUNT(*) as countSum  from SCM_FlowDet as d where d.Item=? and exists( select 1 from SCM_FlowMstr as m where m.Code=d.Flow and m.PartyFrom=? and m.LocTo=? and m.Type=2  ) and d.Id <> ?", new object[] { item, flowMaster.PartyFrom, flowMaster.LocationTo, flowDetail.Id })[0];
+                    int checkeSame = this.genericMgr.FindAllWithNativeSql<int>(" select COUNT(*) as countSum  from SCM_FlowDet as d where d.Item=? and exists( select 1 from SCM_FlowMstr as m where m.Code=d.Flow and m.PartyFrom=? and m.PartyTo=? and m.Type=2  ) and d.Id <> ?", new object[] { item, flowMaster.PartyFrom, flowMaster.PartyTo, flowDetail.Id })[0];
                     if (checkeSame > 0)
                     {
-                        businessException.AddMessage(string.Format("第{0}行:来源区域{1}+物料{2}+目的库位{3}已经存在数据库。", rowCount, flowMaster.PartyFrom, item, flowMaster.LocationTo));
+                        businessException.AddMessage(string.Format("第{0}行:来源区域{1}+物料{2}+目的区域{3}已经存在数据库。", rowCount, flowMaster.PartyFrom, item, flowMaster.PartyTo));
                         continue;
                     }
 
-                    if (exactFlowDetailList.Where(ef => ef.PartyFrom == flowMaster.PartyFrom && ef.LocationTo == flowMaster.LocationTo && ef.Item == flowDetail.Item && ef.Id != flowDetail.Id && (ef.Id == 0 || ef.IsUpdate)).Count() > 0)
+                    if (exactFlowDetailList.Where(ef => ef.PartyFrom == flowMaster.PartyFrom && ef.PartyTo == flowMaster.PartyTo && ef.Item == flowDetail.Item && ef.Id != flowDetail.Id && (ef.Id == 0 || ef.IsUpdate)).Count() > 0)
                     {
-                        businessException.AddMessage(string.Format("第{0}行:来源区域{1}+物料{2}+目的库位{3}在模板中重复。", rowCount, flowMaster.PartyFrom, item, flowMaster.LocationTo));
+                        businessException.AddMessage(string.Format("第{0}行:来源区域{1}+物料{2}+目的区域{3}在模板中重复。", rowCount, flowMaster.PartyFrom, item, flowMaster.PartyTo));
                         continue;
                     }
 

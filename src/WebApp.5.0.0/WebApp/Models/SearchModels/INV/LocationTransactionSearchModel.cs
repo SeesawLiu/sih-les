@@ -18,5 +18,8 @@ namespace com.Sconit.Web.Models.SearchModels.INV
         public string Location { get; set; }
         public string CreateUserName { get; set; }
         public string OrderNo { get; set; }
+        public string IpNo { get; set; }
+        public string ReceiptNo { get; set; }
+
     }
 }

@@ -124,6 +124,10 @@ namespace com.Sconit.Entity.MD
 
         public string BESKZ { get; set; }
         public string SOBSL { get; set; }
+        /// <summary>
+        /// 外部物料组
+        /// </summary>
+        public string EXTWG { get; set; }
         #endregion
 
 		public override int GetHashCode()

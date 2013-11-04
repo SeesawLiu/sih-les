@@ -131,6 +131,7 @@ BEGIN
 		LocFrom varchar(50) NULL,
 		LocTo varchar(50) NULL,
 		OrderNo varchar(50) NULL,
+		TraceCode varchar(50) NULL,
 		Lvl tinyint NULL,
 		ErrorId tinyint NULL,
 		Msg varchar(500) NULL,

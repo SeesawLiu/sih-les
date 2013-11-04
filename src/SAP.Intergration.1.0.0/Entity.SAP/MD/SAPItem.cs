@@ -53,6 +53,10 @@ namespace com.Sconit.Entity.SAP.MD
         /// 特殊采购类型
         /// </summary>
         public string SOBSL { get; set; }
+        /// <summary>
+        /// 外部物料组
+        /// </summary>
+        public string EXTWG { get; set; }
         [XmlIgnore]
         public Int32 IOStatus { get; set; }
         [XmlIgnore]

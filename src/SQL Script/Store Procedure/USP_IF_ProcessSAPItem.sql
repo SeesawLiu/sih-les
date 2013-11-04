@@ -42,6 +42,7 @@ BEGIN
 				mi.PLIFZ = ii.PLIFZ,
 				mi.BESKZ = ii.BESKZ,
 				mi.SOBSL = ii.SOBSL,
+				mi.EXTWG = ii.EXTWG,
 				mi.LastModifyDate = @CurrentDate,
 				mi.LastModifyUser = @UserId,
 				mi.LastModifyUserNm = @UserName
@@ -54,7 +55,8 @@ BEGIN
 					ISNULL(mi.DISPO, '') <> ISNULL(ii.DISPO, '') OR
 					ISNULL(mi.PLIFZ, '') <> ISNULL(ii.PLIFZ, '') OR
 					ISNULL(mi.BESKZ, '') <> ISNULL(ii.BESKZ, '') OR
-					ISNULL(mi.SOBSL, '') <> ISNULL(ii.SOBSL, ''))
+					ISNULL(mi.SOBSL, '') <> ISNULL(ii.SOBSL, '') OR
+					ISNULL(mi.EXTWG, '') <> ISNULL(ii.EXTWG, ''))
 
 			INSERT INTO MD_Item
 			   (Code
@@ -86,7 +88,8 @@ BEGIN
 			   ,DISPO
 			   ,PLIFZ
 			   ,BESKZ
-			   ,SOBSL)
+			   ,SOBSL
+			   ,EXTWG)
 			SELECT DISTINCT Code
 			   ,RefCode
 			   ,Uom
@@ -116,7 +119,8 @@ BEGIN
 			   ,DISPO
 			   ,PLIFZ
 			   ,BESKZ
-			   ,SOBSL		
+			   ,SOBSL
+			   ,EXTWG	
 			FROM SAP_Item ii 
 			WHERE ii.BatchNo=@BatchNo and NOT EXISTS(SELECT 1 FROM MD_Item mi WHERE mi.Code=ii.Code)
 		END TRY 

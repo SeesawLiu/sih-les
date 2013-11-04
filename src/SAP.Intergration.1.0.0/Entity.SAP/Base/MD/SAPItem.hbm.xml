@@ -16,5 +16,6 @@
         <property name="PLIFZ" column="PLIFZ" type="String" length="100"/>
         <property name="BESKZ" column="BESKZ" type="String" length="50"/>
         <property name="SOBSL" column="SOBSL" type="String" length="50"/>
+        <property name="EXTWG" column="EXTWG" type="String" length="50"/>
     </class>
 </hibernate-mapping>

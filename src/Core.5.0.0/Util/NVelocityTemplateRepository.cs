@@ -110,6 +110,11 @@ namespace com.Sconit.Utility
             /// 看板订单创建失败
             /// </summary>
             GenAnDonOrderFail = 12104,
+
+            /// <summary>
+            /// 精益引擎运行异常
+            /// </summary>
+            LeanEngineRunException = 12105,
         }
 
         public IDictionary<int, string> templateNameDictionary { get; set; }

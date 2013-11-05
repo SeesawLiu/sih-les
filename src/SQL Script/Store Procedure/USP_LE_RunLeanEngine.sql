@@ -92,4 +92,48 @@ BEGIN
 	--记录日志
 	set @Msg = N'精益引擎运行结束'
 	insert into LOG_RunLeanEngine(Lvl, Msg, BatchNo) values(0, @Msg, @BatchNo)
+	
+	
+	
+	-------------------↓发送引擎运行错误-----------------------
+	set @Msg = ''
+
+	if exists(select top 1 1 from LOG_RunLeanEngine where Lvl = 1 and BatchNo = @BatchNo)
+	begin
+		set @Msg = @Msg + 'select * from LOG_RunLeanEngine where Lvl = 1 and BatchNo = ' + CONVERT(varchar,  @BatchNo) + CHAR(10) + CHAR(13)
+	end
+	
+	if exists(select top 1 1 from LOG_GenOrder4VanProdLine where Lvl = 1 and BatchNo = @BatchNo)
+	begin
+		set @Msg = @Msg + 'select * from LOG_GenOrder4VanProdLine where Lvl = 1 and BatchNo = ' + CONVERT(varchar,  @BatchNo) + CHAR(10) + CHAR(13)
+	end
+	
+	if exists(select top 1 1 from LOG_GenSequenceOrder where Lvl = 1 and BatchNo = @BatchNo)
+	begin
+		set @Msg = @Msg + 'select * from LOG_GenSequenceOrder where Lvl = 1 and BatchNo = ' + CONVERT(varchar,  @BatchNo) + CHAR(10) + CHAR(13)
+	end
+	
+	if exists(select top 1 1 from LOG_GenJITOrder where Lvl = 1 and BatchNo = @BatchNo)
+	begin
+		set @Msg = @Msg + 'select * from LOG_GenJITOrder where Lvl = 1 and BatchNo = ' + CONVERT(varchar,  @BatchNo) + CHAR(10) + CHAR(13)
+	end
+	
+	if exists(select top 1 1 from LOG_GenKBOrder where Lvl = 1 and BatchNo = @BatchNo)
+	begin
+		set @Msg = @Msg + 'select * from LOG_GenKBOrder where Lvl = 1 and BatchNo = ' + CONVERT(varchar,  @BatchNo) + CHAR(10) + CHAR(13)
+	end
+	
+	if @Msg <> ''
+	begin
+		declare @EmailRecipients varchar(max)
+		select @EmailRecipients = Emails from SYS_MsgSubscirber where Id = 12105
+		set @Msg = '请用下列SQL查询' + CHAR(10) + CHAR(13) + @Msg
+		exec msdb..sp_send_dbmail @profile_name =  'mail_profile'               -- profile 名称 
+									 ,@recipients   =  @EmailRecipients				-- 收件人邮箱 
+									 ,@subject      =  '精益引擎运行异常'			-- 邮件标题 
+									 ,@body         =  @Msg							-- 邮件内容 
+									 ,@body_format  =  'TEXT'                       -- 邮件格式 TEXT/HTML
+	end
+	
+	-------------------↑生成要货单-----------------------
 END 

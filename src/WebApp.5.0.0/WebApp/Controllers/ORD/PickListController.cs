@@ -124,8 +124,11 @@ namespace com.Sconit.Web.Controllers.ORD
 
         private SearchStatementModel PrepareSearchStatement(GridCommand command, PickListSearchModel searchModel)
         {
-            string whereStatement = string.Empty;
-
+            string whereStatement = " where 1=1 ";
+            if (!string.IsNullOrWhiteSpace(searchModel.Item))
+            {
+                whereStatement += " and exists( select 1 from PickListDetail as d where d.PickListNo=pl.PickListNo and d.Item='"+searchModel.Item+"' ) ";
+            }
             IList<object> param = new List<object>();
             HqlStatementHelper.AddEqStatement("PickListNo", searchModel.PickListNo, "pl", ref whereStatement, param);
             HqlStatementHelper.AddEqStatement("Status", searchModel.Status, "pl", ref whereStatement, param);

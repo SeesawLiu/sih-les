@@ -106,10 +106,10 @@
 <script type="text/javascript">
 
     function ExportClick() {
-        if ($('#Item').val() == "" && $("#flowCode").val() == "" && $("#PartyTo").val() == "" && $("#PartyFrom").val() == "" && $("#Strategy").val() == "" && $("#Type").val() == "") {
-            $message.error("请输入条件进行导出。");
-            return;
-        }
+//        if ($('#Item').val() == "" && $("#flowCode").val() == "" && $("#PartyTo").val() == "" && $("#PartyFrom").val() == "" && $("#Strategy").val() == "" && $("#Type").val() == "") {
+//            $message.error("请输入条件进行导出。");
+//            return;
+//        }
         location.href = '/ItemFlow/ExportXLS/?Item=' + $('#Item').val() + "&flowCode=" + $('#flowCode').val() + "&PartyTo=" + $('#PartyTo').val()
         + "&PartyFrom=" + $('#PartyFrom').val() + "&Strategy=" + $('#Strategy').val() + "&Type=" + $('#Type').val();
     }

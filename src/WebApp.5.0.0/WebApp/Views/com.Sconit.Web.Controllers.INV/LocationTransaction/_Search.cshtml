@@ -100,7 +100,40 @@
                 }
             </div>
 
+           
             <div class="search-label">
+                <label for="OrderMaster_CreateUserName">
+                    @Resources.ORD.OrderMaster.OrderMaster_CreateUserName
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("CreateUserName", TempData["LocationTransactionSearchModel"] != null ? ((LocationTransactionSearchModel)TempData["LocationTransactionSearchModel"]).CreateUserName : string.Empty)
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_OrderNo">
+                    @Resources.ORD.OrderMaster.OrderMaster_OrderNo
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("OrderNo", TempData["LocationTransactionSearchModel"] != null ? ((LocationTransactionSearchModel)TempData["LocationTransactionSearchModel"]).OrderNo : string.Empty)
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_CreateUserName">
+                    @Resources.INV.LocationTransaction.LocationTransaction_IpNo
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("IpNo", TempData["LocationTransactionSearchModel"] != null ? ((LocationTransactionSearchModel)TempData["LocationTransactionSearchModel"]).IpNo : string.Empty)
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_OrderNo">
+                    @Resources.INV.LocationTransaction.LocationTransaction_ReceiptNo
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("ReceiptNo", TempData["LocationTransactionSearchModel"] != null ? ((LocationTransactionSearchModel)TempData["LocationTransactionSearchModel"]).ReceiptNo : string.Empty)
+            </div>
+             <div class="search-label">
              <label>
                      创建日期 从
              </label>
@@ -124,22 +157,6 @@
                 .Value(TempData["LocationTransactionSearchModel"] != null ? ((LocationTransactionSearchModel)TempData["LocationTransactionSearchModel"]).EndDate : System.DateTime.Today.AddDays(1))
                 .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
             </div>
-            <div class="search-label">
-                <label for="OrderMaster_CreateUserName">
-                    @Resources.ORD.OrderMaster.OrderMaster_CreateUserName
-                </label>
-            </div>
-            <div class="search-field">
-                @Html.TextBox("CreateUserName", TempData["LocationTransactionSearchModel"] != null ? ((LocationTransactionSearchModel)TempData["LocationTransactionSearchModel"]).CreateUserName : string.Empty)
-            </div>
-            <div class="search-label">
-                <label for="OrderMaster_OrderNo">
-                    @Resources.ORD.OrderMaster.OrderMaster_OrderNo
-                </label>
-            </div>
-            <div class="search-field">
-                @Html.TextBox("OrderNo", TempData["LocationTransactionSearchModel"] != null ? ((LocationTransactionSearchModel)TempData["LocationTransactionSearchModel"]).OrderNo : string.Empty)
-            </div>
         </div>
         <div class="search-footer">
             @Html.Hidden("isFromList", true)
@@ -154,7 +171,8 @@
     function ExportClick() {
         location.href = '/LocationTransaction/ExportXLS/?TransactionType=' + $('#TransactionType').val() + '&Item=' + $('#Item').val() + '&PartyFrom=' + $('#PartyFrom').val()
          + '&PartyTo=' + $('#PartyTo').val() + '&LocationFrom=' + $('#LocationFrom').val() + '&LocationTo=' + $('#LocationTo').val()
-         + '&CreateUserName=' + $('#CreateUserName').val() + '&StartDate=' + $('#StartDate').val() + '&EndDate=' + $('#EndDate').val() + '&OrderNo=' + $('#OrderNo').val();
+         + '&CreateUserName=' + $('#CreateUserName').val() + '&StartDate=' + $('#StartDate').val() + '&EndDate=' + $('#EndDate').val() + '&OrderNo=' + $('#OrderNo').val()
+         + '&ReceiptNo=' + $('#ReceiptNo').val() + '&IpNo=' + $('#IpNo').val();
     }
     function CodeMaster_Change(e) {
         e.date = {

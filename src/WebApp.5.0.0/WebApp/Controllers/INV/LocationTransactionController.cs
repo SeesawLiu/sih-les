@@ -299,7 +299,14 @@ where 1=1  ";
             {
                 whereStatement += " and lt.OrderNo = '" + searchModel.OrderNo + "'";
             }
-
+            if (!string.IsNullOrEmpty(searchModel.ReceiptNo))
+            {
+                whereStatement += " and lt.ReceiptNo = '" + searchModel.ReceiptNo + "'";
+            }
+            if (!string.IsNullOrEmpty(searchModel.IpNo))
+            {
+                whereStatement += " and lt.IpNo = '" + searchModel.IpNo + "'";
+            }
             if (searchModel.StartDate != null & searchModel.EndDate != null)
             {
                 whereStatement += string.Format(" and lt.CreateDate between '{0}' and '{1}' ", searchModel.StartDate, searchModel.EndDate);

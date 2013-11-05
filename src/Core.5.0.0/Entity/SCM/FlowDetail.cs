@@ -96,6 +96,12 @@ namespace com.Sconit.Entity.SCM
                         return "上线包装为0";
                     case 5:
                         return "策略不同";
+                    case 6:
+                        return "路线不完整";
+                    case 7:
+                        return "EKB没有安全库存";
+                    case 8:
+                        return "JIT有安全库存";
                     default:
                         return string.Empty;
                 }

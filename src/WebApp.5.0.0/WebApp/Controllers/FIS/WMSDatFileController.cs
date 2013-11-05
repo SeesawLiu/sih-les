@@ -114,26 +114,30 @@ namespace com.Sconit.Web.Controllers.FIS
                         {
                             continue;
                         }
-                        if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "311" && wmsFile.MoveType + wmsFile.SOBKZ == "312" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine)
+                        if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "311" && wmsFile.MoveType + wmsFile.SOBKZ == "312" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine
+                            && wmsFile.ReceiveTotal - wmsFile.CancelQty == 0 && wMSDatFile.ReceiveTotal - wMSDatFile.CancelQty == 0)
                         {
                             wmsFile.MoveType = null;
                             wMSDatFile.MoveType = null;
                             break;
                         }
-                        else if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "311K" && wmsFile.MoveType + wmsFile.SOBKZ == "312K" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine)
+                        else if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "311K" && wmsFile.MoveType + wmsFile.SOBKZ == "312K" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine
+                            && wmsFile.ReceiveTotal - wmsFile.CancelQty == 0 && wMSDatFile.ReceiveTotal - wMSDatFile.CancelQty == 0)
                         {
                             wmsFile.MoveType = null;
                             wMSDatFile.MoveType = null;
                             break;
                         }
 
-                        else if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "411" && wmsFile.MoveType + wMSDatFile.SOBKZ == "412" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine)
+                        else if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "411" && wmsFile.MoveType + wMSDatFile.SOBKZ == "412" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine
+                            && wmsFile.ReceiveTotal - wmsFile.CancelQty == 0 && wMSDatFile.ReceiveTotal - wMSDatFile.CancelQty == 0)
                         {
                             wmsFile.MoveType = null;
                             wMSDatFile.MoveType = null;
                             break;
                         }
-                        else if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "411K" && wmsFile.MoveType + wMSDatFile.SOBKZ == "412K" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine)
+                        else if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "411K" && wmsFile.MoveType + wMSDatFile.SOBKZ == "412K" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine
+                            && wmsFile.ReceiveTotal - wmsFile.CancelQty == 0 && wMSDatFile.ReceiveTotal - wMSDatFile.CancelQty == 0)
                         {
                             wmsFile.MoveType = null;
                             wMSDatFile.MoveType = null;
@@ -210,26 +214,30 @@ namespace com.Sconit.Web.Controllers.FIS
                             {
                                 continue;
                             }
-                            if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "311" && wmsFile.MoveType + wmsFile.SOBKZ == "312" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine)
+                            if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "311" && wmsFile.MoveType + wmsFile.SOBKZ == "312" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine
+                                && wmsFile.ReceiveTotal - wmsFile.CancelQty == 0 && wMSDatFile.ReceiveTotal - wMSDatFile.CancelQty == 0)
                             {
                                 wmsFile.MoveType = null;
                                 wMSDatFile.MoveType = null;
                                 break;
                             }
-                            else if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "311K" && wmsFile.MoveType + wmsFile.SOBKZ == "312K" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine)
+                            else if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "311K" && wmsFile.MoveType + wmsFile.SOBKZ == "312K" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine
+                                && wmsFile.ReceiveTotal - wmsFile.CancelQty == 0 && wMSDatFile.ReceiveTotal - wMSDatFile.CancelQty == 0)
                             {
                                 wmsFile.MoveType = null;
                                 wMSDatFile.MoveType = null;
                                 break;
                             }
 
-                            else if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "411" && wmsFile.MoveType + wMSDatFile.SOBKZ == "412" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine)
+                            else if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "411" && wmsFile.MoveType + wMSDatFile.SOBKZ == "412" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine
+                                && wmsFile.ReceiveTotal - wmsFile.CancelQty == 0 && wMSDatFile.ReceiveTotal - wMSDatFile.CancelQty == 0)
                             {
                                 wmsFile.MoveType = null;
                                 wMSDatFile.MoveType = null;
                                 break;
                             }
-                            else if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "411K" && wmsFile.MoveType + wMSDatFile.SOBKZ == "412K" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine)
+                            else if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "411K" && wmsFile.MoveType + wMSDatFile.SOBKZ == "412K" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine
+                                && wmsFile.ReceiveTotal - wmsFile.CancelQty == 0 && wMSDatFile.ReceiveTotal - wMSDatFile.CancelQty == 0)
                             {
                                 wmsFile.MoveType = null;
                                 wMSDatFile.MoveType = null;

@@ -406,14 +406,12 @@ namespace com.Sconit.Web.Controllers.SCM
                 {
                     try
                     {
-
-
                         #region andon的要做校验
                         FlowMaster flow = genericMgr.FindById<FlowMaster>(flowDetail.Flow);
-                        int checkeSame = this.genericMgr.FindAllWithNativeSql<int>(" select COUNT(*) as countSum  from SCM_FlowDet as d where d.Item=? and exists( select 1 from SCM_FlowMstr as m where m.Code=d.Flow and m.PartyFrom=? and m.LocTo=? and m.Type=2  )", new object[] { flowDetail.Item, flow.PartyFrom, flow.LocationTo })[0];
+                        int checkeSame = this.genericMgr.FindAllWithNativeSql<int>(" select COUNT(*) as countSum  from SCM_FlowDet as d where d.Item=? and exists( select 1 from SCM_FlowMstr as m where m.Code=d.Flow and m.PartyFrom=? and m.PartyTo=? and m.Type=2  ) ", new object[] { flowDetail.Item, flow.PartyFrom, flow.PartyTo})[0];
                         if (checkeSame > 0)
                         {
-                            throw new BusinessException(string.Format("来源区域{1}+物料{2}+目的库位{3}已经存在数据库。", flow.PartyFrom, flowDetail.Item, flow.LocationTo));
+                            throw new BusinessException(string.Format("来源区域{0}+物料{1}+目的区域{2}已经存在数据库。", flow.PartyFrom, flowDetail.Item, flow.PartyTo));
                         }
                         if (flow.FlowStrategy == com.Sconit.CodeMaster.FlowStrategy.ANDON)
                         {
@@ -511,10 +509,10 @@ namespace com.Sconit.Web.Controllers.SCM
                 try
                 {
                     FlowMaster flow = genericMgr.FindById<FlowMaster>(flowDetail.Flow);
-                    int checkeSame = this.genericMgr.FindAllWithNativeSql<int>(" select COUNT(*) as countSum  from SCM_FlowDet as d where d.Item=? and exists( select 1 from SCM_FlowMstr as m where m.Code=d.Flow and m.PartyFrom=? and m.LocTo=? and m.Type=2  ) and d.Id<>?", new object[] { flowDetail.Item, flow.PartyFrom, flow.LocationTo, flowDetail.Id })[0];
+                    int checkeSame = this.genericMgr.FindAllWithNativeSql<int>(" select COUNT(*) as countSum  from SCM_FlowDet as d where d.Item=? and exists( select 1 from SCM_FlowMstr as m where m.Code=d.Flow and m.PartyFrom=? and m.PartyTo=? and m.Type=2  ) and d.Id <> ?", new object[] { flowDetail.Item, flow.PartyFrom, flow.PartyTo, flowDetail.Id })[0];
                     if (checkeSame > 0)
                     {
-                        throw new BusinessException(string.Format("来源区域{0}+物料{1}+目的库位{2}已经存在数据库。", flow.PartyFrom, flowDetail.Item, flow.LocationTo));
+                        throw new BusinessException(string.Format("来源区域{0}+物料{1}+目的区域{2}已经存在数据库。", flow.PartyFrom, flowDetail.Item, flow.PartyTo));
                     }
                     Item item = this.genericMgr.FindById<Item>(flowDetail.Item);
                     flowDetail.UnitCount = item.UnitCount;

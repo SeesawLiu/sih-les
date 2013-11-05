@@ -271,6 +271,9 @@
 	    })
         }
     }
+    
+    <button type="button" id="btnCheck" onclick="onCheckClick()">
+        检查库存</button>
     <button type="button" id="btnBack" onclick="location.href='@Url.Content("~/SequenceMaster/List")'">
         @Resources.Global.Button_Back</button>
 </div>
@@ -278,6 +281,33 @@
     Html.RenderAction("_OrderDetailList", "SequenceMaster", new { orderNo = Model.OrderNo });
 }
 <script type="text/javascript" language="javascript">
+    function onCheckClick() {
+        var orderData = {
+            "orderNo": $("#OrderNo").val()
+        };
+        $("#btnBack").attr("disabled", true);
+        $("#btnShip").attr("disabled", true);
+        $("#btnCheck").attr("disabled", true);
+        $.ajax({
+            type: "post",
+            dataType: "Json",
+            data: orderData,
+            url: "/SequenceMaster/CheckInventory/",
+            cache: false,
+            success: function (data, textStatus) {
+                DisplayJsonMessages(data);
+                $("#btnBack").attr("disabled", false);
+                $("#btnShip").attr("disabled", false);
+                $("#btnCheck").attr("disabled", false);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+                $("#btnBack").attr("disabled", false);
+                $("#btnShip").attr("disabled", false);
+                $("#btnCheck").attr("disabled", false);
+            }
+        });
+    }
     function onShipClick() {
         var orderData = {
             "orderNo": $("#OrderNo").val()

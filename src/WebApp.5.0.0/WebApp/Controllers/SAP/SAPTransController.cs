@@ -34,10 +34,10 @@ namespace com.Sconit.Web.Controllers.SAP
         /// <summary>
         /// 
         /// </summary>
-        private static string selectStatement = "select t from InvTrans as t";
+        private static string selectStatement = "  select TCODE, BWART, BLDAT, BUDAT, EBELN, EBELP, VBELN, POSNR, LIFNR, WERKS, LGORT, SOBKZ, MATNR, ERFMG, ERFME, UMLGO, GRUND, KOSTL, XBLNR, RSNUM, RSPOS, FRBNR, SGTXT, OLD, INSMK, XABLN, AUFNR, UMMAT, UMWRK, POSID, CreateDate, LastModifyDate, Status, ErrorCount, BatchNo, CHARG, KZEAR, ErrorId, ErrorMessage, OrderNo, DetailId, Version from SAP_InvTrans as t  with(nolock)  ";
 
 
-        private static string InvLocSelectStatement = "select l from InvLoc as l";
+        private static string InvLocSelectStatement = "select l.* from SAP_InvLoc as l with(nolock) ";
         public SAPTransController()
         {
 
@@ -115,14 +115,19 @@ namespace com.Sconit.Web.Controllers.SAP
         {
 
             SearchStatementModel searchStatementModel = PrepareSearchStatement(command, searchModel);
-            GridModel<InvTrans> gridlist = GetAjaxPageData<InvTrans>(searchStatementModel, command);
+            int total = this.genericMgr.FindAllWithNativeSql<int>("select count(*) from (" + searchStatementModel.SelectStatement + searchStatementModel.WhereStatement + ") as r1", searchStatementModel.Parameters).First();
+            string sql = string.Format("select * from (select RowId=ROW_NUMBER()OVER({0}),r1.* from ({1}) as r1 ) as rt where rt.RowId between {2} and {3}", searchStatementModel.SortingStatement, searchStatementModel.SelectStatement + searchStatementModel.WhereStatement, (command.Page - 1) * command.PageSize, command.PageSize * command.Page);
+            IList<InvTrans> invTranslist = this.genericMgr.FindEntityWithNativeSql<InvTrans>(sql, searchStatementModel.Parameters);
             TempData["InvTransSearchModel_1"] = searchModel;
-            TempData["Total"] = gridlist.Total;
-            foreach (InvTrans inv in gridlist.Data)
+            TempData["Total"] = total;
+            foreach (InvTrans inv in invTranslist)
             {
                 inv.StatusName = GetEnumDescription(inv.Status);
             }
-            return View(gridlist);
+            GridModel<InvTrans> gridModel = new GridModel<InvTrans>();
+            gridModel.Total = total;
+            gridModel.Data = invTranslist;
+            return View(gridModel);
             //return PartialView(GetAjaxPageData<ReceiptMaster>(searchStatementModel, command));
         }
 
@@ -132,7 +137,7 @@ namespace com.Sconit.Web.Controllers.SAP
         public ActionResult _AjaxListInvLoc(string FRBNR, string SGTXT)
         {
             string hql = InvLocSelectStatement + " where l.FRBNR = ? and l.SGTXT=? ";
-            IList<InvLoc> InvLocList = genericMgr.FindAll<InvLoc>(hql,new object[]{FRBNR,SGTXT},new IType[]{NHibernate.NHibernateUtil.String,NHibernate.NHibernateUtil.String});
+            IList<InvLoc> InvLocList = genericMgr.FindEntityWithNativeSql<InvLoc>(hql,new object[]{FRBNR,SGTXT},new IType[]{NHibernate.NHibernateUtil.String,NHibernate.NHibernateUtil.String});
             return View(new GridModel<InvLoc>(InvLocList));
         }
 
@@ -241,13 +246,14 @@ namespace com.Sconit.Web.Controllers.SAP
             command.PageSize = pageSize;
             command.Page = 1;
             SearchStatementModel searchStatementModel = PrepareSearchStatement(command, searchModel);
-            GridModel<InvTrans> gridlist = GetAjaxPageData<InvTrans>(searchStatementModel, command);
-            foreach (InvTrans inv in gridlist.Data)
+            string sql = string.Format("select top 65300 RowId=ROW_NUMBER()OVER({0}),r1.* from ({1}) as r1 ", searchStatementModel.SortingStatement, searchStatementModel.SelectStatement + searchStatementModel.WhereStatement, (command.Page - 1) * command.PageSize, command.PageSize * command.Page);
+            IList<InvTrans> invTranslist = this.genericMgr.FindEntityWithNativeSql<InvTrans>(sql, searchStatementModel.Parameters);
+            foreach (InvTrans inv in invTranslist)
             {
                 inv.StatusName = GetEnumDescription(inv.Status);
             }
             IList<object> data = new List<object>();
-            data.Add(gridlist.Data);
+            data.Add(invTranslist);
             reportGen.WriteToClient("InvTrans.xls", data, "InvTrans.xls");
         }
         #endregion
@@ -304,7 +310,7 @@ namespace com.Sconit.Web.Controllers.SAP
             string sortingStatement = HqlStatementHelper.GetSortingStatement(command.SortDescriptors);
             if (command.SortDescriptors.Count == 0)
             {
-                sortingStatement = " order by t.CreateDate desc";
+                sortingStatement = " order by CreateDate desc";
             }
             SearchStatementModel searchStatementModel = new SearchStatementModel();
             searchStatementModel.SelectCountStatement = selectCountStatement;

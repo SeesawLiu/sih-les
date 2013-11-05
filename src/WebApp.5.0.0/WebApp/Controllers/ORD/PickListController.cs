@@ -363,7 +363,7 @@ namespace com.Sconit.Web.Controllers.ORD
 
         [GridAction(EnableCustomBinding = true)]
         [SconitAuthorize(Permissions = "Url_PickList_New_button")]
-        public JsonResult PickShipOrder(string idStr, string qtyStr,string deliveryGroup)
+        public JsonResult PickShipOrder(string idStr, string qtyStr, string deliveryGroup, bool isAutoReceive)
         {
             try
             {
@@ -377,19 +377,29 @@ namespace com.Sconit.Web.Controllers.ORD
                 {
                     string[] idArray = idStr.Split(',');
                     string[] qtyArray = qtyStr.Split(',');
-                    string pickNo = pickListMgr.CreatePickList4Qty(deliveryGroup,idArray, qtyArray);
-                    if (!string.IsNullOrWhiteSpace(pickNo))
+                    //string pickNo = pickListMgr.CreatePickList4Qty(deliveryGroup,idArray, qtyArray);
+                    //if (!string.IsNullOrWhiteSpace(pickNo))
+                    //{
+                    //    SaveSuccessMessage(string.Format("操作成功，生成拣货单号{0}。", pickNo));
+                    //    //return RedirectToAction("Edit/?id=" + pickNo + "& UrlId=New ");
+                    //    //return new RedirectToRouteResult(new RouteValueDictionary  
+                    //    //                                       { 
+                    //    //                                           { "action", "Edit" }, 
+                    //    //                                           { "controller", "PickList" },
+                    //    //                                           { "id", pickNo },
+                    //    //                                           { "UrlId", "New" }
+                    //    //                                       });
+                    //    return Json(new { url = "/PickList/Edit/", id = pickNo, UrlId = "New" });
+                    //}
+                    string[] successNos=orderMgr.PickShipOrder(idStr,  qtyStr,  deliveryGroup,  isAutoReceive);
+                    if (!string.IsNullOrWhiteSpace(successNos[0]))
                     {
-                        SaveSuccessMessage(string.Format("操作成功，生成拣货单号{0}。", pickNo));
-                        //return RedirectToAction("Edit/?id=" + pickNo + "& UrlId=New ");
-                        //return new RedirectToRouteResult(new RouteValueDictionary  
-                        //                                       { 
-                        //                                           { "action", "Edit" }, 
-                        //                                           { "controller", "PickList" },
-                        //                                           { "id", pickNo },
-                        //                                           { "UrlId", "New" }
-                        //                                       });
-                        return Json(new { url = "/PickList/Edit/", id = pickNo, UrlId = "New" });
+                        SaveSuccessMessage(string.Format("操作成功，生成拣货单号{0}。", successNos[0]));
+                    }
+                    
+                    if (!string.IsNullOrWhiteSpace(successNos[1]))
+                    {
+                        SaveSuccessMessage(string.Format("发货成功，生成收货单号{0}。", successNos[1]));
                     }
                 }
                 else

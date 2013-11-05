@@ -301,7 +301,7 @@ where 1=1  ";
             }
             if (!string.IsNullOrEmpty(searchModel.ReceiptNo))
             {
-                whereStatement += " and lt.ReceiptNo = '" + searchModel.ReceiptNo + "'";
+                whereStatement += " and lt.RecNo = '" + searchModel.ReceiptNo + "'";
             }
             if (!string.IsNullOrEmpty(searchModel.IpNo))
             {

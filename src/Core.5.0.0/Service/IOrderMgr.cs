@@ -273,5 +273,9 @@ namespace com.Sconit.Service
         #region 在拣货的时候删除明细
         void DeleteDetailById(int id);
         #endregion
+
+        #region 创建拣货单
+        string[] PickShipOrder(string idStr, string qtyStr, string deliveryGroup, bool isAutoReceive);
+        #endregion
     }
 }

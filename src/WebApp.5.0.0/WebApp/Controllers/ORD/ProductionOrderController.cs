@@ -717,10 +717,28 @@ namespace com.Sconit.Web.Controllers.ORD
                 {
                     throw new BusinessException("窗口时间不能为空。");
                 }
-                this.genericMgr.FindAllWithNativeSql<object[]>("exec USP_LE_ManualGenOrder ?,?,?,?,?",
-                    new object[] { orderNo, windowTime.Value,priority, CurrentUser.Id, CurrentUser.FullName },
-                    new IType[] { NHibernateUtil.String, NHibernateUtil.DateTime, NHibernateUtil.Int16, NHibernateUtil.Int32, NHibernateUtil.String });
+               
                 SaveSuccessMessage("拉料成功。");
+                IList<object[]> returnMessages = this.genericMgr.FindAllWithNativeSql<object[]>("exec USP_LE_ManualGenOrder ?,?,?,?,?",
+                    new object[] { orderNo, windowTime.Value, priority, CurrentUser.Id, CurrentUser.FullName },
+                    new IType[] { NHibernateUtil.String, NHibernateUtil.DateTime, NHibernateUtil.Int16, NHibernateUtil.Int32, NHibernateUtil.String });
+                for (int i = 0; i < returnMessages.Count; i++)
+                {
+                    if (Convert.ToInt16(returnMessages[i][0]) == 0)
+                    {
+                        if (returnMessages[i][1] != null)
+                        {
+                            SaveSuccessMessage((string)(returnMessages[i][1]));
+                        }
+                    }
+                    else
+                    {
+                        if (returnMessages[i][1] != null)
+                        {
+                            SaveErrorMessage((string)(returnMessages[i][1]));
+                        }
+                    }
+                }
             }
             catch (BusinessException be)
             {

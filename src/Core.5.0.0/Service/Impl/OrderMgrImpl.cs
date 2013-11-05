@@ -8536,9 +8536,29 @@ namespace com.Sconit.Service.Impl
                 {
                     try
                     {
-                        this.genericMgr.FindAllWithNativeSql<object[]>("exec USP_LE_ManualGenOrder ?,?,?,?,?",
+                       IList<object[]> returnMessages= this.genericMgr.FindAllWithNativeSql<object[]>("exec USP_LE_ManualGenOrder ?,?,?,?,?",
                             new object[] { master.OrderNo, windowTime, (int)master.Priority, CurrentUser.Id, CurrentUser.FullName },
                             new IType[] { NHibernateUtil.String, NHibernateUtil.DateTime, NHibernateUtil.Int16, NHibernateUtil.Int32, NHibernateUtil.String });
+                   //     IList<object[]> returnMessages = this.genericMgr.FindAllWithNativeSql<object[]>("exec USP_LE_ManualGenOrder ?,?,?,?,?",
+                   //new object[] { orderNo, windowTime.Value, priority, CurrentUser.Id, CurrentUser.FullName },
+                   //new IType[] { NHibernateUtil.String, NHibernateUtil.DateTime, NHibernateUtil.Int16, NHibernateUtil.Int32, NHibernateUtil.String });
+                        for (int i = 0; i < returnMessages.Count; i++)
+                        {
+                            if (Convert.ToInt16(returnMessages[i][0]) == 0)
+                            {
+                                if (returnMessages[i][1] != null)
+                                {
+                                    MessageHolder.AddInfoMessage((string)(returnMessages[i][1]));
+                                }
+                            }
+                            else
+                            {
+                                if (returnMessages[i][1] != null)
+                                {
+                                    businessException.AddMessage((string)(returnMessages[i][1]));
+                                }
+                            }
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -8701,6 +8721,49 @@ namespace com.Sconit.Service.Impl
             updateSeqOrderChange.CreateUserId = user.Id;
             updateSeqOrderChange.CreateUserName = user.FirstName + user.LastName;
             this.genericMgr.Create(updateSeqOrderChange);
+        }
+        #endregion
+
+        #region 创建拣货单
+        [Transaction(TransactionMode.Requires)]
+        public string[] PickShipOrder(string idStr, string qtyStr, string deliveryGroup, bool isAutoReceive)
+        {
+            string [] successNos=new string[2];
+            try
+            {
+                IList<OrderDetail> orderDetailList = new List<OrderDetail>();
+                if (!string.IsNullOrEmpty(idStr))
+                {
+                    string[] idArray = idStr.Split(',');
+                    string[] qtyArray = qtyStr.Split(',');
+                    string pickNo = pickListMgr.CreatePickList4Qty(deliveryGroup, idArray, qtyArray);
+                    this.genericMgr.FlushSession();
+                    if (!string.IsNullOrWhiteSpace(pickNo))
+                    {
+                        successNos[0] = pickNo;
+                        if (isAutoReceive)
+                        {
+                            IList<PickListDetail> detailList = this.genericMgr.FindAll<PickListDetail>(" select pd from PickListDetail as pd where pd.PickListNo=? ", pickNo);
+                            ReceiptMaster receiptMaster = ShipPickList(pickNo, detailList.Select(d => d.Id.ToString()).ToArray(), detailList.Select(d => d.Qty.ToString()).ToArray());
+                            successNos[1] = receiptMaster.ReceiptNo;
+                        }
+                    }
+                }
+                else
+                {
+                    throw new BusinessException("拣货明细不能为空。");
+                }
+
+            }
+            catch (BusinessException ex)
+            {
+                throw ex;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return successNos;
         }
         #endregion
 

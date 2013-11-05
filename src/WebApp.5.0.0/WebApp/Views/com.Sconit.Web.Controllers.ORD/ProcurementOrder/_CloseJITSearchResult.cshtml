@@ -1,0 +1,89 @@
+﻿@model IEnumerable<com.Sconit.Entity.ORD.OrderDetail>
+<fieldset>
+<script type="text/javascript">
+    function CloseDetailGrid_OnDataBinding(e) {
+       
+        e.data = {
+            OrderNo: $('#OrderNo').val(),
+            Flow: $('#Flow').val(),
+            Status: $('#Status').val(),
+            Item: $('#Item').val(),
+            DateFrom: $('#DateFrom').val(),
+            DateTo: $('#DateTo').val(),
+            Picker: $('#Picker').val()
+        };
+    }
+
+
+    function doDeleteClick(id) {
+        if (confirm("确定要关闭吗？")) {
+            var data = {
+                "Picker": $("#Picker").val(),
+                "OrderNo": $("#OrderNo").val(),
+                "Flow": $("#Flow").val(),
+                "Item": $("#Item").val(),
+                "DateFrom": $("#DateFrom").val(),
+                "DateTo": $("#DateTo").val(),
+                "isFromList": true,
+                "id": id
+            };
+            $.ajax({
+                type: "post",
+                dataType: "html",
+                data: data,
+                url: "/ProcurementOrder/DeleteJITDetailById/",
+                cache: false,
+                success: function (returnDate, textStatus) {
+                    $("#content").html(returnDate);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    DisplayTextMessages(XMLHttpRequest.responseText);
+                }
+            });
+        }
+    }
+
+
+</script>
+    @(Html.Telerik().Grid(Model)
+        .Name("CloseDetailGrid")
+        .Columns(columns =>
+        {
+            //要货单号、物料代码、旧图号、物料描述、制造商、剩余订单数、本次拣货数、库存数、来源库位、目的库位、工位、窗口时间、创建日期
+            //columns.Bound(o => o.Id)
+             //  .ClientTemplate("<input type='checkbox' id='checkedRecords' name='checkedRecords' value='<#= Id #>' onClick='showButtons()' style='display:<#=Picker==null ||Picker==''?'none':'inline'  #>'  />")
+             //  .HeaderTemplate("<input type='checkbox' id='checkAll' name='checkAll' />")
+             //  .Width(36).HtmlAttributes(new { style = "text-align:center" });
+            //columns.Bound(o => o.Id).Hidden().ClientTemplate("<input type='text' id='Id' name='Id' style='display:none' value='<#=Id #>'/>");
+            columns.Bound(o => o.OrderNo);
+            columns.Bound(o => o.OrderStrategyDescription);
+            columns.Bound(o => o.PickerDesc);
+            columns.Bound(o => o.Item);
+            columns.Bound(o => o.ReferenceItemCode);
+            columns.Bound(o => o.ItemDescription);
+            columns.Bound(o => o.ManufactureParty);
+            columns.Bound(o => o.OrderedQty);
+            columns.Bound(o => o.PickedQty);
+            columns.Bound(o => o.ShippedQty);
+            columns.Bound(o => o.ReceivedQty);
+            columns.Bound(o => o.LocationFrom);
+            columns.Bound(o => o.LocationTo);
+            columns.Bound(o => o.BinTo);
+            columns.Bound(o => o.WindowTime);
+            columns.Bound(o => o.CreateDate);
+            columns.Bound(o => o.Id).Title(" ").ClientTemplate("<input type='button' value='关闭' onclick='doDeleteClick(<#=Id #>)' >");
+        })
+        .Scrollable(c => c.Enabled(false))
+        //.Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+        .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxCloseJIT", "ProcurementOrder"))
+        .ClientEvents(events => events.OnDataBinding("CloseDetailGrid_OnDataBinding").OnComplete("TelerikGridView_OnComplete"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(ViewBag.PageSize);
+        })
+    )
+</fieldset>
+
+

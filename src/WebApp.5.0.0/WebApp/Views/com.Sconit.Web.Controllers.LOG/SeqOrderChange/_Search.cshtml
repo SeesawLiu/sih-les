@@ -81,6 +81,20 @@
                    });
                 }
             </div>
+              <div class="search-label">
+                <label for="OrderMaster_Flow">
+                    操作类型
+                </label>
+            </div>
+            <div class="search-field">
+                
+               原数据 @Html.CheckBox("Initial", TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).Initial : true)
+               新增 @Html.CheckBox("Insert", TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).Insert : true)
+               修改 @Html.CheckBox("Update", TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).Update : true)
+               删除 @Html.CheckBox("Delete", TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).Delete : true)
+               要货需求关闭 @Html.CheckBox("CloseDet", TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).CloseDet : true)
+               JIT需求关闭 @Html.CheckBox("JITClose", TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).JITClose : true)
+            </div>
         </div>
         <div class="search-footer">
             @Html.Hidden("isFromList", true)

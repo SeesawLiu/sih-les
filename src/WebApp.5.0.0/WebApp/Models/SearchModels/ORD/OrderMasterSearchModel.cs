@@ -62,5 +62,13 @@ namespace com.Sconit.Web.Models.SearchModels.ORD
         public bool IsNoneClsoe { get; set; }
 
         public string WorkCenter { get; set; }
+
+        public bool Initial { get; set; }
+        public bool Insert { get; set; }
+        public bool Update { get; set; }
+        public bool Delete { get; set; }
+        public bool CloseDet { get; set; }
+        public bool JITClose { get; set; }
+
     }
 }

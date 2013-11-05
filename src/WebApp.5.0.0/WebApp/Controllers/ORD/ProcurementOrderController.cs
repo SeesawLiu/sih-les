@@ -3181,5 +3181,147 @@
         }
         #endregion
 
+        #region JIT的要货需求关闭
+
+        [SconitAuthorize(Permissions = "Url_ProcurementOrder_CloseJIT")]
+        public ActionResult CloseJITIndex()
+        {
+            return View();
+        }
+
+        [GridAction]
+        [SconitAuthorize(Permissions = "Url_ProcurementOrder_CloseJIT")]
+        public ActionResult CloseJITList(GridCommand command, OrderMasterSearchModel searchModel)
+        {
+            this.ProcessSearchModel(command, searchModel);
+            ViewBag.PageSize = base.ProcessPageSize(command.PageSize);
+            return View();
+        }
+
+        [GridAction(EnableCustomBinding = true)]
+        public ActionResult _AjaxCloseJIT(GridCommand command, OrderMasterSearchModel searchModel)
+        {
+            if (!string.IsNullOrWhiteSpace(searchModel.successMesage))
+            {
+                SaveSuccessMessage(searchModel.successMesage);
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.errorMesage))
+            {
+                SaveErrorMessage(searchModel.errorMesage);
+            }
+            string searchSql = PrepareCloseJITStatement(command, searchModel);
+            int total = this.genericMgr.FindAllWithNativeSql<int>(string.Format("select count(*) as rowTotal from( {0} ) as t", searchSql)).First();
+            IList<object[]> serchResult = this.genericMgr.FindAllWithNativeSql<object[]>(string.Format(" select t.* from ( {0} ) as t where t.RowId between {1} and {2} ", searchSql, (command.Page - 1) * command.PageSize, command.Page * command.PageSize));
+            GridModel<OrderDetail> gridModelOrderDet = new GridModel<OrderDetail>();
+            IList<OrderDetail> orderDetList = new List<OrderDetail>();
+            if (serchResult != null && serchResult.Count > 0)
+            {
+                #region
+                //d.Id,d.OrderNo,d.Item,d.RefItemCode,d.ItemDesc,d.ManufactureParty,d.OrderQty,
+                //d.ShipQty,rr.qty,vl.Qty,d.LocFrom,d.LocTo,d.BinTo,m.WindowTime,d.CreateDate,pr.Picker
+                orderDetList = (from tak in serchResult
+                                select new OrderDetail
+                                {
+                                    Id = (int)tak[0],
+                                    OrderNo = (string)tak[1],
+                                    Item = (string)tak[2],
+                                    ReferenceItemCode = (string)tak[3],
+                                    ItemDescription = (string)tak[4],
+                                    ManufactureParty = (string)tak[5],
+                                    OrderedQty = (decimal)tak[6],
+                                    ShippedQty = (decimal)tak[7],
+                                    OccupyQty = (decimal)tak[8],
+                                    //InventoryQty = (decimal)tak[9],
+                                    LocationFrom = (string)tak[10],
+                                    LocationTo = (string)tak[11],
+                                    BinTo = (string)tak[12],
+                                    WindowTime = (DateTime?)tak[13],
+                                    CreateDate = (DateTime)tak[14],
+                                    Picker = (string)tak[15],
+                                    PickerDesc = (string)tak[9],
+                                    PickedQty = (decimal)tak[16],
+                                    OrderStrategyDescription = systemMgr.GetCodeDetailDescription(com.Sconit.CodeMaster.CodeMaster.FlowStrategy, Convert.ToInt32((object)tak[17])),
+                                    ReceivedQty = (decimal)tak[18],
+                                }).ToList();
+                #endregion
+            }
+
+            gridModelOrderDet.Total = total;
+            gridModelOrderDet.Data = orderDetList;
+            return PartialView(gridModelOrderDet);
+        }
+
+
+        private string PrepareCloseJITStatement(GridCommand command, OrderMasterSearchModel searchModel)
+        {
+            //left join VIEW_LocationDet as vl on vl.Location=d.LocFrom and vl.Item=d.Item  isnull(vl.Qty,0) as InvQty
+            string sql = @"select d.Id,d.OrderNo,d.Item,d.RefItemCode,d.ItemDesc,d.ManufactureParty,isnull(d.OrderQty,0) as OrderQty,isnull(d.ShipQty,0) as ShipQty ,isnull(rr.qty,0) as OccupyQty, pk.Decs1,d.LocFrom,d.LocTo,d.BinTo,m.WindowTime,d.CreateDate,pr.Picker,d.PickQty,m.OrderStrategy,isnull(d.RecQty,0) as RecQty
+                 from ORD_OrderDet_2 as d with(nolock) inner join ORD_OrderMstr_2 as m with(nolock) on d.OrderNo=m.OrderNo 
+						                 left join MD_PickRule as pr with(nolock) on pr.Location=d.LocFrom and pr.Item=d.Item
+                                         left join MD_Picker as pk with(nolock) on pr.Picker=pk.Code
+						                 left join (select pd.LocFrom,pd.Item,sum(pd.Qty) as qty from ORD_PickListDet as pd  with(nolock) where exists(select 1 from ORD_PickListMstr as pm where pd.PLNo=pm.PLNo and pm.Status=0 )  group by pd.LocFrom,pd.Item) as rr on rr.LocFrom=d.LocFrom and rr.Item=d.Item  
+                                         where m.SubType=0 and (d.ShipPickQty)<d.OrderQty and m.Status in( 1,2 ) and m.OrderStrategy=3 ";
+            sql += string.Format(" and exists ( select 1 from VIEW_UserPermission as p  with(nolock) where p.UserId={0} and p.CategoryType={1} and (p.PermissionCode=m.PartyFrom  or p.PermissionCode=m.PartyTo)) ", CurrentUser.Id, (int)com.Sconit.CodeMaster.PermissionCategoryType.Region);
+            if (!string.IsNullOrWhiteSpace(searchModel.Picker))
+            {
+                sql += string.Format(" and pr.Picker='{0}' ", searchModel.Picker);
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.OrderNo))
+            {
+                sql += string.Format(" and d.OrderNo='{0}' ", searchModel.OrderNo);
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.Flow))
+            {
+                sql += string.Format(" and m.Flow='{0}' ", searchModel.Flow);
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.Item))
+            {
+                sql += string.Format(" and d.Item='{0}' ", searchModel.Item);
+            }
+            if (searchModel.DateFrom != null)
+            {
+                sql += string.Format(" and d.CreateDate>='{0}' ", searchModel.DateFrom.Value);
+            }
+            if (searchModel.DateTo != null)
+            {
+                sql += string.Format(" and d.CreateDate<='{0}' ", searchModel.DateTo.Value);
+            }
+            string orderBysql = " order by CreateDate asc ";
+            if (command.SortDescriptors.Count > 0)
+            {
+                orderBysql = " order by " + command.SortDescriptors[0].Member + (command.SortDescriptors[0].SortDirection == ListSortDirection.Descending ? " desc" : " asc");
+            }
+            return " select result.*,RowId=ROW_NUMBER()OVER(order by Id asc)  from (" + sql + " ) as  result";
+        }
+
+        [SconitAuthorize(Permissions = "Url_ProcurementOrder_CloseJIT")]
+        public ActionResult DeleteJITDetailById(int id, OrderMasterSearchModel searchModel)
+        {
+            string successMesage = string.Empty;
+            string errorMesage = string.Empty;
+            try
+            {
+                orderMgr.DeleteDetailById(id);
+                successMesage = "JIT需求关闭成功。";
+
+            }
+            catch (BusinessException be)
+            {
+                errorMesage = be.GetMessages()[0].GetMessageString();
+            }
+            catch (Exception e)
+            {
+                errorMesage = "JIT需求关闭失败，" + e.Message;
+            }
+            return new RedirectToRouteResult(new RouteValueDictionary  
+                                                   { 
+                                                       { "action", "CloseJITList" }, 
+                                                       { "controller", "ProcurementOrder" },
+                                                       { "successMesage", successMesage},
+                                                       { "errorMesage", errorMesage}
+                                                   });
+        }
+        #endregion
+
     }
 }

@@ -60,7 +60,7 @@ namespace com.Sconit.Web.Controllers.LOG
         #region 导出
         public void ExportXLS(OrderMasterSearchModel searchModel)
         {
-            string hql = " select s from SeqOrderChange as s  where 1=1";
+            string hql = " select s from SeqOrderChange as s  where 1=1 ";
             if (!string.IsNullOrWhiteSpace(searchModel.OrderNo))
             {
                 hql += string.Format(" and s.OrderNo like '{0}%' ", searchModel.OrderNo);
@@ -88,6 +88,35 @@ namespace com.Sconit.Web.Controllers.LOG
             if (!string.IsNullOrWhiteSpace(searchModel.Flow))
             {
                 hql += string.Format(" and s.Flow = '{0}' ", searchModel.Flow);
+            }
+            if (searchModel.Initial || searchModel.Insert || searchModel.Update || searchModel.Delete || searchModel.CloseDet || searchModel.JITClose)
+            {
+                hql += " and s.Status in( ";
+                if (searchModel.Initial)
+                {
+                    hql += "0,";
+                }
+                if (searchModel.Insert)
+                {
+                    hql += "1,";
+                }
+                if (searchModel.Update)
+                {
+                    hql += "2,";
+                }
+                if (searchModel.Delete)
+                {
+                    hql += "3,";
+                }
+                if (searchModel.CloseDet)
+                {
+                    hql += "4,";
+                }
+                if (searchModel.JITClose)
+                {
+                    hql += "5,";
+                }
+                hql = hql.Substring(0, hql.Length - 1) + ") ";
             }
          
             hql += " order by s.CreateDate asc ";
@@ -120,8 +149,36 @@ namespace com.Sconit.Web.Controllers.LOG
 
         private SearchStatementModel PrepareSearchStatement(GridCommand command, OrderMasterSearchModel searchModel)
         {
-            string whereStatement = string.Empty;
-
+            string whereStatement = " where 1=1  ";
+            if (searchModel.Initial || searchModel.Insert || searchModel.Update || searchModel.Delete || searchModel.CloseDet || searchModel.JITClose)
+            {
+                whereStatement += " and Status in( ";
+                if (searchModel.Initial)
+                {
+                    whereStatement += "0,";
+                }
+                if (searchModel.Insert)
+                {
+                    whereStatement += "1,";
+                }
+                if (searchModel.Update)
+                {
+                    whereStatement += "2,";
+                }
+                if (searchModel.Delete)
+                {
+                    whereStatement += "3,";
+                }
+                if (searchModel.CloseDet)
+                {
+                    whereStatement += "4,";
+                }
+                if (searchModel.JITClose)
+                {
+                    whereStatement += "5,";
+                }
+                whereStatement = whereStatement.Substring(0, whereStatement.Length - 1) + ") ";
+            }
             IList<object> param = new List<object>();
 
             HqlStatementHelper.AddEqStatement("OrderNo", searchModel.OrderNo, "u", ref whereStatement, param);
@@ -141,6 +198,7 @@ namespace com.Sconit.Web.Controllers.LOG
             {
                 HqlStatementHelper.AddLeStatement("CreateDate", searchModel.DateTo, "u", ref whereStatement, param);
             }
+           
             string sortingStatement = HqlStatementHelper.GetSortingStatement(command.SortDescriptors);
 
             SearchStatementModel searchStatementModel = new SearchStatementModel();

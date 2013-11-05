@@ -133,6 +133,7 @@ namespace com.Sconit.Entity.ORD
         [Display(Name = "OrderDetail_ReceiveLotSize", ResourceType = typeof(Resources.ORD.OrderDetail))]
         public Decimal? ReceiveLotSize { get; set; }
 
+        [Export(ExportName = "ProcurementDetailXls", ExportSeq = 100)]//Òª»õÃ÷Ï¸
         [Export(ExportName = "ExportPreviewXLS", ExportSeq = 90)]
         [Display(Name = "OrderDetail_LocationFrom", ResourceType = typeof(Resources.ORD.OrderDetail))]
         public string LocationFrom { get; set; }

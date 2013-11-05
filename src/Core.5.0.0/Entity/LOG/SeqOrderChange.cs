@@ -20,6 +20,8 @@ namespace com.Sconit.Entity.LOG
                         return "删除";
                     case 4:
                         return "要货需求关闭";
+                    case 5:
+                        return "JIT需求关闭";
                     default:
                         return "原数据";
                 }

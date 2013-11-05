@@ -8694,7 +8694,7 @@ namespace com.Sconit.Service.Impl
             var updateSeqOrderChange = Mapper.Map<OrderDetail, SeqOrderChange>(ordDetail);
             updateSeqOrderChange.ExternalOrderNo = null;
             updateSeqOrderChange.ExternalSequence = null;
-            updateSeqOrderChange.Status = 4;
+            updateSeqOrderChange.Status = ordMaster.OrderStrategy == com.Sconit.CodeMaster.FlowStrategy.JIT ? (short)5 : (short)4;
             updateSeqOrderChange.OrderedQty = ordDetail.OrderedQty;
             updateSeqOrderChange.OrderDetId = ordDetail.Id;
             updateSeqOrderChange.CreateDate = System.DateTime.Now;

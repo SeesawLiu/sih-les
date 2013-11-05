@@ -338,7 +338,7 @@ BEGIN
 			end
 			
 			set @Msg = N'更新工位余量失败，失败信息：' + Error_Message()
-			insert into #tempMsg(Lvl, Msg) values(0, @Msg)
+			insert into #tempMsg(Lvl, Msg) values(1, @Msg)
 		end catch
 	end
 	-------------------↑先考虑使用工位余量-----------------------
@@ -1225,7 +1225,7 @@ BEGIN
 				end
 				
 				set @Msg = N'创建物流路线' + @Flow + N'的拉料单失败，失败信息：' + Error_Message()
-				insert into #tempMsg(Lvl, Msg) values(0, @Msg)
+				insert into #tempMsg(Lvl, Msg) values(1, @Msg)
 			end catch
 			
 			set @FlowRowId = @FlowRowId + 1

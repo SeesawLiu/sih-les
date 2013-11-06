@@ -272,7 +272,7 @@ namespace com.Sconit.Service.SAP.Impl
                         {
                             string errorMessage = "交货单过账失败:" + postDO.ReceiptNo;
                             postDO.Result = errorMessage;
-                            postDO.Status = Entity.SAP.StatusEnum.Exception;
+                            postDO.Status = Entity.SAP.StatusEnum.Fail;
                             log.Error(errorMessage, ex);
                             errorMessageList.Add(new ErrorMessage
                             {
@@ -343,7 +343,7 @@ namespace com.Sconit.Service.SAP.Impl
                     {
                         string errorMessage = "交货单重新过账失败:" + postDO.ReceiptNo;
                         postDO.Result = errorMessage;
-                        postDO.Status = Entity.SAP.StatusEnum.Exception;
+                        postDO.Status = Entity.SAP.StatusEnum.Fail;
                         this.UpdateSiSap(postDO);
                         log.Error(errorMessage, ex);
 

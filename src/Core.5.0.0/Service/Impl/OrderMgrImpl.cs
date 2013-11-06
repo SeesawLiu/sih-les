@@ -6039,7 +6039,7 @@ namespace com.Sconit.Service.Impl
                     if (!isQuick && !isReturn)
                     {
                         string hql = " select fd from FlowDetail as fd where Item=? and exists( select 1 from FlowMaster as fm where fm.Code=fd.Flow and fm.PartyFrom=? and fm.PartyTo=? and fm.Type=2 ) ";
-                        var flowDetails = this.genericMgr.FindAll<FlowDetail>(hql, new object[] { od.Item, od.MastPartyFrom, od.MastPartyTo }, new IType[] { NHibernateUtil.String, NHibernateUtil.String, NHibernateUtil.String});
+                        var flowDetails = this.genericMgr.FindAll<FlowDetail>(hql, new object[] { od.Item, od.MastPartyFrom, od.MastPartyTo }, new IType[] { NHibernateUtil.String, NHibernateUtil.String, NHibernateUtil.String });
                         if (flowDetails != null && flowDetails.Count > 0)
                         {
                             if (flowDetails.FirstOrDefault().RoundUpOption != com.Sconit.CodeMaster.RoundUpOption.None)
@@ -6181,28 +6181,59 @@ namespace com.Sconit.Service.Impl
             }
             else
             {
-                var groups = (from tak in exactOrderDetailList
-                              group tak by new
-                              {
-                                  tak.MastWindowTime,
-                                  tak.MastPartyFrom,
-                                  tak.MastPartyTo,
-                              }
-                                  into result
-                                  select new
-                                  {
-                                      PartyFrom = result.Key.MastPartyFrom,
-                                      PartyTo = result.Key.MastPartyTo,
-                                      WindowTime = result.Key.MastWindowTime,
-                                      list = result.ToList()
-                                  }
-                    ).ToList();
-                string orderNos = string.Empty;
-                foreach (var order in groups)
+                if (!isReturn && !isQuick)
                 {
-                    orderNos += CreateFreeTransferOrderMaster(shift, order.PartyFrom, order.PartyTo, order.list, System.DateTime.Now, order.WindowTime, isQuick, isReturn) + "*";
+                    var groups = (from tak in exactOrderDetailList
+                                  group tak by new
+                                  {
+                                      tak.MastWindowTime,
+                                      tak.MastPartyFrom,
+                                      tak.MastPartyTo,
+                                      tak.LocationFrom,
+                                  }
+                                      into result
+                                      select new
+                                      {
+                                          PartyFrom = result.Key.MastPartyFrom,
+                                          PartyTo = result.Key.MastPartyTo,
+                                          WindowTime = result.Key.MastWindowTime,
+                                          LocationFrom = result.Key.LocationFrom,
+                                          list = result.ToList()
+                                      }
+                        ).ToList();
+                    string orderNos = string.Empty;
+                    foreach (var order in groups)
+                    {
+                        orderNos += CreateFreeTransferOrderMaster(shift, order.PartyFrom, order.PartyTo, order.list, System.DateTime.Now, order.WindowTime, isQuick, isReturn) + "*";
+                    }
+                    return orderNos.Substring(0, orderNos.Length - 1);
                 }
-                return orderNos.Substring(0, orderNos.Length - 1);
+                else
+                {
+                    var groups = (from tak in exactOrderDetailList
+                                  group tak by new
+                                  {
+                                      tak.MastWindowTime,
+                                      tak.MastPartyFrom,
+                                      tak.MastPartyTo,
+                                  }
+                                      into result
+                                      select new
+                                      {
+                                          PartyFrom = result.Key.MastPartyFrom,
+                                          PartyTo = result.Key.MastPartyTo,
+                                          WindowTime = result.Key.MastWindowTime,
+                                          list = result.ToList()
+                                      }
+                           ).ToList();
+                    string orderNos = string.Empty;
+                    foreach (var order in groups)
+                    {
+                        orderNos += CreateFreeTransferOrderMaster(shift, order.PartyFrom, order.PartyTo, order.list, System.DateTime.Now, order.WindowTime, isQuick, isReturn) + "*";
+                    }
+                    return orderNos.Substring(0, orderNos.Length - 1);
+                }
+
             }
 
 

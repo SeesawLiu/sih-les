@@ -6872,8 +6872,8 @@ namespace com.Sconit.Service.Impl
                 orderDAT.WindowTime = orderMaster.WindowTime;//要求到货时间
                 orderDAT.Priority = (int)orderMaster.Priority;
                 //orderDAT.Sequence = string.Empty;//整车顺序号,只有排序单才有
-                orderDAT.PartyFrom = orderMaster.LocationFrom;//安吉要求这里要放库位
-                orderDAT.PartyTo = orderMaster.LocationTo;//安吉要求这里要放库位
+                orderDAT.PartyFrom = det.LocationFrom;//安吉要求这里要放库位
+                orderDAT.PartyTo = det.LocationTo;//安吉要求这里要放库位
                 orderDAT.Dock = orderMaster.Dock;
                 orderDAT.CreateDate = System.DateTime.Now;
                 orderDAT.Flow = orderMaster.Flow;

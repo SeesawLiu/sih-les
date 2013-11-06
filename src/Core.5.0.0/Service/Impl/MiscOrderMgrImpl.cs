@@ -805,15 +805,16 @@ namespace com.Sconit.Service.Impl
             ISheet sheet = workbook.GetSheetAt(0);
             IEnumerator rows = sheet.GetRowEnumerator();
 
-            ImportHelper.JumpRows(rows, 11);
+            ImportHelper.JumpRows(rows, 10);
+            int rowCount=10;
+            BusinessException businessException = new BusinessException();
 
             #region 列定义
             int colItem = 1;//物料代码
-            int colUom = 3;//单位
-            int colLocation = 4;//库位
-            int colQty = 5;//数量
-            int colReverseLine = 6;//预留行
-            int colReverseNo = 7;//预留号
+            int colLocation = 2;//库位
+            int colQty = 3;//数量
+            int colReverseLine = 4;//预留行
+            int colReverseNo = 5;//预留号
             #endregion
 
             DateTime dateTimeNow = DateTime.Now;
@@ -821,97 +822,102 @@ namespace com.Sconit.Service.Impl
             IList<MiscOrderDetail> miscOrderDetailList = new List<MiscOrderDetail>();
             while (rows.MoveNext())
             {
+                rowCount++;
                 HSSFRow row = (HSSFRow)rows.Current;
                 if (!ImportHelper.CheckValidDataRow(row, 1, 9))
                 {
                     break;//边界
                 }
                 string itemCode = string.Empty;
-                decimal qty = 0;
-                string uomCode = string.Empty;
                 string locationCode = string.Empty;
+                decimal qty = 0;
                 string reverseLine = string.Empty;
                 string reverseNo = string.Empty;
+                Item item = new Item();
 
                 #region 读取数据
                 #region 读取物料代码
                 itemCode = ImportHelper.GetCellStringValue(row.GetCell(colItem));
-                if (itemCode == null || itemCode.Trim() == string.Empty)
+                if (string.IsNullOrWhiteSpace(itemCode))
                 {
-                    ImportHelper.ThrowCommonError(row.RowNum, colItem, row.GetCell(colItem));
+                    businessException.AddMessage(string.Format("第{0}行：物料代码不能为空。", rowCount));
                 }
+                else {
+                    try
+                    {
+                        item = this.genericMgr.FindById<Item>(itemCode);
+                    }
+                    catch (Exception ex)
+                    {
 
+                        businessException.AddMessage(string.Format("第{0}行：物料代码{1}不存在。", rowCount,itemCode));
+                    }
+                }
                 #endregion
-                #region 读取单位,如果没填则取零件主数据中的单位
-                uomCode = row.GetCell(colUom) != null ? row.GetCell(colUom).StringCellValue : string.Empty;
-                //if (uomCode == null || uomCode.Trim() == string.Empty)
-                //{
-                //    throw new BusinessException("Import.Read.Error.Empty", (row.RowNum + 1).ToString(), colUom.ToString());
-                //}
-                #endregion
+              
 
                 #endregion
 
                 #region 读取库位,如果没填则取MiscOrderMaster上的库位
-                locationCode = row.GetCell(colLocation) != null ? row.GetCell(colLocation).StringCellValue : string.Empty;
-                //if (string.IsNullOrEmpty(locationCode))
-                //{
-                //    throw new BusinessException("Import.Read.Error.Empty", (row.RowNum + 1).ToString(), locationCode.ToString());
-                //}
-
+                locationCode = ImportHelper.GetCellStringValue(row.GetCell(colLocation));
                 if (!string.IsNullOrEmpty(locationCode))
                 {
-                    Location location = genericMgr.FindById<Location>(locationCode);
-                    if (location.Region != miscOrder.Region)
+                    try
                     {
-                        throw new BusinessException("指定区域不存在此库位" + location, (row.RowNum + 1).ToString(), colLocation.ToString());
+                        Location location = genericMgr.FindById<Location>(locationCode);
+                        if (location.Region != miscOrder.Region)
+                        {
+                            businessException.AddMessage(string.Format("第{0}行：指定区域{1}不存在此库位{2}。", rowCount, miscOrder.Region, locationCode));
+                        }
                     }
+                    catch (Exception ex)
+                    {
+                        businessException.AddMessage(string.Format("第{0}行：库位{1}不存在。", rowCount, locationCode));
+                    }
+                   
                 }
                 #endregion
 
 
                 #region 读取数量
-                try
+              
+                string  ReadQty = ImportHelper.GetCellStringValue(row.GetCell(colQty));
+                if (string.IsNullOrEmpty(ReadQty))
                 {
-                    qty = Convert.ToDecimal(row.GetCell(colQty).NumericCellValue);
+                    businessException.AddMessage(string.Format("第{0}行：数量不能为空。", rowCount));
                 }
-                catch
+                decimal.TryParse(ReadQty, out qty);
+                if (qty <= 0)
                 {
-                    ImportHelper.ThrowCommonError(row.RowNum, colQty, row.GetCell(colQty));
+                    businessException.AddMessage(string.Format("第{0}行：数量{1}填写有误。", rowCount, ReadQty));
                 }
+               
                 #endregion
 
-                #region
-                MiscOrderMoveType miscOrderMoveType = genericMgr.FindAll<MiscOrderMoveType>("from MiscOrderMoveType as m where m.MoveType=? and m.IOType=?", new object[] { miscOrder.MoveType, miscOrder.Type })[0];
-                if (miscOrderMoveType.CheckReserveLine)
-                {
-                    reverseLine = row.GetCell(colReverseLine) != null ? row.GetCell(colReverseLine).StringCellValue : string.Empty;
-                    //if (reverseLine == null || reverseLine.Trim() == string.Empty)
-                    //{
-                    //    throw new BusinessException("Import.Read.Error.Empty", (row.RowNum + 1).ToString(), colUom.ToString());
-                    //}
-                }
-                if (miscOrderMoveType.CheckReserveNo)
-                {
-                    reverseNo = row.GetCell(colReverseNo) != null ? row.GetCell(colReverseNo).StringCellValue : string.Empty;
-                    //if (reverseNo == null || reverseNo.Trim() == string.Empty)
-                    //{
-                    //    throw new BusinessException("Import.Read.Error.Empty", (row.RowNum + 1).ToString(), colUom.ToString());
-                    //}
-                }
-                #endregion
+                reverseLine = ImportHelper.GetCellStringValue(row.GetCell(colReverseLine));
+
+                reverseNo = ImportHelper.GetCellStringValue(row.GetCell(colReverseNo));
+
 
                 #region 填充数据
                 MiscOrderDetail mod = new MiscOrderDetail();
-                Item item = genericMgr.FindById<Item>(itemCode);
-                mod.Location = locationCode != string.Empty ? locationCode : miscOrder.Location;
+                mod.Location = !string.IsNullOrWhiteSpace(locationCode) ? locationCode : miscOrder.Location;
                 mod.Item = itemCode;
-                mod.Uom = uomCode != string.Empty ? uomCode : item.Uom;
+                mod.Uom = item.Uom;
+                mod.UnitCount = item.UnitCount;
                 mod.ItemDescription = item.Description;
-                mod.BaseUom = uomCode != string.Empty ? uomCode : item.Uom;
+                mod.ReferenceItemCode = item.ReferenceCode;
+                mod.BaseUom =  item.Uom;
                 mod.Qty = qty;
-                mod.ReserveLine = reverseLine;
-                mod.ReserveNo = reverseNo;
+                MiscOrderMoveType miscOrderMoveType = genericMgr.FindAll<MiscOrderMoveType>("from MiscOrderMoveType as m where m.MoveType=? and m.IOType=?", new object[] { miscOrder.MoveType, miscOrder.Type })[0];
+                if (miscOrderMoveType.CheckReserveLine)
+                {
+                    mod.ReserveLine = reverseLine;
+                }
+                if (miscOrderMoveType.CheckReserveNo)
+                {
+                    mod.ReserveNo = reverseNo;
+                }
                 //如果是寄售，则需要将供应商填充到明细的manufactureparty
                 if (miscOrder.Consignment)
                 {

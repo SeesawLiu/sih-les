@@ -392,14 +392,16 @@ namespace com.Sconit.Web.Controllers.ORD
                     //    return Json(new { url = "/PickList/Edit/", id = pickNo, UrlId = "New" });
                     //}
                     string[] successNos=orderMgr.PickShipOrder(idStr,  qtyStr,  deliveryGroup,  isAutoReceive);
-                    if (!string.IsNullOrWhiteSpace(successNos[0]))
-                    {
-                        SaveSuccessMessage(string.Format("操作成功，生成拣货单号{0}。", successNos[0]));
-                    }
+                   
                     
                     if (!string.IsNullOrWhiteSpace(successNos[1]))
                     {
                         SaveSuccessMessage(string.Format("发货成功，生成收货单号{0}。", successNos[1]));
+                    }
+                    if (!string.IsNullOrWhiteSpace(successNos[0]))
+                    {
+                        SaveSuccessMessage(string.Format("拣货成功，生成拣货单号{0}。", successNos[0]));
+                        return Json(new { url = "/PickList/Edit/", id = successNos[0], UrlId = "New" });
                     }
                 }
                 else

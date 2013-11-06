@@ -269,11 +269,17 @@
             {"needconfirm","true"},
             {"onclick","onShipClick()"}
 	    })
+        @Html.Button("指定寄售供应商", "", new Dictionary<string, string>()
+            {
+	            {"type", "button"},
+	            {"id", "btnSpecify"},
+                {"needconfirm","true"},
+                {"onclick","onSpecifyClick()"}
+            })
+        <button type="button" id="btnCheck" onclick="onCheckClick()">
+            检查库存</button>
         }
     }
-    
-    <button type="button" id="btnCheck" onclick="onCheckClick()">
-        检查库存</button>
     <button type="button" id="btnBack" onclick="location.href='@Url.Content("~/SequenceMaster/List")'">
         @Resources.Global.Button_Back</button>
 </div>
@@ -281,10 +287,54 @@
     Html.RenderAction("_OrderDetailList", "SequenceMaster", new { orderNo = Model.OrderNo });
 }
 <script type="text/javascript" language="javascript">
+    function onSpecifyClick() {
+
+        var data = {
+            "orderNo": $("#OrderNo").val()
+        }
+        $("#btnSpecify").attr("disabled", true);
+        $("#btnBack").attr("disabled", true);
+        $("#btnShip").attr("disabled", true);
+        $("#btnCheck").attr("disabled", true);
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            data: data,
+            url: "/ProcurementOrder/SpecifySequenceOrderCSSupplier/",
+            cache: false,
+            success: function (returnData, textStatus) {
+                DisplayJsonMessages(returnData);
+                $("#btnSpecify").attr("disabled", false);
+                $("#btnBack").attr("disabled", false);
+                $("#btnShip").attr("disabled", false);
+                $("#btnCheck").attr("disabled", false);
+                $.ajax({
+                    type: "get",
+                    dataType: "html",
+                    data: { orderNo: $("#OrderNo").val() },
+                    url: "/SequenceMaster/Edit/",
+                    cache: false,
+                    success: function (data, textStatus) {
+                        var $tGrid = $("#content");
+                        $($tGrid).html(data);
+                    }
+                });
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+                $("#btnSpecify").attr("disabled", false);
+                $("#btnBack").attr("disabled", false);
+                $("#btnShip").attr("disabled", false);
+                $("#btnCheck").attr("disabled", false);
+            }
+        });
+    }
+
     function onCheckClick() {
         var orderData = {
             "orderNo": $("#OrderNo").val()
         };
+        $("#btnSpecify").attr("disabled", true);
         $("#btnBack").attr("disabled", true);
         $("#btnShip").attr("disabled", true);
         $("#btnCheck").attr("disabled", true);
@@ -296,12 +346,14 @@
             cache: false,
             success: function (data, textStatus) {
                 DisplayJsonMessages(data);
+                $("#btnSpecify").attr("disabled", false);
                 $("#btnBack").attr("disabled", false);
                 $("#btnShip").attr("disabled", false);
                 $("#btnCheck").attr("disabled", false);
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
                 DisplayTextMessages(XMLHttpRequest.responseText);
+                $("#btnSpecify").attr("disabled", false);
                 $("#btnBack").attr("disabled", false);
                 $("#btnShip").attr("disabled", false);
                 $("#btnCheck").attr("disabled", false);

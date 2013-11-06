@@ -61,7 +61,7 @@ namespace com.Sconit.Service.Impl
                 criteria.Add(Expression.Or(Expression.IsNull("StartDate"), Expression.Le("StartDate", dateTimeNow)));
                 criteria.Add(Expression.Or(Expression.IsNull("EndDate"), Expression.Ge("EndDate", dateTimeNow)));
             }
-            var list = this.genericMgr.FindAll<FlowDetail>(criteria, 0, 200);
+            var list = this.genericMgr.FindAll<FlowDetail>(criteria, 0, 500);
 
             return list;
         }

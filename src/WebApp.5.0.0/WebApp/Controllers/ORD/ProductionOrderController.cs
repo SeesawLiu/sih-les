@@ -718,7 +718,6 @@ namespace com.Sconit.Web.Controllers.ORD
                     throw new BusinessException("窗口时间不能为空。");
                 }
                
-                SaveSuccessMessage("拉料成功。");
                 IList<object[]> returnMessages = this.genericMgr.FindAllWithNativeSql<object[]>("exec USP_LE_ManualGenOrder ?,?,?,?,?",
                     new object[] { orderNo, windowTime.Value, priority, CurrentUser.Id, CurrentUser.FullName },
                     new IType[] { NHibernateUtil.String, NHibernateUtil.DateTime, NHibernateUtil.Int16, NHibernateUtil.Int32, NHibernateUtil.String });

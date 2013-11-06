@@ -109,13 +109,13 @@ BEGIN
 				update ORD_OrderMstr_4 set PauseStatus = 2, LastModifyDate = @DateTimeNow, LastModifyUser = @CreateUserId, LastModifyUserNm = @CreateUserNm, [Version] = [Version] + 1
 				where OrderNo = @OrderNo and [Version] = @Version
 				
-				set @NormalPause=0--直接暂停
-				
 				if @@ROWCOUNT <> 1
 				begin
 					set @ErrorMsg = N'整车生产单' + @OrderNo + N'已经更新，请重新暂停。'
 					RAISERROR(@ErrorMsg, 16, 1)
 				end
+				
+				set @NormalPause=0--直接暂停
 				
 				--删除工序过点时间
 				delete from ORD_OrderOpCPTime where OrderNo = @OrderNo
@@ -134,14 +134,13 @@ BEGIN
 				update ORD_OrderMstr_4 set PauseStatus = 1, PauseSeq = @PauseSeq, LastModifyDate = @DateTimeNow, LastModifyUser = @CreateUserId, LastModifyUserNm = @CreateUserNm, [Version] = [Version] + 1
 				where OrderNo = @OrderNo and [Version] = @Version
 				
-				set @NormalPause=1--工序暂停
-				
-				
 				if @@ROWCOUNT <> 1
 				begin
 					set @ErrorMsg = N'整车生产单' + @OrderNo + N'已经更新，请重新暂停。'
 					RAISERROR(@ErrorMsg, 16, 1)
 				end
+				
+				set @NormalPause=1--工序暂停
 				
 				--重新计算物料消耗时间
 				exec USP_Busi_UpdateOrderBomConsumeTime @ProdLine, @CreateUserId, @CreateUserNm
@@ -150,8 +149,8 @@ BEGIN
 		
 		---插入暂停LOG记录
 		
-		insert into LOG_ProdOrderPauseResume(ProdLine, ProdLineDesc, OrderNo, VanCode, CurrentOperation, OprateType, CreateUserName, Seq, SubSeq)
-		values(@ProdLine, @ProdLineDesc, @OrderNo, @TraceCode, @PauseSeq, @NormalPause, @CreateUserNm, @Seq, @SubSeq)
+		insert into LOG_ProdOrderPauseResume(ProdLine, ProdLineDesc, OrderNo, VanCode, CurrentOperation, PauseOp, OprateType, CreateUserName, Seq, SubSeq)
+		values(@ProdLine, @ProdLineDesc, @OrderNo, @TraceCode, @CurrentOp, @PauseSeq, @NormalPause, @CreateUserNm, @Seq, @SubSeq)
 		
 		if @trancount = 0 
 		begin  

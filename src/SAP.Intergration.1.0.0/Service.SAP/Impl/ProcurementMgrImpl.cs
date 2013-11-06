@@ -19,7 +19,7 @@ namespace com.Sconit.Service.SAP.Impl
     public class ProcurementMgrImpl : BaseMgr, IProcurementMgr
     {
         private static log4net.ILog log = log4net.LogManager.GetLogger("SAP_Procurement");
-        private static log4net.ILog log1 = log4net.LogManager.GetLogger("SAP_Distribution");
+        //private static log4net.ILog log = log4net.LogManager.GetLogger("SAP_Distribution");
         public IOrderMgr orderMgr { get; set; }
         public IItemMgr itemMgr { get; set; }
 
@@ -1113,29 +1113,29 @@ namespace com.Sconit.Service.SAP.Impl
                 try
                 {
                     //实例化webservice
-                    log1.Info(string.Format("-----------------------------{0}----------------------------", guid));
-                    log1.Info(string.Format("{0}：连接Web服务反写计划协议开始",guid));
+                    log.Info(string.Format("-----------------------------{0}----------------------------", guid));
+                    log.Info(string.Format("{0}：连接Web服务反写计划协议开始",guid));
 
                     IList<com.Sconit.Entity.SAP.ORD.CreateScheduleLine> createScheduleLineList = this.genericMgr.FindAll<com.Sconit.Entity.SAP.ORD.CreateScheduleLine>(
                         "from CreateScheduleLine where Status in(?,?) and ErrorCount < 3 and LIFNR<>?",
                         new object[] { Entity.SAP.StatusEnum.Pending, Entity.SAP.StatusEnum.Fail, "1000000746" }, 0, 1000);
-                    log1.Info(string.Format("{0}：开始处理共{1}行数据。", guid, createScheduleLineList.Count.ToString()));
+                    log.Info(string.Format("{0}：开始处理共{1}行数据。", guid, createScheduleLineList.Count.ToString()));
                     if (createScheduleLineList != null && createScheduleLineList.Count > 0)
                     {
                         int i = 0;
                         foreach (var createScheduleLine in createScheduleLineList)
                         {
                             i++;
-                            log1.Info(string.Format("{0}：开始处理第{1}行数据，供应商{2}，物料号{3}。", guid, i.ToString(), createScheduleLine.FRBNR, createScheduleLine.MATNR));
+                            log.Info(string.Format("{0}：开始处理第{1}行数据，供应商{2}，物料号{3}。", guid, i.ToString(), createScheduleLine.FRBNR, createScheduleLine.MATNR));
                             procurementOperatorMgrImpl.CreateOneCRSL(createScheduleLine, errorMessageList);
                         }
                     }
-                    log1.Info(string.Format("{0}：连接Web服务反写计划协议成功",guid));
+                    log.Info(string.Format("{0}：连接Web服务反写计划协议成功",guid));
                 }
                 catch (Exception ex)
                 {
                     string logMessage = string.Format("{0}：连接Web服务反写计划协议出现异常，异常信息：" + ex.Message, guid);
-                    log1.Error(logMessage, ex);
+                    log.Error(logMessage, ex);
                     errorMessageList.Add(new ErrorMessage
                     {
                         Template = NVelocityTemplateRepository.TemplateEnum.GenerateSAPScheduleLine,
@@ -1166,16 +1166,16 @@ namespace com.Sconit.Service.SAP.Impl
                     serviceProxy.Url = ReplaceSAPServiceUrl(serviceProxy.Url);
 
                     IList<com.Sconit.Entity.SAP.ORD.CRSLSummary> crslSummaryList = this.genericMgr.FindEntityWithNativeSql<com.Sconit.Entity.SAP.ORD.CRSLSummary>("exec USP_IF_GenCRSLSummary");
-                    log1.Info(string.Format("-----------------------------{0}----------------------------", guid));
-                    log1.Info(string.Format("{0}：连接Web服务反写计划协议开始", guid));
+                    log.Info(string.Format("-----------------------------{0}----------------------------", guid));
+                    log.Info(string.Format("{0}：连接Web服务反写计划协议开始", guid));
                     int i = 0;
                     if (crslSummaryList != null && crslSummaryList.Count > 0)
                     {
-                        log1.Info(string.Format("{0}：开始处理共{1}行数据。", guid, crslSummaryList.Count.ToString()));
+                        log.Info(string.Format("{0}：开始处理共{1}行数据。", guid, crslSummaryList.Count.ToString()));
                         foreach (var crslSummary in crslSummaryList)
                         {
                             i++;
-                            log1.Info(string.Format("{0}：开始处理第{1}行数据，供应商{2}，物料号{3}。", guid, i.ToString(), crslSummary.FRBNR, crslSummary.MATNR));
+                            log.Info(string.Format("{0}：开始处理第{1}行数据，供应商{2}，物料号{3}。", guid, i.ToString(), crslSummary.FRBNR, crslSummary.MATNR));
                             try
                             {
                                 MI_CRSL_LES.ZLSCHE_IN zlscheIn = new MI_CRSL_LES.ZLSCHE_IN();
@@ -1210,7 +1210,7 @@ namespace com.Sconit.Service.SAP.Impl
 
                                     //失败
                                     string logMessage = "SAP反写计划协议失败，失败信息：" + zlscheOut.MESSAGE;
-                                    log1.Error(logMessage);
+                                    log.Error(logMessage);
 
                                     if (crslSummary.ErrorCount == 3)
                                     {
@@ -1225,7 +1225,7 @@ namespace com.Sconit.Service.SAP.Impl
                             catch (Exception ex)
                             {
                                 string logMessage = string.Format("连接Web服务反写计划协议出现异常，异常信息：" + ex.Message);
-                                log1.Error(logMessage, ex);
+                                log.Error(logMessage, ex);
                                 errorMessageList.Add(new ErrorMessage
                                 {
                                     Template = NVelocityTemplateRepository.TemplateEnum.GenerateSAPScheduleLine,
@@ -1241,7 +1241,7 @@ namespace com.Sconit.Service.SAP.Impl
                 catch (Exception ex)
                 {
                     string logMessage = string.Format("反写计划协议出现异常，异常信息：" + ex.Message);
-                    log1.Error(logMessage, ex);
+                    log.Error(logMessage, ex);
                     errorMessageList.Add(new ErrorMessage
                     {
                         Template = NVelocityTemplateRepository.TemplateEnum.GenerateSAPScheduleLine,
@@ -1259,8 +1259,8 @@ namespace com.Sconit.Service.SAP.Impl
     [Transactional]
     public class ProcurementOperatorMgrImpl :BaseMgr, IProcurementOperatorMgr
     {
-        //private static log4net.ILog log = log4net.LogManager.GetLogger("SAP_Procurement");
-        private static log4net.ILog log1 = log4net.LogManager.GetLogger("SAP_Distribution");
+        private static log4net.ILog log = log4net.LogManager.GetLogger("SAP_Procurement");
+        //private static log4net.ILog log = log4net.LogManager.GetLogger("SAP_Distribution");
 
         public static object lockCreateSAPScheduleLineFromLes = new object();
         [Transaction(TransactionMode.Requires)]
@@ -1323,7 +1323,7 @@ namespace com.Sconit.Service.SAP.Impl
                     this.genericMgr.Update(orderDetail);
                     //失败
                     string logMessage = "SAP反写计划协议失败，失败信息：" + zlscheOut.MESSAGE;
-                    log1.Error(logMessage);
+                    log.Error(logMessage);
 
                     if (createScheduleLine.ErrorCount == 10)
                     {

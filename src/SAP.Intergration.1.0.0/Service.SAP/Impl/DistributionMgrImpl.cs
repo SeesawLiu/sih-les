@@ -79,6 +79,10 @@ namespace com.Sconit.Service.SAP.Impl
 
                     if (flowMasterList == null || flowMasterList.Count == 0)
                     {
+                        if (firstAlterDO.Location == "1000")
+                        {
+                            return "F";
+                        }
                         throw new Exception(string.Format("交货单{0}找不到销售路线。", firstAlterDO.OrderNo));
                     }
                  
@@ -173,7 +177,7 @@ namespace com.Sconit.Service.SAP.Impl
                 //    this.UpdateSiSap(alterDO);
                 //}
                 log.Error(NVelocityTemplateRepository.TemplateEnum.ImportSapDO_ImportFail, ex);
-                string errorMessage = "创建交货单失败。";
+                string errorMessage = "创建交货单失败。"+ex.Message;
 
                 var errorMessageList = new List<ErrorMessage>();
                 errorMessageList.Add(new ErrorMessage

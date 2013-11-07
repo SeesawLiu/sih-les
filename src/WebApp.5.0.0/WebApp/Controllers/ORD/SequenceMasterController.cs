@@ -28,6 +28,7 @@ using NHibernate;
 using com.Sconit.Entity.SCM;
 using com.Sconit.Entity.CUST;
 using com.Sconit.Entity.VIEW;
+using com.Sconit.Entity.INV;
 
 namespace com.Sconit.Web.Controllers.ORD
 {
@@ -490,17 +491,17 @@ namespace com.Sconit.Web.Controllers.ORD
                 {
                     if (!string.IsNullOrWhiteSpace(det.ICHARG))
                     {
-                        IList<LocationDetailView> locationDetails = this.genericMgr.FindEntityWithNativeSql<LocationDetailView>("select * from VIEW_LocationDet with(nolock) where Item=? and ManufactureParty=? ", new object[] { det.Item, det.ICHARG });
+                        IList<LocationLotDetail> locationDetails = this.genericMgr.FindEntityWithNativeSql<LocationLotDetail>("select * from VIEW_LocationLotDet with(nolock) where Item=? and ConsigementParty=? and Location=? ", new object[] { det.Item, det.ICHARG, det.LocationFrom });
                         if (locationDetails != null && locationDetails.Count > 0)
                         {
-                            if (locationDetails.First().CsQty < det.OrderedQty)
+                            if (locationDetails.Sum(l=>l.Qty) < det.OrderedQty)
                             {
-                                SaveErrorMessage(string.Format("物料号{0}，寄售供应商{1}的寄售库存数为{2}小于当前订单数{3}。", det.Item, det.ICHARG, locationDetails.First().CsQty, det.OrderedQty));
+                                SaveErrorMessage(string.Format("物料号{0}，寄售供应商{1},在库位{2}的寄售库存数为{3}小于当前订单数{4}。", det.Item, det.ICHARG, det.LocationFrom, locationDetails.Sum(l => l.Qty), det.OrderedQty));
                             }
                         }
                         else
                         {
-                            SaveErrorMessage(string.Format("物料号{0}，寄售供应商{1}没有找到对应的库存。", det.Item, det.ICHARG));
+                            SaveErrorMessage(string.Format("物料号{0}，寄售供应商{1},在库位{2}没有找到对应的库存。", det.Item, det.ICHARG,det.LocationFrom));
                         }
                     }
                 }

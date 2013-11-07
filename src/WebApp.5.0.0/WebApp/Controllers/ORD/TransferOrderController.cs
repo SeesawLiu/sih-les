@@ -188,6 +188,10 @@ namespace com.Sconit.Web.Controllers.ORD
                     var workingCalendars = this.genericMgr.FindAll<WorkingCalendar>(" select w from WorkingCalendar as w where w.Region=? and w.WorkingDate=? ", new object[] { PartyTo, WindowTime.Value.Date });
                     if (workingCalendars != null && workingCalendars.Count > 0)
                     {
+                        if (insertedOrderDetails.Select(io => io.LocationFrom).Distinct().Count() > 1)
+                        {
+                            throw new BusinessException(string.Format("手工要货，不能同时向多个库位要货。"));
+                        }
                         if (workingCalendars.First().Type == com.Sconit.CodeMaster.WorkingCalendarType.Rest)
                         {
                             throw new BusinessException(string.Format("窗口时间{0}是休息时间，请确认。", WindowTime));

@@ -63,7 +63,7 @@ BEGIN
 		select top 1 @Id = Id, @Version = [Version] from SCM_OpRefBalance where Item = @Item and OpRef = @OpRef
 		
 		--汇总已计算未装配的零件数量
-		select @TobeAssQty = SUM(bom.OrderQty)
+		select @TobeAssQty = ISNULL(SUM(bom.OrderQty), 0)
 		from ORD_OrderBomDet as bom
 		inner join ORD_OrderMstr_4 as mstr on bom.OrderNo = mstr.OrderNo
 		inner join ORD_OrderSeq as seq on seq.OrderNo = mstr.OrderNo
@@ -71,7 +71,7 @@ BEGIN
 		and bom.IsCreateOrder = 1
 		
 		--汇总在途数量
-		select @IntransitQty = SUM(det.OrderQty)
+		select @IntransitQty = ISNULL(SUM(det.OrderQty), 0)
 		from (select SUM(det.OrderQty - det.RecQty) as OrderQty
 			from ORD_OrderDet_1 as det
 			inner join ORD_OrderMstr_1 as mstr on det.OrderNo = mstr.OrderNo

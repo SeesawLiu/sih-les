@@ -155,7 +155,7 @@
   </wsdl:binding>
   <wsdl:service name="MI_LES2SAP_POST_DELIV_DOCService">
     <wsdl:port name="MI_LES2SAP_POST_DELIV_DOCPort" binding="p1:MI_LES2SAP_POST_DELIV_DOCBinding">
-      <address location="http://10.86.128.31:8000/XISOAPAdapter/MessageServlet?channel=:LES01:CC_SOAP_SD1&amp;version=3.0&amp;Sender.Service=LES01&amp;Interface=http%3A%2F%2Fwww.sih.cq.cn%2Fsap%2Fsd%2F01%2Fles%5EMI_LES2SAP_POST_DELIV_DOC" xmlns="http://schemas.xmlsoap.org/wsdl/soap/" />
+      <address location="http://10.86.128.63:8000/XISOAPAdapter/MessageServlet?channel=:LES01:CC_SOAPS2&amp;version=3.0&amp;Sender.Service=MI_LES2SAP_POST_DELIV_DOCService&amp;Interface=http%3A%2F%2Fwww.sih.cq.cn%2Fsap%2Fsd%2F01%2Fles%5EMI_LES2SAP_POST_DELIV_DOC" xmlns="http://schemas.xmlsoap.org/wsdl/soap/" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

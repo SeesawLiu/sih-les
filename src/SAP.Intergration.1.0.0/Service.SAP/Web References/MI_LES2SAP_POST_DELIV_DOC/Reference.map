@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <DiscoveryClientResultsFile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Results>
-    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.ContractReference" url="file:///D:/sih/10.Interface/SAP-LES/WDSL/MI_LES2SAP_POST_DELIV_DOC.wsdl" filename="MI_LES2SAP_POST_DELIV_DOC.wsdl" />
+    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.ContractReference" url="file:///E:/MI_LES2SAP_POST_DELIV_DOC_V1.1.wsdl" filename="MI_LES2SAP_POST_DELIV_DOC.wsdl" />
   </Results>
 </DiscoveryClientResultsFile>

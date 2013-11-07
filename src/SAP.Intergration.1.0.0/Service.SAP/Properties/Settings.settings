@@ -33,7 +33,7 @@
       <Value Profile="(Default)">http://10.86.128.31:8000/XISOAPAdapter/MessageServlet?channel=:LES01:CC_SOAPP7&amp;version=3.0&amp;Sender.Service=LES01&amp;Interface=http%3A%2F%2Fwww.sih.cq.cn%2Fsap%2Fpp%2F07%5EMI_POFIX_LES</Value>
     </Setting>
     <Setting Name="com_Sconit_Service_SAP_MI_LES2SAP_POST_DELIV_DOC_MI_LES2SAP_POST_DELIV_DOCService" Type="(Web Service URL)" Scope="Application">
-      <Value Profile="(Default)">http://10.86.128.31:8000/XISOAPAdapter/MessageServlet?channel=:LES01:CC_SOAP_SD1&amp;version=3.0&amp;Sender.Service=LES01&amp;Interface=http%3A%2F%2Fwww.sih.cq.cn%2Fsap%2Fsd%2F01%2Fles%5EMI_LES2SAP_POST_DELIV_DOC</Value>
+      <Value Profile="(Default)">http://10.86.128.63:8000/XISOAPAdapter/MessageServlet?channel=:LES01:CC_SOAPS2&amp;version=3.0&amp;Sender.Service=MI_LES2SAP_POST_DELIV_DOCService&amp;Interface=http%3A%2F%2Fwww.sih.cq.cn%2Fsap%2Fsd%2F01%2Fles%5EMI_LES2SAP_POST_DELIV_DOC</Value>
     </Setting>
     <Setting Name="com_Sconit_Service_SAP_MI_CRSL_LES1_MI_CRSL_LESService" Type="(Web Service URL)" Scope="Application">
       <Value Profile="(Default)">http://10.86.128.31:8000/XISOAPAdapter/MessageServlet?channel=:LES01:CC_SOAP7&amp;version=3.0&amp;Sender.Service=LES01&amp;Interface=http%3A%2F%2Fwww.sih.cq.cn%2Fsap%2Fmm%2F07%5EMI_CRSL_LES</Value>

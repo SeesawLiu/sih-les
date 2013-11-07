@@ -146,9 +146,9 @@ namespace com.Sconit.Service.SAP.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://10.86.128.31:8000/XISOAPAdapter/MessageServlet?channel=:LES01:CC_SOAP_SD1&" +
-            "version=3.0&Sender.Service=LES01&Interface=http%3A%2F%2Fwww.sih.cq.cn%2Fsap%2Fsd" +
-            "%2F01%2Fles%5EMI_LES2SAP_POST_DELIV_DOC")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://10.86.128.63:8000/XISOAPAdapter/MessageServlet?channel=:LES01:CC_SOAPS2&ve" +
+            "rsion=3.0&Sender.Service=MI_LES2SAP_POST_DELIV_DOCService&Interface=http%3A%2F%2" +
+            "Fwww.sih.cq.cn%2Fsap%2Fsd%2F01%2Fles%5EMI_LES2SAP_POST_DELIV_DOC")]
         public string com_Sconit_Service_SAP_MI_LES2SAP_POST_DELIV_DOC_MI_LES2SAP_POST_DELIV_DOCService {
             get {
                 return ((string)(this["com_Sconit_Service_SAP_MI_LES2SAP_POST_DELIV_DOC_MI_LES2SAP_POST_DELIV_DOCService" +

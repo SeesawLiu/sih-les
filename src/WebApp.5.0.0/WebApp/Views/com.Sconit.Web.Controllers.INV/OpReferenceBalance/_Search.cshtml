@@ -97,16 +97,16 @@
             @Html.Hidden("isFromList", true)
             <button type="submit" id="btnSearch">
                 @Resources.Global.Button_Search</button>
-           @* <button type="button" id="btnExport" onclick="ExportClick()">
-                @Resources.Global.Button_SearchExport</button>*@
+            <button type="button" id="btnExport" onclick="ExportClick()">
+                @Resources.Global.Button_SearchExport</button>
         </div>
 
     }
 </fieldset>
-@*<script type="text/javascript">
-//    function ExportClick() {
-//        location.href = '/LocationTransaction/ExportXLS/?TransactionType=' + $('#TransactionType').val() + '&Item=' + $('#Item').val() + '&PartyFrom=' + $('#PartyFrom').val()
-//         + '&PartyTo=' + $('#PartyTo').val() + '&LocationFrom=' + $('#LocationFrom').val() + '&LocationTo=' + $('#LocationTo').val()
-//         + '&CreateUserName=' + $('#CreateUserName').val() + '&StartDate=' + $('#StartDate').val() + '&OrderNo=' + $('#OrderNo').val();
-//    }
-</script>*@
+<script type="text/javascript">
+    function ExportClick() {
+        location.href = '/OpReferenceBalance/ExportXLS/?Item=' + $('#Item').val() + '&OpReference=' + $('#OpReference').val() + '&CreateUserName=' + $('#CreateUserName').val()
+         + '&LastModifyUserName=' + $('#LastModifyUserName').val() + '&CreateStartDate=' + $('#CreateStartDate').val() + '&CreateEndDate=' + $('#CreateEndDate').val()
+        + '&ModifyStartDate=' + $('#ModifyStartDate').val() + '&ModifyEndDate=' + $('#ModifyEndDate').val();
+    }
+</script>

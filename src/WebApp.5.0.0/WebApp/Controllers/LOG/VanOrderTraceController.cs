@@ -65,6 +65,62 @@ namespace com.Sconit.Web.Controllers.LOG
 
         }
 
+
+        #region 导出
+        public void ExportJITInfo(VanOrderTraceSearchModel searchModel)
+        {
+
+            string selectSql = @" select top 65530 vt.Flow,vt.Item,i.RefCode,i.Desc1,om.TraceCode,bt.OrderQty,vt.UC,i.Container,vt.CreateDate,vt.WindowTime ,vt.OpRef 
+ from LOG_VanOrderTrace as vt  with(nolock)
+ inner join LOG_VanOrderBomTrace as bt  with(nolock) on vt.UUID=bt.UUID
+ inner join MD_Item as i  with(nolock) on vt.Item=i.Code 
+ inner join ORD_OrderMstr_4 as om  with(nolock) on om.OrderNo=bt.VanOrderNo where 1=1 ";
+            if (!string.IsNullOrWhiteSpace(searchModel.OrderNo))
+            {
+                selectSql +=string.Format( " and vt.OrderNo='{0}' ",searchModel.OrderNo);
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.Flow))
+            {
+                selectSql += string.Format(" and vt.Flow='{0}' ", searchModel.Flow);
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.Item))
+            {
+                selectSql += string.Format(" and vt.Item='{0}' ", searchModel.Item);
+            }
+          
+            if (!string.IsNullOrWhiteSpace(searchModel.OpReference))
+            {
+                selectSql += string.Format(" and vt.OpReference='{0}' ", searchModel.OpReference);
+            }
+            if (searchModel.CreateDateFrom!=null)
+            {
+                selectSql += string.Format(" and vt.CreateDate>='{0}' ", searchModel.CreateDateFrom.Value);
+            }
+            if (searchModel.CreateDateTo != null)
+            {
+                selectSql += string.Format(" and vt.CreateDate<='{0}' ", searchModel.CreateDateTo.Value);
+            }
+            var searchList = this.genericMgr.FindAllWithNativeSql<object[]>(selectSql);
+            //vt.Flow,vt.Item,i.RefCode,i.Desc1,om.TraceCode,bt.OrderQty,vt.UC,i.Container,vt.CreateDate,vt.WindowTime ,vt.OpRef
+            var returnList = (from take in searchList
+                              select new VanOrderTrace
+                              {
+                                  Flow = (string)take[0],
+                                  Item = (string)take[1],
+                                  RefItemCode = (string)take[2],
+                                  ItemDesc = (string)take[3],
+                                  TraceCode = (string)take[4],
+                                  OrderQty = Convert.ToDecimal((take[5]).ToString()),
+                                  UnitCount = Convert.ToDecimal((take[6]).ToString()),
+                                  Container = (string)take[7],
+                                  CreateDate = (DateTime)take[8],
+                                  WindowTime = (DateTime)take[9],
+                                  OpReference = (string)take[10],
+                              }).ToList();
+            ExportToXLS<VanOrderTrace>("ExportJITInfo", "xls", returnList);
+        }
+        #endregion
+
         #endregion
 
         #region private

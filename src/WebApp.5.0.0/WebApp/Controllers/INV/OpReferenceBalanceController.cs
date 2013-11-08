@@ -15,6 +15,7 @@ using com.Sconit.Entity.SCM;
 using com.Sconit.Entity.Exception;
 using NHibernate.Type;
 using NHibernate;
+using com.Sconit.Entity.MD;
 
 namespace com.Sconit.Web.Controllers.INV
 {
@@ -65,6 +66,9 @@ namespace com.Sconit.Web.Controllers.INV
             {
                 foreach (var opReferenceBalance in gridModel.Data)
                 {
+                    Item item = this.genericMgr.FindById<Item>(opReferenceBalance.Item);
+                    opReferenceBalance.ReferenceItemCode = item.ReferenceCode;
+                    opReferenceBalance.ItemDescription = item.Description;
                     //User createUser = base.genericMgr.FindById<User>(opReferenceBalance.CreateUserId);
                     //opReferenceBalance.CreateUserName = createUser.FirstName + createUser.LastName;
                 }
@@ -72,91 +76,84 @@ namespace com.Sconit.Web.Controllers.INV
             return PartialView(gridModel);
         }
 
-        //public void ExportXLS(OpReferenceBalanceSearchModel searchModel)
-        //{
-        //    string sql = @"select lt.TransType,lt.EffDate,lt.OrderNo,lt.IpNo,lt.RecNo,lt.PartyFrom,lt.PartyTo,lt.LocFrom,lt.LocTo,lt.Item,lt.IOType,lt.HuId,lt.LotNo,lt.Qty,(a.FirstName+a.LastName) as createUserName from VIEW_LocTrans as lt inner join ACC_User as a on lt.CreateUser=a.Id   where 1=1 ";
-        //    IList<object> param = new List<object>();
-        //    if (!string.IsNullOrEmpty(searchModel.CreateUserName))
-        //    {
-        //        sql += "and  exists (select 1 from User as u where u.Id=lt.CreateUser and (u.FirstName+u.LastName) like ? )";
-        //        param.Add(searchModel.CreateUserName + "%");
-        //    }
-        //    if (!string.IsNullOrWhiteSpace(searchModel.PartyFrom))
-        //    {
-        //        sql += " and  lt.PartyFrom=?";
-        //        param.Add(searchModel.PartyFrom);
-        //    }
-        //    if (!string.IsNullOrWhiteSpace(searchModel.PartyTo))
-        //    {
-        //        sql += " and  lt.PartyTo = ?";
-        //        param.Add(searchModel.PartyTo);
-        //    }
-        //    if (!string.IsNullOrWhiteSpace(searchModel.LocationFrom))
-        //    {
-        //        sql += " and  lt.LocFrom = ?";
-        //        param.Add(searchModel.LocationFrom);
-        //    } if (!string.IsNullOrWhiteSpace(searchModel.LocationTo))
-        //    {
-        //        sql += " and  lt.LocTo = ?";
-        //        param.Add(searchModel.LocationTo);
-        //    }
-        //    if (!string.IsNullOrWhiteSpace(searchModel.Item))
-        //    {
-        //        sql += " and  lt.Item = ?";
-        //        param.Add(searchModel.Item);
-        //    }
-        //    if (!string.IsNullOrWhiteSpace(searchModel.OrderNo))
-        //    {
-        //        sql += " and  lt.OrderNo = ?";
-        //        param.Add(searchModel.OrderNo);
-        //    }
-        //    if (!string.IsNullOrWhiteSpace(searchModel.TransactionType))
-        //    {
-        //        sql += " and  lt.TransType = ?";
-        //        param.Add(searchModel.TransactionType);
-        //    }
-        //    if (searchModel.StartDate != null & searchModel.EndDate != null)
-        //    {
-        //        sql += " and  lt.CreateDate between ? and  ?";
-        //        param.Add(searchModel.StartDate);
-        //        param.Add(searchModel.EndDate);
-        //    }
-        //    else if (searchModel.StartDate != null & searchModel.EndDate == null)
-        //    {
-        //        sql += " and  lt.CreateDate >=? ";
-        //        param.Add(searchModel.StartDate);
-        //    }
-        //    else if (searchModel.StartDate == null & searchModel.EndDate != null)
-        //    {
-        //        sql += " and  lt.CreateDate <=?";
-        //        param.Add(searchModel.EndDate);
-        //    }
+        public void ExportXLS(OpReferenceBalanceSearchModel searchModel)
+        {
+            string sql = @" select top 65530 op.Item,i.RefCode,i.Desc1,op.OpRef,op.Qty,op.CreateDate,op.CreateUserNm,op.LastModifyDate,op.LastModifyUserNm from SCM_OpRefBalance  as op  with(nolock) 
+ inner join MD_Item  as i with(nolock) on op.Item=i.Code  where 1=1 ";
+            IList<object> param = new List<object>();
 
-        //    sql += " order by lt.Id desc";
-        //    IList<object[]> searchList = this.genericMgr.FindAllWithNativeSql<object[]>(sql, param.ToArray());
-        //    //lt.TransType,lt.EffDate,lt.OrderNo,lt.IpNo,lt.RecNo,lt.PartyFrom,lt.PartyTo,lt.LocFrom,lt.LocTo,
-        //    //lt.Item,lt.IOType,lt.HuId,lt.LotNo,lt.Qty,(a.FirstName+a.LastName) as createUserName
-        //    IList<OpReferenceBalance> exportList = (from tak in searchList
-        //                                            select new OpReferenceBalance
-        //                                   {
-        //                                       TransactionTypeDescription = systemMgr.GetCodeDetailDescription(CodeMaster.CodeMaster.TransactionType, Convert.ToInt32(((object)tak[0]).ToString())),
-        //                                       EffectiveDate = (DateTime)tak[1],
-        //                                       OrderNo = (string)tak[2],
-        //                                       IpNo = (string)tak[3],
-        //                                       ReceiptNo = (string)tak[4],
-        //                                       PartyFrom = (string)tak[5],
-        //                                       PartyTo = (string)tak[6],
-        //                                       LocationFrom = (string)tak[7],
-        //                                       LocationTo = (string)tak[8],
-        //                                       Item = (string)tak[9],
-        //                                       IOTypeDescription = systemMgr.GetCodeDetailDescription(CodeMaster.CodeMaster.TransactionIOType, Convert.ToInt32(((object)tak[10]).ToString())),
-        //                                       HuId = (string)tak[11],
-        //                                       LotNo = (string)tak[12],
-        //                                       Qty = (decimal)tak[13],
-        //                                       CreateUserName = (string)tak[14],
-        //                                   }).ToList();
-        //    ExportToXLS<OpReferenceBalance>("ExportList", "xls", exportList);
-        //}
+            if (!string.IsNullOrWhiteSpace(searchModel.Item))
+            {
+                sql += " and  op.Item=?";
+                param.Add(searchModel.Item);
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.OpReference))
+            {
+                sql += " and  op.OpReference=?";
+                param.Add(searchModel.OpReference);
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.CreateUserName))
+            {
+                sql += " and  op.CreateUserName=?";
+                param.Add(searchModel.CreateUserName);
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.LastModifyUserName))
+            {
+                sql += " and  op.LastModifyUserName=?";
+                param.Add(searchModel.LastModifyUserName);
+            }
+            if (searchModel.CreateStartDate != null & searchModel.CreateEndDate != null)
+            {
+                sql += " and  op.CreateDate between ? and  ?";
+                param.Add(searchModel.CreateStartDate);
+                param.Add(searchModel.CreateEndDate);
+            }
+            else if (searchModel.CreateStartDate != null & searchModel.CreateEndDate == null)
+            {
+                sql += " and  op.CreateDate >=? ";
+                param.Add(searchModel.CreateStartDate);
+            }
+            else if (searchModel.CreateStartDate == null & searchModel.CreateEndDate != null)
+            {
+                sql += " and  op.CreateDate <=?";
+                param.Add(searchModel.CreateEndDate);
+            }
+
+            if (searchModel.ModifyStartDate != null & searchModel.ModifyEndDate != null)
+            {
+                sql += " and  op.LastModifyDate between ? and  ?";
+                param.Add(searchModel.ModifyStartDate);
+                param.Add(searchModel.ModifyEndDate);
+            }
+            else if (searchModel.ModifyStartDate != null & searchModel.ModifyEndDate == null)
+            {
+                sql += " and  op.LastModifyDate >=? ";
+                param.Add(searchModel.ModifyStartDate);
+            }
+            else if (searchModel.ModifyStartDate == null & searchModel.ModifyEndDate != null)
+            {
+                sql += " and  op.LastModifyDate <=?";
+                param.Add(searchModel.ModifyEndDate);
+            }
+
+            sql += " order by op.CreateDate desc";
+            IList<object[]> searchList = this.genericMgr.FindAllWithNativeSql<object[]>(sql, param.ToArray());
+            //op.Item,i.RefCode,i.Desc1,op.OpRef,op.Qty,op.CreateDate,op.CreateUserNm,op.LastModifyDate,op.LastModifyUserNm 
+            IList<OpReferenceBalance> exportList = (from tak in searchList
+                                                    select new OpReferenceBalance
+                                           {
+                                               Item = (string)tak[0],
+                                               ReferenceItemCode = (string)tak[1],
+                                               ItemDescription = (string)tak[2],
+                                               OpReference = (string)tak[3],
+                                               Qty = (decimal)tak[4],
+                                               CreateDate = (DateTime)tak[5],
+                                               CreateUserName = (string)tak[6],
+                                               LastModifyDate = (DateTime)tak[7],
+                                               LastModifyUserName = (string)tak[8],
+                                           }).ToList();
+            ExportToXLS<OpReferenceBalance>("ExporOpReferenceBalancetList", "xls", exportList);
+        }
 
 
         #endregion

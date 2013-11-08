@@ -33,13 +33,20 @@
          @Html.Hidden("isFromList", true)
             <button type="submit" id="btnSearch">
                 @Resources.Global.Button_Search</button>
+            <button type="button" id="btnExport" onclick="ExportClick()">
+                @Resources.Global.Button_SearchExport</button>
                  @Html.Button(Resources.Global.Button_New, "Url_ProcurementFlow_New", new Dictionary<string, string>()
-	{
-	    {"type", "button"},
-	    {"id", "btnNew"},
-        {"onclick","location.href='"+Url.Content("~/Supplier/New/") +"'"}
-	})
+	            {
+	                {"type", "button"},
+	                {"id", "btnNew"},
+                    {"onclick","location.href='"+Url.Content("~/Supplier/New/") +"'"}
+	            })
         </div>
-
     }
 </fieldset>
+<script type="text/javascript">
+    function ExportClick() {
+        location.href = '/Supplier/ExportSupplierXLS/?Code=' + $('#Code').val() + '&Name=' + $('#Name').val() + '&ShortCode=' + $('#ShortCode').val();
+    }
+</script>
+

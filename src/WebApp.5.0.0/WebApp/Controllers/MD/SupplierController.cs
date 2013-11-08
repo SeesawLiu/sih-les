@@ -220,6 +220,28 @@ namespace com.Sconit.Web.Controllers.MD
             searchStatementModel.Parameters = param.ToArray<object>();
             return searchStatementModel;
         }
+
+        #region 导出
+        public void ExportSupplierXLS(PartySearchModel searchModel)
+        {
+            string hql = " select u from Supplier  as u where 1=1";
+            if (!string.IsNullOrWhiteSpace(searchModel.Code))
+            {
+                hql += string.Format(" and u.ReferenceCode like '{0}%' ", searchModel.Code);
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.ShortCode))
+            {
+                hql += string.Format(" and u.ShortCode like '{0}%' ", searchModel.ShortCode);
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.Name))
+            {
+                hql += string.Format(" and u.Name like '{0}%' ", searchModel.Name);
+            }
+            hql += " order by u.CreateDate asc ";
+            IList<Supplier> exportSupplierList = this.genericMgr.FindAll<Supplier>(hql);
+            ExportToXLS<Supplier>("ExportSupplierXLS", "xls", exportSupplierList);
+        }
+        #endregion
         #endregion
 
         #region 开票地址

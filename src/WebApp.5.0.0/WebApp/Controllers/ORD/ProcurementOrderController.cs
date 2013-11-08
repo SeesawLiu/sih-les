@@ -1331,7 +1331,14 @@
             IList<object> data = new List<object>();
             data.Add(printOrderMstr);
             data.Add(printOrderMstr.OrderDetails);
-            if (orderMaster.Type == Sconit.CodeMaster.OrderType.Transfer && orderMaster.OrderStrategy == Sconit.CodeMaster.FlowStrategy.Manual)
+            if (orderMaster.Type == Sconit.CodeMaster.OrderType.Transfer &&
+                (orderMaster.OrderStrategy == Sconit.CodeMaster.FlowStrategy.NA ||
+                orderMaster.OrderStrategy == Sconit.CodeMaster.FlowStrategy.Manual ||
+                orderMaster.OrderStrategy == Sconit.CodeMaster.FlowStrategy.TRIAL ||
+                orderMaster.OrderStrategy == Sconit.CodeMaster.FlowStrategy.SPARTPART ||
+            orderMaster.OrderStrategy == Sconit.CodeMaster.FlowStrategy.REPAIR ||
+            orderMaster.OrderStrategy == Sconit.CodeMaster.FlowStrategy.CKD ||
+            orderMaster.OrderStrategy == Sconit.CodeMaster.FlowStrategy.Semi))
             {
                 orderTemplate = "ORD_Transfer.xls";
             }

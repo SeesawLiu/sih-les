@@ -42,6 +42,19 @@ namespace com.Sconit.Entity.LOG
         [Display(Name = "VanOrderTrace_Priority", ResourceType = typeof(Resources.LOG.VanOrderTrace))]
         public string OrderPriorityDescription { get; set; }
 
+        [Export(ExportName = "ExportJITInfo", ExportSeq = 50)]
+        [Display(Name = "OrderMaster_TraceCode", ResourceType = typeof(Resources.ORD.OrderMaster))]
+        public string TraceCode { get; set; }
+
+        [Export(ExportName = "ExportJITInfo", ExportSeq = 60)]
+        [Display(Name = "VanOrderBomTrace_OrderQty", ResourceType = typeof(Resources.LOG.VanOrderBomTrace))]
+        public Decimal OrderQty { get; set; }
+
+
+        [Export(ExportName = "ExportJITInfo", ExportSeq = 80)]
+        [Display(Name = "Item_Container", ResourceType = typeof(Resources.MD.Item))]
+        public string Container { get; set; }
+
         #endregion
     }
 }

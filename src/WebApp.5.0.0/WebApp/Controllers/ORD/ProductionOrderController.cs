@@ -907,22 +907,27 @@ namespace com.Sconit.Web.Controllers.ORD
 
             if (!string.IsNullOrWhiteSpace(Item))
             {
-                selectOrderDetSql.Append(" and od.Item = ?");
+                selectOrderDetSql.Append(" and od.Item = ? ");
                 selectOrderDetParam.Add(Item);
             }
             else if (!string.IsNullOrWhiteSpace(LocationTo))
             {
-                selectOrderDetSql.Append(" and od.LocTo = ?");
+                selectOrderDetSql.Append(" and od.LocTo = ? ");
                 selectOrderDetParam.Add(LocationTo);
             }
 
             if (!string.IsNullOrWhiteSpace(LocationFrom))
             {
-                selectOrderDetSql.Append(" and od.LocFrom = ?");
+                selectOrderDetSql.Append(" and od.LocFrom = ? ");
                 selectOrderDetParam.Add(LocationFrom);
             }
+            if (!string.IsNullOrWhiteSpace(DetailOrderNo))
+            {
+                selectOrderDetSql.Append(" and od.OrderNo = ? ");
+                selectOrderDetParam.Add(DetailOrderNo);
+            }
 
-            selectOrderDetSql.Append("order by od.OrderNo desc ");
+            selectOrderDetSql.Append(" order by od.OrderNo desc ");
 
             IList<OrderDetail> orderDetailList = base.genericMgr.FindEntityWithNativeSql<OrderDetail>(selectOrderDetSql.ToString(), selectOrderDetParam.ToArray());
             return PartialView(new GridModel(orderDetailList));

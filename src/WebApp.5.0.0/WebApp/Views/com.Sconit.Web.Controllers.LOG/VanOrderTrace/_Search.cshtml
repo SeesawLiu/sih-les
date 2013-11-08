@@ -81,7 +81,15 @@
             @Html.Hidden("isFromList", true)
             <button type="submit" id="btnSearch">
                 @Resources.Global.Button_Search</button>
+             <button type="button" id="btnExport" onclick="ExportClick()">
+                @Resources.Global.Button_SearchExport</button>
         </div>
 
     }
 </fieldset>
+<script type="text/javascript">
+    function ExportClick() {
+        location.href = '/VanOrderTrace/ExportJITInfo/?OrderNo=' + $('#OrderNo').val() + '&Flow=' + $('#Flow').val() + '&Item=' + $('#Item').val()
+        + '&OpReference=' + $('#OpReference').val() + '&CreateDateFrom=' + $('#CreateDateFrom').val() + '&CreateDateTo=' + $('#CreateDateTo').val();
+    }
+</script>

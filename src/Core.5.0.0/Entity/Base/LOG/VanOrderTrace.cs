@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using com.Sconit.Entity.SYS;
 
 namespace com.Sconit.Entity.LOG
 {
@@ -10,6 +11,7 @@ namespace com.Sconit.Entity.LOG
 		
 		public Int32 Id { get; set; }
 		public string UUID { get; set; }
+        [Export(ExportName = "ExportJITInfo", ExportSeq = 10)]
         [Display(Name = "VanOrderTrace_Flow", ResourceType = typeof(Resources.LOG.VanOrderTrace))]
 		public string Flow { get; set; }
         [Display(Name = "VanOrderTrace_OrderNo", ResourceType = typeof(Resources.LOG.VanOrderTrace))]
@@ -20,6 +22,7 @@ namespace com.Sconit.Entity.LOG
         public Int32? OrderDetSeq { get; set; }
         //[Display(Name = "VanOrderTrace_StartTime", ResourceType = typeof(Resources.LOG.VanOrderTrace))]
         public DateTime? StartTime { get; set; }
+        [Export(ExportName = "ExportJITInfo", ExportSeq = 100)]
         [Display(Name = "VanOrderTrace_WindowTime", ResourceType = typeof(Resources.LOG.VanOrderTrace))]
         public DateTime? WindowTime { get; set; }
 
@@ -28,22 +31,27 @@ namespace com.Sconit.Entity.LOG
         public DateTime? ReqTimeFrom { get; set; }
         public DateTime? ReqTimeTo { get; set; }
 
+        [Export(ExportName = "ExportJITInfo", ExportSeq = 20)]
         [Display(Name = "VanOrderTrace_Item", ResourceType = typeof(Resources.LOG.VanOrderTrace))]
 		public string Item { get; set; }
 
+        [Export(ExportName = "ExportJITInfo", ExportSeq = 30)]
         [Display(Name = "VanOrderTrace_RefItemCode", ResourceType = typeof(Resources.LOG.VanOrderTrace))]
         public string RefItemCode { get; set; }
 
+        [Export(ExportName = "ExportJITInfo", ExportSeq = 40)]
         [Display(Name = "VanOrderTrace_ItemDesc", ResourceType = typeof(Resources.LOG.VanOrderTrace))]
         public string ItemDesc { get; set; }
 
 		public string Uom { get; set; }
+        [Export(ExportName = "ExportJITInfo", ExportSeq = 70)]
         [Display(Name = "VanOrderTrace_UnitCount", ResourceType = typeof(Resources.LOG.VanOrderTrace))]
 		public Decimal? UnitCount { get; set; }
 
         public string ManufactureParty { get; set; }
         public string Location { get; set; }
-        
+
+        [Export(ExportName = "ExportJITInfo", ExportSeq = 65)]
         [Display(Name = "VanOrderTrace_OpReference", ResourceType = typeof(Resources.LOG.VanOrderTrace))]
 		public string OpReference { get; set; }
         [Display(Name = "VanOrderTrace_NetOrderQty", ResourceType = typeof(Resources.LOG.VanOrderTrace))]
@@ -54,6 +62,7 @@ namespace com.Sconit.Entity.LOG
 		public Decimal? GrossOrderQty { get; set; }
         [Display(Name = "VanOrderTrace_OpRefQty", ResourceType = typeof(Resources.LOG.VanOrderTrace))]
 		public Decimal? OpRefQty { get; set; }
+        [Export(ExportName = "ExportJITInfo", ExportSeq = 90)]
         [Display(Name = "VanOrderTrace_CreateDate", ResourceType = typeof(Resources.LOG.VanOrderTrace))]
 		public DateTime CreateDate { get; set; }
         

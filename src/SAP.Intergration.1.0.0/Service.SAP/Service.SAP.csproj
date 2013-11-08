@@ -310,10 +310,10 @@
       <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
       <CachedSettingsPropName>com_Sconit_Service_SAP_MI_EORD_OUT_MI_EORD_OUTService</CachedSettingsPropName>
     </WebReferenceUrl>
-    <WebReferenceUrl Include="D:\sih\10.Interface\SAP-LES\WDSL\MI_LES2SAP_POST_DELIV_DOC.wsdl">
+    <WebReferenceUrl Include="E:\MI_LES2SAP_POST_DELIV_DOC_V1.1.wsdl">
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\MI_LES2SAP_POST_DELIV_DOC\</RelPath>
-      <UpdateFromURL>D:\sih\10.Interface\SAP-LES\WDSL\MI_LES2SAP_POST_DELIV_DOC.wsdl</UpdateFromURL>
+      <UpdateFromURL>E:\MI_LES2SAP_POST_DELIV_DOC_V1.1.wsdl</UpdateFromURL>
       <ServiceLocationURL>
       </ServiceLocationURL>
       <CachedDynamicPropName>

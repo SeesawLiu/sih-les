@@ -123,6 +123,11 @@ BEGIN
 		set @Msg = @Msg + 'select * from LOG_GenKBOrder where Lvl = 1 and BatchNo = ' + CONVERT(varchar,  @BatchNo) + CHAR(10) + CHAR(13)
 	end
 	
+	if exists(select top 1 1 from LOG_SnapshotFlowDet4LeanEngine where Lvl = 2 and BatchNo = @BatchNo)
+	begin
+		set @Msg = @Msg + 'select * from LOG_SnapshotFlowDet4LeanEngine where Lvl = 2 and BatchNo = ' + CONVERT(varchar,  @BatchNo) + CHAR(10) + CHAR(13)
+	end
+	
 	if @Msg <> ''
 	begin
 		declare @EmailRecipients varchar(max)

@@ -1,7 +1,8 @@
 ﻿@{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "List";
     Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_OpReferenceBalance_Stock" });
 }
 
-
 @Html.Partial("_StockSearch")
+
+@Html.Partial("_StockSearchResult")

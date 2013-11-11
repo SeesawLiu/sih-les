@@ -80,7 +80,7 @@
                         success: function (data, textStatus) {
                             var $tGrid = $("#LocationDetailPrefGrid").data("tGrid");
                             var $itemCell = $(e.target).parent().parent();
-                            $itemCell.next().html(data.Description);
+                            $itemCell.next().next().html(data.Description);
                             $itemCell.next().html(data.ReferenceCode);
 
                             var oldData = $tGrid.dataItem($itemCell.parent());

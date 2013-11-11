@@ -82,10 +82,10 @@ namespace com.Sconit.Web.Controllers.INV
  inner join MD_Item  as i with(nolock) on op.Item=i.Code  where 1=1 ";
             IList<object> param = new List<object>();
 
-            if (!string.IsNullOrWhiteSpace(searchModel.Item))
+            if (!string.IsNullOrWhiteSpace(searchModel.ItemCode))
             {
                 sql += " and  op.Item=?";
-                param.Add(searchModel.Item);
+                param.Add(searchModel.ItemCode);
             }
             if (!string.IsNullOrWhiteSpace(searchModel.OpReference))
             {
@@ -208,13 +208,133 @@ namespace com.Sconit.Web.Controllers.INV
         }
         #endregion
 
-        #region 盘点导入
+        #region 盘点
 
         [SconitAuthorize(Permissions = "Url_OpReferenceBalance_Stock")]
         public ActionResult Stock()
         {
             return View();
         }
+
+        [SconitAuthorize(Permissions = "Url_LocationDetailPref_View")]
+        [GridAction]
+        public ActionResult StockList(GridCommand command, OpReferenceBalanceSearchModel searchModel)
+        {
+            TempData["GridCommand"] = command;
+            TempData["searchModel"] = searchModel;
+            SearchCacheModel searchCacheModel = this.ProcessSearchModel(command, searchModel);
+            ViewBag.PageSize = this.ProcessPageSize(command.PageSize);
+            return View();
+        }
+
+        [SconitAuthorize(Permissions = "Url_LocationDetailPref_View")]
+        [GridAction(EnableCustomBinding = true)]
+        public ActionResult _AjaxStockList(GridCommand command, OpReferenceBalanceSearchModel searchModel)
+        {
+            SearchStatementModel searchStatementModel = this.PrepareSearchStatement(command, searchModel);
+            GridModel<OpReferenceBalance> gridModel = GetAjaxPageData<OpReferenceBalance>(searchStatementModel, command);
+            if (gridModel.Data != null)
+            {
+                foreach (var opReferenceBalance in gridModel.Data)
+                {
+                    Item item = this.genericMgr.FindById<Item>(opReferenceBalance.Item);
+                    opReferenceBalance.ReferenceItemCode = item.ReferenceCode;
+                    opReferenceBalance.ItemDescription = item.Description;
+                }
+            }
+            return PartialView(gridModel);
+        }
+
+
+        [GridAction]
+        [SconitAuthorize(Permissions = "Url_LocationDetailPref_View")]
+        public ActionResult _Insert(OpReferenceBalance opReferenceBalance)
+        {
+            if (CheckOpReferenceBalance(opReferenceBalance))
+            {
+                this.genericMgr.Create(opReferenceBalance);
+                SaveSuccessMessage("添加成功。");
+            }
+            GridCommand command = (GridCommand)TempData["GridCommand"];
+            OpReferenceBalanceSearchModel searchModel = (OpReferenceBalanceSearchModel)TempData["searchModel"];
+            TempData["GridCommand"] = command;
+            TempData["searchModel"] = searchModel;
+            SearchStatementModel searchStatementModel = this.PrepareSearchStatement(command, searchModel);
+            GridModel<OpReferenceBalance> gridModel = GetAjaxPageData<OpReferenceBalance>(searchStatementModel, command);
+            if (gridModel.Data != null)
+            {
+                foreach (var opref in gridModel.Data)
+                {
+                    Item item = this.genericMgr.FindById<Item>(opref.Item);
+                    opref.ReferenceItemCode = item.ReferenceCode;
+                    opref.ItemDescription = item.Description;
+                }
+            }
+            return PartialView(gridModel);
+        }
+
+        [GridAction]
+        [SconitAuthorize(Permissions = "Url_LocationDetailPref_View")]
+        public ActionResult _Update(OpReferenceBalance opReferenceBalance, string id)
+        {
+            if (CheckOpReferenceBalance(opReferenceBalance))
+            {
+                OpReferenceBalance upOpReferenceBalance = base.genericMgr.FindById<OpReferenceBalance>(Convert.ToInt32(id));
+                upOpReferenceBalance.Item = opReferenceBalance.Item;
+                upOpReferenceBalance.OpReference = opReferenceBalance.OpReference;
+                upOpReferenceBalance.Qty = opReferenceBalance.Qty;
+                this.genericMgr.Update(upOpReferenceBalance);
+                SaveSuccessMessage("修改成功。");
+            }
+            GridCommand command = (GridCommand)TempData["GridCommand"];
+            OpReferenceBalanceSearchModel searchModel = (OpReferenceBalanceSearchModel)TempData["searchModel"];
+            TempData["GridCommand"] = command;
+            TempData["searchModel"] = searchModel;
+            SearchStatementModel searchStatementModel = this.PrepareSearchStatement(command, searchModel);
+            GridModel<OpReferenceBalance> gridModel = GetAjaxPageData<OpReferenceBalance>(searchStatementModel, command);
+            if (gridModel.Data != null)
+            {
+                foreach (var opref in gridModel.Data)
+                {
+                    Item item = this.genericMgr.FindById<Item>(opref.Item);
+                    opref.ReferenceItemCode = item.ReferenceCode;
+                    opref.ItemDescription = item.Description;
+                }
+            }
+            return PartialView(gridModel);
+        }
+
+        [GridAction]
+        [SconitAuthorize(Permissions = "Url_LocationDetailPref_View")]
+        public ActionResult _Delete(string Id)
+        {
+            if (string.IsNullOrEmpty(Id))
+            {
+                return HttpNotFound();
+            }
+            else
+            {
+                base.genericMgr.DeleteById<OpReferenceBalance>(Convert.ToInt32(Id));
+                SaveSuccessMessage("删除成功。");
+            }
+            GridCommand command = (GridCommand)TempData["GridCommand"];
+            OpReferenceBalanceSearchModel searchModel = (OpReferenceBalanceSearchModel)TempData["searchModel"];
+            TempData["GridCommand"] = command;
+            TempData["searchModel"] = searchModel;
+            SearchStatementModel searchStatementModel = this.PrepareSearchStatement(command, searchModel);
+            GridModel<OpReferenceBalance> gridModel = GetAjaxPageData<OpReferenceBalance>(searchStatementModel, command);
+            if (gridModel.Data != null)
+            {
+                foreach (var opref in gridModel.Data)
+                {
+                    Item item = this.genericMgr.FindById<Item>(opref.Item);
+                    opref.ReferenceItemCode = item.ReferenceCode;
+                    opref.ItemDescription = item.Description;
+                }
+            }
+            return PartialView(gridModel);
+        }
+
 
         [SconitAuthorize(Permissions = "Url_OpReferenceBalance_Stock")]
         public ActionResult ImportStockXls(IEnumerable<HttpPostedFileBase> attachments)
@@ -240,6 +360,33 @@ namespace com.Sconit.Web.Controllers.INV
             return Content(string.Empty);
         }
 
+
+        private bool CheckOpReferenceBalance(OpReferenceBalance opReferenceBalance)
+        {
+            bool hasError = false;
+            if (string.IsNullOrWhiteSpace(opReferenceBalance.Item))
+            {
+                hasError = true;
+                SaveErrorMessage("物料编号不能为空。");
+            }
+            if (string.IsNullOrWhiteSpace(opReferenceBalance.OpReference))
+            {
+                hasError = true;
+                SaveErrorMessage("工位不能为空。");
+            }
+            if (opReferenceBalance.Qty < 0)
+            {
+                hasError = true;
+                SaveErrorMessage("库存数不能小于0。");
+            }
+            if (this.genericMgr.FindAllWithNativeSql<int>(" select isnull(count(*),0) as counts from SCM_OpRefBalance where Item=? and OpRef=? and Id <>? ", new object[] { opReferenceBalance.Item, opReferenceBalance.OpReference, opReferenceBalance.Id }, new IType[] { NHibernate.NHibernateUtil.String, NHibernate.NHibernateUtil.String, NHibernate.NHibernateUtil.Int32 })[0] > 0)
+            {
+                hasError = true;
+                SaveErrorMessage("物料编号+工位已经维护，请确认！");
+            }
+            return !hasError;
+        }
+
         #endregion
 
 
@@ -249,7 +396,7 @@ namespace com.Sconit.Web.Controllers.INV
             string whereStatement = " where 1=1 ";
 
             IList<object> param = new List<object>();
-            HqlStatementHelper.AddEqStatement("Item", searchModel.Item, "l", ref whereStatement, param);
+            HqlStatementHelper.AddEqStatement("Item", searchModel.ItemCode, "l", ref whereStatement, param);
             HqlStatementHelper.AddEqStatement("OpReference", searchModel.OpReference, "l", ref whereStatement, param);
             HqlStatementHelper.AddEqStatement("CreateUserName", searchModel.CreateUserName, "l", ref whereStatement, param);
             HqlStatementHelper.AddEqStatement("LastModifyUserName", searchModel.LastModifyUserName, "l", ref whereStatement, param);

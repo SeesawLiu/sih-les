@@ -218,8 +218,11 @@ BEGIN
 			exec USP_Busi_SubtractWorkingDate @WindowTime, @EMLeadTime, null, @PartyTo, @EMOrderTime output
 			
 			--根据下次窗口时间计算下次紧急发单时间，如果下次紧急发单时间小于当前时间重新查找下次窗口开始时间和紧急发单时间
-			if (@EMOrderTime < @LERunTime)
+			declare @LoopCount int = 0
+			while (@EMOrderTime < @LERunTime and @LoopCount < 99)
 			begin  --紧急发单时间小于当前时间重新查找下次窗口开始时间和紧急发单时间
+				set @LoopCount = @LoopCount + 1 --控制循环不要超过100次
+				
 				set @Msg = N'根据窗口时间' + + CONVERT(varchar, @WindowTime, 120) + + N'计算的紧急发单时间' + CONVERT(varchar, @EMOrderTime, 120) + N'小于当前时间，重新计算窗口时间'
 				insert into #temp_LOG_SnapshotFlowDet4LeanEngine(Flow, Lvl, ErrorId, Msg) values(@Flow, 1, 11, @Msg)
 				

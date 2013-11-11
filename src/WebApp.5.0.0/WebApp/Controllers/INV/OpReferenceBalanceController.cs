@@ -89,17 +89,17 @@ namespace com.Sconit.Web.Controllers.INV
             }
             if (!string.IsNullOrWhiteSpace(searchModel.OpReference))
             {
-                sql += " and  op.OpReference=?";
+                sql += " and  op.OpRef=?";
                 param.Add(searchModel.OpReference);
             }
             if (!string.IsNullOrWhiteSpace(searchModel.CreateUserName))
             {
-                sql += " and  op.CreateUserName=?";
+                sql += " and  op.CreateUserNm=?";
                 param.Add(searchModel.CreateUserName);
             }
             if (!string.IsNullOrWhiteSpace(searchModel.LastModifyUserName))
             {
-                sql += " and  op.LastModifyUserName=?";
+                sql += " and  op.LastModifyUserNm=?";
                 param.Add(searchModel.LastModifyUserName);
             }
             if (searchModel.CreateStartDate != null & searchModel.CreateEndDate != null)

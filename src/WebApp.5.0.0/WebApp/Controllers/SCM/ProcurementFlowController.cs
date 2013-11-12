@@ -1037,6 +1037,38 @@ namespace com.Sconit.Web.Controllers.SCM
                             }
                         }
 
+                        string[] windowsArr = flowShiftDet.WindowTime.Split('|');
+                        foreach (var windws in windowsArr)
+                        {
+                            if (string.IsNullOrWhiteSpace(windws))
+                            {
+                                throw new BusinessException(string.Format("窗口时间{0}填写有误，正确的格式( 08:00|10:00|12:00 )", flowShiftDet.WindowTime));
+                            }
+                            if (windws.Length != 5)
+                            {
+                                throw new BusinessException(string.Format("窗口时间{0}填写有误，正确的格式( 08:00|10:00|12:00 )", flowShiftDet.WindowTime));
+                            }
+                            string[] times = windws.Split(':');
+                            int cc = 0;
+                            if (!int.TryParse(times[0], out cc))
+                            {
+                                throw new BusinessException(string.Format("窗口时间{0}填写有误，正确的格式( 08:00|10:00|12:00 )", flowShiftDet.WindowTime));
+                            }
+                            if (cc < 0 || cc > 23)
+                            {
+                                throw new BusinessException(string.Format("窗口时间{0}填写有误，正确的格式( 08:00|10:00|12:00 )", flowShiftDet.WindowTime));
+                            }
+                            if (!int.TryParse(times[1], out cc))
+                            {
+                                throw new BusinessException(string.Format("窗口时间{0}填写有误，正确的格式( 08:00|10:00|12:00 )", flowShiftDet.WindowTime));
+                            }
+                            if (cc < 0 || cc > 59)
+                            {
+                                throw new BusinessException(string.Format("窗口时间{0}填写有误，正确的格式( 08:00|10:00|12:00 )", flowShiftDet.WindowTime));
+                            }
+
+                        }
+
                         inserted.Add(flowShiftDet);
                     }
                 }
@@ -1077,11 +1109,41 @@ namespace com.Sconit.Web.Controllers.SCM
                                 throw new BusinessException(Resources.PRD.ShiftDetail.ShiftDetail_SameShift);
                             }
                         }
+                        string[] windowsArr = flowShiftDet.WindowTime.Split('|');
+                        foreach (var windws in windowsArr)
+                        {
+                            if (string.IsNullOrWhiteSpace(windws))
+                            {
+                                throw new BusinessException(string.Format("窗口时间{0}填写有误，正确的格式( 08:00|10:00|12:00 )", flowShiftDet.WindowTime));
+                            }
+                            if (windws.Length != 5)
+                            {
+                                throw new BusinessException(string.Format("窗口时间{0}填写有误，正确的格式( 08:00|10:00|12:00 )", flowShiftDet.WindowTime));
+                            }
+                            string[] times = windws.Split(':');
+                            int cc = 0;
+                            if (!int.TryParse(times[0], out cc))
+                            {
+                                throw new BusinessException(string.Format("窗口时间{0}填写有误，正确的格式( 08:00|10:00|12:00 )", flowShiftDet.WindowTime));
+                            }
+                            if (cc < 0 || cc > 23)
+                            {
+                                throw new BusinessException(string.Format("窗口时间{0}填写有误，正确的格式( 08:00|10:00|12:00 )", flowShiftDet.WindowTime));
+                            }
+                            if (!int.TryParse(times[1], out cc))
+                            {
+                                throw new BusinessException(string.Format("窗口时间{0}填写有误，正确的格式( 08:00|10:00|12:00 )", flowShiftDet.WindowTime));
+                            }
+                            if (cc < 0 || cc > 59)
+                            {
+                                throw new BusinessException(string.Format("窗口时间{0}填写有误，正确的格式( 08:00|10:00|12:00 )", flowShiftDet.WindowTime));
+                            }
+                        }
                         updated.Add(flowShiftDet);
                     }
                 }
 
-                flowMgr.UpdateFlowShiftDetails(flow, inserted, updated, deleted);
+                flowMgr.UpdateFlowShiftDetails(flow.Trim(), inserted, updated, deleted);
 
                 object obj = new { };
                 SaveSuccessMessage(Resources.SCM.FlowShiftDetail.FlowShiftDetail_Save);

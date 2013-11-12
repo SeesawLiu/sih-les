@@ -90,7 +90,7 @@ namespace com.Sconit.Web.Controllers.LOG
           
             if (!string.IsNullOrWhiteSpace(searchModel.OpReference))
             {
-                selectSql += string.Format(" and vt.OpReference='{0}' ", searchModel.OpReference);
+                selectSql += string.Format(" and vt.OpRef='{0}' ", searchModel.OpReference);
             }
             if (searchModel.CreateDateFrom!=null)
             {

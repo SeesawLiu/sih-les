@@ -1,0 +1,97 @@
+﻿@model IEnumerable<com.Sconit.Entity.SCM.OpReferenceBalance>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("OpReferenceBalanceGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .ToolBar(commands =>
+        {
+            commands.Insert();
+        })
+        .Columns(columns =>
+        {
+           
+            columns.Bound(o => o.Item).EditorTemplateName("ItemGridForeignKey").Width(200);
+            columns.Bound(o => o.ReferenceItemCode).ReadOnly();
+            columns.Bound(o => o.ItemDescription).ReadOnly();
+            columns.Bound(o => o.OpReference);
+            columns.Bound(o => o.Qty);
+            columns.Bound(o => o.CreateUserName).ReadOnly();
+            columns.Bound(o => o.CreateDate).ReadOnly();
+            columns.Bound(o => o.LastModifyUserName).ReadOnly();
+            columns.Bound(o => o.LastModifyDate).ReadOnly();
+            columns.Command(commands =>
+            {
+                commands.Edit();
+                commands.Delete();
+            });
+        })
+
+        .Scrollable(c => c.Enabled(false))
+        .EnableCustomBinding(true)
+                .DataBinding(dataBinding => dataBinding.Ajax()
+                        .Select("_AjaxStockList", "OpReferenceBalance")
+                        .Insert("_Insert", "OpReferenceBalance")
+                        .Update("_Update", "OpReferenceBalance")
+                        .Delete("_Delete", "OpReferenceBalance"))
+        .ClientEvents(events => events.OnDataBinding("OpReferenceBalanceGrid_OnDataBinding").OnComplete("TelerikGridView_OnComplete"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+            settings.PageSize(ViewBag.PageSize);
+        })
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+    )
+     <script type="text/javascript">
+         function OpReferenceBalanceGrid_OnDataBinding(e) {
+             e.data = {
+                 ItemCode: $('#ItemCode').val(),
+                 OpReference: $('#OpReference').val(),
+                 ModifyStartDate: $('#ModifyStartDate').val(),
+                 ModifyEndDate: $('#ModifyEndDate').val(),
+                 CreateStartDate: $('#CreateStartDate').val(),
+                 CreateEndDate: $('#CreateEndDate').val(),
+                 CreateUserName: $("#CreateUserName").val(),
+                 LastModifyUserName: $('#LastModifyUserName').val()
+             };
+         }
+
+         function onItemComboBoxChange(e) {
+             if (e.value != "" && e.value != undefined) {
+                 var combobox = $(this).data("tComboBox");
+                 if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                     combobox.value("");
+                     combobox.reload();
+                 } else {
+                     var data = {
+                         "itemCode": e.value
+                     };
+                     $.ajax({
+                         type: "post",
+                         dataType: "json",
+                         url: "/SequenceMaster/_WebOrderDetail/",
+                         data: data,
+                         success: function (data, textStatus) {
+                             var $tGrid = $("#OpReferenceBalanceGrid").data("tGrid");
+                             var $itemCell = $(e.target).parent().parent();
+                             $itemCell.next().html(data.ReferenceCode);
+                             $itemCell.next().next().html(data.Description);
+
+                             var oldData = $tGrid.dataItem($itemCell.parent());
+                             if (oldData != undefined) {
+                                 oldData.ReferenceItemCode = data.ReferenceCode;
+                                 oldData.ItemDescription = data.Description;
+                             }
+                         },
+                         error: function (XMLHttpRequest, textStatus, errorThrown) {
+                             alert(errorThrown);
+                         }
+                     });
+                 }
+             }
+         }
+    </script>
+</fieldset>

@@ -2201,6 +2201,9 @@
     <Content Include="Views\com.Sconit.Web.Controllers.ORD\ProcurementOrder\CloseJITList.cshtml" />
     <Content Include="Views\com.Sconit.Web.Controllers.ORD\ProcurementOrder\_CloseJITSearch.cshtml" />
     <Content Include="Views\com.Sconit.Web.Controllers.ORD\ProcurementOrder\_CloseJITSearchResult.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.INV\OpReferenceBalance\_StockSearch.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.INV\OpReferenceBalance\_StockSearchResult.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.INV\OpReferenceBalance\StockList.cshtml" />
     <None Include="Web References\EncryptDencryptService\EncryptDencryptService.wsdl" />
     <None Include="Web References\EncryptDencryptService\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>

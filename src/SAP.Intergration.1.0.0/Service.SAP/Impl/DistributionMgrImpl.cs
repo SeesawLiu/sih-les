@@ -30,7 +30,7 @@ namespace com.Sconit.Service.SAP.Impl
             }
             LogDebugTList(alterDOs, "DistributionMgr.AlterDistributionOrder");
 
-            //CreateSiSap(alterDOs);
+            CreateSiSap(alterDOs);
             var locations = alterDOs.Select(o => o.Location).Distinct();
             if (locations.Count() > 1)
             {

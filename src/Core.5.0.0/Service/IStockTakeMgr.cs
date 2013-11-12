@@ -3,6 +3,7 @@ using com.Sconit.Entity.INV;
 using com.Sconit.Entity.MD;
 using System;
 using System.IO;
+using com.Sconit.Entity.SCM;
 
 namespace com.Sconit.Service
 {
@@ -102,6 +103,10 @@ namespace com.Sconit.Service
 
         #region 工位余量盘点导入
         void ImportOpReferenceBalanceStockXls(Stream inputStream);
+
+         void CreateOpReferenceBalance(OpReferenceBalance opReferenceBalance);
+
+         void UpdateOpReferenceBalance(OpReferenceBalance opReferenceBalance);
         #endregion
 
     }

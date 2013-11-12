@@ -1,0 +1,8 @@
+﻿@{
+    ViewBag.Title = "List";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_DistributionRequisition_Log" });
+}
+
+@Html.Partial("_LogSearch")
+
+@Html.Partial("_LogSearchResult")

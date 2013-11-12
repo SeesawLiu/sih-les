@@ -265,6 +265,7 @@
     <Compile Include="Controllers\MRP\QuotaController.cs" />
     <Compile Include="Controllers\ORD\AliquotStartTaskController.cs" />
     <Compile Include="Controllers\ORD\CabGuideController.cs" />
+    <Compile Include="Controllers\ORD\DistributionRequisitionController.cs" />
     <Compile Include="Controllers\ORD\PickResultController.cs" />
     <Compile Include="Controllers\ORD\PickTaskController.cs" />
     <Compile Include="Controllers\ORD\OrderSeqController.cs" />
@@ -2204,6 +2205,14 @@
     <Content Include="Views\com.Sconit.Web.Controllers.INV\OpReferenceBalance\_StockSearch.cshtml" />
     <Content Include="Views\com.Sconit.Web.Controllers.INV\OpReferenceBalance\_StockSearchResult.cshtml" />
     <Content Include="Views\com.Sconit.Web.Controllers.INV\OpReferenceBalance\StockList.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.ORD\DistributionRequisition\_NewSearch.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.ORD\DistributionRequisition\_NewSearchResult.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.ORD\DistributionRequisition\NewIndex.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.ORD\DistributionRequisition\NewList.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.ORD\DistributionRequisition\_LogSearch.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.ORD\DistributionRequisition\_LogSearchResult.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.ORD\DistributionRequisition\LogIndex.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.ORD\DistributionRequisition\LogList.cshtml" />
     <None Include="Web References\EncryptDencryptService\EncryptDencryptService.wsdl" />
     <None Include="Web References\EncryptDencryptService\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>

@@ -22,6 +22,7 @@
             columns.Bound(o => o.CreateDate).ReadOnly();
             columns.Bound(o => o.LastModifyUserName).ReadOnly();
             columns.Bound(o => o.LastModifyDate).ReadOnly();
+            columns.Bound(o => o.Version).Hidden();
             columns.Command(commands =>
             {
                 commands.Edit();

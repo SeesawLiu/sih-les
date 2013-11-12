@@ -252,8 +252,16 @@ namespace com.Sconit.Web.Controllers.INV
         {
             if (CheckOpReferenceBalance(opReferenceBalance))
             {
-                this.genericMgr.Create(opReferenceBalance);
-                SaveSuccessMessage("添加成功。");
+                try
+                {
+                    stockTakeMgr.CreateOpReferenceBalance(opReferenceBalance);
+                    SaveSuccessMessage("添加成功。");
+                }
+                catch (Exception e)
+                {
+                    SaveErrorMessage("添加失败。"+e.Message);
+                }
+                
             }
             GridCommand command = (GridCommand)TempData["GridCommand"];
             OpReferenceBalanceSearchModel searchModel = (OpReferenceBalanceSearchModel)TempData["searchModel"];
@@ -279,12 +287,20 @@ namespace com.Sconit.Web.Controllers.INV
         {
             if (CheckOpReferenceBalance(opReferenceBalance))
             {
-                OpReferenceBalance upOpReferenceBalance = base.genericMgr.FindById<OpReferenceBalance>(Convert.ToInt32(id));
-                upOpReferenceBalance.Item = opReferenceBalance.Item;
-                upOpReferenceBalance.OpReference = opReferenceBalance.OpReference;
-                upOpReferenceBalance.Qty = opReferenceBalance.Qty;
-                this.genericMgr.Update(upOpReferenceBalance);
-                SaveSuccessMessage("修改成功。");
+                try
+                {
+                    OpReferenceBalance upOpReferenceBalance = base.genericMgr.FindById<OpReferenceBalance>(Convert.ToInt32(id));
+                    upOpReferenceBalance.Item = opReferenceBalance.Item;
+                    upOpReferenceBalance.OpReference = opReferenceBalance.OpReference;
+                    upOpReferenceBalance.Qty = opReferenceBalance.Qty;
+                    upOpReferenceBalance.Version = opReferenceBalance.Version;
+                    stockTakeMgr.UpdateOpReferenceBalance(upOpReferenceBalance);
+                    SaveSuccessMessage("修改成功。");
+                }
+                catch (Exception e)
+                {
+                    SaveErrorMessage("修改失败。" + e.Message);
+                }
             }
             GridCommand command = (GridCommand)TempData["GridCommand"];
             OpReferenceBalanceSearchModel searchModel = (OpReferenceBalanceSearchModel)TempData["searchModel"];

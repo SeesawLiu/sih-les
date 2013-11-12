@@ -1898,6 +1898,7 @@ namespace com.Sconit.Service.Impl
         #endregion
 
         #region 工位余量盘点导入
+        [Transaction(TransactionMode.Requires)]
         public void ImportOpReferenceBalanceStockXls(Stream inputStream)
         {
             if (inputStream.Length == 0)
@@ -2027,7 +2028,7 @@ namespace com.Sconit.Service.Impl
                 {
                     try
                     {
-                        this.genericMgr.Update(op);
+                        this.UpdateOpReferenceBalance(op);
                     }
                     catch (Exception ex)
                     {
@@ -2041,7 +2042,7 @@ namespace com.Sconit.Service.Impl
                 {
                     try
                     {
-                        this.genericMgr.Create(op);
+                        this.CreateOpReferenceBalance(op);
                     }
                     catch (Exception ex)
                     {
@@ -2054,6 +2055,22 @@ namespace com.Sconit.Service.Impl
             {
                 throw businessException;
             }
+        }
+
+        [Transaction(TransactionMode.Requires)]
+        public void CreateOpReferenceBalance(OpReferenceBalance opReferenceBalance)
+        {
+            this.genericMgr.Create(opReferenceBalance);
+            this.genericMgr.FindAllWithNativeSql(@"insert into LOG_OpRefBalanceChange(Item, OpRef, Qty, [Status], [Version], CreateDate, CreateUserId, CreateUserNm)
+			values(?, ?,?, 0, 1, ?, ?, ?) ",new object[]{opReferenceBalance.Item,opReferenceBalance.OpReference,opReferenceBalance.Qty,System.DateTime.Now,opReferenceBalance.CreateUserId,opReferenceBalance.CreateUserName});
+        }
+
+        [Transaction(TransactionMode.Requires)]
+        public void UpdateOpReferenceBalance(OpReferenceBalance opReferenceBalance)
+        {
+            this.genericMgr.Update(opReferenceBalance);
+            this.genericMgr.FindAllWithNativeSql(@"insert into LOG_OpRefBalanceChange(Item, OpRef, Qty, [Status], [Version], CreateDate, CreateUserId, CreateUserNm)
+			values(?, ?,?, 1, ?, ?, ?, ?) ", new object[] { opReferenceBalance.Item, opReferenceBalance.OpReference, opReferenceBalance.Qty,opReferenceBalance.Version+1, System.DateTime.Now, opReferenceBalance.CreateUserId, opReferenceBalance.CreateUserName });
         }
         #endregion
 

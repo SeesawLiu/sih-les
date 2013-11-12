@@ -548,7 +548,7 @@ BEGIN
 		ReqQty, OrderQty, OpRef, MrpTotal, MrpTotalAdj, MrpWeight, ManufactureParty, RoundUpOpt)
 		select det.Flow, det.FlowDetId, 
 		det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.LocFrom, det.LocTo,
-		0, tbd.OrderQty, tbd.OpRef, det.MrpTotal, det.MrpTotalAdj, det.MrpWeight, tbd.ManufactureParty, det.RoundUpOpt
+		tbd.OrderQty, 0, tbd.OpRef, det.MrpTotal, det.MrpTotalAdj, det.MrpWeight, tbd.ManufactureParty, det.RoundUpOpt
 		from #tempFlowDet as det inner join #tempOrderBomDetTBD as tbd on det.Item = tbd.Item and det.LocTo = tbd.Location
 		
 		insert into #tempFlowMstr(Flow, LocTo) select distinct Flow, LocTo from #tempOrderDet

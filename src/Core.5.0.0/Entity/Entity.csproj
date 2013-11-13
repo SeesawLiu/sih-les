@@ -252,6 +252,11 @@
   <ItemGroup>
     <EmbeddedResource Include="Base\CUST\CreateOrderCode.hbm.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\LOG\DistributionRequisition.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

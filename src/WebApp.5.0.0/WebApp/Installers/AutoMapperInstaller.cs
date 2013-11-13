@@ -42,6 +42,12 @@ namespace com.Sconit.Web.Installer
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Description));
 
             Mapper.CreateMap<com.Sconit.Entity.ORD.OrderDetail, com.Sconit.Entity.LOG.SeqOrderChange>();
+            Mapper.CreateMap<com.Sconit.Entity.ORD.OrderDetail, com.Sconit.Entity.LOG.DistributionRequisition>()
+                .ForMember(d => d.OrderDetId, opt => opt.MapFrom(s => s.Id))
+                .ForMember(d => d.Flow, opt => opt.MapFrom(s => s.Flow))
+                .ForMember(d => d.FlowDescription, opt => opt.MapFrom(s => s.FlowDescription))
+                .ForMember(d => d.PartyFrom, opt => opt.MapFrom(s => s.MastPartyFrom))
+                .ForMember(d => d.PartyTo, opt => opt.MapFrom(s => s.MastPartyTo));
         }
     }
 }

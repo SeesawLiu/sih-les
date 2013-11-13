@@ -1,0 +1,56 @@
+﻿@model IEnumerable<com.Sconit.Entity.LOG.DistributionRequisition>
+<script type="text/javascript">
+    function DistributionRequisitionGrid_OnDataBinding(e) {
+        e.data = {
+            OrderNo: $('#OrderNo').val(),
+            ExtNo: $('#ExtNo').val(),
+            Item: $('#Item').val(),
+            LocFrom: $('#LocFrom').val(),
+            StartDate: $('#StartDate').val(),
+            EndDate: $('#EndDate').val()
+        };
+    }
+
+</script>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+                .Name("DistributionRequisitionGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.OrderDetId).Title("销售单ID号");
+            columns.Bound(o => o.OrderNo).Title("销售单号");
+            columns.Bound(o => o.ExternalOrderNo).Title("Sap销售单号");
+            columns.Bound(o => o.Item);
+            columns.Bound(o => o.ReferenceItemCode);
+            columns.Bound(o => o.ItemDescription);
+            columns.Bound(o => o.OrderedQty);
+            columns.Bound(o => o.Uom);
+            columns.Bound(o => o.UnitCount);
+            columns.Bound(o => o.Container);
+            columns.Bound(o => o.ContainerDescription);
+            columns.Bound(o => o.PartyFrom);
+            columns.Bound(o => o.PartyTo);
+            columns.Bound(o => o.LocationTo);
+            columns.Bound(o => o.Flow);
+            columns.Bound(o => o.FlowDescription);
+            columns.Bound(o => o.CreateDate);
+            columns.Bound(o => o.CreateUserName);
+        })
+
+        .Scrollable(c => c.Enabled(false))
+            .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxLogList", "DistributionRequisition"))
+                    .ClientEvents(events => events.OnDataBinding("DistributionRequisitionGrid_OnDataBinding").OnComplete("TelerikGridView_OnComplete"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+            settings.PageSize(ViewBag.PageSize);
+        })
+        .EnableCustomBinding(true)
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+    )
+</fieldset>

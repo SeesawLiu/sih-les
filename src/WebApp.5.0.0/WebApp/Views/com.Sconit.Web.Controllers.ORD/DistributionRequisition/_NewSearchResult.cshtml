@@ -1,0 +1,72 @@
+﻿@model IEnumerable<com.Sconit.Entity.ORD.OrderDetail>
+<script type="text/javascript">
+    function DistributionRequisitionGrid_OnDataBinding(e) {
+        e.data = {
+            OrderNo: $('#OrderNo').val(),
+            ExtNo: $('#ExtNo').val(),
+            Item: $('#Item').val(),
+            LocFrom: $('#LocFrom').val(),
+            StartDate: $('#StartDate').val(),
+            EndDate: $('#EndDate').val(),
+            IsCreate: $("#IsCreate").val()
+        };
+    }
+
+    $(function () {
+        $("#checkAll").click(function () {
+            $('input[name="checkedRecords"]').attr("checked", this.checked);
+            showButtons();
+        });
+    });
+
+    function showButtons() {
+        var $checkRecords = $("input[name='checkedRecords']");
+        $("#checkAll").attr("checked", $checkRecords.length == $("input[name='checkedRecords']:checked").length ? true : false);
+        $("#btnRequsite").attr("style", $("input[name='checkedRecords']:checked").length > 0 ? "display:inline" : "display:none");
+
+    }
+</script>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+                .Name("DistributionRequisitionGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Id)
+               .ClientTemplate("<input type='checkbox' id='checkedRecords' name='checkedRecords' value='<#= Id #>' onClick='showButtons()'   />")
+               .HeaderTemplate("<input type='checkbox' id='checkAll' name='checkAll' />")
+               .Width(36).HtmlAttributes(new { style = "text-align:center" });
+            columns.Bound(o => o.OrderNo).Title("销售单号");
+            columns.Bound(o => o.ExternalOrderNo).Title("Sap销售单号");
+            //columns.Bound(o => o.ExternalSequence).Title("Sap销售单行号");
+            columns.Bound(o => o.Item);
+            columns.Bound(o => o.ReferenceItemCode);
+            columns.Bound(o => o.ItemDescription);
+            columns.Bound(o => o.OrderedQty);
+            columns.Bound(o => o.Uom);
+            columns.Bound(o => o.UnitCount);
+            columns.Bound(o => o.Container);
+            columns.Bound(o => o.ContainerDescription);
+            columns.Bound(o => o.MastPartyFrom);
+            columns.Bound(o => o.MastPartyTo);
+            columns.Bound(o => o.LocationTo);
+            columns.Bound(o => o.Flow);
+            columns.Bound(o => o.FlowDescription);
+            columns.Bound(o => o.CreateDate);
+        })
+
+        .Scrollable(c => c.Enabled(false))
+            .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxNewList", "DistributionRequisition"))
+                    .ClientEvents(events => events.OnDataBinding("DistributionRequisitionGrid_OnDataBinding").OnComplete("TelerikGridView_OnComplete"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+            settings.PageSize(ViewBag.PageSize);
+        })
+        .EnableCustomBinding(true)
+        .Resizable(resizing => resizing.Columns(true))
+    )
+</fieldset>

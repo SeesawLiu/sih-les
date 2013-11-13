@@ -8798,6 +8798,118 @@ namespace com.Sconit.Service.Impl
         }
         #endregion
 
+        #region 销售单手工拉料
+        [Transaction(TransactionMode.Requires)]
+        public string CreateDistritutionRequsiton(string idStr, DateTime WindowTime, com.Sconit.CodeMaster.OrderPriority Priority,IList<OrderDetail> details)
+        {
+            string orderNos=string.Empty;
+            try
+            {
+                IList<OrderDetail> orderDetailList = new List<OrderDetail>();
+                if (!string.IsNullOrEmpty(idStr))
+                {
+                    string[] idArray = idStr.Split(',');
+                   
+                    orderDetailList = (from tak in details
+                                        where (from id in idArray select id).Contains(tak.Id.ToString())
+                                        select tak).ToList();
+                    if (orderDetailList != null && orderDetailList.Count > 0)
+                    { 
+                        var sumQtyDetails = (from tak in orderDetailList
+                                      group tak by new
+                                      {
+                                          tak.Item,
+                                          tak.ItemDescription,
+                                          tak.ReferenceItemCode,
+                                          tak.Uom,
+                                          tak.UnitCount,
+                                          tak.LocationFrom,
+                                          tak.LocationTo,
+                                          tak.Flow,
+                                          tak.FlowDescription,
+                                          tak.MastPartyFrom,
+                                          tak.MastPartyTo,
+                                          tak.Container,
+                                          tak.ContainerDescription,
+                                      } into result
+                                      select new OrderDetail
+                                      {
+                                          Item = result.Key.Item,
+                                          ItemDescription = result.Key.ItemDescription,
+                                          ReferenceItemCode = result.Key.ReferenceItemCode,
+                                          Uom = result.Key.Uom,
+                                          UnitCount = result.Key.UnitCount,
+                                          MinUnitCount = result.Key.UnitCount,
+                                          LocationFrom = result.Key.LocationFrom,
+                                          LocationTo = result.Key.LocationTo,
+                                          Flow = result.Key.Flow,
+                                          FlowDescription = result.Key.FlowDescription,
+                                          MastPartyFrom = result.Key.MastPartyFrom,
+                                          MastPartyTo = result.Key.MastPartyTo,
+                                          Container = result.Key.Container,
+                                          ContainerDescription = result.Key.ContainerDescription,
+                                          OrderedQty=result.Sum(r=>r.OrderedQty),
+                                      }).ToList();
+
+                        var groups = (from tak in sumQtyDetails
+                                      group tak by new
+                                      {
+                                          tak.Flow,
+                                          tak.FlowDescription,
+                                          tak.MastPartyFrom,
+                                          tak.MastPartyTo,
+                                      } into result
+                                      select new
+                                      {
+                                          Flow = result.Key.Flow,
+                                          FlowDescription = result.Key.FlowDescription,
+                                          MastPartyFrom = result.Key.MastPartyFrom,
+                                          MastPartyTo = result.Key.MastPartyTo,
+                                          Details = result.ToList()
+                                      }).ToList();
+
+                        var effectiveDate = System.DateTime.Now;
+                        
+                        foreach (var group in groups)
+                        {
+                            OrderMaster newOrder = this.TransferFlow2Order(this.genericMgr.FindById<FlowMaster>(group.Flow), null, effectiveDate, false);
+                            newOrder.IsQuick = false;
+                            newOrder.IsShipByOrder = false;
+                            newOrder.WindowTime = WindowTime;
+                            newOrder.StartTime = effectiveDate;
+                            newOrder.Priority = Priority;
+                            newOrder.OrderStrategy = com.Sconit.CodeMaster.FlowStrategy.SPARTPART;
+                            newOrder.OrderDetails = group.Details;
+                            newOrder.IsAutoRelease = true;
+                            this.CreateOrder(newOrder);
+                            orderNos += newOrder.OrderNo+"*";
+                        }
+                        IList<DistributionRequisition> distributionRequisitions = Mapper.Map<IList<OrderDetail>, IList<DistributionRequisition>>(orderDetailList);
+                        foreach (var distributionRequisition in distributionRequisitions)
+                        {
+                            distributionRequisition.Id = 0;
+                            this.genericMgr.Create(distributionRequisition);
+                        }
+                    }
+                }
+                else
+                {
+                    throw new BusinessException("拉料明细不能为空。");
+                }
+
+            }
+            catch (BusinessException ex)
+            {
+                throw ex;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return orderNos;
+        }
+        #endregion
+
         #endregion
 
         #region private methods

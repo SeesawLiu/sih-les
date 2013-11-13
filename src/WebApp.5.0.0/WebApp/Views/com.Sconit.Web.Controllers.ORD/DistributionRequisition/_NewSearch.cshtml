@@ -1,0 +1,177 @@
+﻿@using com.Sconit.Entity.SYS
+@using com.Sconit.Web.Models.SearchModels.ORD
+<fieldset>
+    @using (Html.BeginForm("NewList", "DistributionRequisition"))
+    {   
+        <div class="search">
+            <div class="search-label">
+                <label for="ReceiptMaster_ReceiptNo">
+                    销售单号
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("OrderNo", TempData["ReceiptMasterSearchModel"] != null ? ((ReceiptMasterSearchModel)TempData["ReceiptMasterSearchModel"]).OrderNo : string.Empty)
+            </div>
+           
+
+             <div class="search-label">
+                <label for="ReceiptMaster_Dock">
+                   Sap销售单号
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("ExtNo", TempData["ReceiptMasterSearchModel"] != null ? ((ReceiptMasterSearchModel)TempData["ReceiptMasterSearchModel"]).ExtNo : string.Empty)
+            </div>
+
+            <div class="search-label">
+                <label>
+                    物料代码
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+               Html.RenderAction("_ItemComboBox", "Common", new
+               {
+                   controlName = "Item",
+                   selectedValue = TempData["ReceiptMasterSearchModel"] != null ? ((ReceiptMasterSearchModel)TempData["ReceiptMasterSearchModel"]).Item : string.Empty
+               });
+                }
+            </div>
+             <div class="search-label">
+              <label>
+                库位代码
+            </label>
+            </div>
+            <div class="editor-field-2">
+                @{
+        Html.RenderAction("_LocationComboBox", "Common", new
+        {
+            controlName = "LocFrom",
+            selectedValue = TempData["ReceiptMasterSearchModel"] != null ? ((ReceiptMasterSearchModel)TempData["ReceiptMasterSearchModel"]).LocFrom : string.Empty
+
+        });
+                }
+            </div>
+
+             <div class="search-label">
+                <label for="ReceiptMaster_StartDate">
+                    @Resources.ORD.ReceiptMaster.ReceiptMaster_StartDate
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DatePicker()
+                .Format(com.Sconit.Entity.BusinessConstants.SHORT_DATE_FORMAT)
+                .Name("StartDate")
+.Value(TempData["ReceiptMasterSearchModel"] != null ? ((ReceiptMasterSearchModel)TempData["ReceiptMasterSearchModel"]).StartDate : System.DateTime.Today)
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+            </div>
+            <div class="search-label">
+                <label for="ReceiptMaster_EndDate">
+                    @Resources.ORD.ReceiptMaster.ReceiptMaster_EndDate
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DatePicker()
+                .Format(com.Sconit.Entity.BusinessConstants.SHORT_DATE_FORMAT)
+                .Name("EndDate")
+.Value(TempData["ReceiptMasterSearchModel"] != null ? ((ReceiptMasterSearchModel)TempData["ReceiptMasterSearchModel"]).EndDate : System.DateTime.Today.AddDays(1))
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+            </div>
+
+            <div class="search-label">
+                <label for="ReceiptMaster_EndDate">
+                    窗口时间
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DateTimePicker()
+                .Format(com.Sconit.Entity.BusinessConstants.LONG_DATE_FORMAT)
+            .Name("WindowTime")
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+            </div>
+             <div class="editor-label-2">
+                优先级
+            </div>
+            <div class="editor-field-2">
+                @Html.RadioButton("Priority", (int)com.Sconit.CodeMaster.OrderPriority.Normal, true)@Resources.CodeDetail.CodeDetail_OrderPriority_Normal
+                @Html.RadioButton("Priority", (int)com.Sconit.CodeMaster.OrderPriority.Urgent)@Resources.CodeDetail.CodeDetail_OrderPriority_Urgent
+            </div>
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            @Html.Hidden("IsCreate", TempData["ReceiptMasterSearchModel"] != null ? ((ReceiptMasterSearchModel)TempData["ReceiptMasterSearchModel"]).IsCreate : false)
+            <button type="submit" id="btnSearch">
+                @Resources.Global.Button_Search</button>
+                @Html.Button(Resources.Global.Button_New, "Url_DistributionRequisition_NewIndex", new Dictionary<string, string>()
+	    {
+	        {"type", "button"},
+	        {"id", "btnRequsite"},
+            {"needconfirm","true"},
+            {"style","display:none"},
+            {"onclick","onRequsite()"}
+	    })
+        </div>
+    }
+</fieldset>
+ <script type="text/javascript">
+     function onRequsite() {
+         var $checkRecords = $("input[name='checkedRecords']");
+         var idStr = "";
+         if($("#WindowTime").val()=="" || $("#WindowTime").val()==null || $("#WindowTime").val()==undefined)
+         {
+            $message.error("窗口时间不能为空。");
+            return;
+         }
+         for (var i = 0; i < $checkRecords.length; i++) {
+             if ($checkRecords[i].checked) {
+                 if (idStr == "") {
+                     idStr = $checkRecords[i].value;
+                 } else {
+                     idStr += "," + $checkRecords[i].value;
+                 }
+             }
+         }
+         var data = {
+             "idStr": idStr,
+             "WindowTime": $("#WindowTime").val(),
+            "Priority": $("input[type=radio][name=Priority]:checked").val()
+         }
+         $.ajax({
+             type: "post",
+             dataType: "json",
+             data: data,
+             url: "/DistributionRequisition/CreateOrder/",
+             cache: false,
+             success: function (data, textStatus) {
+                 DisplayJsonMessages(data);
+                 var searchData = {
+                     OrderNo: $('#OrderNo').val(),
+                     ExtNo: $('#ExtNo').val(),
+                     Item: $('#Item').val(),
+                     LocFrom: $('#LocFrom').val(),
+                     StartDate: $('#StartDate').val(),
+                     EndDate: $('#EndDate').val(),
+                     IsCreate: true
+                 };
+                 $.ajax({
+                     type: "Get",
+                     dataType: "html",
+                     data: searchData,
+                     url: "/DistributionRequisition/NewList/",
+                     cache: false,
+                     success: function (data, textStatus) {
+                             var $tGrid = $("#content");
+                             $($tGrid).html(data);
+                         }
+                 });
+             },
+             error: function (XMLHttpRequest, textStatus, errorThrown) {
+                 DisplayTextMessages(XMLHttpRequest.responseText);
+             }
+         });
+     }
+
+  
+   
+
+    </script>

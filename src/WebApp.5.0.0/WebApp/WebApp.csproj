@@ -2213,6 +2213,7 @@
     <Content Include="Views\com.Sconit.Web.Controllers.ORD\DistributionRequisition\_LogSearchResult.cshtml" />
     <Content Include="Views\com.Sconit.Web.Controllers.ORD\DistributionRequisition\LogIndex.cshtml" />
     <Content Include="Views\com.Sconit.Web.Controllers.ORD\DistributionRequisition\LogList.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.INV\OrderItemTrace\CreateBarCode.cshtml" />
     <None Include="Web References\EncryptDencryptService\EncryptDencryptService.wsdl" />
     <None Include="Web References\EncryptDencryptService\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>

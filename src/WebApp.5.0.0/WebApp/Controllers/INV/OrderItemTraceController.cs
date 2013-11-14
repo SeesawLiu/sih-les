@@ -641,5 +641,35 @@ Qty>( select isnull(COUNT(*),0)from ORD_OrderItemTraceResult as result where tra
         }
 
         #endregion
+
+        #region 关键件条码生成
+        public ActionResult CreateBarCode()
+        {
+            return View();
+        }
+
+        public JsonResult _GetItem(string itemCode)
+        {
+            if (!string.IsNullOrEmpty(itemCode))
+            {
+                Item item = base.genericMgr.FindById<Item>(itemCode);
+
+
+                return this.Json(item);
+            }
+            return null;
+        }
+
+        public JsonResult _GetSupplier(string supplierCode)
+        {
+            if (!string.IsNullOrEmpty(supplierCode))
+            {
+                Supplier supplier = base.genericMgr.FindById<Supplier>(supplierCode);
+                return this.Json(supplier);
+            }
+            return null;
+        }
+
+        #endregion
     }
 }

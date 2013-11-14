@@ -77,6 +77,29 @@ namespace com.Sconit.Web.Controllers.ORD
         [GridAction(EnableCustomBinding = true)]
         public ActionResult _AjaxNewList(GridCommand command, ReceiptMasterSearchModel searchModel)
         {
+            if (command.SortDescriptors.Count > 0)
+            {
+                if (command.SortDescriptors[0].Member == "ExternalOrderNo")
+                {
+                    command.SortDescriptors[0].Member = "ExtNo";
+                }
+                else if (command.SortDescriptors[0].Member == "OrderedQty")
+                {
+                    command.SortDescriptors[0].Member = "OrderQty";
+                }
+                else if (command.SortDescriptors[0].Member == "MastPartyFrom")
+                {
+                    command.SortDescriptors[0].Member = "PartyFrom";
+                }
+                else if (command.SortDescriptors[0].Member == "MastPartyTo")
+                {
+                    command.SortDescriptors[0].Member = "PartyTo";
+                }
+                else if (command.SortDescriptors[0].Member == "LocationTo")
+                {
+                    command.SortDescriptors[0].Member = "LocFrom";
+                }
+            }
             SqlParameter[] parameters = new SqlParameter[12];
             parameters[0] = new SqlParameter("@OrderNo", System.Data.SqlDbType.VarChar,50);
             parameters[0].Value = searchModel.OrderNo;
@@ -177,6 +200,7 @@ namespace com.Sconit.Web.Controllers.ORD
             GridModel<OrderDetail> gridModel = new GridModel<OrderDetail>();
             gridModel.Total = string.IsNullOrWhiteSpace(parameters[11].Value.ToString()) ? 0 : Convert.ToInt32(parameters[11].Value);
             gridModel.Data = returList;
+            TempData["DetailList"] = returList;
             return PartialView(gridModel);
         }
 

@@ -127,10 +127,10 @@
     <value>关键件条码</value>
   </data>
   <data name="OrderItemTraceResult_CreateDate" xml:space="preserve">
-    <value>创建时间</value>
+    <value>扫描时间</value>
   </data>
   <data name="OrderItemTraceResult_CreateUserName" xml:space="preserve">
-    <value>创建人</value>
+    <value>扫描用户</value>
   </data>
   <data name="OrderItemTraceResult_IsUpdateBarCode" xml:space="preserve">
     <value>替换条码</value>
@@ -167,6 +167,9 @@
   </data>
   <data name="OrderItemTraceResult_Qty" xml:space="preserve">
     <value>数量</value>
+  </data>
+  <data name="OrderItemTraceResult_ReferenceItemCode" xml:space="preserve">
+    <value>旧图号</value>
   </data>
   <data name="OrderItemTraceResult_Supplier" xml:space="preserve">
     <value>供应商</value>

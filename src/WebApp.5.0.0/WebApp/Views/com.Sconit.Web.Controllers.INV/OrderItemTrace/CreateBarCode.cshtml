@@ -1,0 +1,156 @@
+﻿@using com.Sconit.Web.Models.SearchModels.ORD
+
+<fieldset>
+     
+        <div class="search">
+            
+            <div class="search-label">
+                <label for="OrderItemTraceResult_Item">
+                    @Resources.ORD.OrderItemTraceResult.OrderItemTraceResult_Item
+                </label>
+            </div>
+            <div class="search-field">
+               @{
+               Html.RenderAction("_ItemComboBox", "Common", new
+               {
+                   controlName = "Item",
+                   coupled = true
+               });
+                }
+            </div>
+            <div class="search-label">
+                <label for="OrderItemTraceResult_BarCode">
+                    物料短代码
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("ItemShort", string.Empty, new { disabled = true })
+            </div>
+            <div class="search-label">
+                <label for="OrderItemTraceResult_Item">
+                    @Resources.ORD.OrderItemTraceResult.OrderItemTraceResult_Supplier
+                </label>
+            </div>
+            <div class="search-field">
+               @{
+        Html.RenderAction("_SupplierComboBox", "Common", new
+               {
+                   controlName = "Supplier",
+                   isChange = true
+
+               });
+                }
+            </div>
+            <div class="search-label">
+                <label for="OrderItemTrace_OrderNo">
+                    供应商短代码
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("SupplierShort", string.Empty, new { disabled = true })
+            </div>
+            <div class="search-label">
+                <label for="OrderItemTrace_OpReference">
+                  流水号
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("SequenceNo", string.Empty)
+            </div>
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+             <button type="button" id="btnExport" onclick="CreateBarcodeClick()">
+                生成条码</button>
+        </div>
+          <div class="search">
+            <div class="search-label">
+                <label for="">
+                  新条码
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("NewBarcode", string.Empty, new { disabled = true })
+            </div>
+        </div>
+    <script type="text/javascript">
+        function CreateBarcodeClick()
+        {
+            if ($("#ItemShort").val() == "") {
+                $message.error("请输入物料号。");
+                return;
+            }
+            if ($("#SupplierShort").val() == "") {
+                $message.error("请输入供应商。");
+                return;
+            }
+            if ($("#SequenceNo").val() == "") {
+                $message.error("请输入流水号。");
+                return;
+            }
+
+            if ($("#SequenceNo").val().length != 8) {
+                $message.error("流水号的长度不对。");
+                return;
+            }
+
+
+            $("#NewBarcode").val($("#SupplierShort").val() + $("#ItemShort").val() + $("#SequenceNo").val());
+
+            $("#SupplierShort").val('');
+            $("#SequenceNo").val('');
+            $("#ItemShort").val('');
+
+            var itemCombobox = $("#Item").data("tComboBox");
+            itemCombobox.value("");
+            itemCombobox.reload();
+
+            var supplierCombobox = $("#Supplier").data("tComboBox");
+            supplierCombobox.value("");
+            supplierCombobox.reload();
+        }
+
+        function Item_Change(e) {
+            if (e.value != null) {
+                var combobox = $(this).data("tComboBox");
+                if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                    combobox.value("");
+                    combobox.reload();
+                } else {
+                    $.ajax({
+                        type: "post",
+                        dataType: "json",
+                        url: "/OrderItemTrace/_GetItem/",
+                        data: { "itemCode": $("#Item").val() },
+                        success: function (data, textStatus) {
+                            $("#ItemShort").val(data.ShortCode);
+                        }
+                    });
+                }
+            }
+        }
+
+
+        function Supplier_Change(e) {
+            if (e.value != null) {
+                var combobox = $(this).data("tComboBox");
+                if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                    combobox.value("");
+                    combobox.reload();
+                } else {
+                    $.ajax({
+                        type: "post",
+                        dataType: "json",
+                        url: "/OrderItemTrace/_GetSupplier/",
+                        data: { "supplierCode": $("#Supplier").val() },
+                        success: function (data, textStatus) {
+                            $("#SupplierShort").val(data.ShortCode);
+                        }
+                    });
+                }
+            }
+        }
+    </script>
+</fieldset>
+
+

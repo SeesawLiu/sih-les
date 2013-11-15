@@ -168,6 +168,9 @@
   <data name="OrderItemTraceResult_Qty" xml:space="preserve">
     <value>Qty</value>
   </data>
+  <data name="OrderItemTraceResult_ReferenceItemCode" xml:space="preserve">
+    <value>ReferenceItemCode</value>
+  </data>
   <data name="OrderItemTraceResult_Supplier" xml:space="preserve">
     <value>Supplier</value>
   </data>

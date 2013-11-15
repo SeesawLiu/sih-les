@@ -43,18 +43,18 @@
             columns.Bound(o => o.ExternalOrderNo).Title("Sap销售单号");
             //columns.Bound(o => o.ExternalSequence).Title("Sap销售单行号");
             columns.Bound(o => o.Item);
-            columns.Bound(o => o.ReferenceItemCode);
-            columns.Bound(o => o.ItemDescription);
+            columns.Bound(o => o.ReferenceItemCode).Sortable(false);
+            columns.Bound(o => o.ItemDescription).Sortable(false);
             columns.Bound(o => o.OrderedQty);
-            columns.Bound(o => o.Uom);
-            columns.Bound(o => o.UnitCount);
+            columns.Bound(o => o.Uom).Sortable(false);
+            columns.Bound(o => o.UnitCount).Sortable(false);
             columns.Bound(o => o.Container);
-            columns.Bound(o => o.ContainerDescription);
+            columns.Bound(o => o.ContainerDescription).Sortable(false);
             columns.Bound(o => o.MastPartyFrom);
             columns.Bound(o => o.MastPartyTo);
             columns.Bound(o => o.LocationTo);
             columns.Bound(o => o.Flow);
-            columns.Bound(o => o.FlowDescription);
+            columns.Bound(o => o.FlowDescription).Sortable(false);
             columns.Bound(o => o.CreateDate);
         })
 
@@ -66,6 +66,7 @@
             settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
             settings.PageSize(ViewBag.PageSize);
         })
+                .Sortable()
         .EnableCustomBinding(true)
         .Resizable(resizing => resizing.Columns(true))
     )

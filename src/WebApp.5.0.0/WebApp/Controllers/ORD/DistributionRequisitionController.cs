@@ -27,6 +27,9 @@ namespace com.Sconit.Web.Controllers.ORD
     using System;
     using System.ComponentModel;
     using com.Sconit.Entity.LOG;
+    using System.Data.SqlClient;
+    using System.Data;
+    using com.Sconit.Persistence;
 
     #endregion
 
@@ -38,6 +41,8 @@ namespace com.Sconit.Web.Controllers.ORD
 
 
         public IOrderMgr orderMgr { get; set; }
+
+        public ISqlDao sqlDao { get; set; }
 
         #endregion
 
@@ -70,72 +75,202 @@ namespace com.Sconit.Web.Controllers.ORD
 
 
         [GridAction(EnableCustomBinding = true)]
-        [SconitAuthorize(Permissions = "Url_DistributionRequisition_NewIndex")]
         public ActionResult _AjaxNewList(GridCommand command, ReceiptMasterSearchModel searchModel)
         {
-            string sql = this.StringBuilderPrepareSearchStatement(command, searchModel).ToString();
-            IList<object[]> searchList = base.genericMgr.FindAllWithNativeSql<object[]>(sql);
-            IList<OrderDetail> returnList = new List<OrderDetail>();
-            if (searchList != null && searchList.Count > 0)
+            if (command.SortDescriptors.Count > 0)
             {
-                #region
-                //det.Id,det.OrderNo,det.ExtNo,det.ExtSeq,det.Item,det.ItemDesc,det.RefItemCode,det.Uom,det.UC,det.LocFrom,
-                //det.LocTo,det.OrderQty,det.RecQty,det.CreateDate,fm.Code,fm.Desc1,fm.PartyFrom,fm.PartyTo,fd.Container,fd.ContainerDesc
-                returnList = (from tak in searchList
-                              select new OrderDetail
-                                  {
-                                      Id = (int)tak[0],
-                                      OrderNo = (string)tak[1],
-                                      ExternalOrderNo = (string)tak[2],
-                                      ExternalSequence = (string)tak[3],
-                                      Item = (string)tak[4],
-                                      ItemDescription = (string)tak[5],
-                                      ReferenceItemCode = (string)tak[6],
-                                      Uom = (string)tak[7],
-                                      BaseUom = (string)tak[7],
-                                      UnitCount = (decimal)tak[8],
-                                      MinUnitCount = (decimal)tak[8],//上线包装
-                                      LocationTo = (string)tak[9],
-                                      //LocationTo = (string)tak[10],
-                                      OrderedQty = (decimal)tak[11],
-                                      ReceivedQty = (decimal)tak[12],
-                                      CreateDate = (DateTime)tak[13],
-                                      Flow = (string)tak[14],
-                                      FlowDescription = (string)tak[15],
-                                      MastPartyFrom = (string)tak[16],
-                                      MastPartyTo = (string)tak[17],
-                                      Container = (string)tak[18],
-                                      ContainerDescription = (string)tak[19],
-                                  }).ToList();
-                #endregion
-                returnList = returnList.OrderBy(r => r.Id).ToList();
-
-                foreach (var det in returnList)
+                if (command.SortDescriptors[0].Member == "ExternalOrderNo")
                 {
-                    if (det.Id != 0)
+                    command.SortDescriptors[0].Member = "ExtNo";
+                }
+                else if (command.SortDescriptors[0].Member == "OrderedQty")
+                {
+                    command.SortDescriptors[0].Member = "OrderQty";
+                }
+                else if (command.SortDescriptors[0].Member == "MastPartyFrom")
+                {
+                    command.SortDescriptors[0].Member = "PartyFrom";
+                }
+                else if (command.SortDescriptors[0].Member == "MastPartyTo")
+                {
+                    command.SortDescriptors[0].Member = "PartyTo";
+                }
+                else if (command.SortDescriptors[0].Member == "LocationTo")
+                {
+                    command.SortDescriptors[0].Member = "LocFrom";
+                }
+            }
+            SqlParameter[] parameters = new SqlParameter[12];
+            parameters[0] = new SqlParameter("@OrderNo", System.Data.SqlDbType.VarChar,50);
+            parameters[0].Value = searchModel.OrderNo;
+
+            parameters[1] = new SqlParameter("@LocFrom", System.Data.SqlDbType.VarChar, 50);
+            parameters[1].Value = searchModel.LocFrom;
+
+            parameters[2] = new SqlParameter("@Item", System.Data.SqlDbType.VarChar, 50);
+            parameters[2].Value = searchModel.Item;
+
+            parameters[3] = new SqlParameter("@ExtNo", System.Data.SqlDbType.VarChar, 50);
+            parameters[3].Value = searchModel.ExtNo;
+
+            parameters[4] = new SqlParameter("@ExtSeq", System.Data.SqlDbType.VarChar, 50);
+            parameters[4].Value = searchModel.ExtSeq;
+
+            parameters[5] = new SqlParameter("@StartDate", System.Data.SqlDbType.DateTime);
+            parameters[5].Value = searchModel.StartDate;
+
+            parameters[6] = new SqlParameter("@EndDate", System.Data.SqlDbType.DateTime);
+            parameters[6].Value = searchModel.EndDate;
+
+            parameters[7] = new SqlParameter("@SortCloumn", System.Data.SqlDbType.VarChar, 50);
+            parameters[7].Value = command.SortDescriptors.Count > 0 ? command.SortDescriptors[0].Member : string.Empty;
+
+            parameters[8] = new SqlParameter("@SortRule", System.Data.SqlDbType.VarChar, 50);
+            parameters[8].Value = command.SortDescriptors.Count > 0 ? command.SortDescriptors[0].SortDirection == ListSortDirection.Descending ? "desc" : "asc" : string.Empty;
+
+            parameters[9] = new SqlParameter("@PageSize", SqlDbType.Int);
+            parameters[9].Value = command.PageSize;
+
+            parameters[10] = new SqlParameter("@Page", SqlDbType.Int);
+            parameters[10].Value = command.Page;
+
+            parameters[11] = new SqlParameter("@RowCount", System.Data.SqlDbType.VarChar, 50);
+            parameters[11].Direction = ParameterDirection.Output;
+
+            IList<OrderDetail> returList = new List<OrderDetail>();
+            try
+            {
+                DataSet dataSet = sqlDao.GetDatasetByStoredProcedure("USP_Search_CreateRequisitionDetail", parameters, false);
+
+                //det.Id,det.OrderNo,det.ExtNo,det.ExtSeq,det.Item,det.ItemDesc,det.RefItemCode,det.Uom,det.UC,det.LocFrom,
+                //        //det.LocTo,det.OrderQty,det.RecQty,det.CreateDate,fm.Code,fm.Desc1,fm.PartyFrom,fm.PartyTo,fd.Container,fd.ContainerDesc
+                if (dataSet.Tables[0] != null && dataSet.Tables[0].Rows.Count > 0)
+                {
+                    foreach (DataRow row in dataSet.Tables[0].Rows)
                     {
-                        var tempDets = returnList.Where(rr => rr.Id == det.Id && rr.Flow!=det.Flow).ToList();
-                        if (tempDets.Count > 0)
-                        {
-                            if (!(searchModel.IsCreate != null && searchModel.IsCreate.Value))
-                            {
-                                SaveErrorMessage(string.Format("销售单号{0}sap销售单号{1}物料号{2}匹配到多条路线{3}", det.OrderNo, det.ExternalOrderNo, det.Item, string.Join(",", returnList.Where(rr => rr.Id == det.Id).Select(rr => rr.Flow).ToArray())));
-                            }
-                            var t=returnList.Where(rr => rr.Id == det.Id).ToList();
-                            foreach (var tempdet in t)
-                            {
-                                tempdet.Id = 0;
-                            }
-                        }
+                        //row.ItemArray[0].ToString()
+                        OrderDetail det = new OrderDetail();
+                        det.Id = Convert.ToInt32(row.ItemArray[0].ToString());
+                        det.OrderNo = row.ItemArray[1].ToString();
+                        det.ExternalOrderNo = row.ItemArray[2].ToString();
+                        det.ExternalSequence = row.ItemArray[3].ToString();
+                        det.Item = row.ItemArray[4].ToString();
+                        det.ItemDescription = row.ItemArray[5].ToString();
+                        det.ReferenceItemCode = row.ItemArray[6].ToString();
+                        det.Uom = row.ItemArray[7].ToString();
+                        det.BaseUom = row.ItemArray[7].ToString();
+                        det.UnitCount =  Convert.ToDecimal(row.ItemArray[8]);
+                        det.MinUnitCount = Convert.ToDecimal(row.ItemArray[8]);
+                        det.LocationTo = row.ItemArray[9].ToString();
+                        det.OrderedQty = Convert.ToDecimal(row.ItemArray[11]);
+                        det.RejectedQty = Convert.ToDecimal(row.ItemArray[12]);
+                        det.CreateDate = Convert.ToDateTime(row.ItemArray[13]);
+                        det.Flow = row.ItemArray[14].ToString();
+                        det.FlowDescription = row.ItemArray[15].ToString();
+                        det.MastPartyFrom = row.ItemArray[16].ToString();
+                        det.PartyTo = row.ItemArray[17].ToString();
+                        det.Container = row.ItemArray[18].ToString();
+                        det.ContainerDescription = row.ItemArray[19].ToString();
+                        returList.Add(det);
                     }
                 }
             }
-            GridModel<OrderDetail> gridModelOrderDet = new GridModel<OrderDetail>();
-            gridModelOrderDet.Total = returnList.Where(rl=>rl.Id!=0).ToList().Count;
-            gridModelOrderDet.Data = returnList.Where(rl => rl.Id != 0).ToList().Skip((command.Page - 1) * command.PageSize).Take(command.PageSize);
-            TempData["DetailList"] = gridModelOrderDet.Data.ToList();
-            return PartialView(gridModelOrderDet);
+            catch (BusinessException be)
+            {
+                SaveBusinessExceptionMessage(be);
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                {
+                    if (ex.InnerException.InnerException != null)
+                    {
+                        SaveErrorMessage(ex.InnerException.InnerException.Message);
+                    }
+                    else
+                    {
+                        SaveErrorMessage(ex.InnerException.Message);
+                    }
+                }
+                else
+                {
+                    SaveErrorMessage(ex.Message);
+                }
+            }
+            GridModel<OrderDetail> gridModel = new GridModel<OrderDetail>();
+            gridModel.Total = string.IsNullOrWhiteSpace(parameters[11].Value.ToString()) ? 0 : Convert.ToInt32(parameters[11].Value);
+            gridModel.Data = returList;
+            TempData["DetailList"] = returList;
+            return PartialView(gridModel);
         }
+
+        //[GridAction(EnableCustomBinding = true)]
+        //[SconitAuthorize(Permissions = "Url_DistributionRequisition_NewIndex")]
+        //public ActionResult _AjaxNewList(GridCommand command, ReceiptMasterSearchModel searchModel)
+        //{
+        //    string sql = this.StringBuilderPrepareSearchStatement(command, searchModel).ToString();
+        //    IList<object[]> searchList = base.genericMgr.FindAllWithNativeSql<object[]>(sql);
+        //    IList<OrderDetail> returnList = new List<OrderDetail>();
+        //    if (searchList != null && searchList.Count > 0)
+        //    {
+        //        #region
+        //        //det.Id,det.OrderNo,det.ExtNo,det.ExtSeq,det.Item,det.ItemDesc,det.RefItemCode,det.Uom,det.UC,det.LocFrom,
+        //        //det.LocTo,det.OrderQty,det.RecQty,det.CreateDate,fm.Code,fm.Desc1,fm.PartyFrom,fm.PartyTo,fd.Container,fd.ContainerDesc
+        //        returnList = (from tak in searchList
+        //                      select new OrderDetail
+        //                          {
+        //                              Id = (int)tak[0],
+        //                              OrderNo = (string)tak[1],
+        //                              ExternalOrderNo = (string)tak[2],
+        //                              ExternalSequence = (string)tak[3],
+        //                              Item = (string)tak[4],
+        //                              ItemDescription = (string)tak[5],
+        //                              ReferenceItemCode = (string)tak[6],
+        //                              Uom = (string)tak[7],
+        //                              BaseUom = (string)tak[7],
+        //                              UnitCount = (decimal)tak[8],
+        //                              MinUnitCount = (decimal)tak[8],//上线包装
+        //                              LocationTo = (string)tak[9],
+        //                              //LocationTo = (string)tak[10],
+        //                              OrderedQty = (decimal)tak[11],
+        //                              ReceivedQty = (decimal)tak[12],
+        //                              CreateDate = (DateTime)tak[13],
+        //                              Flow = (string)tak[14],
+        //                              FlowDescription = (string)tak[15],
+        //                              MastPartyFrom = (string)tak[16],
+        //                              MastPartyTo = (string)tak[17],
+        //                              Container = (string)tak[18],
+        //                              ContainerDescription = (string)tak[19],
+        //                          }).ToList();
+        //        #endregion
+        //        returnList = returnList.OrderBy(r => r.Id).ToList();
+
+        //        foreach (var det in returnList)
+        //        {
+        //            if (det.Id != 0)
+        //            {
+        //                var tempDets = returnList.Where(rr => rr.Id == det.Id && rr.Flow!=det.Flow).ToList();
+        //                if (tempDets.Count > 0)
+        //                {
+        //                    if (!(searchModel.IsCreate != null && searchModel.IsCreate.Value))
+        //                    {
+        //                        SaveErrorMessage(string.Format("销售单号{0}sap销售单号{1}物料号{2}匹配到多条路线{3}", det.OrderNo, det.ExternalOrderNo, det.Item, string.Join(",", returnList.Where(rr => rr.Id == det.Id).Select(rr => rr.Flow).ToArray())));
+        //                    }
+        //                    var t=returnList.Where(rr => rr.Id == det.Id).ToList();
+        //                    foreach (var tempdet in t)
+        //                    {
+        //                        tempdet.Id = 0;
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //    GridModel<OrderDetail> gridModelOrderDet = new GridModel<OrderDetail>();
+        //    gridModelOrderDet.Total = returnList.Where(rl=>rl.Id!=0).ToList().Count;
+        //    gridModelOrderDet.Data = returnList.Where(rl => rl.Id != 0).ToList().Skip((command.Page - 1) * command.PageSize).Take(command.PageSize);
+        //    TempData["DetailList"] = gridModelOrderDet.Data.ToList();
+        //    return PartialView(gridModelOrderDet);
+        //}
 
         [GridAction(EnableCustomBinding = true)]
         [SconitAuthorize(Permissions = "Url_DistributionRequisition_NewIndex")]

@@ -5,29 +5,75 @@
     {   
         <div class="search">
             <div class="search-label">
-                <label for="OrderItemTrace_OrderNo">
-                    @Resources.ORD.OrderItemTrace.OrderItemTrace_OrderNo
+                <label for="OrderItemTraceResult_BarCode">
+                    @Resources.ORD.OrderItemTraceResult.OrderItemTraceResult_BarCode
                 </label>
             </div>
             <div class="search-field">
-                @Html.TextBox("OrderNo", TempData["OrderItemTraceSearchModel"] != null ? ((OrderItemTraceSearchModel)TempData["OrderItemTraceSearchModel"]).OrderNo : string.Empty)
+                @Html.TextBox("BarCode", TempData["OrderItemTraceSearchModel"] != null ? ((OrderItemTraceSearchModel)TempData["OrderItemTraceSearchModel"]).BarCode : string.Empty)
+            </div>
+            <div class="search-label">
+                <label for="OrderItemTraceResult_Item">
+                    @Resources.ORD.OrderItemTraceResult.OrderItemTraceResult_Item
+                </label>
+            </div>
+            <div class="search-field">
+               @{
+        Html.RenderAction("_ItemComboBox", "Common", new
+        {
+            controlName = "Item",
+            selectedValue = TempData["OrderItemTraceSearchModel"] != null ? ((OrderItemTraceSearchModel)TempData["OrderItemTraceSearchModel"]).Item : null
+        });
+                }
+            </div>
+            <div class="search-label">
+                <label for="OrderItemTrace_OrderNo">
+                    @Resources.ORD.OrderItemTraceResult.OrderItemTraceResult_TraceCode
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("TraceCode", TempData["OrderItemTraceSearchModel"] != null ? ((OrderItemTraceSearchModel)TempData["OrderItemTraceSearchModel"]).TraceCode : string.Empty)
             </div>
             <div class="search-label">
                 <label for="OrderItemTrace_OpReference">
-                    @Resources.ORD.OrderItemTrace.OrderItemTrace_OpReference
+                    @Resources.ORD.OrderItemTraceResult.OrderItemTraceResult_OpReference
                 </label>
             </div>
             <div class="search-field">
                 @Html.TextBox("OpReference", TempData["OrderItemTraceSearchModel"] != null ? ((OrderItemTraceSearchModel)TempData["OrderItemTraceSearchModel"]).OpReference : string.Empty)
             </div>
+            <div class="search-label">
+                <label>
+                    @Resources.ORD.OrderItemTraceResult.OrderItemTraceResult_Supplier
+                </label>
+            </div>
+            <div class="search-field" >
+            @Html.TextArea("Suppliers", TempData["OrderItemTraceSearchModel"] != null ? ((OrderItemTraceSearchModel)TempData["OrderItemTraceSearchModel"]).Suppliers : string.Empty, new { rows = 4, style = "min-height:0;width:50%" })
+            </div>
+            <div class="search-label">
+                <label for="Hu_HuId">
+                    @Resources.ORD.OrderItemTraceResult.OrderItemTraceResult_LotNo
+                </label>
+            </div>
+            <div class="search-field">
+            @Html.TextArea("LotNos", TempData["OrderItemTraceSearchModel"] != null ? ((OrderItemTraceSearchModel)TempData["OrderItemTraceSearchModel"]).LotNos : string.Empty, new { rows = 4, style = "min-height:0;width:50%" })
+            </div>
         </div>
         <div class="search-footer">
             @Html.Hidden("isFromList", true)
-            @Html.Button(Resources.Global.Button_Search, "Url_OrderItemTrace_View", new Dictionary<string, string>()
-	{
-	    {"type", "submit"},
-	    {"id", "btnSearch"}
-	})
+            @Html.Button(Resources.Global.Button_Search, "Url_OrderItemTraceResult_View", new Dictionary<string, string>()
+	        {
+	            {"type", "submit"},
+	            {"id", "btnSearch"}
+	        })
+             <button type="button" id="btnExport" onclick="ExportClick()">
+                @Resources.Global.Button_SearchExport</button>
         </div>
     }
 </fieldset>
+<script type="text/javascript">
+    function ExportClick() {
+        location.href = "/OrderItemTrace/ExportOrderItemTraceResultXLS/?BarCode=" + $("#BarCode").val() + "&Item=" + $("#Item").val()
+        + "&TraceCode=" + $("#TraceCode").val() + "&OpReference=" + $("#OpReference").val() + "&Suppliers=" + $("#Suppliers").val() + "&LotNos=" + $("#LotNos").val();
+    }
+</script>

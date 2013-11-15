@@ -397,7 +397,7 @@ namespace com.Sconit.Web.Controllers.PRD
             if (shiftDet.Start < dayStartTime)
                 shiftDet.Start = shiftDet.Start.AddDays(1);
             // 如果结束结束时间小于 工作日开始时间，则视为第二天
-            if (shiftDet.End < dayStartTime)
+            if (shiftDet.End <= dayStartTime)
                 shiftDet.End = shiftDet.End.AddDays(1);
 
             if (shiftDet.Start > shiftDet.End)

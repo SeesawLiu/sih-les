@@ -11,6 +11,7 @@ using com.Sconit.Web.Models;
 using com.Sconit.Web.Util;
 using com.Sconit.Web.Models.SearchModels.INV;
 using com.Sconit.Entity.MD;
+using com.Sconit.Web.Models.SearchModels.ORD;
 
 namespace com.Sconit.Web.Controllers.INV
 {
@@ -23,6 +24,174 @@ namespace com.Sconit.Web.Controllers.INV
 
         #endregion
 
+        private static string selectCountStatement = "select count(*) from OrderItemTraceResult as r";
+
+        private static string selectStatement = "select r from OrderItemTraceResult as r";
+
+        #region 关键件追溯
+        [SconitAuthorize(Permissions = "Url_OrderItemTraceResult_View")]
+        public ActionResult Index()
+        {
+            return View();
+        }
+
+        [GridAction]
+        [SconitAuthorize(Permissions = "Url_OrderItemTraceResult_View")]
+        public ActionResult List(GridCommand command, OrderItemTraceSearchModel searchModel)
+        {
+            SearchCacheModel searchCacheModel = this.ProcessSearchModel(command, searchModel);
+            ViewBag.PageSize = base.ProcessPageSize(command.PageSize);
+            return View();
+        }
+
+        [GridAction(EnableCustomBinding = true)]
+        [SconitAuthorize(Permissions = "Url_OrderItemTraceResult_View")]
+        public ActionResult _AjaxList(GridCommand command, OrderItemTraceSearchModel searchModel)
+        {
+            SearchStatementModel searchStatementModel = this.PrepareSearchStatement(command, searchModel);
+            return PartialView(GetAjaxPageData<OrderItemTraceResult>(searchStatementModel, command));
+        }
+
+        public void ExportOrderItemTraceResultXLS(OrderItemTraceSearchModel searchModel)
+        {
+            string hql = " select r from OrderItemTraceResult as r where 1=1 ";
+            IList<object> param = new List<object>();
+
+            if (!string.IsNullOrWhiteSpace(searchModel.BarCode))
+            {
+                hql += " and i.BarCode = ? ";
+                param.Add(searchModel.BarCode);
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchModel.Item))
+            {
+                hql += " and i.Item = ? ";
+                param.Add(searchModel.Item);
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchModel.OpReference))
+            {
+                hql += " and i.OpReference = ? ";
+                param.Add(searchModel.OpReference);
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchModel.TraceCode))
+            {
+                hql += " and i.TraceCode = ? ";
+                param.Add(searchModel.TraceCode);
+            }
+
+            string supplierStatement = string.Empty;
+            if (!string.IsNullOrWhiteSpace(searchModel.Suppliers))
+            {
+                string suppliers = searchModel.Suppliers.Replace("\r\n", ",");
+                suppliers = suppliers.Replace("\n", ",");
+                string[] supplierArr = suppliers.Split(',');
+                for (int i = 0; i < supplierArr.Length; i++)
+                {
+                    if (string.IsNullOrWhiteSpace(supplierStatement))
+                    {
+                        supplierStatement = " and Supplier in (? ";
+                    }
+                    else
+                    {
+                        supplierStatement += " ,? ";
+                    }
+                    param.Add(supplierArr[i]);
+                }
+                hql += supplierStatement + " ) ";
+            }
+
+            string lotNoStatement = string.Empty;
+            if (!string.IsNullOrWhiteSpace(searchModel.LotNos))
+            {
+                string lotNos = searchModel.LotNos.Replace("\r\n", ",");
+                lotNos = lotNos.Replace("\n", ",");
+                string[] lotNoArr = lotNos.Split(',');
+                for (int i = 0; i < lotNoArr.Length; i++)
+                {
+                    if (string.IsNullOrWhiteSpace(lotNoStatement))
+                    {
+                        lotNoStatement = " and LotNo in (? ";
+                    }
+                    else
+                    {
+                        lotNoStatement += " ,? ";
+                    }
+                    param.Add(lotNoArr[i]);
+                }
+                hql += lotNoStatement + " ) ";
+            }
+
+            hql += " order by r.CreateDate desc ";
+            IList<OrderItemTraceResult> exportList = this.genericMgr.FindAll<OrderItemTraceResult>(hql,param.ToArray());
+            ExportToXLS<OrderItemTraceResult>("OrderItemTraceResultXLS", "xls", exportList);
+        }
+
+        private SearchStatementModel PrepareSearchStatement(GridCommand command, OrderItemTraceSearchModel searchModel)
+        {
+            string whereStatement = " where 1=1 ";
+
+            IList<object> param = new List<object>();
+            string supplierStatement = string.Empty;
+            if (!string.IsNullOrWhiteSpace(searchModel.Suppliers))
+            {
+                string suppliers = searchModel.Suppliers.Replace("\r\n", ",");
+                suppliers = suppliers.Replace("\n", ",");
+                string[] supplierArr = suppliers.Split(',');
+                for (int i = 0; i < supplierArr.Length; i++)
+                {
+                    if (string.IsNullOrWhiteSpace(supplierStatement))
+                    {
+                        supplierStatement = " and Supplier in (? ";
+                    }
+                    else
+                    {
+                        supplierStatement += " ,? ";
+                    }
+                    param.Add(supplierArr[i]);
+                }
+                whereStatement += supplierStatement + " ) ";  
+            }
+
+            string lotNoStatement = string.Empty;
+            if (!string.IsNullOrWhiteSpace(searchModel.LotNos))
+            {
+                string lotNos = searchModel.LotNos.Replace("\r\n", ",");
+                lotNos = lotNos.Replace("\n", ",");
+                string[] lotNoArr = lotNos.Split(',');
+                for (int i = 0; i < lotNoArr.Length; i++)
+                {
+                    if (string.IsNullOrWhiteSpace(lotNoStatement))
+                    {
+                        lotNoStatement = " and LotNo in (? ";
+                    }
+                    else
+                    {
+                        lotNoStatement += " ,? ";
+                    }
+                    param.Add(lotNoArr[i]);
+                }
+                whereStatement += lotNoStatement + " ) ";
+            }
+
+            HqlStatementHelper.AddEqStatement("BarCode", searchModel.BarCode, "r", ref whereStatement, param);
+            HqlStatementHelper.AddEqStatement("Item", searchModel.Item, "r", ref whereStatement, param);
+            HqlStatementHelper.AddEqStatement("OpReference", searchModel.OpReference, "r", ref whereStatement, param);
+            HqlStatementHelper.AddEqStatement("TraceCode", searchModel.TraceCode, "r", ref whereStatement, param);
+
+            string sortingStatement = HqlStatementHelper.GetSortingStatement(command.SortDescriptors);
+
+            SearchStatementModel searchStatementModel = new SearchStatementModel();
+            searchStatementModel.SelectCountStatement = selectCountStatement;
+            searchStatementModel.SelectStatement = selectStatement;
+            searchStatementModel.WhereStatement = whereStatement;
+            searchStatementModel.SortingStatement = sortingStatement;
+            searchStatementModel.Parameters = param.ToArray<object>();
+
+            return searchStatementModel;
+        }
+        #endregion
 
         [SconitAuthorize(Permissions = "Url_OrderItemTrace_New")]
         public ActionResult New()
@@ -469,6 +638,36 @@ Qty>( select isnull(COUNT(*),0)from ORD_OrderItemTraceResult as result where tra
                 SaveErrorMessage(ex.Message);
             }
             return Json(null);
+        }
+
+        #endregion
+
+        #region 关键件条码生成
+        public ActionResult CreateBarCode()
+        {
+            return View();
+        }
+
+        public JsonResult _GetItem(string itemCode)
+        {
+            if (!string.IsNullOrEmpty(itemCode))
+            {
+                Item item = base.genericMgr.FindById<Item>(itemCode);
+
+
+                return this.Json(item);
+            }
+            return null;
+        }
+
+        public JsonResult _GetSupplier(string supplierCode)
+        {
+            if (!string.IsNullOrEmpty(supplierCode))
+            {
+                Supplier supplier = base.genericMgr.FindById<Supplier>(supplierCode);
+                return this.Json(supplier);
+            }
+            return null;
         }
 
         #endregion

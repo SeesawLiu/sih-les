@@ -4,6 +4,7 @@ using com.Sconit.Entity.ORD;
 using com.Sconit.Entity.PRD;
 using System.IO;
 using com.Sconit.Entity.ACC;
+using com.Sconit.Entity.SAP.ORD;
 
 namespace com.Sconit.Service
 {
@@ -73,6 +74,14 @@ namespace com.Sconit.Service
 
         #region 工序物料反回冲
         void AntiBackflushProductOrder(OrderOperation orderOperation, OrderOperationReport orderOperationReport);
+        #endregion
+
+        #region SAP工序回冲物料
+        void BackflushProductOrder(ProdOpBackflush prodOpBackflush);
+        #endregion
+
+        #region SAP工序物料反回冲
+        void AntiBackflushProductOrder(ProdOpBackflush prodOpBackflush);
         #endregion
 
         #region 生产线节拍调整

@@ -7262,13 +7262,13 @@ namespace com.Sconit.Service.Impl
             OrderMaster orderMaster = this.genericMgr.FindEntityWithNativeSql<OrderMaster>("select * from ORD_OrderMstr_4 WITH(NOLOCK) where OrderNo = ?", orderOperation.OrderNo).Single();
             OrderDetail orderDetail = this.genericMgr.FindEntityWithNativeSql<OrderDetail>("select * from ORD_OrderDet_4 WITH(NOLOCK) where OrderNo = ?", orderOperation.OrderNo).Single();
             IList<ProductLineMap> prodLineMapList = this.genericMgr.FindAll<ProductLineMap>("select s from ProductLineMap as s where s.ProductLine = ?", orderMaster.Flow);
-            IList<OrderOperation> refOrderOperationList = null;
-            if (orderOperation.NeedReport)
-            {
-                refOrderOperationList = this.genericMgr.FindEntityWithNativeSql<OrderOperation>(@"select * from ORD_OrderOp WITH(NOLOCK) where OrderNo= ?
-                    and Op > ISNULL((select Op from ORD_OrderOp WITH(NOLOCK) where OrderNo = ? and Op < ? and NeedReport = ?), 0) and Op < ?"
-                        , new object[] { orderMaster.OrderNo, orderMaster.OrderNo, orderOperation.Operation, true, orderOperation.Operation });
-            }
+//            IList<OrderOperation> refOrderOperationList = null;
+//            if (orderOperation.NeedReport)
+//            {
+//                refOrderOperationList = this.genericMgr.FindEntityWithNativeSql<OrderOperation>(@"select * from ORD_OrderOp WITH(NOLOCK) where OrderNo= ?
+//                    and Op > ISNULL((select Op from ORD_OrderOp WITH(NOLOCK) where OrderNo = ? and Op < ? and NeedReport = ?), 0) and Op < ?"
+//                        , new object[] { orderMaster.OrderNo, orderMaster.OrderNo, orderOperation.Operation, true, orderOperation.Operation });
+//            }
 
             if (orderMaster.Status != CodeMaster.OrderStatus.InProcess)
             {
@@ -7355,26 +7355,26 @@ namespace com.Sconit.Service.Impl
                 this.genericMgr.Create(prodOpReport);
 
                 #region 反冲物料
-                if (orderOperation.NeedReport)
-                {
-                    orderOperation.CurrentReportQty = reportQty;
-                    this.productionLineMgr.BackflushProductOrder(orderOperation, orderOperationReport);
+                //if (orderOperation.NeedReport)
+                //{
+                //    orderOperation.CurrentReportQty = reportQty;
+                //    this.productionLineMgr.BackflushProductOrder(orderOperation, orderOperationReport);
 
-                    if (refOrderOperationList != null && refOrderOperationList.Count > 0)
-                    {
-                        foreach (OrderOperation refOrderOperation in refOrderOperationList)
-                        {
-                            refOrderOperation.CurrentReportQty = reportQty;
-                            this.productionLineMgr.BackflushProductOrder(refOrderOperation, orderOperationReport);
+                //    if (refOrderOperationList != null && refOrderOperationList.Count > 0)
+                //    {
+                //        foreach (OrderOperation refOrderOperation in refOrderOperationList)
+                //        {
+                //            refOrderOperation.CurrentReportQty = reportQty;
+                //            this.productionLineMgr.BackflushProductOrder(refOrderOperation, orderOperationReport);
 
-                            refOrderOperation.BackflushQty += reportQty;
-                            refOrderOperation.ReportQty += reportQty;
-                        }
-                    }
-                }
+                //            refOrderOperation.BackflushQty += reportQty;
+                //            refOrderOperation.ReportQty += reportQty;
+                //        }
+                //    }
+                //}
                 #endregion
 
-                orderOperation.BackflushQty += reportQty;
+                //orderOperation.BackflushQty += reportQty;
                 orderOperation.ReportQty += reportQty;
             }
             else if (reportQty < 0)
@@ -7436,28 +7436,28 @@ namespace com.Sconit.Service.Impl
                 this.genericMgr.Create(prodOpReport);
 
                 #region 反冲物料
-                if (orderOperation.NeedReport)
-                {
-                    orderOperation.CurrentReportQty = 0;
-                    orderOperation.CurrentScrapQty = scrapQty;
-                    this.productionLineMgr.BackflushProductOrder(orderOperation, orderOperationReport);
+                //if (orderOperation.NeedReport)
+                //{
+                //    orderOperation.CurrentReportQty = 0;
+                //    orderOperation.CurrentScrapQty = scrapQty;
+                //    this.productionLineMgr.BackflushProductOrder(orderOperation, orderOperationReport);
 
-                    if (refOrderOperationList != null && refOrderOperationList.Count > 0)
-                    {
-                        foreach (OrderOperation refOrderOperation in refOrderOperationList)
-                        {
-                            refOrderOperation.CurrentReportQty = 0;
-                            refOrderOperation.CurrentScrapQty = scrapQty;
-                            this.productionLineMgr.BackflushProductOrder(refOrderOperation, orderOperationReport);
+                //    if (refOrderOperationList != null && refOrderOperationList.Count > 0)
+                //    {
+                //        foreach (OrderOperation refOrderOperation in refOrderOperationList)
+                //        {
+                //            refOrderOperation.CurrentReportQty = 0;
+                //            refOrderOperation.CurrentScrapQty = scrapQty;
+                //            this.productionLineMgr.BackflushProductOrder(refOrderOperation, orderOperationReport);
 
-                            refOrderOperation.BackflushQty += scrapQty;
-                            refOrderOperation.ScrapQty += scrapQty;
-                        }
-                    }
-                }
+                //            refOrderOperation.BackflushQty += scrapQty;
+                //            refOrderOperation.ScrapQty += scrapQty;
+                //        }
+                //    }
+                //}
                 #endregion
 
-                orderOperation.BackflushQty += scrapQty;
+                //orderOperation.BackflushQty += scrapQty;
                 orderOperation.ScrapQty += scrapQty;
             }
             else if (scrapQty < 0)
@@ -7467,13 +7467,13 @@ namespace com.Sconit.Service.Impl
             #endregion
 
             this.genericMgr.Update(orderOperation);
-            if (refOrderOperationList != null && refOrderOperationList.Count > 0)
-            {
-                foreach (OrderOperation refOrderOperation in refOrderOperationList)
-                {
-                    this.genericMgr.Update(refOrderOperation);
-                }
-            }
+            //if (refOrderOperationList != null && refOrderOperationList.Count > 0)
+            //{
+            //    foreach (OrderOperation refOrderOperation in refOrderOperationList)
+            //    {
+            //        this.genericMgr.Update(refOrderOperation);
+            //    }
+            //}
         }
 
         public void MakeupReportOrderOp()
@@ -7549,18 +7549,18 @@ namespace com.Sconit.Service.Impl
             OrderOperation orderOperation = this.genericMgr.FindById<OrderOperation>(orderOperationReport.OrderOperationId);
             com.Sconit.Entity.SAP.ORD.ProdOpReport prodOpReport = this.genericMgr.FindEntityWithNativeSql<com.Sconit.Entity.SAP.ORD.ProdOpReport>("select * from SAP_ProdOpReport WITH(NOLOCK) where OrderOpReportId = ?", orderOperationReport.Id).Single();
 
-            IList<OrderOperation> refOrderOperationList = null;
-            if (orderOperation.NeedReport &&
-                !(orderMaster.ProdLineType == CodeMaster.ProdLineType.Cab
-                || orderMaster.ProdLineType == CodeMaster.ProdLineType.Chassis
-                || orderMaster.ProdLineType == CodeMaster.ProdLineType.Assembly
-                || orderMaster.ProdLineType == CodeMaster.ProdLineType.Special
-                || orderMaster.ProdLineType == CodeMaster.ProdLineType.Check))
-            {
-                refOrderOperationList = this.genericMgr.FindEntityWithNativeSql<OrderOperation>(@"select * from ORD_OrderOp where OrderNo= ?
-                    and Op > ISNULL((select Op from ORD_OrderOp where OrderNo = ? and Op < ? and NeedReport = ?), 0) and Op < ?"
-                        , new object[] { orderMaster.OrderNo, orderMaster.OrderNo, orderOperation.Operation, true, orderOperation.Operation });
-            }
+            //IList<OrderOperation> refOrderOperationList = null;
+//            if (orderOperation.NeedReport &&
+//                !(orderMaster.ProdLineType == CodeMaster.ProdLineType.Cab
+//                || orderMaster.ProdLineType == CodeMaster.ProdLineType.Chassis
+//                || orderMaster.ProdLineType == CodeMaster.ProdLineType.Assembly
+//                || orderMaster.ProdLineType == CodeMaster.ProdLineType.Special
+//                || orderMaster.ProdLineType == CodeMaster.ProdLineType.Check))
+//            {
+//                refOrderOperationList = this.genericMgr.FindEntityWithNativeSql<OrderOperation>(@"select * from ORD_OrderOp where OrderNo= ?
+//                    and Op > ISNULL((select Op from ORD_OrderOp where OrderNo = ? and Op < ? and NeedReport = ?), 0) and Op < ?"
+//                        , new object[] { orderMaster.OrderNo, orderMaster.OrderNo, orderOperation.Operation, true, orderOperation.Operation });
+//            }
 
             if (orderMaster.ProdLineType == CodeMaster.ProdLineType.Cab
                 || orderMaster.ProdLineType == CodeMaster.ProdLineType.Chassis
@@ -7578,27 +7578,37 @@ namespace com.Sconit.Service.Impl
                 #region 物料反消耗
                 if (orderOperation.NeedReport)
                 {
-                    this.productionLineMgr.AntiBackflushProductOrder(orderOperation, orderOperationReport);
+                    IList<com.Sconit.Entity.SAP.ORD.ProdOpBackflush> prodOpBackflushList =
+                        this.genericMgr.FindEntityWithNativeSql<com.Sconit.Entity.SAP.ORD.ProdOpBackflush>(
+                        "select * from SAP_ProdOpBackflush where OrderOpReportId = ?", orderOperationReport.Id);
 
-                    if (refOrderOperationList != null && refOrderOperationList.Count > 0)
+                    if (prodOpBackflushList != null && prodOpBackflushList.Count > 0)
                     {
-                        foreach (OrderOperation refOrderOperation in refOrderOperationList)
+                        foreach (com.Sconit.Entity.SAP.ORD.ProdOpBackflush prodOpBackflush in prodOpBackflushList)
                         {
-                            this.productionLineMgr.AntiBackflushProductOrder(refOrderOperation, orderOperationReport);
-
-                            if (!(orderMaster.ProdLineType == CodeMaster.ProdLineType.Cab
-                              || orderMaster.ProdLineType == CodeMaster.ProdLineType.Chassis
-                              || orderMaster.ProdLineType == CodeMaster.ProdLineType.Assembly
-                              || orderMaster.ProdLineType == CodeMaster.ProdLineType.Special
-                              || orderMaster.ProdLineType == CodeMaster.ProdLineType.Check))
-                            {
-                                refOrderOperation.BackflushQty -= prodOpReport.GAMNG;
-                                refOrderOperation.BackflushQty -= prodOpReport.SCRAP;
-                            }
-                            refOrderOperation.ReportQty -= prodOpReport.GAMNG;
-                            refOrderOperation.ScrapQty -= prodOpReport.SCRAP;
+                            this.productionLineMgr.AntiBackflushProductOrder(prodOpBackflush);
                         }
                     }
+
+                    //if (refOrderOperationList != null && refOrderOperationList.Count > 0)
+                    //{
+                    //    foreach (OrderOperation refOrderOperation in refOrderOperationList)
+                    //    {
+                    //        this.productionLineMgr.AntiBackflushProductOrder(refOrderOperation, orderOperationReport);
+
+                    //        if (!(orderMaster.ProdLineType == CodeMaster.ProdLineType.Cab
+                    //          || orderMaster.ProdLineType == CodeMaster.ProdLineType.Chassis
+                    //          || orderMaster.ProdLineType == CodeMaster.ProdLineType.Assembly
+                    //          || orderMaster.ProdLineType == CodeMaster.ProdLineType.Special
+                    //          || orderMaster.ProdLineType == CodeMaster.ProdLineType.Check))
+                    //        {
+                    //            refOrderOperation.BackflushQty -= prodOpReport.GAMNG;
+                    //            refOrderOperation.BackflushQty -= prodOpReport.SCRAP;
+                    //        }
+                    //        refOrderOperation.ReportQty -= prodOpReport.GAMNG;
+                    //        refOrderOperation.ScrapQty -= prodOpReport.SCRAP;
+                    //    }
+                    //}
                 }
                 #endregion
 
@@ -7649,13 +7659,13 @@ namespace com.Sconit.Service.Impl
             orderOperation.ReportQty -= prodOpReport.GAMNG;
             orderOperation.ScrapQty -= prodOpReport.SCRAP;
             this.genericMgr.Update(orderOperation);
-            if (refOrderOperationList != null && refOrderOperationList.Count > 0)
-            {
-                foreach (OrderOperation refOrderOperation in refOrderOperationList)
-                {
-                    this.genericMgr.Update(refOrderOperation);
-                }
-            }
+            //if (refOrderOperationList != null && refOrderOperationList.Count > 0)
+            //{
+            //    foreach (OrderOperation refOrderOperation in refOrderOperationList)
+            //    {
+            //        this.genericMgr.Update(refOrderOperation);
+            //    }
+            //}
             #endregion
 
             #region 更新工序报工记录状态

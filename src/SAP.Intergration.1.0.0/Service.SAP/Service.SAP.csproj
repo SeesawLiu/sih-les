@@ -266,10 +266,10 @@
       <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
       <CachedSettingsPropName>com_Sconit_Service_SAP_MI_PO_BOM_LES_MI_PO_BOM_LESService</CachedSettingsPropName>
     </WebReferenceUrl>
-    <WebReferenceUrl Include="C:\Users\dingxin\Desktop\MI_PO_CFR_LES.wsdl">
+    <WebReferenceUrl Include="G:\Project\sih\10.Interface\WSDL\MI_PO_CFR_LES.wsdl">
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\MI_PO_CFR_LES\</RelPath>
-      <UpdateFromURL>C:\Users\dingxin\Desktop\MI_PO_CFR_LES.wsdl</UpdateFromURL>
+      <UpdateFromURL>G:\Project\sih\10.Interface\WSDL\MI_PO_CFR_LES.wsdl</UpdateFromURL>
       <ServiceLocationURL>
       </ServiceLocationURL>
       <CachedDynamicPropName>
@@ -504,6 +504,9 @@
     <None Include="Web References\MI_PO_CFR_LES\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\MI_PO_CFR_LES\ZITEM_LX.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
     </None>
     <None Include="Web References\MI_PO_CRE_LES\MI_PO_CRE_LES.wsdl" />
     <None Include="Web References\MI_PO_CRE_LES\Reference.map">

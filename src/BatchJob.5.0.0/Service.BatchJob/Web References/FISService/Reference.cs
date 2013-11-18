@@ -32,8 +32,6 @@ namespace com.Sconit.Service.BatchJob.FISService {
         
         private System.Threading.SendOrPostCallback CreateLogOperationCompleted;
         
-        private System.Threading.SendOrPostCallback SelectLesINLogByWmsNoOperationCompleted;
-        
         private System.Threading.SendOrPostCallback UpdateLogOperationCompleted;
         
         private System.Threading.SendOrPostCallback ExportOperationCompleted;
@@ -86,9 +84,6 @@ namespace com.Sconit.Service.BatchJob.FISService {
         public event CreateLogCompletedEventHandler CreateLogCompleted;
         
         /// <remarks/>
-        public event SelectLesINLogByWmsNoCompletedEventHandler SelectLesINLogByWmsNoCompleted;
-        
-        /// <remarks/>
         public event UpdateLogCompletedEventHandler UpdateLogCompleted;
         
         /// <remarks/>
@@ -128,37 +123,6 @@ namespace com.Sconit.Service.BatchJob.FISService {
             if ((this.CreateLogCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.CreateLogCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://com.Sconit.WebService.FIS.FISService/SelectLesINLogByWmsNo", RequestNamespace="http://com.Sconit.WebService.FIS.FISService/", ResponseNamespace="http://com.Sconit.WebService.FIS.FISService/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public LesINLog SelectLesINLogByWmsNo(string selectSql, object param) {
-            object[] results = this.Invoke("SelectLesINLogByWmsNo", new object[] {
-                        selectSql,
-                        param});
-            return ((LesINLog)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void SelectLesINLogByWmsNoAsync(string selectSql, object param) {
-            this.SelectLesINLogByWmsNoAsync(selectSql, param, null);
-        }
-        
-        /// <remarks/>
-        public void SelectLesINLogByWmsNoAsync(string selectSql, object param, object userState) {
-            if ((this.SelectLesINLogByWmsNoOperationCompleted == null)) {
-                this.SelectLesINLogByWmsNoOperationCompleted = new System.Threading.SendOrPostCallback(this.OnSelectLesINLogByWmsNoOperationCompleted);
-            }
-            this.InvokeAsync("SelectLesINLogByWmsNo", new object[] {
-                        selectSql,
-                        param}, this.SelectLesINLogByWmsNoOperationCompleted, userState);
-        }
-        
-        private void OnSelectLesINLogByWmsNoOperationCompleted(object arg) {
-            if ((this.SelectLesINLogByWmsNoCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.SelectLesINLogByWmsNoCompleted(this, new SelectLesINLogByWmsNoCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -324,20 +288,12 @@ namespace com.Sconit.Service.BatchJob.FISService {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.0.30319.233")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.0.30319.1015")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://com.Sconit.WebService.FIS.FISService/")]
     public partial class LesINLog : EntityBase {
-        
-        private decimal shipQtyField;
-        
-        private decimal receivedQtyField;
-        
-        private string locToField;
-        
-        private string receiptStatusField;
         
         private int idField;
         
@@ -355,7 +311,7 @@ namespace com.Sconit.Service.BatchJob.FISService {
         
         private string wMSLineField;
         
-        private string handTimeField;
+        private System.DateTime handTimeField;
         
         private string itemField;
         
@@ -375,45 +331,17 @@ namespace com.Sconit.Service.BatchJob.FISService {
         
         private System.Nullable<bool> qtyMarkField;
         
-        /// <remarks/>
-        public decimal ShipQty {
-            get {
-                return this.shipQtyField;
-            }
-            set {
-                this.shipQtyField = value;
-            }
-        }
+        private System.Nullable<System.DateTime> uploadDateField;
         
-        /// <remarks/>
-        public decimal ReceivedQty {
-            get {
-                return this.receivedQtyField;
-            }
-            set {
-                this.receivedQtyField = value;
-            }
-        }
+        private string lesFileNameField;
         
-        /// <remarks/>
-        public string LocTo {
-            get {
-                return this.locToField;
-            }
-            set {
-                this.locToField = value;
-            }
-        }
+        private decimal shipQtyField;
         
-        /// <remarks/>
-        public string ReceiptStatus {
-            get {
-                return this.receiptStatusField;
-            }
-            set {
-                this.receiptStatusField = value;
-            }
-        }
+        private decimal receivedQtyField;
+        
+        private string locToField;
+        
+        private string receiptStatusField;
         
         /// <remarks/>
         public int Id {
@@ -496,7 +424,7 @@ namespace com.Sconit.Service.BatchJob.FISService {
         }
         
         /// <remarks/>
-        public string HandTime {
+        public System.DateTime HandTime {
             get {
                 return this.handTimeField;
             }
@@ -596,11 +524,72 @@ namespace com.Sconit.Service.BatchJob.FISService {
                 this.qtyMarkField = value;
             }
         }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<System.DateTime> UploadDate {
+            get {
+                return this.uploadDateField;
+            }
+            set {
+                this.uploadDateField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string LesFileName {
+            get {
+                return this.lesFileNameField;
+            }
+            set {
+                this.lesFileNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public decimal ShipQty {
+            get {
+                return this.shipQtyField;
+            }
+            set {
+                this.shipQtyField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public decimal ReceivedQty {
+            get {
+                return this.receivedQtyField;
+            }
+            set {
+                this.receivedQtyField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string LocTo {
+            get {
+                return this.locToField;
+            }
+            set {
+                this.locToField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string ReceiptStatus {
+            get {
+                return this.receiptStatusField;
+            }
+            set {
+                this.receiptStatusField = value;
+            }
+        }
     }
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(LesINLog))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.0.30319.233")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.0.30319.1015")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -611,32 +600,6 @@ namespace com.Sconit.Service.BatchJob.FISService {
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
     public delegate void CreateLogCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
-    public delegate void SelectLesINLogByWmsNoCompletedEventHandler(object sender, SelectLesINLogByWmsNoCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class SelectLesINLogByWmsNoCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal SelectLesINLogByWmsNoCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public LesINLog Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((LesINLog)(this.results[0]));
-            }
-        }
-    }
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]

@@ -74,11 +74,13 @@ namespace com.Sconit.Service.SAP.MI_PO_CFR_LES {
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://sap.com/xi/WebService/soap1.1", RequestElementName="ZSIH_PRODUCTIONORDERCOMFIRE", RequestNamespace="urn:sap-com:document:sap:rfc:functions", ResponseElementName="ZSIH_PRODUCTIONORDERCOMFIRE.Response", ResponseNamespace="urn:sap-com:document:sap:rfc:functions", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        [return: System.Xml.Serialization.XmlElementAttribute("OUTPUT", Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string MI_PO_CFR_LES([System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)] ZSPOCOMF INPUT) {
+        [return: System.Xml.Serialization.XmlArrayAttribute("COMFIRE", Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        [return: System.Xml.Serialization.XmlArrayItemAttribute("item", Form=System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable=false)]
+        public ZITEM_LX[] MI_PO_CFR_LES([System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)] ZSPOCOMF INPUT, [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)] out string OUTPUT) {
             object[] results = this.Invoke("MI_PO_CFR_LES", new object[] {
                         INPUT});
-            return ((string)(results[0]));
+            OUTPUT = ((string)(results[1]));
+            return ((ZITEM_LX[])(results[0]));
         }
         
         /// <remarks/>
@@ -274,6 +276,171 @@ namespace com.Sconit.Service.SAP.MI_PO_CFR_LES {
     }
     
     /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.0.30319.1015")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:sap-com:document:sap:rfc:functions")]
+    public partial class ZITEM_LX {
+        
+        private string aUFNRField;
+        
+        private string wERKSField;
+        
+        private string aUFPLField;
+        
+        private string aPLZLField;
+        
+        private string pLNTYField;
+        
+        private string pLNNRField;
+        
+        private string pLNALField;
+        
+        private string pLNFLField;
+        
+        private string vORNRField;
+        
+        private string aRBPLField;
+        
+        private string rUEKField;
+        
+        private string aUTWEField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string AUFNR {
+            get {
+                return this.aUFNRField;
+            }
+            set {
+                this.aUFNRField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string WERKS {
+            get {
+                return this.wERKSField;
+            }
+            set {
+                this.wERKSField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string AUFPL {
+            get {
+                return this.aUFPLField;
+            }
+            set {
+                this.aUFPLField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string APLZL {
+            get {
+                return this.aPLZLField;
+            }
+            set {
+                this.aPLZLField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string PLNTY {
+            get {
+                return this.pLNTYField;
+            }
+            set {
+                this.pLNTYField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string PLNNR {
+            get {
+                return this.pLNNRField;
+            }
+            set {
+                this.pLNNRField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string PLNAL {
+            get {
+                return this.pLNALField;
+            }
+            set {
+                this.pLNALField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string PLNFL {
+            get {
+                return this.pLNFLField;
+            }
+            set {
+                this.pLNFLField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string VORNR {
+            get {
+                return this.vORNRField;
+            }
+            set {
+                this.vORNRField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string ARBPL {
+            get {
+                return this.aRBPLField;
+            }
+            set {
+                this.aRBPLField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string RUEK {
+            get {
+                return this.rUEKField;
+            }
+            set {
+                this.rUEKField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string AUTWE {
+            get {
+                return this.aUTWEField;
+            }
+            set {
+                this.aUTWEField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
     public delegate void MI_PO_CFR_LESCompletedEventHandler(object sender, MI_PO_CFR_LESCompletedEventArgs e);
     
@@ -291,10 +458,18 @@ namespace com.Sconit.Service.SAP.MI_PO_CFR_LES {
         }
         
         /// <remarks/>
-        public string Result {
+        public ZITEM_LX[] Result {
             get {
                 this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
+                return ((ZITEM_LX[])(this.results[0]));
+            }
+        }
+        
+        /// <remarks/>
+        public string OUTPUT {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[1]));
             }
         }
     }

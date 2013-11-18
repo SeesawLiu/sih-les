@@ -8,7 +8,7 @@ using com.Sconit.Utility;
 namespace com.Sconit.Service.SAP
 {
     public interface IProductionMgr
-    {        
+    {
         void AutoCreateVanOrder(string prodLine);
 
         IList<string> UpdateVanOrder(string plant, string sapOrderNo, string prodlLine);
@@ -22,6 +22,8 @@ namespace com.Sconit.Service.SAP
         IList<string> GetProductOrder(string plant, IList<string> sapOrderNoList);
 
         IList<string> GetProductOrder(string plant, IList<string> sapOrderTypeList, DateOption dateOption, DateTime? dateFrom, DateTime? dateTo, IList<string> mrpCtrlList);
+
+        void BackflushProductionOrder();
     }
 
     public interface IReportProdOrderOperationMgr

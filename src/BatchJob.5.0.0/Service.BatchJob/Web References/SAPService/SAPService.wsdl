@@ -28,6 +28,7 @@
               <s:element minOccurs="0" maxOccurs="1" name="PLIFZ" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="BESKZ" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="SOBSL" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="EXTWG" type="s:string" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
@@ -79,6 +80,16 @@
         </s:complexType>
       </s:element>
       <s:element name="ExchangeMoveTypeResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="ReExchangeMoveType">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReExchangeMoveTypeResponse">
         <s:complexType />
       </s:element>
       <s:element name="AutoCreateVanOrder">
@@ -459,6 +470,16 @@
       <s:element name="GetCurrentVanOrderResponse">
         <s:complexType />
       </s:element>
+      <s:element name="BackflushProductionOrder">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="BackflushProductionOrderResponse">
+        <s:complexType />
+      </s:element>
     </s:schema>
   </wsdl:types>
   <wsdl:message name="ImportItemSoapIn">
@@ -490,6 +511,12 @@
   </wsdl:message>
   <wsdl:message name="ExchangeMoveTypeSoapOut">
     <wsdl:part name="parameters" element="tns:ExchangeMoveTypeResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReExchangeMoveTypeSoapIn">
+    <wsdl:part name="parameters" element="tns:ReExchangeMoveType" />
+  </wsdl:message>
+  <wsdl:message name="ReExchangeMoveTypeSoapOut">
+    <wsdl:part name="parameters" element="tns:ReExchangeMoveTypeResponse" />
   </wsdl:message>
   <wsdl:message name="AutoCreateVanOrderSoapIn">
     <wsdl:part name="parameters" element="tns:AutoCreateVanOrder" />
@@ -581,6 +608,12 @@
   <wsdl:message name="GetCurrentVanOrderSoapOut">
     <wsdl:part name="parameters" element="tns:GetCurrentVanOrderResponse" />
   </wsdl:message>
+  <wsdl:message name="BackflushProductionOrderSoapIn">
+    <wsdl:part name="parameters" element="tns:BackflushProductionOrder" />
+  </wsdl:message>
+  <wsdl:message name="BackflushProductionOrderSoapOut">
+    <wsdl:part name="parameters" element="tns:BackflushProductionOrderResponse" />
+  </wsdl:message>
   <wsdl:portType name="SAPServiceSoap">
     <wsdl:operation name="ImportItem">
       <wsdl:input message="tns:ImportItemSoapIn" />
@@ -601,6 +634,10 @@
     <wsdl:operation name="ExchangeMoveType">
       <wsdl:input message="tns:ExchangeMoveTypeSoapIn" />
       <wsdl:output message="tns:ExchangeMoveTypeSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReExchangeMoveType">
+      <wsdl:input message="tns:ReExchangeMoveTypeSoapIn" />
+      <wsdl:output message="tns:ReExchangeMoveTypeSoapOut" />
     </wsdl:operation>
     <wsdl:operation name="AutoCreateVanOrder">
       <wsdl:input message="tns:AutoCreateVanOrderSoapIn" />
@@ -662,6 +699,10 @@
       <wsdl:input message="tns:GetCurrentVanOrderSoapIn" />
       <wsdl:output message="tns:GetCurrentVanOrderSoapOut" />
     </wsdl:operation>
+    <wsdl:operation name="BackflushProductionOrder">
+      <wsdl:input message="tns:BackflushProductionOrderSoapIn" />
+      <wsdl:output message="tns:BackflushProductionOrderSoapOut" />
+    </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="SAPServiceSoap" type="tns:SAPServiceSoap">
     <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
@@ -703,6 +744,15 @@
     </wsdl:operation>
     <wsdl:operation name="ExchangeMoveType">
       <soap:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/ExchangeMoveType" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReExchangeMoveType">
+      <soap:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/ReExchangeMoveType" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -845,6 +895,15 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="BackflushProductionOrder">
+      <soap:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/BackflushProductionOrder" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:binding name="SAPServiceSoap12" type="tns:SAPServiceSoap">
     <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
@@ -886,6 +945,15 @@
     </wsdl:operation>
     <wsdl:operation name="ExchangeMoveType">
       <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/ExchangeMoveType" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReExchangeMoveType">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/ReExchangeMoveType" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -1021,6 +1089,15 @@
     </wsdl:operation>
     <wsdl:operation name="GetCurrentVanOrder">
       <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/GetCurrentVanOrder" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BackflushProductionOrder">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/BackflushProductionOrder" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

@@ -12,11 +12,11 @@ SET ANSI_PADDING ON
 GO
 
 CREATE TABLE [dbo].[SAP_ProdOpBackflush](
-	[Id] [int] NOT NULL,
+	[Id] [int] IDENTITY(1,1) NOT FOR REPLICATION NOT NULL,
 	[SAPOpReportId] [int] NULL,
 	[AUFNR] [varchar](50) NULL,
 	[WERKS] [varchar](50) NULL,
-	[AUFPL] [varchar](50) NULL,
+	[AUFPL] int NULL,
 	[APLZL] [varchar](50) NULL,
 	[PLNTY] [varchar](50) NULL,
 	[PLNNR] [varchar](50) NULL,

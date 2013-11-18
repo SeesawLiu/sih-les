@@ -939,7 +939,7 @@ namespace com.Sconit.Service.SAP.Impl
         public void BackflushProductionOrder()
         {
             IList<ErrorMessage> errorMessageList = new List<ErrorMessage>();
-            IList<ProdOpBackflush> prodOpBackflushList = this.genericMgr.FindAllWithNativeSql<ProdOpBackflush>(
+            IList<ProdOpBackflush> prodOpBackflushList = this.genericMgr.FindEntityWithNativeSql<ProdOpBackflush>(
                 @"select bf.* from SAP_ProdOpBackflush as bf inner join ORD_OrderMstr_4 as mstr on bf.OrderNo = mstr.OrderNo where mstr.ProdLineType not in (?,?,?,?,?) and (bf.Status = ? or (bf.Status = ? and bf.ErrorCount < 10))",
                 new object[] { CodeMaster.ProdLineType.Cab, CodeMaster.ProdLineType.Chassis, CodeMaster.ProdLineType.Assembly, CodeMaster.ProdLineType.Special, CodeMaster.ProdLineType.Check,
                                 StatusEnum.Pending, StatusEnum.Fail});
@@ -1071,7 +1071,7 @@ namespace com.Sconit.Service.SAP.Impl
                             prodOpBackflush.SAPOpReportId = prodOpReport.Id;
                             prodOpBackflush.AUFNR = ZITEM_LX.AUFNR;
                             prodOpBackflush.WERKS = ZITEM_LX.WERKS;
-                            prodOpBackflush.AUFPL = ZITEM_LX.AUFPL;
+                            prodOpBackflush.AUFPL = ZITEM_LX.AUFPL.TrimStart('0');
                             prodOpBackflush.APLZL = ZITEM_LX.APLZL;
                             prodOpBackflush.PLNTY = ZITEM_LX.PLNTY;
                             prodOpBackflush.PLNNR = ZITEM_LX.PLNNR;

@@ -2214,6 +2214,10 @@
     <Content Include="Views\com.Sconit.Web.Controllers.ORD\DistributionRequisition\LogIndex.cshtml" />
     <Content Include="Views\com.Sconit.Web.Controllers.ORD\DistributionRequisition\LogList.cshtml" />
     <Content Include="Views\com.Sconit.Web.Controllers.INV\OrderItemTrace\CreateBarCode.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.INV\OpReferenceBalance\_ManualAdjustSearch.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.INV\OpReferenceBalance\_ManualAdjustSearchResult.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.INV\OpReferenceBalance\ManualAdjust.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.INV\OpReferenceBalance\ManualAdjustList.cshtml" />
     <None Include="Web References\EncryptDencryptService\EncryptDencryptService.wsdl" />
     <None Include="Web References\EncryptDencryptService\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>

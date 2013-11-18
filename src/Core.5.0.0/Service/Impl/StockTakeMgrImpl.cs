@@ -2060,19 +2060,163 @@ namespace com.Sconit.Service.Impl
         [Transaction(TransactionMode.Requires)]
         public void CreateOpReferenceBalance(OpReferenceBalance opReferenceBalance)
         {
+             User user = SecurityContextHolder.Get();
             this.genericMgr.Create(opReferenceBalance);
             this.genericMgr.FindAllWithNativeSql(@"insert into LOG_OpRefBalanceChange(Item, OpRef, Qty, [Status], [Version], CreateDate, CreateUserId, CreateUserNm)
-			values(?, ?,?, 0, 1, ?, ?, ?) ",new object[]{opReferenceBalance.Item,opReferenceBalance.OpReference,opReferenceBalance.Qty,System.DateTime.Now,opReferenceBalance.CreateUserId,opReferenceBalance.CreateUserName});
+			values(?, ?,?, 0, 1, ?, ?, ?) ", new object[] { opReferenceBalance.Item, opReferenceBalance.OpReference, opReferenceBalance.Qty, System.DateTime.Now, user.Id, user.FullName });
         }
 
         [Transaction(TransactionMode.Requires)]
         public void UpdateOpReferenceBalance(OpReferenceBalance opReferenceBalance)
         {
+            User user = SecurityContextHolder.Get();
             this.genericMgr.Update(opReferenceBalance);
             this.genericMgr.FindAllWithNativeSql(@"insert into LOG_OpRefBalanceChange(Item, OpRef, Qty, [Status], [Version], CreateDate, CreateUserId, CreateUserNm)
-			values(?, ?,?, 1, ?, ?, ?, ?) ", new object[] { opReferenceBalance.Item, opReferenceBalance.OpReference, opReferenceBalance.Qty,opReferenceBalance.Version+1, System.DateTime.Now, opReferenceBalance.CreateUserId, opReferenceBalance.CreateUserName });
+			values(?, ?,?, 1, ?, ?, ?, ?) ", new object[] { opReferenceBalance.Item, opReferenceBalance.OpReference, opReferenceBalance.Qty, opReferenceBalance.Version + 1, System.DateTime.Now, user.Id, user.FullName });
         }
         #endregion
+
+        #region  调整导入
+        [Transaction(TransactionMode.Requires)]
+        public void ImportOpReferenceBalanceAdjustXls(Stream inputStream)
+        {
+            if (inputStream.Length == 0)
+            {
+                throw new BusinessException("Import.Stream.Empty");
+            }
+
+            HSSFWorkbook workbook = new HSSFWorkbook(inputStream);
+
+            ISheet sheet = workbook.GetSheetAt(0);
+            IEnumerator rows = sheet.GetRowEnumerator();
+
+            ImportHelper.JumpRows(rows, 10);
+
+            #region 列定义
+            int colItem = 1;//物料代码
+            int colOpRef = 2;//工位
+            int colQty = 3;//数量
+            #endregion
+
+            BusinessException businessException = new BusinessException();
+            int rowCount = 10;
+            DateTime dateTimeNow = DateTime.Now;
+            IList<OpReferenceBalance> allOpReferenceBalance = this.genericMgr.FindAll<OpReferenceBalance>();
+            IList<OpReferenceBalance> updateOpReferenceBalance = new List<OpReferenceBalance>();
+            while (rows.MoveNext())
+            {
+                rowCount++;
+                HSSFRow row = (HSSFRow)rows.Current;
+                if (!ImportHelper.CheckValidDataRow(row, 1, 9))
+                {
+                    break;//边界
+                }
+                OpReferenceBalance newOprefBlance = new OpReferenceBalance();
+                string itemCode = string.Empty;
+                string opRef = string.Empty;
+                decimal qty = 0;
+
+                #region 读取数据
+                #region 读取物料代码
+                itemCode = ImportHelper.GetCellStringValue(row.GetCell(colItem));
+                if (string.IsNullOrWhiteSpace(itemCode))
+                {
+                    businessException.AddMessage(string.Format("第{0}行：物料代码不能为空。", rowCount));
+                    continue;
+                }
+                else
+                {
+                    var items = this.genericMgr.FindAll<Item>(" select i from Item as i where i.Code=? ", itemCode);
+                    if (items == null || items.Count == 0)
+                    {
+                        businessException.AddMessage(string.Format("第{0}行：物料代码{1}不存在。", rowCount, itemCode));
+                        continue;
+                    }
+                }
+                #endregion
+
+                #region 读取工位
+                opRef = ImportHelper.GetCellStringValue(row.GetCell(colOpRef));
+                if (string.IsNullOrWhiteSpace(opRef))
+                {
+                    businessException.AddMessage(string.Format("第{0}行：工位不能为空。", rowCount));
+                    continue;
+                }
+
+
+                #endregion
+
+                #region 调整数
+
+                string qtyRead = ImportHelper.GetCellStringValue(row.GetCell(colQty));
+                if (string.IsNullOrWhiteSpace(qtyRead))
+                {
+                    businessException.AddMessage(string.Format("第{0}行：调整数不能为空。", rowCount));
+                    continue;
+                }
+                else
+                {
+                    if (decimal.TryParse(qtyRead, out qty))
+                    {
+                       
+                    }
+                    else
+                    {
+                        businessException.AddMessage(string.Format("第{0}行：调整数{1}填写不正确。", rowCount, qtyRead));
+                        continue;
+                    }
+                }
+                #endregion
+                #endregion
+
+                #region 校验
+                var isExistsImport = updateOpReferenceBalance != null ? updateOpReferenceBalance.Where(a => a.Item == itemCode && a.OpReference == opRef) : null;
+                if (isExistsImport != null && isExistsImport.Count() > 0)
+                {
+                    businessException.AddMessage(string.Format("第{0}行：物料+工位在模板中重复。", rowCount));
+                    continue;
+                }
+                var isExistsDatabase = allOpReferenceBalance.Where(a => a.Item == itemCode && a.OpReference == opRef);
+                if (isExistsDatabase != null && isExistsDatabase.Count() > 0)
+                {
+                    newOprefBlance = isExistsDatabase.First();
+                    newOprefBlance.CurrentAdjustQty = qty;
+                    updateOpReferenceBalance.Add(newOprefBlance);
+
+                }
+                else
+                {
+                    businessException.AddMessage(string.Format("第{0}行：物料+工位不存在。", rowCount));
+                    continue;
+                }
+                #endregion
+            }
+
+            if (updateOpReferenceBalance.Count > 0)
+            {
+                foreach (var op in updateOpReferenceBalance)
+                {
+                    try
+                    {
+                        var up = this.genericMgr.FindAllWithNativeSql<object[]>(" select Qty,isnull(Version,0) as version from SCM_OpRefBalance where id=? ", op.Id)[0];
+                        op.Qty = op.CurrentAdjustQty + Convert.ToDecimal(up[0]);
+                        op.Version = Convert.ToInt32(up[1]);
+                        this.UpdateOpReferenceBalance(op);
+                    }
+                    catch (Exception ex)
+                    {
+                        businessException.AddMessage(string.Format("物料代码{0}+ 工位{1} +调整数{2} 导入失败，" + ex.Message, op.Item, op.OpReference, op.CurrentAdjustQty));
+                    }
+                }
+            }
+          
+            if (businessException.HasMessage)
+            {
+                throw businessException;
+            }
+        }
+        #endregion
+
 
     }
 }

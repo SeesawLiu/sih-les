@@ -14,6 +14,9 @@ namespace com.Sconit.Entity.SCM
         [Export(ExportName = "ExporOpReferenceBalancetList", ExportSeq = 20)]
         [Display(Name = "OpReferenceBalance_ReferenceItemCode", ResourceType = typeof(Resources.SCM.OpReferenceBalance))]
         public string ReferenceItemCode { get; set; }
+
+        public decimal CurrentAdjustQty { get; set; }
+        
        
     }
 }

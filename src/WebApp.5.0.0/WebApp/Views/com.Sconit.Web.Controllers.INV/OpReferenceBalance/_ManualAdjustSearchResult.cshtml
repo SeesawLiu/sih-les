@@ -1,0 +1,83 @@
+﻿@model IEnumerable<com.Sconit.Entity.SCM.OpReferenceBalance>
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("OpReferenceBalanceGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+      
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Item).EditorTemplateName("ItemGridForeignKey").Width(200);
+            columns.Bound(o => o.ReferenceItemCode).ReadOnly();
+            columns.Bound(o => o.ItemDescription).ReadOnly();
+            columns.Bound(o => o.OpReference);
+            columns.Bound(o => o.Qty);
+            columns.Bound(o => o.CreateUserName).ReadOnly();
+            columns.Bound(o => o.CreateDate).ReadOnly();
+            columns.Bound(o => o.LastModifyUserName).ReadOnly();
+            columns.Bound(o => o.LastModifyDate).ReadOnly();
+            columns.Bound(o => o.CurrentAdjustQty).Title("本次调整数").ClientTemplate("<input type='text' id='CurrentAdjustQty' name='CurrentAdjustQty' style='width:70px'  />");
+            columns.Bound(o => o.Id).Hidden();
+            columns.Bound(o => o.Id).Title(" ").ClientTemplate("<input type='button' id='Id' name='Id' style='width:70px' value='调整' onclick='doAdjustClick(this)'/>");
+            columns.Bound(o => o.Version).Hidden();
+        })
+
+        .Scrollable(c => c.Enabled(false))
+        .EnableCustomBinding(true)
+                .DataBinding(dataBinding => dataBinding.Ajax()
+                                .Select("_AjaxManualAdjustList", "OpReferenceBalance"))
+        .ClientEvents(events => events.OnDataBinding("OpReferenceBalanceGrid_OnDataBinding").OnComplete("TelerikGridView_OnComplete"))
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+            settings.PageSize(ViewBag.PageSize);
+        })
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+    )
+     <script type="text/javascript">
+         function OpReferenceBalanceGrid_OnDataBinding(e) {
+             e.data = {
+                 ItemCode: $('#ItemCode').val(),
+                 OpReference: $('#OpReference').val(),
+                 ModifyStartDate: $('#ModifyStartDate').val(),
+                 ModifyEndDate: $('#ModifyEndDate').val(),
+                 CreateStartDate: $('#CreateStartDate').val(),
+                 CreateEndDate: $('#CreateEndDate').val(),
+                 CreateUserName: $("#CreateUserName").val(),
+                 LastModifyUserName: $('#LastModifyUserName').val()
+             };
+         }
+
+
+         function doAdjustClick(e) {
+             if (confirm("确定要调整吗？")) {
+                 var parameter = {
+                     "id": $(e).parent().prev().text(),
+                     "currentAdjustQty": $(e).parent().prev().prev().children().val()
+                 }
+                 if (parameter["currentAdjustQty"] == "" || parameter["currentAdjustQty"] == undefined || parameter["currentAdjustQty"] == null) {
+                     $message.error("请填写调整数。");
+                     return;
+                 }
+                 $.ajax({
+                     type: "post",
+                     dataType: "html",
+                     data: parameter,
+                     url: "/OpReferenceBalance/ManualAdjustAction/",
+                     cache: false,
+                     success: function (data, textStatus) {
+                     
+                         $("#content").html(data);
+                     },
+                     error: function (XMLHttpRequest, textStatus, errorThrown) {
+                         DisplayTextMessages(XMLHttpRequest.responseText);
+                     }
+                 });
+             }
+         }
+
+    </script>
+</fieldset>

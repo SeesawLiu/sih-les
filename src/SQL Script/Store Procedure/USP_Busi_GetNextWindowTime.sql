@@ -20,6 +20,8 @@ CREATE PROCEDURE [dbo].[USP_Busi_GetNextWindowTime]
 AS
 BEGIN
 	set nocount on
+	set @NextWindowTime = null
+	
 	declare @ErrorMsg nvarchar(Max)
 	declare @DateTimeNow datetime = GETDATE()
 	declare @FlowType tinyint

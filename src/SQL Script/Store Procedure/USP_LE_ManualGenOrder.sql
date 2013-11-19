@@ -920,7 +920,8 @@ BEGIN
 				--按包装圆整
 				update #tempOrderDet set OrderQty = ReqQty where OrderNo = @OrderNo and ReqQty > 0 and RoundUpOpt in (0, 2)  --不圆整
 				update #tempOrderDet set OrderQty = ReqQty where OrderNo = @OrderNo and ReqQty > 0 and UC <= 0  --不圆整
-				update #tempOrderDet set OrderQty = ceiling(ReqQty / UC) * UC where OrderNo = @OrderNo and ReqQty > 0 and RoundUpOpt = 1 and UC > 0 --向上圆整
+				update #tempOrderDet set OrderQty = ReqQty where OrderNo = @OrderNo and ReqQty > 0 and RoundUpOpt = 1 and UC > 0 --向上圆整
+				--update #tempOrderDet set OrderQty = ceiling(ReqQty / UC) * UC where OrderNo = @OrderNo and ReqQty > 0 and RoundUpOpt = 1 and UC > 0 --向上圆整
 				--update #tempOrderDet set OrderQty = floor(ReqQty / UC) * UC where OrderNo = @OrderNo and ReqQty > 0 and RoundUpOpt = 2 and UC > 0  --向下圆整
 				
 				--更新工位余量

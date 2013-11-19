@@ -123,7 +123,7 @@ where om.ProdLineType in (1,2,3,4,9) and op.Status=0 ";
             paramArr.Add(dateFrom);
             paramArr.Add(dateTo);
 
-            searchSql += " order by op.WorkCenter asc";
+            searchSql += " order by op.EffDate asc";
 
             IList<object[]> searchResult = this.genericMgr.FindAllWithNativeSql<object[]>(searchSql, paramArr.ToArray());
             var returnResult = new List<OrderOperationReport>();
@@ -212,7 +212,7 @@ where om.ProdLineType in (1,2,3,4,9) and op.Status=0 ";
             paramArr.Add(searchModel.DateFrom.Value);
             paramArr.Add(searchModel.DateTo.Value);
 
-            searchSql += " order by op.WorkCenter asc";
+            searchSql += " order by op.EffDate asc";
 
             IList<object[]> searchResult = this.genericMgr.FindAllWithNativeSql<object[]>(searchSql, paramArr.ToArray());
             var returnResult = new List<OrderOperationReport>();

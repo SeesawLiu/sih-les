@@ -91,9 +91,23 @@ BEGIN
 		CreateDate datetime NULL default(GETDATE()),
 	)
 	
+	Create table #tempIgnoreWorkCenter(
+		WorkCenter varchar(50) NULL
+	)
+	
 	--记录日志
 	set @Msg = N'生成整车线边物料要货单开始'
 	insert into LOG_GenOrder4VanProdLine(Lvl, Msg, BatchNo) values(0, @Msg, @BatchNo)
+	
+	--过滤掉工作中心是鞍座和变速器的物料
+	insert into #tempIgnoreWorkCenter(WorkCenter)
+	select distinct WorkCenter from
+		(select transPWC.WorkCenter from CUST_ProductLineMap as map
+		inner join PRD_ProdLineWorkCenter as transPWC on map.TransFlow = transPWC.Flow
+		union all
+		select saddlePWC.WorkCenter from CUST_ProductLineMap as map
+		inner join PRD_ProdLineWorkCenter as saddlePWC on map.SaddleFlow = saddlePWC.Flow
+		) as A
 
 	declare @FlowId int 
 	declare @MaxFlowId int
@@ -157,7 +171,8 @@ BEGIN
 				from (select fdet.Flow, fdet.FlowDetId, fdet.Item, fdet.Uom, fdet.UC, fdet.MinUC, fdet.UCDesc, fdet.Container, fdet.ContainerDesc, fdet.RoundUpOpt, bom.ManufactureParty, fdet.LocFrom, fdet.LocTo, bom.OpRef, SUM(bom.OrderQty) as OrderQty
 						from LE_OrderBomCPTimeSnapshot as bom
 						inner join LE_FlowDetSnapShot as fdet on bom.Item = fdet.Item and bom.Location = fdet.LocTo
-						where fdet.Flow = @Flow and fdet.Strategy = 3 and bom.CPTime < @ReqTimeFrom and bom.IsCreateOrder = 0
+						left join #tempIgnoreWorkCenter as wc on bom.WorkCenter = wc.WorkCenter
+						where fdet.Flow = @Flow and fdet.Strategy = 3 and bom.CPTime < @ReqTimeFrom and bom.IsCreateOrder = 0 and wc.WorkCenter is null
 						group by fdet.Flow, fdet.FlowDetId, fdet.Item, fdet.Uom, fdet.UC, fdet.MinUC, fdet.UCDesc, fdet.Container, fdet.ContainerDesc, fdet.RoundUpOpt, bom.ManufactureParty, fdet.LocFrom, fdet.LocTo, bom.OpRef) as req
 				left join SCM_OpRefBalance as orb on req.Item = orb.Item and req.OpRef = orb.OpRef
 				order by req.Item, req.OpRef
@@ -850,7 +865,8 @@ BEGIN
 					from (select fdet.Flow, fdet.FlowDetId, fdet.Item, fdet.Uom, fdet.UC, fdet.MinUC, fdet.UCDesc, fdet.Container, fdet.ContainerDesc, fdet.RoundUpOpt, bom.ManufactureParty, fdet.LocFrom, fdet.LocTo, bom.OpRef, SUM(bom.OrderQty) as OrderQty
 							from LE_OrderBomCPTimeSnapshot as bom
 							inner join LE_FlowDetSnapShot as fdet on bom.Item = fdet.Item and bom.Location = fdet.LocTo
-							where fdet.Flow = @Flow and fdet.Strategy = 3 and bom.CPTime >= @ReqTimeFrom and bom.CPTime < @ReqTimeTo and bom.IsCreateOrder = 0
+							left join #tempIgnoreWorkCenter as wc on bom.WorkCenter = wc.WorkCenter
+							where fdet.Flow = @Flow and fdet.Strategy = 3 and bom.CPTime >= @ReqTimeFrom and bom.CPTime < @ReqTimeTo and bom.IsCreateOrder = 0 and wc.WorkCenter is null
 							group by fdet.Flow, fdet.FlowDetId, fdet.Item, fdet.Uom, fdet.UC, fdet.MinUC, fdet.UCDesc, fdet.Container, fdet.ContainerDesc, fdet.RoundUpOpt, bom.ManufactureParty, fdet.LocFrom, fdet.LocTo, bom.OpRef) as req
 					left join SCM_OpRefBalance as orb on req.Item = orb.Item and req.OpRef = orb.OpRef
 					order by req.Item, req.OpRef
@@ -1557,6 +1573,7 @@ BEGIN
 	set @Msg = N'生成整车线边物料要货单结束'
 	insert into LOG_GenOrder4VanProdLine(Lvl, Msg, BatchNo) values(0, @Msg, @BatchNo)
 	
+	drop table #tempIgnoreWorkCenter
 	drop table #temp_LOG_GenOrder4VanProdLine
 	drop table #tempOrderDetId
 	drop table #tempOrderDet

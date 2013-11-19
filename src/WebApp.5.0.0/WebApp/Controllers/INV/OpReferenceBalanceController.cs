@@ -16,6 +16,7 @@ using com.Sconit.Entity.Exception;
 using NHibernate.Type;
 using NHibernate;
 using com.Sconit.Entity.MD;
+using System.Web.Routing;
 
 namespace com.Sconit.Web.Controllers.INV
 {
@@ -158,7 +159,7 @@ namespace com.Sconit.Web.Controllers.INV
 
         #endregion
 
-        #region 调整
+        #region 循环盘点
 
         public ActionResult Adjust()
         {
@@ -208,6 +209,113 @@ namespace com.Sconit.Web.Controllers.INV
         }
         #endregion
 
+        #region 调整
+
+        [SconitAuthorize(Permissions = "Url_OpReferenceBalance_ManualAdjust")]
+        public ActionResult ManualAdjust()
+        {
+            return View();
+        }
+
+        [SconitAuthorize(Permissions = "Url_OpReferenceBalance_ManualAdjust")]
+        [GridAction]
+        public ActionResult ManualAdjustList(GridCommand command, OpReferenceBalanceSearchModel searchModel)
+        {
+            SearchCacheModel searchCacheModel = this.ProcessSearchModel(command, searchModel);
+            ViewBag.PageSize = 50;
+            return View();
+        }
+
+        [GridAction(EnableCustomBinding = true)]
+        public ActionResult _AjaxManualAdjustList(GridCommand command, OpReferenceBalanceSearchModel searchModel)
+        {
+            if (!string.IsNullOrWhiteSpace(searchModel.successMessage))
+            {
+                SaveSuccessMessage(searchModel.successMessage);
+            }
+            SearchStatementModel searchStatementModel = this.PrepareSearchStatement(command, searchModel);
+            GridModel<OpReferenceBalance> gridModel = GetAjaxPageData<OpReferenceBalance>(searchStatementModel, command);
+            if (gridModel.Data != null)
+            {
+                foreach (var opReferenceBalance in gridModel.Data)
+                {
+                    Item item = this.genericMgr.FindById<Item>(opReferenceBalance.Item);
+                    opReferenceBalance.ReferenceItemCode = item.ReferenceCode;
+                    opReferenceBalance.ItemDescription = item.Description;
+                }
+            }
+            return PartialView(gridModel);
+        }
+
+        [GridAction(EnableCustomBinding = true)]
+        [SconitAuthorize(Permissions = "Url_OpReferenceBalance_ManualAdjust")]
+        public ActionResult ManualAdjustAction(int id, string currentAdjustQty)
+        {
+            try
+            {
+                decimal adjustQty = 0;
+                if (string.IsNullOrWhiteSpace(currentAdjustQty))
+                {
+                    throw new BusinessException("数量不能为空。");
+                }
+
+                try
+                {
+                    adjustQty = Convert.ToDecimal(currentAdjustQty);
+                }
+                catch (Exception)
+                {
+
+                    throw new BusinessException(string.Format("调整数{0}填写有误。",currentAdjustQty));
+                }
+                OpReferenceBalance op = this.genericMgr.FindById<OpReferenceBalance>(id);
+                op.Qty = op.Qty + adjustQty;
+                stockTakeMgr.UpdateOpReferenceBalance(op);
+
+                SaveSuccessMessage(string.Format("调整成功。"));
+                return new RedirectToRouteResult(new RouteValueDictionary  
+                                                       { 
+                                                           { "action", "ManualAdjustList" }, 
+                                                           { "controller", "OpReferenceBalance" },
+                                                           {"successMessage","调整成功。"}
+                                                       });
+            }
+            catch (BusinessException ex)
+            {
+                SaveBusinessExceptionMessage(ex);
+            }
+            catch (Exception ex)
+            {
+                SaveErrorMessage(ex);
+            }
+            return Json(null);
+        }
+
+        [SconitAuthorize(Permissions = "Url_OpReferenceBalance_Stock")]
+        public ActionResult ImportAdjustXls(IEnumerable<HttpPostedFileBase> attachments)
+        {
+            try
+            {
+                foreach (var file in attachments)
+                {
+                    stockTakeMgr.ImportOpReferenceBalanceAdjustXls(file.InputStream);
+                    SaveSuccessMessage("全部导入成功！");
+                }
+            }
+            catch (BusinessException ex)
+            {
+                SaveBusinessExceptionMessage(ex);
+            }
+            catch (Exception ex)
+            {
+                SaveErrorMessage("导入失败。 - " + ex.Message);
+            }
+
+            return Content(string.Empty);
+        }
+
+        #endregion
+
         #region 盘点
 
         [SconitAuthorize(Permissions = "Url_OpReferenceBalance_Stock")]
@@ -216,7 +324,7 @@ namespace com.Sconit.Web.Controllers.INV
             return View();
         }
 
-        [SconitAuthorize(Permissions = "Url_LocationDetailPref_View")]
+        [SconitAuthorize(Permissions = "Url_OpReferenceBalance_Stock")]
         [GridAction]
         public ActionResult StockList(GridCommand command, OpReferenceBalanceSearchModel searchModel)
         {
@@ -227,7 +335,7 @@ namespace com.Sconit.Web.Controllers.INV
             return View();
         }
 
-        [SconitAuthorize(Permissions = "Url_LocationDetailPref_View")]
+        [SconitAuthorize(Permissions = "Url_OpReferenceBalance_Stock")]
         [GridAction(EnableCustomBinding = true)]
         public ActionResult _AjaxStockList(GridCommand command, OpReferenceBalanceSearchModel searchModel)
         {
@@ -247,7 +355,7 @@ namespace com.Sconit.Web.Controllers.INV
 
 
         [GridAction]
-        [SconitAuthorize(Permissions = "Url_LocationDetailPref_View")]
+        [SconitAuthorize(Permissions = "Url_OpReferenceBalance_Stock")]
         public ActionResult _Insert(OpReferenceBalance opReferenceBalance)
         {
             if (CheckOpReferenceBalance(opReferenceBalance))
@@ -282,7 +390,7 @@ namespace com.Sconit.Web.Controllers.INV
         }
 
         [GridAction]
-        [SconitAuthorize(Permissions = "Url_LocationDetailPref_View")]
+        [SconitAuthorize(Permissions = "Url_OpReferenceBalance_Stock")]
         public ActionResult _Update(OpReferenceBalance opReferenceBalance, string id)
         {
             if (CheckOpReferenceBalance(opReferenceBalance))
@@ -321,7 +429,7 @@ namespace com.Sconit.Web.Controllers.INV
         }
 
         [GridAction]
-        [SconitAuthorize(Permissions = "Url_LocationDetailPref_View")]
+        [SconitAuthorize(Permissions = "Url_OpReferenceBalance_Stock")]
         public ActionResult _Delete(string Id)
         {
             if (string.IsNullOrEmpty(Id))

@@ -109,5 +109,7 @@ namespace com.Sconit.Service
          void UpdateOpReferenceBalance(OpReferenceBalance opReferenceBalance);
         #endregion
 
+         void ImportOpReferenceBalanceAdjustXls(Stream inputStream);
+
     }
 }

@@ -16,5 +16,6 @@ namespace com.Sconit.Web.Models.SearchModels.INV
         public DateTime? CreateEndDate { get; set; }
         public DateTime? ModifyStartDate { get; set; }
         public DateTime? ModifyEndDate { get; set; }
+        public string successMessage { get; set; }
     }
 }

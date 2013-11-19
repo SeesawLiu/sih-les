@@ -89,8 +89,8 @@ namespace com.Sconit.Service.SAP.Impl
                 XlsHelper.SetRowCell(sheet, rownum, colnum++, "特殊标志", headStyle);
                 XlsHelper.SetRowCell(sheet, rownum, colnum++, "供应厂商", headStyle);
                 XlsHelper.SetRowCell(sheet, rownum, colnum++, "正常库存", headStyle);
-                XlsHelper.SetRowCell(sheet, rownum, colnum++, "冻结库存", headStyle);
                 XlsHelper.SetRowCell(sheet, rownum, colnum++, "质检库存", headStyle);
+                XlsHelper.SetRowCell(sheet, rownum, colnum++, "冻结库存", headStyle);
                 XlsHelper.SetRowCell(sheet, rownum, colnum, "库存单位", headStyle);
 
                 rownum++;

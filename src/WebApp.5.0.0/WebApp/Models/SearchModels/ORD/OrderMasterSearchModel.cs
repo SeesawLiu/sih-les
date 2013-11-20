@@ -69,6 +69,7 @@ namespace com.Sconit.Web.Models.SearchModels.ORD
         public bool Delete { get; set; }
         public bool CloseDet { get; set; }
         public bool JITClose { get; set; }
+        public string MultiStatus { get; set; }
 
     }
 }

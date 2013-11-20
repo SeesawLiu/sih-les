@@ -220,6 +220,7 @@ namespace com.Sconit.Entity.ORD
         [Display(Name = "OrderMaster_IsListPrice", ResourceType = typeof(Resources.ORD.OrderMaster))]
         public Boolean IsListPrice { get; set; }
 
+        [Export(ExportName = "ExportSeqOrder", ExportSeq = 160)]
         [Display(Name = "OrderMaster_IsPrintOrder", ResourceType = typeof(Resources.ORD.OrderMaster))]
         public Boolean IsPrintOrder { get; set; }
 

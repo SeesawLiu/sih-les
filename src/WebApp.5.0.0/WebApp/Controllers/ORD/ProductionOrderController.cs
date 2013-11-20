@@ -2878,9 +2878,20 @@ and m.ProdLineType in (1,2,3,4,9) and m.OrderStrategy <>4 and m.SubType=0 ";
                 sql += " and  m.PartyTo = ?";
                 param.Add(searchModel.PartyTo);
             }
-            if (searchModel.Status.HasValue)
+            //if (searchModel.Status.HasValue)
+            //{
+            //    sql += " and m.Status =" + searchModel.Status.Value;
+            //}
+            if (!string.IsNullOrWhiteSpace(searchModel.MultiStatus))
             {
-                sql += " and m.Status =" + searchModel.Status.Value;
+                string statusSql = " and m.Status in( ";
+                string[] statusArr = searchModel.MultiStatus.Split(',');
+                for (int st = 0; st < statusArr.Length; st++)
+                {
+                    statusSql += "'" + statusArr[st] + "',";
+                }
+                statusSql = statusSql.Substring(0, statusSql.Length - 1) + ")";
+                sql += statusSql;
             }
             if (searchModel.Priority.HasValue)
             {
@@ -3013,11 +3024,21 @@ and m.ProdLineType not in (1,2,3,4,9) and m.OrderStrategy <>4 and m.SubType=0 ";
                 sql += " and  m.ReferenceOrderNo like ?";
                 param.Add(searchModel.ReferenceOrderNo + "%");
             }
-            if (searchModel.Status.HasValue)
+            //if (searchModel.Status.HasValue)
+            //{
+            //    sql += " and m.Status =" + searchModel.Status.Value;
+            //}
+            if (!string.IsNullOrWhiteSpace(searchModel.MultiStatus))
             {
-                sql += " and m.Status =" + searchModel.Status.Value;
+                string statusSql = " and m.Status in( ";
+                string[] statusArr = searchModel.MultiStatus.Split(',');
+                for (int st = 0; st < statusArr.Length; st++)
+                {
+                    statusSql += "'" + statusArr[st] + "',";
+                }
+                statusSql = statusSql.Substring(0, statusSql.Length - 1) + ")";
+                sql += statusSql;
             }
-
             if (!string.IsNullOrWhiteSpace(searchModel.CreateUserName))
             {
                 sql += " and  m.CreateUserName like ?";
@@ -3228,6 +3249,17 @@ and m.ProdLineType not in (1,2,3,4,9) and m.OrderStrategy <>4 and m.SubType=0 ";
 
         private ProcedureSearchStatementModel PrepareVanSearchStatement_1(GridCommand command, OrderMasterSearchModel searchModel, string whereStatement, SortDescriptor defaultSort, bool isReturn)
         {
+            if (!string.IsNullOrWhiteSpace(searchModel.MultiStatus))
+            {
+                string statusSql = " and o.Status in( ";
+                string[] statusArr = searchModel.MultiStatus.Split(',');
+                for (int st = 0; st < statusArr.Length; st++)
+                {
+                    statusSql += "'" + statusArr[st] + "',";
+                }
+                statusSql = statusSql.Substring(0, statusSql.Length - 1) + ")";
+                whereStatement += statusSql;
+            }
             searchModel.ExternalOrderNo = searchModel.ExternalOrderNo != null ? searchModel.ExternalOrderNo.PadLeft(12, '0') : null;
             List<ProcedureParameter> paraList = new List<ProcedureParameter>();
             List<ProcedureParameter> pageParaList = new List<ProcedureParameter>();
@@ -3821,6 +3853,17 @@ and m.ProdLineType not in (1,2,3,4,9) and m.OrderStrategy <>4 and m.SubType=0 ";
 
         private ProcedureSearchStatementModel PrepareSearchStatement_1(GridCommand command, OrderMasterSearchModel searchModel, string whereStatement, bool isReturn)
         {
+            if (!string.IsNullOrWhiteSpace(searchModel.MultiStatus))
+            {
+                string statusSql = " and o.Status in( ";
+                string[] statusArr = searchModel.MultiStatus.Split(',');
+                for (int st = 0; st < statusArr.Length; st++)
+                {
+                    statusSql += "'" + statusArr[st] + "',";
+                }
+                statusSql = statusSql.Substring(0, statusSql.Length - 1) + ")";
+                whereStatement += statusSql;
+            }
             searchModel.ExternalOrderNo = searchModel.ExternalOrderNo != null ? searchModel.ExternalOrderNo.PadLeft(12, '0') : searchModel.ExternalOrderNo;
             List<ProcedureParameter> paraList = new List<ProcedureParameter>();
             List<ProcedureParameter> pageParaList = new List<ProcedureParameter>();

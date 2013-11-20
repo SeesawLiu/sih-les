@@ -584,7 +584,8 @@ namespace com.Sconit.Service.Impl
             int colUnitCountDescription = 13;//包装描述
             int colContainerDescription = 14;//容器描述
             int colIsChangeUnitCount = 15;//是否修改包装
-            int colIsDelete = 16;//是否修改包装
+            int colIsDelete = 17;//删除标示
+            int colRoundUpOption = 16;//圆整系数
             int rowCount = 10;
             #endregion
             //IList<FlowDetail> insertFlowDetailList = new List<FlowDetail>();
@@ -608,7 +609,8 @@ namespace com.Sconit.Service.Impl
                 string unitCountDescription = string.Empty;//包装描述
                 string containerDescription = string.Empty;//容器描述
                 string changeUnitCount = string.Empty;//是否修改包装
-                bool isDelete = true;//上线包装
+                bool isDelete = true;//是否删除
+                int roundUpOption = 111;//圆整系数
 
                 #region 读取数据
                 #region 读取Flow
@@ -758,6 +760,28 @@ namespace com.Sconit.Service.Impl
                     }
                     #endregion
 
+                    #region 圆整系数
+                    string readRound = ImportHelper.GetCellStringValue(row.GetCell(colRoundUpOption));
+                    if (!string.IsNullOrWhiteSpace(readRound))
+                    {
+                        switch (readRound)
+                        {
+                            case "0":
+                                roundUpOption = 0;
+                                break;
+                            case "1":
+                                roundUpOption = 1;
+                                break;
+                            case "2":
+                                roundUpOption = 2;
+                                break;
+                            default:
+                                businessException.AddMessage(string.Format("第{0}行:圆整系数{1}填写有误。", rowCount, readRound));
+                                break;
+                        }
+                    }
+                    #endregion
+
 
                     FlowDetail flowDetail = new FlowDetail();
                     var flowdets = this.genericMgr.FindAll<FlowDetail>(" select d from FlowDetail as d where d.Item=? and d.Flow=? ", new object[] { item, flow }, new IType[] { NHibernate.NHibernateUtil.String, NHibernate.NHibernateUtil.String });
@@ -774,6 +798,8 @@ namespace com.Sconit.Service.Impl
                         flowDetail.UnitCountDescription = !string.IsNullOrWhiteSpace(unitCountDescription) ? unitCountDescription : flowDetail.UnitCountDescription;
                         flowDetail.ContainerDescription = !string.IsNullOrWhiteSpace(containerDescription) ? containerDescription : flowDetail.ContainerDescription;
                         flowDetail.IsChangeUnitCount = !string.IsNullOrWhiteSpace(changeUnitCount) ? Convert.ToBoolean(changeUnitCount) : flowDetail.IsChangeUnitCount;
+                        flowDetail.RoundUpOption = (roundUpOption == 0 || roundUpOption == 1 || roundUpOption == 2 )? (CodeMaster.RoundUpOption)roundUpOption : flowDetail.RoundUpOption;
+
                     }
                     else
                     {
@@ -800,6 +826,7 @@ namespace com.Sconit.Service.Impl
                         flowDetail.UnitCount =  Convert.ToDecimal(unitCount);
                         flowDetail.UnitCountDescription =  unitCountDescription; 
                         flowDetail.ContainerDescription =  containerDescription;
+                        flowDetail.RoundUpOption = (roundUpOption == 0 || roundUpOption == 1 || roundUpOption == 2) ? (CodeMaster.RoundUpOption)roundUpOption : (CodeMaster.RoundUpOption)0;
                     }
                     flowDetail.IsChangeUnitCount = Convert.ToBoolean(changeUnitCount);
                     //flowDetail.MinUnitCount = Convert.ToDecimal(minUnitCount);
@@ -926,7 +953,7 @@ namespace com.Sconit.Service.Impl
                 string item = string.Empty; ;// 物料
                 decimal safeStock = 0;//单包装
                 decimal maxStock = 0;//包装描述
-                int roundUpOption = 0;//上线包装
+                int roundUpOption = 0;//圆整系数
                 bool isDelete = true;//删除
                 string changeUnitCount = string.Empty;//是否修改包装
                 #region 读取数据

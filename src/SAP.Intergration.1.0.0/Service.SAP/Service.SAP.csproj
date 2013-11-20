@@ -88,6 +88,7 @@
     <Compile Include="Impl\MasterDataMgrImpl.cs" />
     <Compile Include="Impl\ProcurementMgrImpl.cs" />
     <Compile Include="ITransMgr.cs" />
+    <Compile Include="MasterDataMgrImpl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Impl\TransMgrImpl.cs" />
     <Compile Include="Properties\Settings.Designer.cs">

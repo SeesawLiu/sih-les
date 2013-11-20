@@ -1429,7 +1429,9 @@
     <Content Include="Config\properties.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Config\component-velocity.config" />
+    <Content Include="Config\component-velocity.config">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Content\Images\psd\SIH.psd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

@@ -59,7 +59,7 @@ namespace com.Sconit.Web.Controllers.ORD
 
         public IOrderMgr orderMgr { get; set; }
 
-        public IIpMgr IpMgr { get; set; }
+        //public IIpMgr IpMgr { get; set; }
         #region public actions
 
         #region 查询
@@ -903,7 +903,7 @@ namespace com.Sconit.Web.Controllers.ORD
             IpMaster order = null;
             try
             {
-                order = IpMgr.MergeOrderMaster2IpMaster(Lists);
+                //order = IpMgr.MergeOrderMaster2IpMaster(Lists);
             }
             catch (BusinessException ex)
             {

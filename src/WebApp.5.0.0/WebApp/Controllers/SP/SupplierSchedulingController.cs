@@ -480,7 +480,7 @@ namespace com.Sconit.Web.Controllers.SP
                 SAPService.SAPService sapService = new SAPService.SAPService();
                 sapService.Url = ReplaceSIServiceUrl(sapService.Url);
                 com.Sconit.Entity.ACC.User user = SecurityContextHolder.Get();
-                IList<com.Sconit.Web.SAPService.OrderDetail> scheduleList = sapService.GetProcOrders(null, user.Code, item, "0084", user.Code);
+                IList<com.Sconit.Web.SAPService.OrderDetail> scheduleList = sapService.GetProcOrders(null, user.Code.Trim(), item, "0084", user.Code);
                 #endregion
 
                 DateTime dateTimeNow = DateTime.Now;

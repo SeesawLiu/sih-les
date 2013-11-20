@@ -358,7 +358,7 @@ namespace com.Sconit.Web.Controllers
             return new JsonResult { Data = new SelectList(itemList, "Value", "Text") };
         }
 
-        public ActionResult _CodeMasterMultiSelectBox(com.Sconit.CodeMaster.CodeMaster code, string controlName, string controlId)
+        public ActionResult _CodeMasterMultiSelectBox(com.Sconit.CodeMaster.CodeMaster code, string controlName, string controlId, string checkedValues)
         {
             ViewBag.ControlName = controlName;
             ViewBag.ControlId = controlId;
@@ -370,7 +370,11 @@ namespace com.Sconit.Web.Controllers
             {
                 codeDetail.ChineDescription = systemMgr.TranslateCodeDetailDescription(codeDetail.Description);
             }
-
+            ViewBag.CodeDetails = codeDetailList;
+            if (!string.IsNullOrWhiteSpace(checkedValues))
+            {
+                ViewBag.CheckedValues = checkedValues.Split(',').ToList();
+            }
             ViewBag.CodeDetails = codeDetailList;
 
             return PartialView();

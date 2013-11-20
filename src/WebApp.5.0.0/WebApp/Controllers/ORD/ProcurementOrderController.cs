@@ -222,7 +222,17 @@
             {
                 whereStatement += " and d.RecLotSize=1 ";
             }
-           
+            if (!string.IsNullOrWhiteSpace(searchModel.MultiStatus))
+            {
+                string statusSql = "  and exists (select 1 from OrderMaster as o  with(nolock) where  o.OrderNo=d.OrderNo  and o.Status in( ";
+                string[] statusArr = searchModel.MultiStatus.Split(',');
+                for (int st = 0; st < statusArr.Length; st++)
+                {
+                    statusSql += "'" + statusArr[st] + "',";
+                }
+                statusSql = statusSql.Substring(0, statusSql.Length - 1) + "))";
+                whereStatement += statusSql;
+            }
 
             IList<OrderDetail> orderDetList = new List<OrderDetail>();
             ProcedureSearchStatementModel procedureSearchStatementModel = PrepareSearchDetailStatement(command, searchModel, whereStatement);
@@ -1544,6 +1554,17 @@
 
         private ProcedureSearchStatementModel PrepareSearchStatement_1(GridCommand command, OrderMasterSearchModel searchModel, string whereStatement, bool isReturn)
         {
+            if (!string.IsNullOrWhiteSpace(searchModel.MultiStatus))
+            {
+                string statusSql = " and o.Status in( ";
+                string[] statusArr = searchModel.MultiStatus.Split(',');
+                for (int st = 0; st < statusArr.Length; st++)
+                {
+                    statusSql += "'" + statusArr[st] + "',";
+                }
+                statusSql = statusSql.Substring(0, statusSql.Length - 1) + ")";
+                whereStatement += statusSql;
+            }
             List<ProcedureParameter> paraList = new List<ProcedureParameter>();
             List<ProcedureParameter> pageParaList = new List<ProcedureParameter>();
             paraList.Add(new ProcedureParameter { Parameter = searchModel.OrderNo, Type = NHibernate.NHibernateUtil.String });

@@ -46,6 +46,7 @@
             columns.Bound(o => o.OrderStatusDescription);
             columns.Bound(o => o.CreateDate);
             columns.Bound(o => o.SeqOrderStrategyDescription);
+            columns.Bound(o => o.IsPrintOrder).Title("已打印").ClientTemplate("<input type='checkbox' disabled='disabled' name='IsPrintOrder' <#= IsPrintOrder? checked='checked' : '' #> />");
 
 
         })
@@ -153,7 +154,9 @@
                 TraceCode: $('#TraceCode').val(),
                 Item: $('#Item').val(),
                 OrderStrategy: $('#OrderStrategy').val(),
-                TraceCode: $('#TraceCode').val()
+                TraceCode: $('#TraceCode').val(),
+                IsPrintOrder:$("#IsPrintOrder").is(":checked"),
+                MultiStatus: $('#MultiStatus').val()
             };
         } 
     </script>

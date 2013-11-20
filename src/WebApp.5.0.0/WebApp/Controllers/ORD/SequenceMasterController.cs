@@ -106,6 +106,11 @@ namespace com.Sconit.Web.Controllers.ORD
             {
                 whereStatement += " and o.SeqGroup='" + searchModel.SequenceGroup + "'";
             }
+            if (searchModel.IsPrintOrder)
+            {
+                whereStatement += string.Format(" and IsPrintOrder=0 ");
+            }
+           
             searchModel.SubType = (int)com.Sconit.CodeMaster.OrderSubType.Normal;
             ProcedureSearchStatementModel procedureSearchStatementModel = PrepareSearchStatement(command, searchModel, whereStatement, false);
             GridModel<OrderMaster> gridModel = GetAjaxPageDataProcedure<OrderMaster>(procedureSearchStatementModel, command);
@@ -918,6 +923,7 @@ namespace com.Sconit.Web.Controllers.ORD
                     string reportFileUrl = reportGen.WriteToFile(orderMaster.OrderTemplate, data);
                     printUrls.Append(reportFileUrl);
                     printUrls.Append("||");
+                    
                 }
                 else
                 {
@@ -991,6 +997,8 @@ namespace com.Sconit.Web.Controllers.ORD
                         printUrls.Append("||");
                     }
                 }
+                orderMaster.IsPrintOrder = true;
+                this.genericMgr.Update(orderMaster);
             }
             return printUrls.ToString();
         }
@@ -1410,6 +1418,17 @@ namespace com.Sconit.Web.Controllers.ORD
         #region Private
         private ProcedureSearchStatementModel PrepareSearchStatement(GridCommand command, OrderMasterSearchModel searchModel, string whereStatement, bool isReturn)
         {
+            if (!string.IsNullOrWhiteSpace(searchModel.MultiStatus))
+            {
+                string statusSql = " and o.Status in( ";
+                string[] statusArr = searchModel.MultiStatus.Split(',');
+                for (int st = 0; st < statusArr.Length; st++)
+                {
+                    statusSql += "'" + statusArr[st] + "',";
+                }
+                statusSql = statusSql.Substring(0, statusSql.Length - 1) + ")";
+                whereStatement += statusSql;
+            }
             List<ProcedureParameter> paraList = new List<ProcedureParameter>();
             List<ProcedureParameter> pageParaList = new List<ProcedureParameter>();
             paraList.Add(new ProcedureParameter { Parameter = searchModel.OrderNo, Type = NHibernate.NHibernateUtil.String });

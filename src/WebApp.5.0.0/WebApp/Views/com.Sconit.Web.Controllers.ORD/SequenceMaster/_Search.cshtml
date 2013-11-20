@@ -2,6 +2,11 @@
 @using com.Sconit.Web.Models.SearchModels.ORD
 @using com.Sconit.Entity.SYS
 @using com.Sconit.Entity.ORD
+<script src="@Url.Content("~/Scripts/jquery.ui.core.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.ui.widget.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.multiselect.js")" type="text/javascript"></script>
+<link href="@Url.Content("~/Content/jqueryui/jquery-ui.min.css")" rel="stylesheet" type="text/css" />
+<link href="@Url.Content("~/Content/jqueryui/jquery.multiselect.css")" rel="stylesheet" type="text/css" />
 
 <fieldset>
     @using (Html.BeginForm("List", "SequenceMaster"))
@@ -87,7 +92,7 @@
                 </label>
             </div>
             <div class="search-field">
-                @{
+            @*    @{
         Html.RenderAction("_CodeMasterDropDownList", "Common", new
         {
             code = com.Sconit.CodeMaster.CodeMaster.OrderStatus,
@@ -95,7 +100,17 @@
             includeBlankOption = true,
             selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).Status : null
         });
-                }
+                }*@
+                @{
+          Html.RenderAction("_CodeMasterMultiSelectBox", "Common", new
+         {
+             checkedValues = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).MultiStatus : string.Empty,
+             code = com.Sconit.CodeMaster.CodeMaster.OrderStatus,
+             controlName = "MultiSelectStatus",
+             controlId = "MultiSelectStatus"
+         });
+          }
+          @Html.Hidden("MultiStatus", string.Empty)
             </div>
             <div class="search-label">
                 <label for="OrderMaster_Pirority">
@@ -193,6 +208,16 @@
          .Value(TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).DateTo : null)
                 .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
             </div>
+            <div class="search-label">
+                <label for="OrderMaster_DateTo">
+                  
+                </label>
+            </div>
+            <div class="search-field">
+                &nbsp&nbsp
+                显示未打印
+                @Html.CheckBox("IsPrintOrder", TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).IsPrintOrder : false)
+            </div>
            
            
         </div>
@@ -283,7 +308,8 @@
          + '&PartyTo=' + $('#PartyTo').val() + '&Priority=' + $('#Priority').val() + '&Status=' + $('#Status').val()
          + '&ExternalOrderNo=' + $('#ExternalOrderNo').val() + '&ReferenceOrderNo=' + $('#ReferenceOrderNo').val()
          + '&Item=' + $('#Item').val() + '&CreateUserName=' + $('#CreateUserName').val()
-         + '&DateFrom=' + $('#DateFrom').val() + '&DateTo=' + $('#DateTo').val() + '&SequenceGroup=' + $('#SequenceGroup').val();
+         + '&DateFrom=' + $('#DateFrom').val() + '&DateTo=' + $('#DateTo').val() + '&SequenceGroup=' + $('#SequenceGroup').val()
+         + '&MultiStatus=' + $('#MultiStatus').val() ;
         }
 
         function ExportPrintClick() {
@@ -333,6 +359,43 @@
                     DisplayTextMessages(XMLHttpRequest.responseText);
                 }
             });
+        }
+
+        $(function () {
+            $('#MultiSelectStatus').multiselect({
+                noneSelectedText: "选择状态...",
+                selectedText: "已选#个状态",
+                checkAllText: "全选",
+                uncheckAllText: "取消全选",
+                selectedList: 3,
+                click: function (event, ui) {
+                    $('#MultiStatus').attr("value", getMultiRegions());
+                },
+                checkAll: function () {
+                    $('#MultiStatus').attr("value", getMultiRegions());
+                },
+                uncheckAll: function () {
+                    $('#MultiStatus').attr("value", getMultiRegions());
+                }
+            });
+        });
+
+
+
+        function getMultiRegions() {
+            var m = "";
+            var array_of_checked_values = $("#MultiSelectStatus").multiselect("getChecked").map(function () {
+                return this.value;
+            }).get();
+            if (array_of_checked_values != null) {
+                if (array_of_checked_values.length > 0) {
+                    m = array_of_checked_values[0];
+                    for (var i = 1; i < array_of_checked_values.length; i++) {
+                        m = m + "," + array_of_checked_values[i];
+                    };
+                }
+            }
+            return m;
         }
     </script>
 </fieldset>

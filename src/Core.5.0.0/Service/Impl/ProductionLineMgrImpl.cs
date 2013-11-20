@@ -1903,6 +1903,96 @@ namespace com.Sconit.Service.Impl
         }
         #endregion
 
+        #region SAP工序回冲物料
+        [Transaction(TransactionMode.Requires)]
+        public void BackflushProductOrder(com.Sconit.Entity.SAP.ORD.ProdOpBackflush prodOpBackflush)
+        {
+            IList<OrderBomDetail> orderBomDetailList = this.genericMgr.FindEntityWithNativeSql<OrderBomDetail>(@"select * from ORD_OrderBomDet WITH(NOLOCK) where OrderNo = ? and AUFPL = ? and PLNFL = ? and VORNR = ? and OrderQty <> 0", new object[] { prodOpBackflush.OrderNo, prodOpBackflush.AUFPL, prodOpBackflush.PLNFL, prodOpBackflush.VORNR });
+            if (orderBomDetailList != null && orderBomDetailList.Count > 0)
+            {
+                FlowMaster prodLine = this.genericMgr.FindEntityWithNativeSql<FlowMaster>(@"select * from SCM_FlowMstr WITH(NOLOCK) where Code in (select Flow from ORD_OrderMstr_4 WITH(NOLOCK) where OrderNo = ?)", prodOpBackflush.OrderNo).Single();
+                string fgItem = this.genericMgr.FindAllWithNativeSql<string>(@"select Item from ORD_OrderDet_4 WITH(NOLOCK) where OrderNo = ?", prodOpBackflush.OrderNo).Single();
+
+                IList<BackflushInput> backflushInputList = (from bom in orderBomDetailList
+                                                            select new BackflushInput
+                                                            {
+                                                                OrderNo = bom.OrderNo,
+                                                                OrderDetailId = bom.OrderDetailId,
+                                                                OrderDetailSequence = bom.OrderDetailSequence,
+                                                                OrderBomDetail = bom,
+                                                                OrderType = CodeMaster.OrderType.Production,
+                                                                OrderSubType = CodeMaster.OrderSubType.Normal,
+                                                                FGItem = fgItem,
+                                                                Item = bom.Item,
+                                                                ItemDescription = bom.ItemDescription,
+                                                                ReferenceItemCode = bom.ReferenceItemCode,
+                                                                Uom = bom.Uom,
+                                                                BaseUom = bom.BaseUom,
+                                                                UnitQty = bom.UnitQty,
+                                                                Operation = bom.Operation,
+                                                                OpReference = bom.OpReference,
+                                                                Location = bom.Location,
+                                                                ProductLine = prodLine.Code,
+                                                                Qty = bom.BomUnitQty * (prodOpBackflush.GAMNG + prodOpBackflush.SCRAP),
+                                                                CurrentProductLine = prodLine,
+                                                                EffectiveDate = prodOpBackflush.EffectiveDate,
+                                                                OrderOpReportId = prodOpBackflush.OrderOpReportId,
+                                                                OrderOpId = prodOpBackflush.OrderOpId,
+                                                                WorkCenter = prodOpBackflush.WORKCENTER,
+                                                            }).ToList();
+
+                locationDetailMgr.BackflushProductMaterial(backflushInputList);
+            }
+
+            prodOpBackflush.Status = com.Sconit.Entity.SAP.StatusEnum.Success;
+            this.genericMgr.Update(prodOpBackflush);
+        }
+        #endregion
+
+        #region SAP工序物料反回冲
+        [Transaction(TransactionMode.Requires)]
+        public void AntiBackflushProductOrder(com.Sconit.Entity.SAP.ORD.ProdOpBackflush prodOpBackflush)
+        {
+            IList<OrderBomDetail> orderBomDetailList = this.genericMgr.FindEntityWithNativeSql<OrderBomDetail>(@"select * from ORD_OrderBomDet where OrderNo = ? and AUFPL = ? and PLNFL = ? and VORNR = ? and OrderQty <> 0", new object[] { prodOpBackflush.OrderNo, prodOpBackflush.AUFPL, prodOpBackflush.PLNFL, prodOpBackflush.VORNR });
+            if (orderBomDetailList != null && orderBomDetailList.Count > 0)
+            {
+                FlowMaster prodLine = this.genericMgr.FindEntityWithNativeSql<FlowMaster>(@"select * from SCM_FlowMstr where Code in (select Flow from ORD_OrderMstr_4 where OrderNo = ?)", prodOpBackflush.OrderNo).Single();
+                string fgItem = this.genericMgr.FindAllWithNativeSql<string>(@"select Item from ORD_OrderDet_4 where OrderNo = ?", prodOpBackflush.OrderNo).Single();
+
+                IList<BackflushInput> backflushInputList = (from bom in orderBomDetailList
+                                                            where bom.OrderedQty != 0
+                                                            select new BackflushInput
+                                                            {
+                                                                OrderNo = bom.OrderNo,
+                                                                OrderDetailId = bom.OrderDetailId,
+                                                                OrderDetailSequence = bom.OrderDetailSequence,
+                                                                OrderBomDetail = bom,
+                                                                OrderType = CodeMaster.OrderType.Production,
+                                                                OrderSubType = CodeMaster.OrderSubType.Normal,
+                                                                FGItem = fgItem,
+                                                                Item = bom.Item,
+                                                                ItemDescription = bom.ItemDescription,
+                                                                ReferenceItemCode = bom.ReferenceItemCode,
+                                                                Uom = bom.Uom,
+                                                                BaseUom = bom.BaseUom,
+                                                                UnitQty = bom.UnitQty,
+                                                                Operation = bom.Operation,
+                                                                OpReference = bom.OpReference,
+                                                                Location = bom.Location,
+                                                                ProductLine = prodLine.Code,
+                                                                Qty = bom.BomUnitQty * (prodOpBackflush.GAMNG + prodOpBackflush.SCRAP),
+                                                                CurrentProductLine = prodLine,
+                                                                EffectiveDate = prodOpBackflush.EffectiveDate,
+                                                                OrderOpReportId = prodOpBackflush.OrderOpReportId,
+                                                                OrderOpId = prodOpBackflush.OrderOpId,
+                                                                WorkCenter = prodOpBackflush.WORKCENTER,
+                                                            }).ToList();
+
+                IList<InventoryTransaction> inventoryTransactionList = this.locationDetailMgr.CancelBackflushProductMaterial(backflushInputList);
+            }
+        }
+        #endregion
+
         #region 生产线节拍调整
         public void AdjustProductLineTaktTime(string productLineCode, int taktTime)
         {
@@ -2190,7 +2280,7 @@ namespace com.Sconit.Service.Impl
                 }
             }
             log.Debug("整车物料回冲结束。");
-        }      
+        }
         #endregion
 
         #region 更新物料消耗时间

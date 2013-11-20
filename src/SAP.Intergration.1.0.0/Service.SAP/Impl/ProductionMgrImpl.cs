@@ -27,6 +27,7 @@ namespace com.Sconit.Service.SAP.Impl
         public IItemMgr itemMgr { get; set; }
         public IWorkingCalendarMgr workingCalendarMgr { get; set; }
         public IReportProdOrderOperationMgr reportProdOrderOperationMgr { get; set; }
+        public IProductionLineMgr productionLineMgr { get; set; }
 
         #region 获取整车生产单
         private static object AutoCreateVanOrderLock = new object();
@@ -375,7 +376,7 @@ namespace com.Sconit.Service.SAP.Impl
         {
             log.DebugFormat("开始获取整车生产订单，工厂{0}，生产订单号{1}，生产线{2}，重复获取标识{3}", plant, sapOrderNo, prodlLine, isNextOrder);
             ZHEAD[] orderHeadAry = null;
-            ZITEM_LX[] orderOpAry = null;
+            com.Sconit.Service.SAP.MI_PO_LES.ZITEM_LX[] orderOpAry = null;
             ZITEM_ZJ[] orderBomAry = null;
             try
             {
@@ -448,7 +449,7 @@ namespace com.Sconit.Service.SAP.Impl
             return batchNo;
         }
 
-        private int InsertTmpTable(ZHEAD[] orderHeadAry, ZITEM_LX[] orderOpAry, ZITEM_ZJ[] orderBomAry)
+        private int InsertTmpTable(ZHEAD[] orderHeadAry, com.Sconit.Service.SAP.MI_PO_LES.ZITEM_LX[] orderOpAry, ZITEM_ZJ[] orderBomAry)
         {
             try
             {
@@ -574,7 +575,7 @@ namespace com.Sconit.Service.SAP.Impl
                     PrepareInsertProdRoutingDetSql(insertSql);
                     for (int i = 0; i < orderOpAry.Length; i++)
                     {
-                        ZITEM_LX op = orderOpAry[i];
+                        com.Sconit.Service.SAP.MI_PO_LES.ZITEM_LX op = orderOpAry[i];
                         insertSql.Append("(");
                         insertSql.Append(batchNo.ToString() + ",");
                         //insertSql.Append("'" + createDate.ToString("yyyy/MM/dd HH:mm:ss") + "',");
@@ -756,7 +757,7 @@ namespace com.Sconit.Service.SAP.Impl
         {
             log.DebugFormat("开始获取非整车生产订单，工厂{0}", plant);
             ZHEAD[] orderHeadAry = null;
-            ZITEM_LX[] orderOpAry = null;
+            com.Sconit.Service.SAP.MI_PO_LES.ZITEM_LX[] orderOpAry = null;
             ZITEM_ZJ[] orderBomAry = null;
             try
             {
@@ -934,6 +935,47 @@ namespace com.Sconit.Service.SAP.Impl
         }
         #endregion
 
+        #region 自制件物料反冲
+        public void BackflushProductionOrder()
+        {
+            IList<ErrorMessage> errorMessageList = new List<ErrorMessage>();
+            IList<ProdOpBackflush> prodOpBackflushList = this.genericMgr.FindEntityWithNativeSql<ProdOpBackflush>(
+                @"select bf.* from SAP_ProdOpBackflush as bf inner join ORD_OrderMstr_4 as mstr on bf.OrderNo = mstr.OrderNo where mstr.ProdLineType not in (?,?,?,?,?) and (bf.Status = ? or (bf.Status = ? and bf.ErrorCount < 10))",
+                new object[] { CodeMaster.ProdLineType.Cab, CodeMaster.ProdLineType.Chassis, CodeMaster.ProdLineType.Assembly, CodeMaster.ProdLineType.Special, CodeMaster.ProdLineType.Check,
+                                StatusEnum.Pending, StatusEnum.Fail});
+
+            if (prodOpBackflushList != null && prodOpBackflushList.Count > 0)
+            {
+                foreach (ProdOpBackflush prodOpBackflush in prodOpBackflushList)
+                {
+                    try
+                    {
+                        this.productionLineMgr.BackflushProductOrder(prodOpBackflush);                     
+                        this.genericMgr.FlushSession();
+                    }
+                    catch (Exception ex)
+                    {                       
+                        this.genericMgr.CleanSession();
+                        prodOpBackflush.Status = StatusEnum.Fail;
+                        prodOpBackflush.ErrorCount++;
+                        this.genericMgr.Update(prodOpBackflush);
+
+                        string logMessage = string.Format("自制件物料反冲出现异常, 异常信息：{0}", ex.Message);
+                        log.Error(logMessage, ex);
+                        errorMessageList.Add(new ErrorMessage
+                        {
+                            Template = NVelocityTemplateRepository.TemplateEnum.BackflushProductionOrder,
+                            Exception = ex,
+                            Message = logMessage
+                        });
+                    }
+                }
+            }
+
+            this.SendErrorMessage(errorMessageList);
+        }
+        #endregion
+
         #region 手工重发报工信息
         public void ReportProdOrderOperation(IList<ProdOpReport> prodOpReportList)
         {
@@ -1011,11 +1053,52 @@ namespace com.Sconit.Service.SAP.Impl
                 input.PLNFL = orderOp.PLNFL;
                 input.VORNR = orderOp.VORNR;
 
-                string result = service.MI_PO_CFR_LES(input);
+                string result = null;
+                com.Sconit.Service.SAP.MI_PO_CFR_LES.ZITEM_LX[] orderOpAry = service.MI_PO_CFR_LES(input, out result);
 
                 if (result.Equals("TRUE", StringComparison.OrdinalIgnoreCase))
                 {
                     log.DebugFormat("生产报工成功，生产单号{0}, 工作中心{1}，数量{2}，废品数{3}。", prodOpReport.AUFNR, prodOpReport.WORKCENTER, prodOpReport.GAMNG, prodOpReport.SCRAP);
+
+                    if (orderOpAry != null && orderOpAry.Count() > 0)
+                    {
+                        DateTime dateTimeNow = DateTime.Now;
+
+                        foreach (com.Sconit.Service.SAP.MI_PO_CFR_LES.ZITEM_LX ZITEM_LX in orderOpAry)
+                        {
+                            ProdOpBackflush prodOpBackflush = new ProdOpBackflush();
+
+                            prodOpBackflush.SAPOpReportId = prodOpReport.Id;
+                            prodOpBackflush.AUFNR = ZITEM_LX.AUFNR;
+                            prodOpBackflush.WERKS = ZITEM_LX.WERKS;
+                            prodOpBackflush.AUFPL = ZITEM_LX.AUFPL.TrimStart('0');
+                            prodOpBackflush.APLZL = ZITEM_LX.APLZL;
+                            prodOpBackflush.PLNTY = ZITEM_LX.PLNTY;
+                            prodOpBackflush.PLNNR = ZITEM_LX.PLNNR;
+                            prodOpBackflush.PLNAL = ZITEM_LX.PLNAL;
+                            prodOpBackflush.PLNFL = ZITEM_LX.PLNFL;
+                            prodOpBackflush.VORNR = ZITEM_LX.VORNR;
+                            prodOpBackflush.ARBPL = ZITEM_LX.ARBPL;
+                            prodOpBackflush.RUEK = ZITEM_LX.RUEK;
+                            prodOpBackflush.AUTWE = ZITEM_LX.AUTWE;
+                            prodOpBackflush.WORKCENTER = prodOpReport.WORKCENTER;
+                            prodOpBackflush.GAMNG = prodOpReport.GAMNG;
+                            prodOpBackflush.SCRAP = prodOpReport.SCRAP;
+                            prodOpBackflush.Status = StatusEnum.Pending;
+                            prodOpBackflush.CreateDate = dateTimeNow;
+                            prodOpBackflush.LastModifyDate = dateTimeNow;
+                            prodOpBackflush.ErrorCount = 0;
+                            prodOpBackflush.ProdLine = prodOpReport.ProdLine;
+                            prodOpBackflush.OrderNo = prodOpReport.OrderNo;
+                            prodOpBackflush.ReceiptNo = prodOpReport.ReceiptNo;
+                            prodOpBackflush.OrderOpId = prodOpReport.OrderOpId;
+                            prodOpBackflush.OrderOpReportId = prodOpReport.OrderOpReportId;
+                            prodOpBackflush.EffectiveDate = prodOpReport.EffectiveDate;
+                            prodOpBackflush.Version = 1;
+
+                            this.genericMgr.Create(prodOpBackflush);
+                        }
+                    }
                 }
                 else
                 {

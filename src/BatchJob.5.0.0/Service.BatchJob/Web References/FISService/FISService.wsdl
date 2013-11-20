@@ -13,10 +13,6 @@
         <s:complexContent mixed="false">
           <s:extension base="tns:EntityBase">
             <s:sequence>
-              <s:element minOccurs="1" maxOccurs="1" name="ShipQty" type="s:decimal" />
-              <s:element minOccurs="1" maxOccurs="1" name="ReceivedQty" type="s:decimal" />
-              <s:element minOccurs="0" maxOccurs="1" name="LocTo" type="s:string" />
-              <s:element minOccurs="0" maxOccurs="1" name="ReceiptStatus" type="s:string" />
               <s:element minOccurs="1" maxOccurs="1" name="Id" type="s:int" />
               <s:element minOccurs="0" maxOccurs="1" name="Type" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="MoveType" type="s:string" />
@@ -25,7 +21,7 @@
               <s:element minOccurs="0" maxOccurs="1" name="POLine" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="WMSNo" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="WMSLine" type="s:string" />
-              <s:element minOccurs="0" maxOccurs="1" name="HandTime" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="HandTime" type="s:dateTime" />
               <s:element minOccurs="0" maxOccurs="1" name="Item" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="HandResult" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="ErrorCause" type="s:string" />
@@ -35,6 +31,12 @@
               <s:element minOccurs="0" maxOccurs="1" name="ExtNo" type="s:string" />
               <s:element minOccurs="1" maxOccurs="1" name="Qty" nillable="true" type="s:decimal" />
               <s:element minOccurs="1" maxOccurs="1" name="QtyMark" nillable="true" type="s:boolean" />
+              <s:element minOccurs="1" maxOccurs="1" name="UploadDate" nillable="true" type="s:dateTime" />
+              <s:element minOccurs="0" maxOccurs="1" name="LesFileName" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="ShipQty" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="ReceivedQty" type="s:decimal" />
+              <s:element minOccurs="0" maxOccurs="1" name="LocTo" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ReceiptStatus" type="s:string" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
@@ -42,21 +44,6 @@
       <s:complexType name="EntityBase" />
       <s:element name="CreateLogResponse">
         <s:complexType />
-      </s:element>
-      <s:element name="SelectLesINLogByWmsNo">
-        <s:complexType>
-          <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="selectSql" type="s:string" />
-            <s:element minOccurs="0" maxOccurs="1" name="param" />
-          </s:sequence>
-        </s:complexType>
-      </s:element>
-      <s:element name="SelectLesINLogByWmsNoResponse">
-        <s:complexType>
-          <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="SelectLesINLogByWmsNoResult" type="tns:LesINLog" />
-          </s:sequence>
-        </s:complexType>
       </s:element>
       <s:element name="UpdateLog">
         <s:complexType>
@@ -119,12 +106,6 @@
   <wsdl:message name="CreateLogSoapOut">
     <wsdl:part name="parameters" element="tns:CreateLogResponse" />
   </wsdl:message>
-  <wsdl:message name="SelectLesINLogByWmsNoSoapIn">
-    <wsdl:part name="parameters" element="tns:SelectLesINLogByWmsNo" />
-  </wsdl:message>
-  <wsdl:message name="SelectLesINLogByWmsNoSoapOut">
-    <wsdl:part name="parameters" element="tns:SelectLesINLogByWmsNoResponse" />
-  </wsdl:message>
   <wsdl:message name="UpdateLogSoapIn">
     <wsdl:part name="parameters" element="tns:UpdateLog" />
   </wsdl:message>
@@ -160,10 +141,6 @@
       <wsdl:input message="tns:CreateLogSoapIn" />
       <wsdl:output message="tns:CreateLogSoapOut" />
     </wsdl:operation>
-    <wsdl:operation name="SelectLesINLogByWmsNo">
-      <wsdl:input message="tns:SelectLesINLogByWmsNoSoapIn" />
-      <wsdl:output message="tns:SelectLesINLogByWmsNoSoapOut" />
-    </wsdl:operation>
     <wsdl:operation name="UpdateLog">
       <wsdl:input message="tns:UpdateLogSoapIn" />
       <wsdl:output message="tns:UpdateLogSoapOut" />
@@ -189,15 +166,6 @@
     <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
     <wsdl:operation name="CreateLog">
       <soap:operation soapAction="http://com.Sconit.WebService.FIS.FISService/CreateLog" style="document" />
-      <wsdl:input>
-        <soap:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="SelectLesINLogByWmsNo">
-      <soap:operation soapAction="http://com.Sconit.WebService.FIS.FISService/SelectLesINLogByWmsNo" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -255,15 +223,6 @@
     <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
     <wsdl:operation name="CreateLog">
       <soap12:operation soapAction="http://com.Sconit.WebService.FIS.FISService/CreateLog" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="SelectLesINLogByWmsNo">
-      <soap12:operation soapAction="http://com.Sconit.WebService.FIS.FISService/SelectLesINLogByWmsNo" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

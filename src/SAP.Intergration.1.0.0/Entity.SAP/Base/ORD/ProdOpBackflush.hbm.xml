@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.SAP.ORD.ProdOpBackflush, com.Sconit.Entity.SAP" table="SAP_ProdOpBackflush" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<version name="Version" column="Version" type="Int32" />	
+		<property name="AUFNR" column="AUFNR" type="String" length="50"/>	
+		<property name="WERKS" column="WERKS" type="String" length="50"/>
+        <property name="AUFPL" column="AUFPL" type="String" length="50"/>
+        <property name="APLZL" column="APLZL" type="String" length="50"/>	
+		<property name="PLNTY" column="PLNTY" type="String" length="50"/>	
+		<property name="PLNNR" column="PLNNR" type="String" length="50"/>
+        <property name="PLNAL" column="PLNAL" type="String" length="50"/>
+        <property name="PLNFL" column="PLNFL" type="String" length="50"/>	
+		<property name="VORNR" column="VORNR" type="String" length="50"/>	
+		<property name="ARBPL" column="ARBPL" type="String" length="50"/>	
+		<property name="RUEK" column="RUEK" type="String" length="50"/>	
+		<property name="AUTWE" column="AUTWE" type="String" length="50"/>	
+		<property name="WORKCENTER" column="WORKCENTER" type="String" length="50"/>	
+		<property name="GAMNG" column="GAMNG" type="Decimal"/>	
+		<property name="SCRAP" column="SCRAP" type="Decimal"/>	
+		<property name="Status" column="Status" type="Int16"/>	
+		<property name="CreateDate" column="CreateDate" type="DateTime" update="false"/>	
+		<property name="LastModifyDate" column="LastModifyDate" type="DateTime"/>	
+		<property name="ErrorCount" column="ErrorCount" type="Int32"/>	
+		<property name="ProdLine" column="ProdLine" type="String" length="50"/>	
+		<property name="OrderNo" column="OrderNo" type="String" length="50"/>	
+		<property name="ReceiptNo" column="RecNo" type="String" length="50"/>	
+		<property name="OrderOpId" column="OrderOpId" type="Int32"/>
+        <property name="OrderOpReportId" column="OrderOpReportId" type="Int32"/>
+        <property name="SAPOpReportId" column="SAPOpReportId" type="Int32"/>
+        <property name="EffectiveDate" column="EffectiveDate" type="DateTime"/>
+    </class>
+</hibernate-mapping>

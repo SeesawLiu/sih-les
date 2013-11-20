@@ -272,5 +272,14 @@
             productionMgr.GetCurrentVanOrder(plant, sapOrderNo, prodlLine);
         }
         #endregion
+
+        #region 自制件物料反冲
+        [WebMethod]
+        public void BackflushProductionOrder(string userCode)
+        {
+            SecurityContextHolder.Set(securityMgr.GetUser(userCode));
+            productionMgr.BackflushProductionOrder();
+        }
+        #endregion
     }
 }

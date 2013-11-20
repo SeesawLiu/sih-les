@@ -73,6 +73,7 @@
     <Compile Include="Job\AutoCreateVanOrderJob.cs" />
     <Compile Include="Job\AutoCreateAnDonOrderJob.cs" />
     <Compile Include="Job\BackFlushVanOrderJob.cs" />
+    <Compile Include="Job\BackFlushProductionOrderJob.cs" />
     <Compile Include="Job\PostDistributionOrderJob.cs" />
     <Compile Include="Job\ImportSAPQuotaJob.cs" />
     <Compile Include="Job\CRSLJob.cs" />

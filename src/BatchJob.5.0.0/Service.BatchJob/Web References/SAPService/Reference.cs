@@ -41,6 +41,8 @@ namespace com.Sconit.Service.BatchJob.SAPService {
         
         private System.Threading.SendOrPostCallback ExchangeMoveTypeOperationCompleted;
         
+        private System.Threading.SendOrPostCallback ReExchangeMoveTypeOperationCompleted;
+        
         private System.Threading.SendOrPostCallback AutoCreateVanOrderOperationCompleted;
         
         private System.Threading.SendOrPostCallback UpdateVanOrderOperationCompleted;
@@ -70,6 +72,8 @@ namespace com.Sconit.Service.BatchJob.SAPService {
         private System.Threading.SendOrPostCallback CRSLSummaryFromLesOperationCompleted;
         
         private System.Threading.SendOrPostCallback GetCurrentVanOrderOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback BackflushProductionOrderOperationCompleted;
         
         private bool useDefaultCredentialsSetExplicitly;
         
@@ -125,6 +129,9 @@ namespace com.Sconit.Service.BatchJob.SAPService {
         public event ExchangeMoveTypeCompletedEventHandler ExchangeMoveTypeCompleted;
         
         /// <remarks/>
+        public event ReExchangeMoveTypeCompletedEventHandler ReExchangeMoveTypeCompleted;
+        
+        /// <remarks/>
         public event AutoCreateVanOrderCompletedEventHandler AutoCreateVanOrderCompleted;
         
         /// <remarks/>
@@ -168,6 +175,9 @@ namespace com.Sconit.Service.BatchJob.SAPService {
         
         /// <remarks/>
         public event GetCurrentVanOrderCompletedEventHandler GetCurrentVanOrderCompleted;
+        
+        /// <remarks/>
+        public event BackflushProductionOrderCompletedEventHandler BackflushProductionOrderCompleted;
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://com.Sconit.WebService.SAP.SAPService/ImportItem", RequestNamespace="http://com.Sconit.WebService.SAP.SAPService/", ResponseNamespace="http://com.Sconit.WebService.SAP.SAPService/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
@@ -316,6 +326,34 @@ namespace com.Sconit.Service.BatchJob.SAPService {
             if ((this.ExchangeMoveTypeCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.ExchangeMoveTypeCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://com.Sconit.WebService.SAP.SAPService/ReExchangeMoveType", RequestNamespace="http://com.Sconit.WebService.SAP.SAPService/", ResponseNamespace="http://com.Sconit.WebService.SAP.SAPService/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public void ReExchangeMoveType(string userCode) {
+            this.Invoke("ReExchangeMoveType", new object[] {
+                        userCode});
+        }
+        
+        /// <remarks/>
+        public void ReExchangeMoveTypeAsync(string userCode) {
+            this.ReExchangeMoveTypeAsync(userCode, null);
+        }
+        
+        /// <remarks/>
+        public void ReExchangeMoveTypeAsync(string userCode, object userState) {
+            if ((this.ReExchangeMoveTypeOperationCompleted == null)) {
+                this.ReExchangeMoveTypeOperationCompleted = new System.Threading.SendOrPostCallback(this.OnReExchangeMoveTypeOperationCompleted);
+            }
+            this.InvokeAsync("ReExchangeMoveType", new object[] {
+                        userCode}, this.ReExchangeMoveTypeOperationCompleted, userState);
+        }
+        
+        private void OnReExchangeMoveTypeOperationCompleted(object arg) {
+            if ((this.ReExchangeMoveTypeCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.ReExchangeMoveTypeCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -811,6 +849,34 @@ namespace com.Sconit.Service.BatchJob.SAPService {
         }
         
         /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://com.Sconit.WebService.SAP.SAPService/BackflushProductionOrder", RequestNamespace="http://com.Sconit.WebService.SAP.SAPService/", ResponseNamespace="http://com.Sconit.WebService.SAP.SAPService/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public void BackflushProductionOrder(string userCode) {
+            this.Invoke("BackflushProductionOrder", new object[] {
+                        userCode});
+        }
+        
+        /// <remarks/>
+        public void BackflushProductionOrderAsync(string userCode) {
+            this.BackflushProductionOrderAsync(userCode, null);
+        }
+        
+        /// <remarks/>
+        public void BackflushProductionOrderAsync(string userCode, object userState) {
+            if ((this.BackflushProductionOrderOperationCompleted == null)) {
+                this.BackflushProductionOrderOperationCompleted = new System.Threading.SendOrPostCallback(this.OnBackflushProductionOrderOperationCompleted);
+            }
+            this.InvokeAsync("BackflushProductionOrder", new object[] {
+                        userCode}, this.BackflushProductionOrderOperationCompleted, userState);
+        }
+        
+        private void OnBackflushProductionOrderOperationCompleted(object arg) {
+            if ((this.BackflushProductionOrderCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.BackflushProductionOrderCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
         public new void CancelAsync(object userState) {
             base.CancelAsync(userState);
         }
@@ -856,6 +922,8 @@ namespace com.Sconit.Service.BatchJob.SAPService {
         private string bESKZField;
         
         private string sOBSLField;
+        
+        private string eXTWGField;
         
         /// <remarks/>
         public string Code {
@@ -954,6 +1022,16 @@ namespace com.Sconit.Service.BatchJob.SAPService {
             }
             set {
                 this.sOBSLField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string EXTWG {
+            get {
+                return this.eXTWGField;
+            }
+            set {
+                this.eXTWGField = value;
             }
         }
     }
@@ -2111,6 +2189,10 @@ namespace com.Sconit.Service.BatchJob.SAPService {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    public delegate void ReExchangeMoveTypeCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
     public delegate void AutoCreateVanOrderCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
     
     /// <remarks/>
@@ -2322,6 +2404,10 @@ namespace com.Sconit.Service.BatchJob.SAPService {
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
     public delegate void GetCurrentVanOrderCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    public delegate void BackflushProductionOrderCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
 }
 
 #pragma warning restore 1591

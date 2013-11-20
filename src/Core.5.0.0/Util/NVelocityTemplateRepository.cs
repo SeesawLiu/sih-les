@@ -43,6 +43,11 @@ namespace com.Sconit.Utility
             ReportProdOrderOpFail = 10801,
 
             /// <summary>
+            ///  //自制件物料反冲失败
+            /// </summary>
+            BackflushProductionOrder = 10802,
+
+            /// <summary>
             /// //创建交货单失败 
             /// </summary>
             ImportSapDO_ImportFail = 10901,

@@ -936,43 +936,47 @@ namespace com.Sconit.Service.SAP.Impl
         #endregion
 
         #region 自制件物料反冲
+        private static object BackflushProductionOrderLock = new object();
         public void BackflushProductionOrder()
         {
-            IList<ErrorMessage> errorMessageList = new List<ErrorMessage>();
-            IList<ProdOpBackflush> prodOpBackflushList = this.genericMgr.FindEntityWithNativeSql<ProdOpBackflush>(
-                @"select bf.* from SAP_ProdOpBackflush as bf inner join ORD_OrderMstr_4 as mstr on bf.OrderNo = mstr.OrderNo where mstr.ProdLineType not in (?,?,?,?,?) and (bf.Status = ? or (bf.Status = ? and bf.ErrorCount < 10))",
-                new object[] { CodeMaster.ProdLineType.Cab, CodeMaster.ProdLineType.Chassis, CodeMaster.ProdLineType.Assembly, CodeMaster.ProdLineType.Special, CodeMaster.ProdLineType.Check,
+            lock (BackflushProductionOrderLock)
+            {
+                IList<ErrorMessage> errorMessageList = new List<ErrorMessage>();
+                IList<ProdOpBackflush> prodOpBackflushList = this.genericMgr.FindEntityWithNativeSql<ProdOpBackflush>(
+                    @"select bf.* from SAP_ProdOpBackflush as bf inner join ORD_OrderMstr_4 as mstr on bf.OrderNo = mstr.OrderNo where mstr.ProdLineType not in (?,?,?,?,?) and (bf.Status = ? or (bf.Status = ? and bf.ErrorCount < 10))",
+                    new object[] { CodeMaster.ProdLineType.Cab, CodeMaster.ProdLineType.Chassis, CodeMaster.ProdLineType.Assembly, CodeMaster.ProdLineType.Special, CodeMaster.ProdLineType.Check,
                                 StatusEnum.Pending, StatusEnum.Fail});
 
-            if (prodOpBackflushList != null && prodOpBackflushList.Count > 0)
-            {
-                foreach (ProdOpBackflush prodOpBackflush in prodOpBackflushList)
+                if (prodOpBackflushList != null && prodOpBackflushList.Count > 0)
                 {
-                    try
+                    foreach (ProdOpBackflush prodOpBackflush in prodOpBackflushList)
                     {
-                        this.productionLineMgr.BackflushProductOrder(prodOpBackflush);                     
-                        this.genericMgr.FlushSession();
-                    }
-                    catch (Exception ex)
-                    {                       
-                        this.genericMgr.CleanSession();
-                        prodOpBackflush.Status = StatusEnum.Fail;
-                        prodOpBackflush.ErrorCount++;
-                        this.genericMgr.Update(prodOpBackflush);
-
-                        string logMessage = string.Format("自制件物料反冲出现异常, 异常信息：{0}", ex.Message);
-                        log.Error(logMessage, ex);
-                        errorMessageList.Add(new ErrorMessage
+                        try
                         {
-                            Template = NVelocityTemplateRepository.TemplateEnum.BackflushProductionOrder,
-                            Exception = ex,
-                            Message = logMessage
-                        });
+                            this.productionLineMgr.BackflushProductOrder(prodOpBackflush);
+                            this.genericMgr.FlushSession();
+                        }
+                        catch (Exception ex)
+                        {
+                            this.genericMgr.CleanSession();
+                            prodOpBackflush.Status = StatusEnum.Fail;
+                            prodOpBackflush.ErrorCount++;
+                            this.genericMgr.Update(prodOpBackflush);
+
+                            string logMessage = string.Format("自制件物料反冲出现异常, 异常信息：{0}", ex.Message);
+                            log.Error(logMessage, ex);
+                            errorMessageList.Add(new ErrorMessage
+                            {
+                                Template = NVelocityTemplateRepository.TemplateEnum.BackflushProductionOrder,
+                                Exception = ex,
+                                Message = logMessage
+                            });
+                        }
                     }
                 }
-            }
 
-            this.SendErrorMessage(errorMessageList);
+                this.SendErrorMessage(errorMessageList);
+            }
         }
         #endregion
 

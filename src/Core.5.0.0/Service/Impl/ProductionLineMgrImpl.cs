@@ -2133,6 +2133,13 @@ namespace com.Sconit.Service.Impl
         public void BackFlushVanOrder()
         {
             log.Debug("整车物料回冲开始。");
+
+            User user = SecurityContextHolder.Get();
+            DateTime dateTimeNow = DateTime.Now;
+
+            StringBuilder sql = new StringBuilder();
+            log.DebugFormat("开始更新生产单状态和工序回冲数量。");
+
             DataSet dataSet = this.sqlDao.GetDatasetBySql(@"select OrderNo into #tempOrderNo from ORD_OrderMstr_4 WITH(NOLOCK) where ProdLineType in (1,2,3,4,9) and Status = 3
                                                             select det.Item as FGItem,
                                                                 bom.Item, bom.ItemDesc, bom.Uom, bom.Location,
@@ -2146,9 +2153,20 @@ namespace com.Sconit.Service.Impl
                                                                 mstr.Flow, mstr.Type--, mstr.CompleteDate
                                                             select OrderNo from #tempOrderNo", null);
 
+            DataRowCollection orderNoDataRow = dataSet.Tables[1].Rows;
+            IList<string> orderNoList = new List<string>();
+            foreach (DataRow dr in orderNoDataRow)
+            {
+                sql.Append("update ORD_OrderMstr_4 set Status = 4, LastModifyDate='" + dateTimeNow.ToString("yyyy-MM-dd HH:ss:mm") + "',LastModifyUser = " + user.Id.ToString() + ",LastModifyUserNm = '" + user.FullName + "',CloseDate='" + dateTimeNow.ToString("yyyy-MM-dd HH:ss:mm") + "',CloseUser = " + user.Id.ToString() + ",CloseUserNm = '" + user.FullName + "',Version=Version + 1 where OrderNo = '" + (string)dr[0] + "';");
+                sql.Append("update ORD_OrderOp set LastModifyDate='" + dateTimeNow.ToString("yyyy-MM-dd HH:ss:mm") + "',LastModifyUser = " + user.Id.ToString() + ",LastModifyUserNm = '" + user.FullName + "',BackflushQty = ReportQty,Version=Version + 1 where OrderNo = '" + (string)dr[0] + "';");
+                sql.Append("update ORD_OrderOpReport set LastModifyDate='" + dateTimeNow.ToString("yyyy-MM-dd HH:ss:mm") + "',LastModifyUser = " + user.Id.ToString() + ",LastModifyUserNm = '" + user.FullName + "',BackflushQty = ReportQty,Version=Version + 1 where OrderNo = '" + (string)dr[0] + "';");
+            }
+
+            this.genericMgr.UpdateWithNativeQuery(sql.ToString());
+            log.DebugFormat("更新生产单状态和工序回冲数量完成。");
+
             if (dataSet != null && dataSet.Tables != null && dataSet.Tables[0].Rows.Count > 0)
             {
-                DateTime dateTimeNow = DateTime.Now;
                 IList<FlowMaster> prodLineList = this.genericMgr.FindAll<FlowMaster>("from FlowMaster where ProdLineType in (?,?,?,?,?)",
                     new object[] { CodeMaster.ProdLineType.Cab, CodeMaster.ProdLineType.Chassis, CodeMaster.ProdLineType.Assembly, CodeMaster.ProdLineType.Special, CodeMaster.ProdLineType.Check });
 
@@ -2178,21 +2196,7 @@ namespace com.Sconit.Service.Impl
                 locationDetailMgr.BackflushVanProductMaterial(backflushInputList);
                 log.DebugFormat("整车生产单物料回冲完成。");
 
-                User user = SecurityContextHolder.Get();
-
-                StringBuilder sql = new StringBuilder();
-                log.DebugFormat("开始更新生产单状态和工序回冲数量。");
-                DataRowCollection orderNoDataRow = dataSet.Tables[1].Rows;
-                IList<string> orderNoList = new List<string>();
-                foreach (DataRow dr in orderNoDataRow)
-                {
-                    sql.Append("update ORD_OrderMstr_4 set Status = 4, LastModifyDate='" + dateTimeNow.ToString("yyyy-MM-dd HH:ss:mm") + "',LastModifyUser = " + user.Id.ToString() + ",LastModifyUserNm = '" + user.FullName + "',CloseDate='" + dateTimeNow.ToString("yyyy-MM-dd HH:ss:mm") + "',CloseUser = " + user.Id.ToString() + ",CloseUserNm = '" + user.FullName + "',Version=Version + 1 where OrderNo = '" + (string)dr[0] + "';");
-                    sql.Append("update ORD_OrderOp set LastModifyDate='" + dateTimeNow.ToString("yyyy-MM-dd HH:ss:mm") + "',LastModifyUser = " + user.Id.ToString() + ",LastModifyUserNm = '" + user.FullName + "',BackflushQty = ReportQty,Version=Version + 1 where OrderNo = '" + (string)dr[0] + "';");
-                    sql.Append("update ORD_OrderOpReport set LastModifyDate='" + dateTimeNow.ToString("yyyy-MM-dd HH:ss:mm") + "',LastModifyUser = " + user.Id.ToString() + ",LastModifyUserNm = '" + user.FullName + "',BackflushQty = ReportQty,Version=Version + 1 where OrderNo = '" + (string)dr[0] + "';");
-                }
-
-                this.genericMgr.UpdateWithNativeQuery(sql.ToString());
-                log.DebugFormat("更新生产单状态和工序回冲数量完成。");
+              
             }
 
             log.Debug("整车物料回冲结束。");

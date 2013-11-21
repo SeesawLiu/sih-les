@@ -279,6 +279,7 @@
                                                      CreateOrderCode = (string)tak[35],
                                                      ReceiveLotSize = (decimal?)tak[36],
                                                      UnitPrice = (decimal?)tak[37],
+                                                     MasterCloseDate = (DateTime?)tak[38],
                                                  }).ToList();
                 #endregion
             }
@@ -1421,6 +1422,7 @@
                                     CreateOrderCode = (string)tak[35],
                                     ReceiveLotSize = (decimal?)tak[36],
                                     UnitPrice = (decimal?)tak[37],
+                                    MasterCloseDate = (DateTime?)tak[38],
                                 }).ToList();
                 #endregion
             }

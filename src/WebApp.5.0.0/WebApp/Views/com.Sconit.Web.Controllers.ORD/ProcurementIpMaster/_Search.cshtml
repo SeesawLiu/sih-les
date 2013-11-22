@@ -147,6 +147,14 @@
                     
                 }
             </div>
+            <div class="search-label">
+                <label for="IpMaster_IpNo">
+                    @Resources.ORD.IpMaster.IpMaster_OrderNo
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("OrderNo", TempData["IpMasterSearchModel"] != null ? ((IpMasterSearchModel)TempData["IpMasterSearchModel"]).OrderNo : string.Empty)
+            </div>
           
         </div>
         <div class="search-footer">

@@ -1015,6 +1015,7 @@ namespace com.Sconit.Service.SAP.Impl
 
                 #region 检验
                 #region 报验
+                //如果不传322的话，会出现这种情况101K+INSMK=2成功,411K失败,如果判定不合格350K,但411K就一直卡住了
                 else if (locTrans.TransactionType == CodeMaster.TransactionType.RCT_INP
                     || locTrans.TransactionType == CodeMaster.TransactionType.RCT_ISL)
                 {

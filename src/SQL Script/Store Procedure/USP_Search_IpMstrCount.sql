@@ -52,11 +52,11 @@ BEGIN
 		SET @IPNo='%'+@IPNo+'%' 
 		SET @Where=@Where+' AND i.IpNo LIKE @IPNo_1' 
 	END	 
-	IF(ISNULL(@OrderNo,'')<>'') 
-	BEGIN 
-		SET @OrderNo=@OrderNo+'%' 
-		SET @Where=@Where+' AND i.OrderNo LIKE @OrderNo_1' 
-	END 
+	--IF(ISNULL(@OrderNo,'')<>'') 
+	--BEGIN 
+	--	SET @OrderNo=@OrderNo+'%' 
+	--	SET @Where=@Where+' AND i.OrderNo LIKE @OrderNo_1' 
+	--END 
 	IF(ISNULL(@WMSNo,'')<>'') 
 	BEGIN 
 		SET @WMSNo=@WMSNo+'%' 

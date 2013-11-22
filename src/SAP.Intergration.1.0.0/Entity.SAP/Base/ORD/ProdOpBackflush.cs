@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace com.Sconit.Entity.SAP.ORD
 {
     [Serializable]
-    public partial class ProdOpBackflush : EntityBase
+    public partial class ProdOpBackflush : EntityBase, ITraceable
     {
         #region O/R Mapping Properties
 		

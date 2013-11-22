@@ -6087,11 +6087,30 @@ namespace com.Sconit.Service.Impl
                             }
                             string times = (windowTime.Hour).ToString().PadLeft(2, '0') + ":" + (windowTime.Minute).ToString().PadLeft(2, '0');
 
-                            var shiftDet = this.genericMgr.FindAll<ShiftDetail>(" select s from ShiftDetail as s where s.Shift=? and s.StartTime<=? and s.EndTime>=? ", new object[] { workingCalendars.FirstOrDefault().Shift, times, times });
-                            if (shiftDet == null || shiftDet.Count == 0)
+                            var shiftDet = this.genericMgr.FindAll<ShiftDetail>(" select s from ShiftDetail as s where s.Shift=? ", new object[] { workingCalendars.FirstOrDefault().Shift });
+                            if (shiftDet != null || shiftDet.Count > 0)
                             {
-                                businessException.AddMessage(string.Format("第{0}行：窗口时间{1}是休息时间，请确认。", rowCount, readWindowTime));
-                                continue;
+                                DateTime nowTime = this.ParseDateTime(times);
+                                bool isTure = true;
+                                foreach (var det in shiftDet)
+                                {
+                                    DateTime prevTime = this.ParseDateTime(det.StartTime);
+                                    DateTime nextTime = this.ParseDateTime(det.EndTime);
+                                    if (nextTime < prevTime) nextTime = nextTime.AddDays(1);
+                                    if (nowTime >= prevTime && nowTime <= nextTime)
+                                    {
+                                        isTure = true;
+                                        break;
+                                    }
+                                }
+                                if (!isTure)
+                                {
+                                    throw new BusinessException(string.Format("窗口时间{0}是休息时间，请确认。", windowTime));
+                                }
+                            }
+                            else
+                            {
+                                throw new BusinessException(string.Format("没有找到区域的工作日历。"));
                             }
                         }
                     }
@@ -8920,6 +8939,30 @@ namespace com.Sconit.Service.Impl
         }
         #endregion
 
+        #region 00:02 转换时间
+        public DateTime ParseDateTime(string time)
+        {
+            if (string.IsNullOrWhiteSpace(time))
+                return DateTime.MinValue;
+
+            var t = time.Split(':');
+            if (t.Length != 2)
+                return DateTime.MinValue;
+
+            int h;
+            int.TryParse(t[0], out h);
+            if (h >= 24)
+                return DateTime.MinValue;
+
+            int m;
+            int.TryParse(t[1], out m);
+
+            if (h > 59)
+                return DateTime.MinValue;
+
+            return new DateTime(System.DateTime.Now.Year, System.DateTime.Now.Month, System.DateTime.Now.Day, h, m, 0);
+        }
+        #endregion
         #endregion
 
         #region private methods

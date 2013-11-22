@@ -109,8 +109,18 @@ namespace com.Sconit.Web.Controllers.ORD
             //                        + (int)com.Sconit.CodeMaster.OrderType.SubContract + "," + (int)com.Sconit.CodeMaster.OrderType.Transfer + "," + (int)com.Sconit.CodeMaster.OrderType.SubContractTransfer + ")";
 
             string whereStatement = string.Empty;
-            if (searchModel.Item != null && searchModel.Item != string.Empty)
+            if (!string.IsNullOrWhiteSpace(searchModel.Item) && !string.IsNullOrWhiteSpace(searchModel.OrderNo))
+            {
+                whereStatement = " and exists(select 1 from IpDetail as d where d.IpNo = i.IpNo and d.Item = '" + searchModel.Item + "' and d.OrderNo='"+searchModel.OrderNo+"')";
+            }
+            else if (!string.IsNullOrWhiteSpace(searchModel.Item) && string.IsNullOrWhiteSpace(searchModel.OrderNo))
+            {
                 whereStatement += " and exists(select 1 from IpDetail as d where d.IpNo = i.IpNo and d.Item = '" + searchModel.Item + "')";
+            }
+            else if (string.IsNullOrWhiteSpace(searchModel.Item) && !string.IsNullOrWhiteSpace(searchModel.OrderNo))
+            {
+                whereStatement = " and exists(select 1 from IpDetail as d where d.IpNo = i.IpNo and  d.OrderNo='" + searchModel.OrderNo + "')";
+            }
             ProcedureSearchStatementModel procedureSearchStatementModel = this.PrepareProcedureSearchStatement(command, searchModel, whereStatement);
             return PartialView(GetAjaxPageDataProcedure<IpMaster>(procedureSearchStatementModel, command));
 

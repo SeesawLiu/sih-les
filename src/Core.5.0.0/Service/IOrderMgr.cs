@@ -281,5 +281,9 @@ namespace com.Sconit.Service
         #region 销售手工拉料
         string CreateDistritutionRequsiton(string idStr, DateTime WindowTime, com.Sconit.CodeMaster.OrderPriority Priority, IList<OrderDetail> details);
         #endregion
+
+        #region 00:02 转换时间
+        DateTime ParseDateTime(string time);
+        #endregion
     }
 }

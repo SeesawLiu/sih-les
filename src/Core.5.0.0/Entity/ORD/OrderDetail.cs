@@ -366,6 +366,10 @@ namespace com.Sconit.Entity.ORD
         [Display(Name = "OrderMaster_Shift_CreateOrderCode", ResourceType = typeof(Resources.ORD.OrderMaster))]
         public string CreateOrderCode { get; set; }
 
+        [Export(ExportName = "ProcurementDetailXls", ExportSeq = 241)]//Òª»õÃ÷Ï¸
+        [Display(Name = "OrderMaster_CloseDate", ResourceType = typeof(Resources.ORD.OrderMaster))]
+        public DateTime? MasterCloseDate { get; set; }
+
         #endregion
     }
 

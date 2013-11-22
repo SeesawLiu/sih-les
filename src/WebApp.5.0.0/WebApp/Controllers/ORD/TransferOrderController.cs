@@ -197,10 +197,29 @@ namespace com.Sconit.Web.Controllers.ORD
                             throw new BusinessException(string.Format("窗口时间{0}是休息时间，请确认。", WindowTime));
                         }
                         string times = (WindowTime.Value.Hour).ToString().PadLeft(2, '0') + ":" + (WindowTime.Value.Minute).ToString().PadLeft(2, '0');
-                        var shiftDet = this.genericMgr.FindAll<ShiftDetail>(" select s from ShiftDetail as s where s.Shift=? and s.StartTime<=? and s.EndTime>=? ", new object[] { workingCalendars.FirstOrDefault().Shift, times, times });
-                        if (shiftDet == null || shiftDet.Count == 0)
+                        var shiftDet = this.genericMgr.FindAll<ShiftDetail>(" select s from ShiftDetail as s where s.Shift=? ", new object[] { workingCalendars.FirstOrDefault().Shift});
+                        if (shiftDet != null || shiftDet.Count > 0)
                         {
-                            throw new BusinessException(string.Format("窗口时间{0}是休息时间，请确认。", WindowTime));
+                            DateTime nowTime = orderMgr.ParseDateTime(times);
+                            bool isTure = false;
+                            foreach (var det in shiftDet)
+                            {
+                                DateTime prevTime = orderMgr.ParseDateTime(det.StartTime);
+                                DateTime nextTime = orderMgr.ParseDateTime(det.EndTime);
+                                if (nextTime < prevTime) nextTime = nextTime.AddDays(1);
+                                if (nowTime >= prevTime && nowTime <= nextTime)
+                                {
+                                    isTure = true;
+                                    break;
+                                }
+                            }
+                            if (!isTure)
+                            {
+                                throw new BusinessException(string.Format("窗口时间{0}是休息时间，请确认。", WindowTime));
+                            }
+                        }
+                        else {
+                            throw new BusinessException(string.Format("没有找到区域的工作日历。"));
                         }
                     }
                 }
@@ -308,6 +327,7 @@ namespace com.Sconit.Web.Controllers.ORD
             }
             return Json(null);
         }
+
 
 
         public string Print(string orderNo)

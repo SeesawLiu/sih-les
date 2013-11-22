@@ -2608,7 +2608,7 @@
                 if (orderNo.Substring(0, 1).ToUpper() == "D")
                 {
                     IList<OrderMaster> orderMasterList = this.genericMgr.FindAll<OrderMaster>(@" select o from OrderMaster as o where   o.SubType =0 
-                and o.IsReceiveScanHu = 0 and o.PartyFrom not in ('SQC','LOC') and o.Status in (1,2) and exists(select 1 from OrderDetail as d where d.OrderNo=o.OrderNo and  d.ReceivedQty < d.OrderedQty) and o.OrderNo=? ",orderNo);
+                and o.IsReceiveScanHu = 0 and o.PartyFrom not in ('SQC','LOC') and o.Status in (1,2) and exists(select 1 from OrderDetail as d where d.OrderNo=o.OrderNo and  d.ReceivedQty < d.OrderedQty) and o.OrderNo=? and o.Type <> 1 ",orderNo);
                     if (orderMasterList == null || orderMasterList.Count == 0)
                     {
                         isTrue = false;

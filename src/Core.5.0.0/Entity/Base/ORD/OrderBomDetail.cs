@@ -121,6 +121,7 @@ namespace com.Sconit.Entity.ORD
         public string BESKZ { get; set; }
         public string SOBSL { get; set; }
         public Int32 JointOperation { get; set; }
+        public string RefOpRef { get; set; }
         #endregion
 
         public override int GetHashCode()

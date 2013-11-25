@@ -255,6 +255,11 @@ BEGIN
 		from #tempOrderBom as bom
 		left join #tempRoutingDet as det on bom.OpRef = det.OpRef
 		
+		update bom set OpRef = map.OpRef, 
+		from #tempOrderBom as bom
+		inner join CUST_OpRefMap as map on bom.Item = map.Item
+		where map.ProdLine = @VanProdLine
+		
 		--更新物料消耗库位，再从工作中心上找
 		update bom set Location = wc.Location
 		from #tempOrderBom as bom

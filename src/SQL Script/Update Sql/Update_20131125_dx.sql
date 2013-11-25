@@ -1,0 +1,41 @@
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[CUST_OpRefMap]') AND type in (N'U'))
+DROP TABLE [dbo].[CUST_OpRefMap]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[CUST_OpRefMap](
+	[Id] [int] NOT NULL,
+	[SAPProdLine] [varchar](50) NULL,
+	[ProdLine] [varchar](50) NULL,
+	[Item] [varchar](50) NULL,
+	[ItemDesc] [varchar](50) NULL,
+	[ItemRefCode] [varchar](50) NULL,
+	[OpRef] [varchar](50) NULL,
+	[RefOpRef] [varchar](256) NULL,
+	[IsPrimary] [bit] NULL,
+	[CreateUser] [int] NULL,
+	[CreateUserNm] [varchar](100) NULL,
+	[CreateDate] [datetime] NULL,
+	[LastModifyUser] [int] NULL,
+	[LastModifyUserNm] [varchar](100) NULL,
+	[LastModifyDate] [datetime] NULL,
+ CONSTRAINT [PK_CUST_OpRefMap] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+

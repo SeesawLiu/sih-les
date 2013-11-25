@@ -140,6 +140,7 @@ BEGIN
 			JointOp int,
 			Op int,
 			OpRef varchar(50),
+			RefOpRef varchar(256),
 			OrderQty decimal(18, 8),
 			Location varchar(50),
 			ReserveNo varchar(50),
@@ -255,7 +256,8 @@ BEGIN
 		from #tempOrderBom as bom
 		left join #tempRoutingDet as det on bom.OpRef = det.OpRef
 		
-		update bom set OpRef = map.OpRef, 
+		--按工位映射表更新
+		update bom set OpRef = map.OpRef, RefOpRef = map.RefOpRef
 		from #tempOrderBom as bom
 		inner join CUST_OpRefMap as map on bom.Item = map.Item
 		where map.ProdLine = @VanProdLine
@@ -559,6 +561,7 @@ BEGIN
 			JointOp,					--合装工序，对于分装线JointOp代表合装的工序
 			Op,							--工序
 			OpRef,						--工位
+			RefOpRef,					--参考工位
 			OrderQty,					--Bom用量
 			BFQty,						--反冲合格数量
 			BFRejQty,					--反冲不合格数量
@@ -613,6 +616,7 @@ BEGIN
 			JointOp,					--合装工序，对于分装线JointOp代表合装的工序
 			Op,							--工序
 			OpRef,						--工位
+			RefOpRef,					--参考工位
 			OrderQty,					--Bom用量
 			0,							--反冲合格数量
 			0,							--反冲不合格数量
@@ -837,6 +841,7 @@ BEGIN
 			JointOp,					--合装工序，对于分装线JointOp代表合装的工序
 			Op,							--工序
 			OpRef,						--工位
+			RefOpRef,					--参考工位
 			OrderQty,					--Bom用量
 			BFQty,						--反冲合格数量
 			BFRejQty,					--反冲不合格数量
@@ -891,6 +896,7 @@ BEGIN
 			JointOp,					--合装工序，对于分装线JointOp代表合装的工序
 			Op,							--工序
 			OpRef,						--工位
+			RefOpRef,					--参考工位
 			OrderQty,					--Bom用量
 			0,							--反冲合格数量
 			0,							--反冲不合格数量

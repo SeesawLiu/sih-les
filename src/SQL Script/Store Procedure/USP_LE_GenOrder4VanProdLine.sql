@@ -42,6 +42,8 @@ BEGIN
 		LocFrom varchar(50),
 		LocTo varchar(50),
 		OpRef varchar(50),
+		RefOpRef varchar(256),
+		DeliveryOpRef varchar(256),
 		NetOrderQty decimal(18, 8),
 		OpRefQty decimal(18, 8),
 		OrderQty decimal(18, 8),
@@ -166,14 +168,14 @@ BEGIN
 				
 				--计算净用量
 				truncate table #tempOrderBomDet
-				insert into #tempOrderBomDet(Flow, FlowDetId, Item, Uom, UC, MinUC, UCDesc, Container, ContainerDesc, RoundUpOpt, ManufactureParty, LocFrom, LocTo, OpRef, NetOrderQty, OpRefQty, OrderQty, UUID)
-				select req.Flow, req.FlowDetId, req.Item, req.Uom, req.UC, req.MinUC, req.UCDesc, req.Container, req.ContainerDesc, req.RoundUpOpt, req.ManufactureParty, req.LocFrom, req.LocTo, req.OpRef, req.OrderQty, ISNULL(orb.Qty, 0), req.OrderQty - (CASE WHEN ISNULL(req.ManufactureParty, '') = '' THEN ISNULL(orb.Qty, 0) ELSE 0 END), NEWID()
-				from (select fdet.Flow, fdet.FlowDetId, fdet.Item, fdet.Uom, fdet.UC, fdet.MinUC, fdet.UCDesc, fdet.Container, fdet.ContainerDesc, fdet.RoundUpOpt, bom.ManufactureParty, fdet.LocFrom, fdet.LocTo, bom.OpRef, SUM(bom.OrderQty) as OrderQty
+				insert into #tempOrderBomDet(Flow, FlowDetId, Item, Uom, UC, MinUC, UCDesc, Container, ContainerDesc, RoundUpOpt, ManufactureParty, LocFrom, LocTo, OpRef, RefOpRef, NetOrderQty, OpRefQty, OrderQty, UUID)
+				select req.Flow, req.FlowDetId, req.Item, req.Uom, req.UC, req.MinUC, req.UCDesc, req.Container, req.ContainerDesc, req.RoundUpOpt, req.ManufactureParty, req.LocFrom, req.LocTo, req.OpRef, req.RefOpRef, req.OrderQty, ISNULL(orb.Qty, 0), req.OrderQty - (CASE WHEN ISNULL(req.ManufactureParty, '') = '' THEN ISNULL(orb.Qty, 0) ELSE 0 END), NEWID()
+				from (select fdet.Flow, fdet.FlowDetId, fdet.Item, fdet.Uom, fdet.UC, fdet.MinUC, fdet.UCDesc, fdet.Container, fdet.ContainerDesc, fdet.RoundUpOpt, bom.ManufactureParty, fdet.LocFrom, fdet.LocTo, bom.OpRef, bom.RefOpRef, SUM(bom.OrderQty) as OrderQty
 						from LE_OrderBomCPTimeSnapshot as bom
 						inner join LE_FlowDetSnapShot as fdet on bom.Item = fdet.Item and bom.Location = fdet.LocTo
 						left join #tempIgnoreWorkCenter as wc on bom.WorkCenter = wc.WorkCenter
 						where fdet.Flow = @Flow and fdet.Strategy = 3 and bom.CPTime < @ReqTimeFrom and bom.IsCreateOrder = 0 and wc.WorkCenter is null
-						group by fdet.Flow, fdet.FlowDetId, fdet.Item, fdet.Uom, fdet.UC, fdet.MinUC, fdet.UCDesc, fdet.Container, fdet.ContainerDesc, fdet.RoundUpOpt, bom.ManufactureParty, fdet.LocFrom, fdet.LocTo, bom.OpRef) as req
+						group by fdet.Flow, fdet.FlowDetId, fdet.Item, fdet.Uom, fdet.UC, fdet.MinUC, fdet.UCDesc, fdet.Container, fdet.ContainerDesc, fdet.RoundUpOpt, bom.ManufactureParty, fdet.LocFrom, fdet.LocTo, bom.OpRef, bom.RefOpRef) as req
 				left join SCM_OpRefBalance as orb on req.Item = orb.Item and req.OpRef = orb.OpRef
 				order by req.Item, req.OpRef
 				
@@ -219,12 +221,15 @@ BEGIN
 					
 					if exists(select top 1 1 from #tempOrderBomDet where OrderQty > 0)
 					begin
+						--更新配送工位，先去参考工位再取工位
+						update #tempOrderBomDet set DeliveryOpRef = ISNULL(RefOpRef, OpRef)
+						
 						--汇总订单明细
 						truncate table #tempOrderDet
 						insert into #tempOrderDet(Flow, FlowDetId, Item, Uom, UC, MinUC, UCDesc, Container, ContainerDesc, ManufactureParty, LocFrom, LocTo, OpRef, ReqQty, OrderQty)
-						select det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.OpRef, SUM(det.NetOrderQty), SUM(det.OrderQty)
+						select det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.DeliveryOpRef, SUM(det.NetOrderQty), SUM(det.OrderQty)
 						from #tempOrderBomDet as det
-						group by det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.OpRef having SUM(det.OrderQty) > 0
+						group by det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.DeliveryOpRef having SUM(det.OrderQty) > 0
 						
 						--获取订单号
 						exec USP_GetDocNo_ORD @Flow, 3, @FlowType, 0, 0, 1, @FlowPartyFrom, @FlowPartyTo, @FlowLocTo, @FlowLocFrom, @FlowDock, 0, @OrderNo output
@@ -860,14 +865,14 @@ BEGIN
 					
 					--计算净用量
 					truncate table #tempOrderBomDet
-					insert into #tempOrderBomDet(Flow, FlowDetId, Item, Uom, UC, MinUC, UCDesc, Container, ContainerDesc, RoundUpOpt, ManufactureParty, LocFrom, LocTo, OpRef, NetOrderQty, OpRefQty, OrderQty, UUID)
-					select req.Flow, req.FlowDetId, req.Item, req.Uom, req.UC, req.MinUC, req.UCDesc, req.Container, req.ContainerDesc, req.RoundUpOpt, req.ManufactureParty, req.LocFrom, req.LocTo, req.OpRef, req.OrderQty, ISNULL(orb.Qty, 0), req.OrderQty - (CASE WHEN ISNULL(req.ManufactureParty, '') = '' THEN ISNULL(orb.Qty, 0) ELSE 0 END), NEWID()
-					from (select fdet.Flow, fdet.FlowDetId, fdet.Item, fdet.Uom, fdet.UC, fdet.MinUC, fdet.UCDesc, fdet.Container, fdet.ContainerDesc, fdet.RoundUpOpt, bom.ManufactureParty, fdet.LocFrom, fdet.LocTo, bom.OpRef, SUM(bom.OrderQty) as OrderQty
+					insert into #tempOrderBomDet(Flow, FlowDetId, Item, Uom, UC, MinUC, UCDesc, Container, ContainerDesc, RoundUpOpt, ManufactureParty, LocFrom, LocTo, OpRef, RefOpRef, NetOrderQty, OpRefQty, OrderQty, UUID)
+					select req.Flow, req.FlowDetId, req.Item, req.Uom, req.UC, req.MinUC, req.UCDesc, req.Container, req.ContainerDesc, req.RoundUpOpt, req.ManufactureParty, req.LocFrom, req.LocTo, req.OpRef, req.RefOpRef, req.OrderQty, ISNULL(orb.Qty, 0), req.OrderQty - (CASE WHEN ISNULL(req.ManufactureParty, '') = '' THEN ISNULL(orb.Qty, 0) ELSE 0 END), NEWID()
+					from (select fdet.Flow, fdet.FlowDetId, fdet.Item, fdet.Uom, fdet.UC, fdet.MinUC, fdet.UCDesc, fdet.Container, fdet.ContainerDesc, fdet.RoundUpOpt, bom.ManufactureParty, fdet.LocFrom, fdet.LocTo, bom.OpRef, bom.RefOpRef, SUM(bom.OrderQty) as OrderQty
 							from LE_OrderBomCPTimeSnapshot as bom
 							inner join LE_FlowDetSnapShot as fdet on bom.Item = fdet.Item and bom.Location = fdet.LocTo
 							left join #tempIgnoreWorkCenter as wc on bom.WorkCenter = wc.WorkCenter
 							where fdet.Flow = @Flow and fdet.Strategy = 3 and bom.CPTime >= @ReqTimeFrom and bom.CPTime < @ReqTimeTo and bom.IsCreateOrder = 0 and wc.WorkCenter is null
-							group by fdet.Flow, fdet.FlowDetId, fdet.Item, fdet.Uom, fdet.UC, fdet.MinUC, fdet.UCDesc, fdet.Container, fdet.ContainerDesc, fdet.RoundUpOpt, bom.ManufactureParty, fdet.LocFrom, fdet.LocTo, bom.OpRef) as req
+							group by fdet.Flow, fdet.FlowDetId, fdet.Item, fdet.Uom, fdet.UC, fdet.MinUC, fdet.UCDesc, fdet.Container, fdet.ContainerDesc, fdet.RoundUpOpt, bom.ManufactureParty, fdet.LocFrom, fdet.LocTo, bom.OpRef, bom.RefOpRef) as req
 					left join SCM_OpRefBalance as orb on req.Item = orb.Item and req.OpRef = orb.OpRef
 					order by req.Item, req.OpRef
 					
@@ -913,12 +918,15 @@ BEGIN
 						
 						if exists(select top 1 1 from #tempOrderBomDet where OrderQty > 0)
 						begin
+							--更新配送工位，先去参考工位再取工位
+							update #tempOrderBomDet set DeliveryOpRef = ISNULL(RefOpRef, OpRef)
+						
 							--汇总订单明细
 							truncate table #tempOrderDet
 							insert into #tempOrderDet(Flow, FlowDetId, Item, Uom, UC, MinUC, UCDesc, Container, ContainerDesc, ManufactureParty, LocFrom, LocTo, OpRef, ReqQty, OrderQty)
-							select det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.OpRef, SUM(det.NetOrderQty), SUM(det.OrderQty)
+							select det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.DeliveryOpRef, SUM(det.NetOrderQty), SUM(det.OrderQty)
 							from #tempOrderBomDet as det
-							group by det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.OpRef having SUM(det.OrderQty) > 0
+							group by det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.DeliveryOpRef having SUM(det.OrderQty) > 0
 							
 							--获取订单号
 							exec USP_GetDocNo_ORD @Flow, 3, @FlowType, 0, 0, 0, @FlowPartyFrom, @FlowPartyTo, @FlowLocTo, @FlowLocFrom, @FlowDock, 0, @OrderNo output

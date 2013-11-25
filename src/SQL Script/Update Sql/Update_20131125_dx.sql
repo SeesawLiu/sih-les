@@ -50,4 +50,9 @@ CREATE UNIQUE NONCLUSTERED INDEX [OpRefMap_ProdLine_Item] ON [dbo].[CUST_OpRefMa
 GO
 
 
+alter table ORD_OrderBomDet add RefOpRef varchar(256)
+GO
+
+alter table LE_OrderBomCPTimeSnapshot add RefOpRef varchar(256)
+GO
 

@@ -124,7 +124,7 @@
     <value>创建用户</value>
   </data>
   <data name="OpRefMap_IsPrimary" xml:space="preserve">
-    <value>是否主键</value>
+    <value>是否优先</value>
   </data>
   <data name="OpRefMap_Item" xml:space="preserve">
     <value>物料代码</value>
@@ -136,13 +136,13 @@
     <value>旧图号</value>
   </data>
   <data name="OpRefMap_OpReference" xml:space="preserve">
-    <value>工位</value>
+    <value>JIT计算工位</value>
   </data>
   <data name="OpRefMap_ProdLine" xml:space="preserve">
     <value>生产线</value>
   </data>
   <data name="OpRefMap_RefOpReference" xml:space="preserve">
-    <value>引用工位</value>
+    <value>配送工位</value>
   </data>
   <data name="OpRefMap_SAPProdLine" xml:space="preserve">
     <value>SAP生产线</value>

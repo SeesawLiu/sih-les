@@ -2401,11 +2401,11 @@ namespace com.Sconit.Service.Impl
                 }
                 #endregion
 
-                #region opReference
+                #region JIT计算工位
                 opReference = ImportHelper.GetCellStringValue(row.GetCell(colOpReference));
                 if (string.IsNullOrWhiteSpace(opReference))
                 {
-                    businessException.AddMessage(string.Format("第{0}行工位不能为空", i));
+                    businessException.AddMessage(string.Format("第{0}行JIT计算工位不能为空", i));
                 }
                 else
                 {
@@ -2414,11 +2414,11 @@ namespace com.Sconit.Service.Impl
                 }
                 #endregion
 
-                #region refOpReference
+                #region 配送工位
                 refOpReference = ImportHelper.GetCellStringValue(row.GetCell(colRefOpReference));
                 if (string.IsNullOrWhiteSpace(refOpReference))
                 {
-                    businessException.AddMessage(string.Format("第{0}行引用工位不能为空", i));
+                    businessException.AddMessage(string.Format("第{0}行配送工位不能为空", i));
                 }
                 else
                 {
@@ -2431,7 +2431,7 @@ namespace com.Sconit.Service.Impl
                 isPrimary = ImportHelper.GetCellStringValue(row.GetCell(colIsPrimary));
                 if (string.IsNullOrWhiteSpace(isPrimary))
                 {
-                    businessException.AddMessage(string.Format("第{0}行是否主键不能为空", i));
+                    businessException.AddMessage(string.Format("第{0}行是否优先不能为空", i));
                 }
                 else
                 {
@@ -2444,7 +2444,7 @@ namespace com.Sconit.Service.Impl
                             opRefMap.IsPrimary = false;
                             break;
                         default:
-                            businessException.AddMessage(string.Format("第{0}行是否主键{1}填写有误", i,isPrimary));
+                            businessException.AddMessage(string.Format("第{0}行是否优先{1}填写有误", i, isPrimary));
                             break;
                     }
                 }
@@ -2457,10 +2457,24 @@ namespace com.Sconit.Service.Impl
                     {
                         businessException.AddMessage(string.Format("第{0}行【物料编号+生产线】在模板中重复", i));
                     }
+                    if (opRefMap.IsPrimary.HasValue && opRefMap.IsPrimary.Value)
+                    {
+                        if (exactOpRefMapList.Where(a => a.Item == opRefMap.Item && a.OpReference == opRefMap.OpReference && a.IsPrimary == opRefMap.IsPrimary).Count()>0)
+                        {
+                            businessException.AddMessage(string.Format("第{0}行【物料编号+JIT计算工位+优先】在模板中重复", i));
+                        }
+                    }
                 }
                 
                 if (allOpRefMap != null && allOpRefMap.Count > 0)
                 {
+                    if (opRefMap.IsPrimary.HasValue && opRefMap.IsPrimary.Value)
+                    {
+                        if (allOpRefMap.Where(a => a.Item == opRefMap.Item && a.OpReference == opRefMap.OpReference && a.IsPrimary == opRefMap.IsPrimary).Count() > 0)
+                        {
+                            businessException.AddMessage(string.Format("第{0}行【物料编号+JIT计算工位】在数据库中已经存在优先的", i));
+                        }
+                    }
                     var updateOprefMaps = allOpRefMap.Where(a => a.Item == opRefMap.Item && a.ProdLine == opRefMap.ProdLine);
                     if (updateOprefMaps != null && updateOprefMaps.Count() > 0)
                     {

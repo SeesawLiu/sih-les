@@ -543,15 +543,19 @@ namespace com.Sconit.Web.Controllers.SP
 
                 if (findBody.RowCellList != null && findBody.RowCellList.Count > 0)
                 {
-                    var historyReceivedQty = findBody.RowCellList.Where(r => r.EndDate < dateTimeNow.Date).Sum(r => r.ReceivedQty);
-                    var historyDemandQty = findBody.RowCellList.Where(r => r.EndDate < dateTimeNow.Date).Sum(r => r.OrderQty);
-                    var historyDemandDate = findBody.RowCellList.Min(r => r.EndDate).Value.ToShortDateString() + "-" + DateTime.Now.ToShortDateString();
-                    returnList.Add(new ScheduleBody
-                        {
-                            ReceivedQty = historyReceivedQty.ToString("0.###"),
-                            DemandDate = historyDemandDate,
-                            DemandQty = historyDemandQty,
-                        });
+                    var historySheculine = findBody.RowCellList.Where(r => r.EndDate < dateTimeNow.Date);
+                    if (historySheculine != null && historySheculine.Count() > 0)
+                    {
+                        var historyReceivedQty = historySheculine.Sum(r => r.ReceivedQty);
+                        var historyDemandQty = historySheculine.Sum(r => r.OrderQty);
+                        var historyDemandDate = historySheculine.Min(r => r.EndDate).Value.ToShortDateString() + "-" + DateTime.Now.ToShortDateString();
+                        returnList.Add(new ScheduleBody
+                            {
+                                ReceivedQty = historyReceivedQty.ToString("0.###"),
+                                DemandDate = historyDemandDate,
+                                DemandQty = historyDemandQty,
+                            });
+                    }
                     foreach (var roeCell in findBody.RowCellList.Where(r => r.EndDate >= dateTimeNow.Date))
                     {
                         returnList.Add(new ScheduleBody
@@ -567,6 +571,63 @@ namespace com.Sconit.Web.Controllers.SP
             return PartialView(new GridModel(returnList));
         }
 
+        public void ExporDemandPlanListXls()
+        {
+            DateTime dateTimeNow = System.DateTime.Now;
+            IList<ScheduleBody> scheduleBodyList = TempData["DemandPlanList"] != null ? TempData["DemandPlanList"] as IList<ScheduleBody> : new List<ScheduleBody>();
+            if (scheduleBodyList != null && scheduleBodyList.Count > 0)
+            {
+                TempData["DemandPlanList"] = scheduleBodyList;
+            }
+            else
+            {
+                scheduleBodyList = new List<ScheduleBody>();
+            }
+            var returnList = new List<ScheduleBody>();
+            foreach (var scheduleBody in scheduleBodyList)
+            {
+                if (scheduleBody.RowCellList != null && scheduleBody.RowCellList.Count > 0)
+                {
+                    var historySheculine = scheduleBody.RowCellList.Where(r => r.EndDate < dateTimeNow.Date);
+                    if (historySheculine != null && historySheculine.Count() > 0)
+                    {
+                        var historyReceivedQty = historySheculine.Sum(r => r.ReceivedQty);
+                        var historyDemandQty = historySheculine.Sum(r => r.OrderQty);
+                        var historyDemandDate = historySheculine.Min(r => r.EndDate).Value.ToShortDateString() + "-" + DateTime.Now.ToShortDateString();
+                        returnList.Add(new ScheduleBody
+                        {
+                            OrderNo = scheduleBody.OrderNo,
+                            Sequence = scheduleBody.Sequence,
+                            Item = scheduleBody.Item,
+                            ItemDescription = scheduleBody.ItemDescription,
+                            ReferenceItemCode = scheduleBody.ReferenceItemCode,
+                            Uom = scheduleBody.Uom,
+                            ReceivedQty = historyReceivedQty.ToString("0.###"),
+                            DemandDate = historyDemandDate,
+                            DemandQty = historyDemandQty,
+                        });
+                    }
+                   
+                    foreach (var roeCell in scheduleBody.RowCellList.Where(r => r.EndDate >= dateTimeNow.Date))
+                    {
+                        returnList.Add(new ScheduleBody
+                        {
+                            OrderNo = scheduleBody.OrderNo,
+                            Sequence = scheduleBody.Sequence,
+                            Item = scheduleBody.Item,
+                            ItemDescription = scheduleBody.ItemDescription,
+                            ReferenceItemCode = scheduleBody.ReferenceItemCode,
+                            Uom = scheduleBody.Uom,
+                            ReceivedQty = roeCell.ReceivedQty.ToString("0.###"),
+                            DemandDate = roeCell.EndDate.Value.ToShortDateString(),
+                            DemandQty = Convert.ToDecimal(roeCell.OrderQty),
+                        });
+                    }
+                }
+            }
+
+            ExportToXLS("DemandPlanListXls", "XLS", returnList);
+        }
         #endregion
 
 

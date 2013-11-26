@@ -55,23 +55,44 @@ namespace com.Sconit.Web.Controllers.CUST
         [SconitAuthorize(Permissions = "Url_OpRefMap_View")]
         public ActionResult _Insert(OpRefMap oprefMap)
         {
-            if (ModelState.IsValid)
+            try
             {
-                IList<OpRefMap> oprefMapList = base.genericMgr.FindAll<OpRefMap>("from OpRefMap as o where o.Item=? and o.ProdLine=?", new object[] { oprefMap.Item, oprefMap.ProdLine });
-                if (oprefMapList.Count > 0)
+                if (ModelState.IsValid)
                 {
-                    SaveErrorMessage(string.Format("生产线{0}+物料代码{1}已经存在。",oprefMap.ProdLine,oprefMap.Item));
-                }
-                else
-                {
-                    Item item = this.genericMgr.FindById<Item>(oprefMap.Item);
-                    oprefMap.Item = item.Code;
-                    oprefMap.ItemDesc = item.Description;
-                    oprefMap.ItemRefCode = item.ReferenceCode;
-                    base.genericMgr.Create(oprefMap);
-                    SaveSuccessMessage("添加成功。");
+                    IList<OpRefMap> oprefMapList = base.genericMgr.FindAll<OpRefMap>("from OpRefMap as o where o.Item=? and o.ProdLine=?", new object[] { oprefMap.Item, oprefMap.ProdLine });
+                    if (oprefMapList.Count > 0)
+                    {
+                        throw new BusinessException(string.Format("生产线{0}+物料代码{1}已经存在。", oprefMap.ProdLine, oprefMap.Item));
+                    }
+                    else
+                    {
+                        if (oprefMap.IsPrimary.HasValue && oprefMap.IsPrimary.Value)
+                        {
+                            var checkPrimary = this.genericMgr.FindAll<OpRefMap>(" from OpRefMap as o where o.Item=? and o.OpReference=? and o.IsPrimary=? ", new object[] { oprefMap.Item, oprefMap.OpReference, true });
+                            if (checkPrimary != null && checkPrimary.Count > 0)
+                            {
+                                throw new BusinessException(string.Format("【物料编号{0}+JIT计算工位{1}】在数据库中已经存在优先的", oprefMap.Item, oprefMap.OpReference));
+                            }
+                        }
+
+                        Item item = this.genericMgr.FindById<Item>(oprefMap.Item);
+                        oprefMap.Item = item.Code;
+                        oprefMap.ItemDesc = item.Description;
+                        oprefMap.ItemRefCode = item.ReferenceCode;
+                        base.genericMgr.Create(oprefMap);
+                        SaveSuccessMessage("添加成功。");
+                    }
                 }
             }
+            catch (BusinessException ex)
+            {
+                SaveErrorMessage(ex.GetMessages()[0].GetMessageString());
+            }
+            catch (Exception e)
+            {
+                SaveErrorMessage(e.Message);
+            }
+
             GridCommand command = (GridCommand)TempData["GridCommand"];
             OpRefMapSearchModel searchModel = (OpRefMapSearchModel)TempData["searchModel"];
             TempData["GridCommand"] = command;
@@ -106,29 +127,47 @@ namespace com.Sconit.Web.Controllers.CUST
         [SconitAuthorize(Permissions = "Url_OpRefMap_View")]
         public ActionResult _Update(OpRefMap oprefMap, string id)
         {
-            if (ModelState.IsValid)
+            try
             {
-                IList<OpRefMap> oprefMapList = base.genericMgr.FindAll<OpRefMap>("from OpRefMap as o where o.Item=? and o.ProdLine=? and o.Id <> ?", new object[] { oprefMap.Item,  oprefMap.ProdLine,oprefMap.Id });
-                if (oprefMapList.Count > 0)
+                if (ModelState.IsValid)
                 {
-                    SaveErrorMessage(string.Format("生产线{0}+物料代码{1}已经存在。", oprefMap.ProdLine, oprefMap.Item));
-
+                    IList<OpRefMap> oprefMapList = base.genericMgr.FindAll<OpRefMap>("from OpRefMap as o where o.Item=? and o.ProdLine=? and o.Id <> ?", new object[] { oprefMap.Item, oprefMap.ProdLine, oprefMap.Id });
+                    if (oprefMapList.Count > 0)
+                    {
+                        throw new BusinessException(string.Format("生产线{0}+物料代码{1}已经存在。", oprefMap.ProdLine, oprefMap.Item));
+                    }
+                    else
+                    {
+                        if (oprefMap.IsPrimary.HasValue && oprefMap.IsPrimary.Value)
+                        {
+                            var checkPrimary = this.genericMgr.FindAll<OpRefMap>(" from OpRefMap as o where o.Item=? and o.OpReference=? and o.IsPrimary=? ", new object[] { oprefMap.Item, oprefMap.OpReference, true });
+                            if (checkPrimary != null && checkPrimary.Count > 0)
+                            {
+                                throw new BusinessException(string.Format("【物料编号{0}+JIT计算工位{1}】在数据库中已经存在优先的", oprefMap.Item, oprefMap.OpReference));
+                            }
+                        }
+                        OpRefMap upOpRefMap = base.genericMgr.FindById<OpRefMap>(Convert.ToInt32(id));
+                        Item item = this.genericMgr.FindById<Item>(oprefMap.Item);
+                        upOpRefMap.ProdLine = oprefMap.ProdLine;
+                        upOpRefMap.SAPProdLine = oprefMap.SAPProdLine;
+                        upOpRefMap.Item = item.Code;
+                        upOpRefMap.ItemDesc = item.Description;
+                        upOpRefMap.ItemRefCode = item.ReferenceCode;
+                        upOpRefMap.OpReference = oprefMap.OpReference;
+                        upOpRefMap.RefOpReference = oprefMap.RefOpReference;
+                        upOpRefMap.IsPrimary = oprefMap.IsPrimary;
+                        base.genericMgr.Update(upOpRefMap);
+                        SaveSuccessMessage("修改成功。");
+                    }
                 }
-                else
-                {
-                    OpRefMap upOpRefMap = base.genericMgr.FindById<OpRefMap>(Convert.ToInt32(id));
-                    Item item = this.genericMgr.FindById<Item>(oprefMap.Item);
-                    upOpRefMap.ProdLine = oprefMap.ProdLine;
-                    upOpRefMap.SAPProdLine = oprefMap.SAPProdLine;
-                    upOpRefMap.Item = item.Code;
-                    upOpRefMap.ItemDesc = item.Description;
-                    upOpRefMap.ItemRefCode = item.ReferenceCode;
-                    upOpRefMap.OpReference = oprefMap.OpReference;
-                    upOpRefMap.RefOpReference = oprefMap.RefOpReference;
-                    upOpRefMap.IsPrimary = oprefMap.IsPrimary;
-                    base.genericMgr.Update(upOpRefMap);
-                    SaveSuccessMessage("修改成功。");
-                }
+            }
+            catch (BusinessException ex)
+            {
+                SaveErrorMessage(ex.GetMessages()[0].GetMessageString());
+            }
+            catch (Exception e)
+            {
+                SaveErrorMessage(e.Message);
             }
             GridCommand command = (GridCommand)TempData["GridCommand"];
             OpRefMapSearchModel searchModel = (OpRefMapSearchModel)TempData["searchModel"];

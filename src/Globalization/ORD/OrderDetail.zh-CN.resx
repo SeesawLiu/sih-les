@@ -384,4 +384,10 @@
   <data name="SeqOrderChange_ExternalSequence" xml:space="preserve">
     <value>车辆流水号</value>
   </data>
+  <data name="OrderDetail_DemandDate" xml:space="preserve">
+    <value>需求时间</value>
+  </data>
+  <data name="OrderDetail_DemandQty" xml:space="preserve">
+    <value>需求数量</value>
+  </data>
 </root>

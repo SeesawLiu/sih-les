@@ -12,7 +12,7 @@ SET ANSI_PADDING ON
 GO
 
 CREATE TABLE [dbo].[CUST_OpRefMap](
-	[Id] [int] NOT NULL,
+	[Id] [int] NOT NULL Identity(1, 1),
 	[SAPProdLine] [varchar](50) NULL,
 	[ProdLine] [varchar](50) NULL,
 	[Item] [varchar](50) NULL,

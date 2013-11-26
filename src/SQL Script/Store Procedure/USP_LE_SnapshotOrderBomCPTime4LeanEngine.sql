@@ -46,7 +46,7 @@ BEGIN
 		select @VanProdLine = VanProdLine from #VanProdLine where RowId = @RowId
 		select top 1 @LastUpdateDate = CreateDate from ORD_OrderOpCPTime where VanProdLine = @VanProdLine order by CreateDate desc
 		
-		if DATEADD(HOUR, -1, @DateTimeNow) > (select top 1 CreateDate from ORD_OrderOpCPTime where VanProdLine = @VanProdLine)
+		if not exists(select top 1 1 from ORD_OrderOpCPTime where VanProdLine = @VanProdLine) or (DATEADD(HOUR, -1, @DateTimeNow) > (select top 1 CreateDate from ORD_OrderOpCPTime where VanProdLine = @VanProdLine))
 		begin
 			set @Msg = N'生产线' + @VanProdLine + N' 最后刷新时间为' + convert(varchar, @LastUpdateDate, 120) + N'，已有1小时没有刷新OrderBomConsumeTime，强制进行刷新。'
 			insert into LOG_RunLeanEngine(Lvl, Msg, BatchNo) values(0, @Msg, @BatchNo)

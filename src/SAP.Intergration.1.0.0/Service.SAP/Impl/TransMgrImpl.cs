@@ -1152,13 +1152,13 @@ namespace com.Sconit.Service.SAP.Impl
                 #region 判定不合格
                 else if (locTrans.TransactionType == CodeMaster.TransactionType.RCT_INP_REJ)
                 {
-                    InspectResult inspectResult = genericMgr.FindEntityWithNativeSql<InspectResult>("select * from INP_InspectResult WITH(NOLOCK) where Id = ?", locTrans.OrderDetailId).Single();
-                    InspectDetail inspectDetail = genericMgr.FindEntityWithNativeSql<InspectDetail>("select * from INP_InspectDet WITH(NOLOCK) where Id = ?", inspectResult.InspectDetailId).SingleOrDefault();
+                    //InspectResult inspectResult = genericMgr.FindEntityWithNativeSql<InspectResult>("select * from INP_InspectResult WITH(NOLOCK) where Id = ?", locTrans.OrderDetailId).Single();
+                    //InspectDetail inspectDetail = genericMgr.FindEntityWithNativeSql<InspectDetail>("select * from INP_InspectDet WITH(NOLOCK) where Id = ?", inspectResult.InspectDetailId).SingleOrDefault();
 
-                    if (inspectDetail.IpDetailSequence == 0 && inspectDetail.ReceiptDetailSequence == 0)
-                        invTrans.BWART = "344";
-                    else
-                        invTrans.BWART = "350";
+                    //if (inspectDetail.IpDetailSequence == 0 && inspectDetail.ReceiptDetailSequence == 0)
+                    //    invTrans.BWART = "344";
+                    //else
+                    invTrans.BWART = "350";
                     invTrans.WERKS = plantFrom;
                     invTrans.LGORT = sapLocationFrom;
                     invTrans.UMLGO = sapLocationTo;

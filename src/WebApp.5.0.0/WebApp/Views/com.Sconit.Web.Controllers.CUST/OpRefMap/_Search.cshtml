@@ -1,0 +1,136 @@
+﻿@using com.Sconit.Web.Models.SearchModels.CUST
+<fieldset>
+    @using (Html.BeginForm("List", "OpRefMap"))
+    {   
+        <div class="search">
+            <div class="editor-label-2">
+                <label for="MiscOrderMstr_Location">
+                @Resources.CUST.OpRefMap.OpRefMap_SAPProdLine
+                </label>
+            </div>
+            <div class="editor-field-2">
+                @Html.TextBox("SAPProdLineSearch", TempData["OpRefMapSearchModel"] != null ? ((OpRefMapSearchModel)TempData["OpRefMapSearchModel"]).SAPProdLineSearch : string.Empty)
+            </div>
+            <div class="editor-label-2">
+                <label for="MiscOrderMstr_Location">
+                @Resources.CUST.OpRefMap.OpRefMap_ProdLine
+
+                </label>
+            </div>
+            <div class="editor-field-2">
+                @{
+        Html.RenderAction("_FlowComboBox", "Common",
+            new
+            {
+                controlName = "ProdLineSearch",
+                type = (int)com.Sconit.CodeMaster.OrderType.Production,
+                isVanOrder = true,
+                selectedValue = TempData["OpRefMapSearchModel"] != null ? ((OpRefMapSearchModel)TempData["OpRefMapSearchModel"]).ProdLineSearch : string.Empty
+            });
+                }
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_OrderNo">
+                @Resources.CUST.OpRefMap.OpRefMap_Item
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+               Html.RenderAction("_ItemComboBox", "Common",
+                   new
+                   {
+                       controlName = "ItemSearch",
+                       selectedValue = TempData["OpRefMapSearchModel"] != null ? ((OpRefMapSearchModel)TempData["OpRefMapSearchModel"]).ItemSearch : string.Empty
+                   });
+                    
+                }
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_WMSNO">
+                @Resources.CUST.OpRefMap.OpRefMap_OpReference
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("OpReferenceSearch", TempData["OpRefMapSearchModel"] != null ? ((OpRefMapSearchModel)TempData["OpRefMapSearchModel"]).OpReferenceSearch : string.Empty)
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_WMSNO">
+                @Resources.CUST.OpRefMap.OpRefMap_CreateUserName
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("CreateUserNameSearch", TempData["OpRefMapSearchModel"] != null ? ((OpRefMapSearchModel)TempData["OpRefMapSearchModel"]).CreateUserNameSearch : string.Empty)
+            </div>
+            <div class="search-label">
+                <label for="">
+                @Resources.CUST.OpRefMap.OpRefMap_IsPrimary
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.CheckBox("IsPrimarySearch", TempData["OpRefMapSearchModel"] != null ? ((OpRefMapSearchModel)TempData["OpRefMapSearchModel"]).IsPrimarySearch : false)
+            </div>
+             <div class="search-label">
+                <label for="OrderMaster_DateFrom">
+                    创建时间 从
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DatePicker().Format(com.Sconit.Entity.BusinessConstants.SHORT_DATE_FORMAT)
+                .Name("CreateStartDate")
+            .Value(TempData["OpRefMapSearchModel"] != null ? ((OpRefMapSearchModel)TempData["OpRefMapSearchModel"]).CreateStartDate : null)
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_DateTo">
+                    至
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DatePicker().Format(com.Sconit.Entity.BusinessConstants.SHORT_DATE_FORMAT)
+                .Name("CreateStartDate")
+            .Value(TempData["OpRefMapSearchModel"] != null ? ((OpRefMapSearchModel)TempData["OpRefMapSearchModel"]).CreateEndDate : null)
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+            </div>
+            <div class="search-label">
+                <label>
+                    <a href='/Resource/Templates/UploadTemplate/OpRefMap.xls'>模板下载</a>
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().Upload()
+                    .Name("attachments")
+                    .Multiple(false)
+                    .Async(async => async
+                    .Save("ImportOpRefMap", "OpRefMap")
+                    .AutoUpload(true))
+                    .ClientEvents(e => e.OnSuccess("TelerikonUpload_OnSuccess")))
+            </div>
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            <button type="submit" id="btnSearch">
+                @Resources.Global.Button_Search</button>
+            <button type="button" id="btnExport" onclick="ExportClick()">
+                @Resources.Global.Button_Export</button>
+        </div>
+
+    }
+</fieldset>
+<script type="text/javascript">
+    var t = "";
+    $('#btnSearch').click(function () {
+
+        if (t != "") {
+            $('form').attr('action', t);
+        }
+        $('form').submit();
+    });
+    $('#btnExport').click(function () {
+
+        if (t == "") {
+            t = $('form').attr('action');
+        }
+        $('form').attr('action', "/OpRefMap/ExportOpRefMapXls/");
+        $('form').submit();
+    });
+</script>

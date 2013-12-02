@@ -113,6 +113,10 @@ namespace com.Sconit.Service
         #region 更新物料消耗时间
         void AsyncUpdateOrderBomCPTime(string prodLine, User user);
         #endregion
+
+        #region 工位映射导入
+        void ImportOpRefMap(Stream inputStream);
+        #endregion
     }
 
     public interface IBackflushVanOrderMgr

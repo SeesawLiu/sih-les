@@ -202,6 +202,21 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
+    <Compile Include="CUST\OpRefMap.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OpRefMap.resx</DependentUpon>
+    </Compile>
+    <Compile Include="CUST\OpRefMap.en-US.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OpRefMap.en-US.resx</DependentUpon>
+    </Compile>
+    <Compile Include="CUST\OprefMap.zh-CN.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OprefMap.zh-CN.resx</DependentUpon>
+    </Compile>
     <Compile Include="CUST\ProdBomDetForecast.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -2484,6 +2499,18 @@
     <EmbeddedResource Include="CUST\OperationReport.zh-CN.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>OperationReport.zh-CN.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CUST\OpRefMap.en-US.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>OpRefMap.en-US.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CUST\OpRefMap.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>OpRefMap.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CUST\OprefMap.zh-CN.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>OprefMap.zh-CN.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="CUST\ProdBomDetForecast.en-US.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>

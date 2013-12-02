@@ -1,0 +1,102 @@
+﻿@model IEnumerable<com.Sconit.Entity.CUST.OpRefMap>
+<fieldset>
+
+    @(Html.Telerik().Grid(Model)
+               .Name("OpRefMapGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .ToolBar(commands =>
+        {
+
+            commands.Insert();
+
+        })
+        .DataBinding(dataBinding => dataBinding.Ajax()
+                .Select("_AjaxList", "OpRefMap")
+                .Insert("_Insert", "OpRefMap")
+                .Update("_Update", "OpRefMap")
+                .Delete("_Delete", "OpRefMap"))
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.SAPProdLine);
+            columns.Bound(o => o.ProdLine);
+            columns.Bound(o => o.Item).EditorTemplateName("ItemGridForeignKey").Width(200);
+            columns.Bound(o => o.ItemRefCode).ReadOnly();
+            columns.Bound(o => o.ItemDesc).ReadOnly();
+            columns.Bound(o => o.OpReference);
+            columns.Bound(o => o.RefOpReference);
+            columns.Bound(o => o.IsPrimary)
+                      .ClientTemplate("<input type='checkbox' disabled='disabled' name='IsPrimary' <#= IsPrimary? checked='checked' : '' #> />");
+            columns.Bound(o => o.CreateDate).ReadOnly();
+            columns.Bound(o => o.CreateUserName).ReadOnly();
+            columns.Command(commands =>
+            {
+                commands.Edit();
+                commands.Delete();
+
+            });
+            
+
+        }).ClientEvents(events =>
+        {
+            events.OnDataBinding("OpRefMapGrid_OnDataBinding").OnComplete("TelerikGridView_OnComplete");
+        })
+        .EnableCustomBinding(true)
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(ViewBag.PageSize);
+        })
+        .Scrollable()
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+    )
+    <script type="text/javascript">
+        function OpRefMapGrid_OnDataBinding(e) {
+            e.data = {
+                ProdLineSearch: $('#ProdLineSearch').val(),
+                SAPProdLineSearch: $('#SAPProdLineSearch').val(),
+                ItemSearch: $('#ItemSearch').val(),
+                OpReferenceSearch: $('#OpReferenceSearch').val(),
+                CreateUserNameSearch: $('#CreateUserNameSearch').val(),
+                IsPrimarySearch: $('#IsPrimarySearch').is(":checked"),
+                CreateStartDate: $('#CreateStartDate').val(),
+                CreateEndDate: $('#CreateEndDate').val()
+            };
+        }
+
+
+        function onItemComboBoxChange(e) {
+            if (e.value != "" && e.value != undefined) {
+                var combobox = $(this).data("tComboBox");
+                if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
+                    combobox.value("");
+                    combobox.reload();
+                } else {
+                    var data = {
+                        "itemCode": e.value
+                    };
+                    $.ajax({
+                        type: "post",
+                        dataType: "json",
+                        url: "/OpRefMap/_GetItem/",
+                        data: data,
+                        success: function (data, textStatus) {
+                            var $tGrid = $("#LocationDetailPrefGrid").data("tGrid");
+                            var $itemCell = $(e.target).parent().parent();
+                            $itemCell.next().next().html(data.Description);
+                            $itemCell.next().html(data.ReferenceCode);
+
+                        
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            alert(errorThrown);
+                        }
+                    });
+                }
+            }
+        }
+    </script>
+</fieldset>

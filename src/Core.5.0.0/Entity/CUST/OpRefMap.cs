@@ -8,6 +8,7 @@ namespace com.Sconit.Entity.CUST
     {
         #region Non O/R Mapping Properties
 
+        public bool IsUpdate { get; set; }
         //TODO: Add Non O/R Mapping Properties here. 
 
         #endregion

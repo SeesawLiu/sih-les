@@ -2029,7 +2029,7 @@ namespace com.Sconit.Service.Impl
                     //if (orderMaster.PartyFrom == "SQC")
                     //    this.CreateOrderDAT(orderMaster);
                     //else
-                        //this.CreateProcurementOrderDAT(orderMaster);
+                    //this.CreateProcurementOrderDAT(orderMaster);
                     //this.CreateProcurementOrderDAT(orderMaster); 全面上线后要调用此方法
 
                     if (orderMaster.OrderStrategy != com.Sconit.CodeMaster.FlowStrategy.SEQ)
@@ -6792,7 +6792,7 @@ namespace com.Sconit.Service.Impl
                     //if (orderMaster.PartyFrom == "SQC")
                     //    this.CreateOrderDAT(orderMaster);
                     //else
-                        this.CreateProcurementOrderDAT(orderMaster);
+                    this.CreateProcurementOrderDAT(orderMaster);
                     //this.CreateOrderDAT(orderMaster);
                     //this.CreateProcurementOrderDAT(orderMaster);
                 }
@@ -7281,13 +7281,13 @@ namespace com.Sconit.Service.Impl
             OrderMaster orderMaster = this.genericMgr.FindEntityWithNativeSql<OrderMaster>("select * from ORD_OrderMstr_4 WITH(NOLOCK) where OrderNo = ?", orderOperation.OrderNo).Single();
             OrderDetail orderDetail = this.genericMgr.FindEntityWithNativeSql<OrderDetail>("select * from ORD_OrderDet_4 WITH(NOLOCK) where OrderNo = ?", orderOperation.OrderNo).Single();
             IList<ProductLineMap> prodLineMapList = this.genericMgr.FindAll<ProductLineMap>("select s from ProductLineMap as s where s.ProductLine = ?", orderMaster.Flow);
-//            IList<OrderOperation> refOrderOperationList = null;
-//            if (orderOperation.NeedReport)
-//            {
-//                refOrderOperationList = this.genericMgr.FindEntityWithNativeSql<OrderOperation>(@"select * from ORD_OrderOp WITH(NOLOCK) where OrderNo= ?
-//                    and Op > ISNULL((select Op from ORD_OrderOp WITH(NOLOCK) where OrderNo = ? and Op < ? and NeedReport = ?), 0) and Op < ?"
-//                        , new object[] { orderMaster.OrderNo, orderMaster.OrderNo, orderOperation.Operation, true, orderOperation.Operation });
-//            }
+            //            IList<OrderOperation> refOrderOperationList = null;
+            //            if (orderOperation.NeedReport)
+            //            {
+            //                refOrderOperationList = this.genericMgr.FindEntityWithNativeSql<OrderOperation>(@"select * from ORD_OrderOp WITH(NOLOCK) where OrderNo= ?
+            //                    and Op > ISNULL((select Op from ORD_OrderOp WITH(NOLOCK) where OrderNo = ? and Op < ? and NeedReport = ?), 0) and Op < ?"
+            //                        , new object[] { orderMaster.OrderNo, orderMaster.OrderNo, orderOperation.Operation, true, orderOperation.Operation });
+            //            }
 
             if (orderMaster.Status != CodeMaster.OrderStatus.InProcess)
             {
@@ -7569,17 +7569,17 @@ namespace com.Sconit.Service.Impl
             com.Sconit.Entity.SAP.ORD.ProdOpReport prodOpReport = this.genericMgr.FindEntityWithNativeSql<com.Sconit.Entity.SAP.ORD.ProdOpReport>("select * from SAP_ProdOpReport WITH(NOLOCK) where OrderOpReportId = ?", orderOperationReport.Id).Single();
 
             //IList<OrderOperation> refOrderOperationList = null;
-//            if (orderOperation.NeedReport &&
-//                !(orderMaster.ProdLineType == CodeMaster.ProdLineType.Cab
-//                || orderMaster.ProdLineType == CodeMaster.ProdLineType.Chassis
-//                || orderMaster.ProdLineType == CodeMaster.ProdLineType.Assembly
-//                || orderMaster.ProdLineType == CodeMaster.ProdLineType.Special
-//                || orderMaster.ProdLineType == CodeMaster.ProdLineType.Check))
-//            {
-//                refOrderOperationList = this.genericMgr.FindEntityWithNativeSql<OrderOperation>(@"select * from ORD_OrderOp where OrderNo= ?
-//                    and Op > ISNULL((select Op from ORD_OrderOp where OrderNo = ? and Op < ? and NeedReport = ?), 0) and Op < ?"
-//                        , new object[] { orderMaster.OrderNo, orderMaster.OrderNo, orderOperation.Operation, true, orderOperation.Operation });
-//            }
+            //            if (orderOperation.NeedReport &&
+            //                !(orderMaster.ProdLineType == CodeMaster.ProdLineType.Cab
+            //                || orderMaster.ProdLineType == CodeMaster.ProdLineType.Chassis
+            //                || orderMaster.ProdLineType == CodeMaster.ProdLineType.Assembly
+            //                || orderMaster.ProdLineType == CodeMaster.ProdLineType.Special
+            //                || orderMaster.ProdLineType == CodeMaster.ProdLineType.Check))
+            //            {
+            //                refOrderOperationList = this.genericMgr.FindEntityWithNativeSql<OrderOperation>(@"select * from ORD_OrderOp where OrderNo= ?
+            //                    and Op > ISNULL((select Op from ORD_OrderOp where OrderNo = ? and Op < ? and NeedReport = ?), 0) and Op < ?"
+            //                        , new object[] { orderMaster.OrderNo, orderMaster.OrderNo, orderOperation.Operation, true, orderOperation.Operation });
+            //            }
 
             if (orderMaster.ProdLineType == CodeMaster.ProdLineType.Cab
                 || orderMaster.ProdLineType == CodeMaster.ProdLineType.Chassis
@@ -8514,9 +8514,11 @@ namespace com.Sconit.Service.Impl
             #region 列定义
             int colOrderNo = 1;//生产单号
             int colPriority = 2;//优先级
+            int colSAPProdline = 3;//SAP生产单号
             int rowCount = 10;
             #endregion
             IList<OrderMaster> exactMasterList = new List<OrderMaster>();
+            string defaultSAPProdLine = this.systemMgr.GetEntityPreferenceValue(EntityPreference.CodeEnum.DefaultSAPProdLine);
             while (rows.MoveNext())
             {
                 rowCount++;
@@ -8585,8 +8587,31 @@ namespace com.Sconit.Service.Impl
                     }
                 }
                 #endregion
-                exactMasterList.Add(orderMaster);
 
+                #region SAP生产单号
+                string sapProdLine = ImportHelper.GetCellStringValue(row.GetCell(colSAPProdline));
+                if (string.IsNullOrWhiteSpace(sapProdLine))
+                {
+                    sapProdLine = defaultSAPProdLine;
+                }
+
+                try
+                {
+                    ProductLineMap productLineMap = this.genericMgr.FindById<ProductLineMap>(sapProdLine);
+                    if (productLineMap.Type == CodeMaster.ProductLineMapType.NotVan)
+                    {
+                        businessException.AddMessage(string.Format("第{0}行:SAP生产线{1}不是整车生产线。", rowCount, sapProdLine));
+                        continue;
+                    }
+                }
+                catch (Exception)
+                {
+                    businessException.AddMessage(string.Format("第{0}行:SAP生产线{1}不存在。", rowCount, sapProdLine));
+                    continue;
+                }
+                orderMaster.ProdLine = sapProdLine;
+                #endregion
+                exactMasterList.Add(orderMaster);
             }
 
             if (exactMasterList != null && exactMasterList.Count > 0)
@@ -8596,12 +8621,12 @@ namespace com.Sconit.Service.Impl
                 {
                     try
                     {
-                       IList<object[]> returnMessages= this.genericMgr.FindAllWithNativeSql<object[]>("exec USP_LE_ManualGenOrder ?,?,?,?,?",
-                            new object[] { master.OrderNo, windowTime, (int)master.Priority, CurrentUser.Id, CurrentUser.FullName },
-                            new IType[] { NHibernateUtil.String, NHibernateUtil.DateTime, NHibernateUtil.Int16, NHibernateUtil.Int32, NHibernateUtil.String });
-                   //     IList<object[]> returnMessages = this.genericMgr.FindAllWithNativeSql<object[]>("exec USP_LE_ManualGenOrder ?,?,?,?,?",
-                   //new object[] { orderNo, windowTime.Value, priority, CurrentUser.Id, CurrentUser.FullName },
-                   //new IType[] { NHibernateUtil.String, NHibernateUtil.DateTime, NHibernateUtil.Int16, NHibernateUtil.Int32, NHibernateUtil.String });
+                        IList<object[]> returnMessages = this.genericMgr.FindAllWithNativeSql<object[]>("exec USP_LE_ManualGenOrder ?,?,?,?,?,?",
+                             new object[] { master.OrderNo, windowTime, (int)master.Priority, master.ProdLine, CurrentUser.Id, CurrentUser.FullName },
+                             new IType[] { NHibernateUtil.String, NHibernateUtil.DateTime, NHibernateUtil.Int16, NHibernateUtil.String, NHibernateUtil.Int32, NHibernateUtil.String });
+                        //     IList<object[]> returnMessages = this.genericMgr.FindAllWithNativeSql<object[]>("exec USP_LE_ManualGenOrder ?,?,?,?,?",
+                        //new object[] { orderNo, windowTime.Value, priority, CurrentUser.Id, CurrentUser.FullName },
+                        //new IType[] { NHibernateUtil.String, NHibernateUtil.DateTime, NHibernateUtil.Int16, NHibernateUtil.Int32, NHibernateUtil.String });
                         for (int i = 0; i < returnMessages.Count; i++)
                         {
                             if (Convert.ToInt16(returnMessages[i][0]) == 0)
@@ -8788,7 +8813,7 @@ namespace com.Sconit.Service.Impl
         [Transaction(TransactionMode.Requires)]
         public string[] PickShipOrder(string idStr, string qtyStr, string deliveryGroup, bool isAutoReceive)
         {
-            string [] successNos=new string[2];
+            string[] successNos = new string[2];
             try
             {
                 IList<OrderDetail> orderDetailList = new List<OrderDetail>();
@@ -8829,56 +8854,56 @@ namespace com.Sconit.Service.Impl
 
         #region 销售单手工拉料
         [Transaction(TransactionMode.Requires)]
-        public string CreateDistritutionRequsiton(string idStr, DateTime WindowTime, com.Sconit.CodeMaster.OrderPriority Priority,IList<OrderDetail> details)
+        public string CreateDistritutionRequsiton(string idStr, DateTime WindowTime, com.Sconit.CodeMaster.OrderPriority Priority, IList<OrderDetail> details)
         {
-            string orderNos=string.Empty;
+            string orderNos = string.Empty;
             try
             {
                 IList<OrderDetail> orderDetailList = new List<OrderDetail>();
                 if (!string.IsNullOrEmpty(idStr))
                 {
                     string[] idArray = idStr.Split(',');
-                   
+
                     orderDetailList = (from tak in details
-                                        where (from id in idArray select id).Contains(tak.Id.ToString())
-                                        select tak).ToList();
+                                       where (from id in idArray select id).Contains(tak.Id.ToString())
+                                       select tak).ToList();
                     if (orderDetailList != null && orderDetailList.Count > 0)
-                    { 
+                    {
                         var sumQtyDetails = (from tak in orderDetailList
-                                      group tak by new
-                                      {
-                                          tak.Item,
-                                          tak.ItemDescription,
-                                          tak.ReferenceItemCode,
-                                          tak.Uom,
-                                          tak.UnitCount,
-                                          tak.LocationFrom,
-                                          tak.LocationTo,
-                                          tak.Flow,
-                                          tak.FlowDescription,
-                                          tak.MastPartyFrom,
-                                          tak.MastPartyTo,
-                                          tak.Container,
-                                          tak.ContainerDescription,
-                                      } into result
-                                      select new OrderDetail
-                                      {
-                                          Item = result.Key.Item,
-                                          ItemDescription = result.Key.ItemDescription,
-                                          ReferenceItemCode = result.Key.ReferenceItemCode,
-                                          Uom = result.Key.Uom,
-                                          UnitCount = result.Key.UnitCount,
-                                          MinUnitCount = result.Key.UnitCount,
-                                          LocationFrom = result.Key.LocationFrom,
-                                          LocationTo = result.Key.LocationTo,
-                                          Flow = result.Key.Flow,
-                                          FlowDescription = result.Key.FlowDescription,
-                                          MastPartyFrom = result.Key.MastPartyFrom,
-                                          MastPartyTo = result.Key.MastPartyTo,
-                                          Container = result.Key.Container,
-                                          ContainerDescription = result.Key.ContainerDescription,
-                                          OrderedQty=result.Sum(r=>r.OrderedQty),
-                                      }).ToList();
+                                             group tak by new
+                                             {
+                                                 tak.Item,
+                                                 tak.ItemDescription,
+                                                 tak.ReferenceItemCode,
+                                                 tak.Uom,
+                                                 tak.UnitCount,
+                                                 tak.LocationFrom,
+                                                 tak.LocationTo,
+                                                 tak.Flow,
+                                                 tak.FlowDescription,
+                                                 tak.MastPartyFrom,
+                                                 tak.MastPartyTo,
+                                                 tak.Container,
+                                                 tak.ContainerDescription,
+                                             } into result
+                                             select new OrderDetail
+                                             {
+                                                 Item = result.Key.Item,
+                                                 ItemDescription = result.Key.ItemDescription,
+                                                 ReferenceItemCode = result.Key.ReferenceItemCode,
+                                                 Uom = result.Key.Uom,
+                                                 UnitCount = result.Key.UnitCount,
+                                                 MinUnitCount = result.Key.UnitCount,
+                                                 LocationFrom = result.Key.LocationFrom,
+                                                 LocationTo = result.Key.LocationTo,
+                                                 Flow = result.Key.Flow,
+                                                 FlowDescription = result.Key.FlowDescription,
+                                                 MastPartyFrom = result.Key.MastPartyFrom,
+                                                 MastPartyTo = result.Key.MastPartyTo,
+                                                 Container = result.Key.Container,
+                                                 ContainerDescription = result.Key.ContainerDescription,
+                                                 OrderedQty = result.Sum(r => r.OrderedQty),
+                                             }).ToList();
 
                         var groups = (from tak in sumQtyDetails
                                       group tak by new
@@ -8898,7 +8923,7 @@ namespace com.Sconit.Service.Impl
                                       }).ToList();
 
                         var effectiveDate = System.DateTime.Now;
-                        
+
                         foreach (var group in groups)
                         {
                             OrderMaster newOrder = this.TransferFlow2Order(this.genericMgr.FindById<FlowMaster>(group.Flow), null, effectiveDate, false);
@@ -8911,7 +8936,7 @@ namespace com.Sconit.Service.Impl
                             newOrder.OrderDetails = group.Details;
                             newOrder.IsAutoRelease = true;
                             this.CreateOrder(newOrder);
-                            orderNos += newOrder.OrderNo+"*";
+                            orderNos += newOrder.OrderNo + "*";
                         }
                         IList<DistributionRequisition> distributionRequisitions = Mapper.Map<IList<OrderDetail>, IList<DistributionRequisition>>(orderDetailList);
                         foreach (var distributionRequisition in distributionRequisitions)

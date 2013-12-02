@@ -45,6 +45,7 @@ namespace com.Sconit.Entity.SYS
             CheckItemTrace = 11055,
             FilterVanLogistic = 11056,
             SystemFlag = 11040,
+            DefaultSAPProdLine = 11057,
         }
 
         [Display(Name = "EntityPreference_Desc", ResourceType = typeof(Resources.SYS.EntityPreference))]

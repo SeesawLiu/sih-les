@@ -705,7 +705,7 @@ namespace com.Sconit.Web.Controllers.ORD
         }
 
         [SconitAuthorize(Permissions = "Url_OrderMstr_Production_CreateRequisitionList")]
-        public ActionResult CreateRequisitionList(string orderNo, DateTime? windowTime, int priority)
+        public ActionResult CreateRequisitionList(string orderNo, DateTime? windowTime, int priority, string sapProdLine)
         {
             try
             {
@@ -717,10 +717,15 @@ namespace com.Sconit.Web.Controllers.ORD
                 {
                     throw new BusinessException("窗口时间不能为空。");
                 }
-               
-                IList<object[]> returnMessages = this.genericMgr.FindAllWithNativeSql<object[]>("exec USP_LE_ManualGenOrder ?,?,?,?,?",
-                    new object[] { orderNo, windowTime.Value, priority, CurrentUser.Id, CurrentUser.FullName },
-                    new IType[] { NHibernateUtil.String, NHibernateUtil.DateTime, NHibernateUtil.Int16, NHibernateUtil.Int32, NHibernateUtil.String });
+
+                if (sapProdLine == null)
+                {
+                    sapProdLine = this.systemMgr.GetEntityPreferenceValue(EntityPreference.CodeEnum.DefaultSAPProdLine);
+                }
+
+                IList<object[]> returnMessages = this.genericMgr.FindAllWithNativeSql<object[]>("exec USP_LE_ManualGenOrder ?,?,?,?,?,?",
+                    new object[] { orderNo, windowTime.Value, priority, sapProdLine, CurrentUser.Id, CurrentUser.FullName },
+                    new IType[] { NHibernateUtil.String, NHibernateUtil.DateTime, NHibernateUtil.Int16, NHibernateUtil.String, NHibernateUtil.Int32, NHibernateUtil.String });
                 for (int i = 0; i < returnMessages.Count; i++)
                 {
                     if (Convert.ToInt16(returnMessages[i][0]) == 0)

@@ -238,6 +238,6 @@
     <value>StartTime</value>
   </data>
   <data name="InvTrans_ErrorMessage" xml:space="preserve">
-    <value>Error Message</value>
+    <value>Message</value>
   </data>
 </root>

@@ -238,6 +238,6 @@
     <value>开始日期</value>
   </data>
   <data name="InvTrans_ErrorMessage" xml:space="preserve">
-    <value>错误信息</value>
+    <value>信息</value>
   </data>
 </root>

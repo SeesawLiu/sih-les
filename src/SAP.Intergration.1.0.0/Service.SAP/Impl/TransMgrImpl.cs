@@ -1490,7 +1490,7 @@ namespace com.Sconit.Service.SAP.Impl
                         if (zSMIGOR.MTYPE == "S")
                         {
                             invTrans.Status = Entity.SAP.StatusEnum.Success;
-                            invTrans.ErrorMessage = string.Empty;
+                            invTrans.ErrorMessage = zSMIGOR.MBLNR;
                         }
                         else
                         {

@@ -2301,6 +2301,229 @@ namespace com.Sconit.Service.Impl
             this.genericMgr.UpdateWithNativeQuery("exec USP_Busi_UpdateOrderBomConsumeTime ?,?,?", new object[] { prodLine, user.Id, user.FullName });
         }
         #endregion
+
+        #region 工位映射导入
+        [Transaction(TransactionMode.Requires)]
+        public void ImportOpRefMap(Stream inputStream)
+        {
+            if (inputStream.Length == 0)
+            {
+                throw new BusinessException("Import.Stream.Empty");
+            }
+
+            HSSFWorkbook workbook = new HSSFWorkbook(inputStream);
+            ISheet sheet = workbook.GetSheetAt(0);
+            IEnumerator rows = sheet.GetRowEnumerator();
+            ImportHelper.JumpRows(rows, 10);
+            BusinessException businessException = new BusinessException();
+            #region 列定义
+            int colSAPProdLine = 1;//SAP生产线
+            int colProdLine = 2;//生产线
+            int colItem = 3;//物料
+            int colOpReference = 4;//工位
+            int colRefOpReference = 5;//工位
+            int colIsPrimary = 6;//是否主键
+            #endregion
+            IList<OpRefMap> exactOpRefMapList = new List<OpRefMap>();
+            //IList<Item> allItemList = this.genericMgr.FindAll<Item>();
+            IList<FlowMaster> allProdLineList = this.genericMgr.FindAll<FlowMaster>(" select fm from FlowMaster as fm where fm.Type=? ",com.Sconit.CodeMaster.OrderType.Production);
+            IList<OpRefMap> allOpRefMap = this.genericMgr.FindAll<OpRefMap>();
+            int i = 10;
+            while (rows.MoveNext())
+            {
+                i++;
+                HSSFRow row = (HSSFRow)rows.Current;
+                if (!ImportHelper.CheckValidDataRow(row, 1, 5))
+                {
+                    break;//边界
+                }
+                string sAPProdLine = string.Empty;
+                string prodLine = string.Empty;
+                string itemCode = string.Empty;
+                string opReference = string.Empty;
+                string refOpReference = string.Empty;
+                string isPrimary = string.Empty;
+                OpRefMap opRefMap = new OpRefMap();
+                #region 读取数据
+                #region sAPProdLine
+                sAPProdLine = ImportHelper.GetCellStringValue(row.GetCell(colSAPProdLine));
+                if (string.IsNullOrWhiteSpace(sAPProdLine))
+                {
+                    businessException.AddMessage(string.Format("第{0}行SAP生产线不能为空", i));
+                }
+                else
+                {
+                    opRefMap.SAPProdLine = sAPProdLine;
+                }
+                #endregion
+
+                #region prodLine
+                prodLine = ImportHelper.GetCellStringValue(row.GetCell(colProdLine));
+                if (string.IsNullOrWhiteSpace(prodLine))
+                {
+                    businessException.AddMessage(string.Format("第{0}行生产线不能为空", i));
+                }
+                else
+                {
+                    var prodLines = allProdLineList.Where(a => a.Code == prodLine);
+                    //var duplicateItemTrace=
+                    if (prodLines == null)
+                    {
+                        businessException.AddMessage(string.Format("第{0}行生产线{1}不存在。", i, prodLine));
+                    }
+                    else
+                    {
+                        opRefMap.ProdLine = prodLine;
+                    }
+                }
+                #endregion
+
+                #region Item
+                itemCode = ImportHelper.GetCellStringValue(row.GetCell(colItem));
+                if (string.IsNullOrWhiteSpace(itemCode))
+                {
+                    businessException.AddMessage(string.Format("第{0}行物料编号不能为空", i));
+                }
+                else
+                {
+                    var items = this.genericMgr.FindAll<Item>("select i from Item as i where i.Code=? ",itemCode);
+                    //var duplicateItemTrace=
+                    if (items == null)
+                    {
+                        businessException.AddMessage(string.Format("第{0}行{1}物料编号不存在。", i, itemCode));
+                    }
+                    else
+                    {
+                        opRefMap.Item = items.First().Code;
+                        opRefMap.ItemDesc = items.First().Description;
+                        opRefMap.ItemRefCode = items.First().ReferenceCode;
+                    }
+                }
+                #endregion
+
+                #region JIT计算工位
+                opReference = ImportHelper.GetCellStringValue(row.GetCell(colOpReference));
+                if (string.IsNullOrWhiteSpace(opReference))
+                {
+                    businessException.AddMessage(string.Format("第{0}行JIT计算工位不能为空", i));
+                }
+                else
+                {
+
+                    opRefMap.OpReference = opReference;
+                }
+                #endregion
+
+                #region 配送工位
+                refOpReference = ImportHelper.GetCellStringValue(row.GetCell(colRefOpReference));
+                if (string.IsNullOrWhiteSpace(refOpReference))
+                {
+                    businessException.AddMessage(string.Format("第{0}行配送工位不能为空", i));
+                }
+                else
+                {
+
+                    opRefMap.RefOpReference = refOpReference;
+                }
+                #endregion
+
+                #region isPrimary
+                isPrimary = ImportHelper.GetCellStringValue(row.GetCell(colIsPrimary));
+                if (string.IsNullOrWhiteSpace(isPrimary))
+                {
+                    businessException.AddMessage(string.Format("第{0}行是否优先不能为空", i));
+                }
+                else
+                {
+                    switch (isPrimary)
+                    {
+                        case "1":
+                            opRefMap.IsPrimary = true;
+                            break;
+                        case "0":
+                            opRefMap.IsPrimary = false;
+                            break;
+                        default:
+                            businessException.AddMessage(string.Format("第{0}行是否优先{1}填写有误", i, isPrimary));
+                            break;
+                    }
+                }
+
+                #endregion
+
+                if (exactOpRefMapList != null && exactOpRefMapList.Count > 0)
+                {
+                    if (exactOpRefMapList.Where(a => a.Item == opRefMap.Item && a.ProdLine == opRefMap.ProdLine).Count() > 0)
+                    {
+                        businessException.AddMessage(string.Format("第{0}行【物料编号+生产线】在模板中重复", i));
+                    }
+                    if (opRefMap.IsPrimary.HasValue && opRefMap.IsPrimary.Value)
+                    {
+                        if (exactOpRefMapList.Where(a => a.Item == opRefMap.Item && a.OpReference == opRefMap.OpReference && a.IsPrimary == opRefMap.IsPrimary).Count()>0)
+                        {
+                            businessException.AddMessage(string.Format("第{0}行【物料编号+JIT计算工位+优先】在模板中重复", i));
+                        }
+                    }
+                }
+                
+                if (allOpRefMap != null && allOpRefMap.Count > 0)
+                {
+                    if (opRefMap.IsPrimary.HasValue && opRefMap.IsPrimary.Value)
+                    {
+                        if (allOpRefMap.Where(a => a.Item == opRefMap.Item && a.OpReference == opRefMap.OpReference && a.IsPrimary == opRefMap.IsPrimary).Count() > 0)
+                        {
+                            businessException.AddMessage(string.Format("第{0}行【物料编号+JIT计算工位】在数据库中已经存在优先的", i));
+                        }
+                    }
+                    var updateOprefMaps = allOpRefMap.Where(a => a.Item == opRefMap.Item && a.ProdLine == opRefMap.ProdLine);
+                    if (updateOprefMaps != null && updateOprefMaps.Count() > 0)
+                    {
+                        var updateOprefMap = updateOprefMaps.First();
+                        updateOprefMap.ProdLine = opRefMap.ProdLine;
+                        updateOprefMap.SAPProdLine = opRefMap.SAPProdLine;
+                        updateOprefMap.Item = opRefMap.Item;
+                        updateOprefMap.ItemDesc = opRefMap.ItemDesc;
+                        updateOprefMap.ItemRefCode = opRefMap.ItemRefCode;
+                        updateOprefMap.OpReference = opRefMap.OpReference;
+                        updateOprefMap.RefOpReference = opRefMap.RefOpReference;
+                        updateOprefMap.IsPrimary = opRefMap.IsPrimary;
+                        updateOprefMap.IsUpdate = opRefMap.IsUpdate;
+                        exactOpRefMapList.Add(updateOprefMap);
+                    }
+                    else
+                    {
+                        exactOpRefMapList.Add(opRefMap);
+                    }
+                }
+                else
+                {
+                    exactOpRefMapList.Add(opRefMap);
+                }
+                
+
+                #endregion
+            }
+            if (businessException.HasMessage)
+            {
+                throw businessException;
+            }
+            if (exactOpRefMapList == null || exactOpRefMapList.Count == 0)
+            {
+                throw new BusinessException("模版为空，请确认。");
+            }
+            foreach (OpRefMap oprefMap in exactOpRefMapList)
+            {
+                if (oprefMap.IsUpdate)
+                {
+                    genericMgr.Update(oprefMap);
+                }
+                else
+                {
+                    genericMgr.Create(oprefMap);
+                }
+            }
+        }
+        #endregion
     }
 
     [Transactional]

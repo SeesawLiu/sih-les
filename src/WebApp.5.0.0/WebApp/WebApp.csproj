@@ -192,6 +192,7 @@
     <Compile Include="Controllers\BIL\DistributionPriceListController.cs" />
     <Compile Include="Controllers\BIL\ProcurementPriceListController.cs" />
     <Compile Include="Controllers\CommonController.cs" />
+    <Compile Include="Controllers\CUST\OpRefMapController.cs" />
     <Compile Include="Controllers\CUST\CreateOrderCodeController.cs" />
     <Compile Include="Controllers\CUST\DeferredFeedCounterController.cs" />
     <Compile Include="Controllers\CUST\FailCodeController.cs" />
@@ -382,6 +383,7 @@
     <Compile Include="Models\SearchModels\BIL\PriceListMasterSearchModel.cs" />
     <Compile Include="Models\SearchModels\BIL\PlanBillSearchModel.cs" />
     <Compile Include="Models\SearchModels\CabProductionViewSearchModel.cs" />
+    <Compile Include="Models\SearchModels\CUST\OpRefMapSearchModel.cs" />
     <Compile Include="Models\SearchModels\CUST\CreateOrderSearchModel.cs" />
     <Compile Include="Models\SearchModels\CUST\ProdBomDetForecastChargSearchModel.cs" />
     <Compile Include="Models\SearchModels\INV\OpReferenceBalanceSearchModel.cs" />
@@ -2220,6 +2222,10 @@
     <Content Include="Views\com.Sconit.Web.Controllers.INV\OpReferenceBalance\_ManualAdjustSearchResult.cshtml" />
     <Content Include="Views\com.Sconit.Web.Controllers.INV\OpReferenceBalance\ManualAdjust.cshtml" />
     <Content Include="Views\com.Sconit.Web.Controllers.INV\OpReferenceBalance\ManualAdjustList.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.CUST\OpRefMap\_Search.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.CUST\OpRefMap\_SearchResult.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.CUST\OpRefMap\Index.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.CUST\OpRefMap\List.cshtml" />
     <None Include="Web References\EncryptDencryptService\EncryptDencryptService.wsdl" />
     <None Include="Web References\EncryptDencryptService\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>

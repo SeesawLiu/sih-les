@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Collections;
 using System.ComponentModel.DataAnnotations;
+using com.Sconit.Entity.SYS;
 
 namespace com.Sconit.Web.Models.ORD
 {
@@ -91,26 +92,32 @@ namespace com.Sconit.Web.Models.ORD
     {
 
         //计划协议号
+        [Export(ExportName = "DemandPlanListXls", ExportSeq = 10)]
         [Display(Name = "OrderDetail_ScheduleLineNo", ResourceType = typeof(Resources.ORD.OrderDetail))]
         public string OrderNo { get; set; }
 
         //序号
+        [Export(ExportName = "DemandPlanListXls", ExportSeq =20)]
         [Display(Name = "OrderDetail_Sequence", ResourceType = typeof(Resources.ORD.OrderDetail))]
         public string Sequence { get; set; }
 
         //零件号
+        [Export(ExportName = "DemandPlanListXls", ExportSeq = 30)]
         [Display(Name = "OrderDetail_Item", ResourceType = typeof(Resources.ORD.OrderDetail))]
         public string Item { get; set; }
 
         //描述
+        [Export(ExportName = "DemandPlanListXls", ExportSeq = 40)]
         [Display(Name = "OrderDetail_ItemDescription", ResourceType = typeof(Resources.ORD.OrderDetail))]
         public string ItemDescription { get; set; }
 
         //旧图号
+        [Export(ExportName = "DemandPlanListXls", ExportSeq = 50)]
         [Display(Name = "OrderDetail_ReferenceItemCode", ResourceType = typeof(Resources.ORD.OrderDetail))]
         public string ReferenceItemCode { get; set; }
 
         //单位
+        [Export(ExportName = "DemandPlanListXls", ExportSeq = 60)]
         [Display(Name = "OrderDetail_Uom", ResourceType = typeof(Resources.ORD.OrderDetail))]
         public string Uom { get; set; }
 
@@ -141,6 +148,7 @@ namespace com.Sconit.Web.Models.ORD
         public string ShippedQty { get; set; }
 
         //已收货数
+        [Export(ExportName = "DemandPlanListXls", ExportSeq = 80)]
         [Display(Name = "OrderDetail_ReceivedQty", ResourceType = typeof(Resources.ORD.OrderDetail))]
         public string ReceivedQty { get; set; }
 
@@ -203,7 +211,11 @@ namespace com.Sconit.Web.Models.ORD
             }
         }
 
+        [Export(ExportName = "DemandPlanListXls", ExportSeq = 70)]
+        [Display(Name = "OrderDetail_DemandQty", ResourceType = typeof(Resources.ORD.OrderDetail))]
         public decimal DemandQty { get; set; }
+        [Export(ExportName = "DemandPlanListXls", ExportSeq = 90)]
+        [Display(Name = "OrderDetail_DemandDate", ResourceType = typeof(Resources.ORD.OrderDetail))]
         public string DemandDate { get; set; }
 
     }

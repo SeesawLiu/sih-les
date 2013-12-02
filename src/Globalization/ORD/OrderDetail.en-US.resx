@@ -375,4 +375,10 @@
   <data name="SeqOrderChange_ExternalSequence" xml:space="preserve">
     <value>ExternalSequence</value>
   </data>
+  <data name="OrderDetail_DemandDate" xml:space="preserve">
+    <value>DemandDate</value>
+  </data>
+  <data name="OrderDetail_DemandQty" xml:space="preserve">
+    <value>DemandQty</value>
+  </data>
 </root>

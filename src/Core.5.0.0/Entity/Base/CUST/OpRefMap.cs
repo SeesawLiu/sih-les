@@ -50,6 +50,7 @@ namespace com.Sconit.Entity.CUST
 		public Int32 LastModifyUserId { get; set; }
 		public string LastModifyUserName { get; set; }
 		public DateTime LastModifyDate { get; set; }
+        public string Location { get; set; }
         
         #endregion
 

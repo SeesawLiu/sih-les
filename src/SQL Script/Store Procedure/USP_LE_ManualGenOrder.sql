@@ -34,11 +34,18 @@ BEGIN
 		Msg varchar(max)
 	)
 	
+	Create table #tempDuplicateOpRef
+	(
+		Item varchar(50),
+		Location varchar(50)
+	)
+	
 	Create table #tempOrderBomDetTotal
 	(
 		Item varchar(50),
 		Location varchar(50),
 		OpRef varchar(50),
+		RefOpRef varchar(50),
 		OrderQty decimal(18, 8),
 		ManufactureParty varchar(50)
 	)
@@ -57,6 +64,7 @@ BEGIN
 		Item varchar(50),
 		Location varchar(50),
 		OpRef varchar(50),
+		RefOpRef varchar(50),
 		OrderQty decimal(18, 8),
 		IsMatch bit,
 		ManufactureParty varchar(50)
@@ -249,13 +257,116 @@ BEGIN
 		--手工
 		set @OrderStrategy = 1
 	end
+	
+	-------------------↓更新工位-----------------------
+	if @SAPProdline is not null
+	begin
+		set @trancount = @@trancount
+		begin try
+			if @trancount = 0
+			begin
+				begin tran
+			end
+
+			-------------------↓先用首选工位-----------------------
+			--记录重复工位
+			insert into #tempDuplicateOpRef(Item, Location)
+			select bom.Item, bom.Location
+			from ORD_OrderBomDet as bom
+			inner join CUST_OpRefMap as map on bom.Item = map.Item and bom.Location = map.Location
+			where bom.OrderNo = @ProdOrderNo and (bom.OpRef is null or bom.OpRef = '')
+			and map.SAPProdLine = @SAPProdline and map.IsPrimary = 1
+			group by bom.Item, bom.Location
+			having COUNT(1) > 1
+				
+			--更新Bom工位
+			update bom set OpRef = map.OpRef, RefOpRef = map.RefOpRef
+			from ORD_OrderBomDet as bom
+			inner join (select bom.Item, bom.Location from ORD_OrderBomDet as bom
+						inner join CUST_OpRefMap as map on bom.Item = map.Item and bom.Location = map.Location
+						where bom.OrderNo = @ProdOrderNo and (bom.OpRef is null or bom.OpRef = '')
+						and map.SAPProdLine = @SAPProdline and map.IsPrimary = 1
+						group by bom.Item, bom.Location
+						having COUNT(1) = 1) as t on bom.Item = t.Item and bom.Location = t.Location
+			inner join CUST_OpRefMap as map on bom.Item = map.Item and bom.Location = map.Location
+			where bom.OrderNo = @ProdOrderNo and (bom.OpRef is null or bom.OpRef = '') and map.SAPProdLine = @SAPProdline and map.IsPrimary = 1
+			-------------------↑先用首选工位-----------------------
+			
+			-------------------↓不考虑首选工位-----------------------
+			--记录重复工位
+			insert into #tempDuplicateOpRef(Item, Location)
+			select bom.Item, bom.Location
+			from ORD_OrderBomDet as bom
+			inner join CUST_OpRefMap as map on bom.Item = map.Item and bom.Location = map.Location
+			where bom.OrderNo = @ProdOrderNo and (bom.OpRef is null or bom.OpRef = '')
+			and map.SAPProdLine = @SAPProdline
+			group by bom.Item, bom.Location 
+			having COUNT(1) > 1
+			
+			--更新Bom工位
+			update bom set OpRef = map.OpRef, RefOpRef = map.RefOpRef
+			from ORD_OrderBomDet as bom
+			inner join (select bom.Item, bom.Location from ORD_OrderBomDet as bom
+						inner join CUST_OpRefMap as map on bom.Item = map.Item and bom.Location = map.Location
+						where bom.OrderNo = @ProdOrderNo and (bom.OpRef is null or bom.OpRef = '')
+						and map.SAPProdLine = @SAPProdline
+						group by bom.Item, bom.Location
+						having COUNT(1) = 1) as t on bom.Item = t.Item and bom.Location = t.Location
+			inner join CUST_OpRefMap as map on bom.Item = map.Item and bom.Location = map.Location
+			where bom.OrderNo = @ProdOrderNo and (bom.OpRef is null or bom.OpRef = '') and map.SAPProdLine = @SAPProdline
+			-------------------↑不考虑首选工位-----------------------
+
+			if @trancount = 0 
+			begin  
+				commit
+			end
+		end try
+		begin catch
+			if @trancount = 0
+			begin
+				rollback
+			end
+			
+			set @Msg = N'更新工位失败，失败信息：' + Error_Message()
+			insert into #tempMsg(Lvl, Msg) values(1, @Msg)
+			
+			select Lvl, Msg from #tempMsg
+	
+			drop table #tempConsumedOpRefBalance
+			drop table #tempThisConsumeOpRefBalance
+			drop table #tempFlowMstr
+			drop table #tempOrderDetId
+			drop table #tempOrderDet
+			drop table #tempPurchase
+			drop table #tempItemLocationTBD
+			drop table #tempOrderBomDetTBD
+			drop table #tempCreatedOrderDet
+			drop table #tempOrderBomDetTotal
+			drop table #tempMsg
+			drop table #tempMultiSupplierGroup
+			drop table #tempMultiSupplierItem
+			drop table #tempSortedMultiSupplierItem
+			drop table #tempDuplicateOpRef 
+			
+			return
+		end catch
+	end
+	
+	--记录多个工位的物料的日志
+	insert into #tempMsg(Lvl, Msg)
+	select distinct 1, N'零件' + Item + N'库位' + Location + N'找到多个工位，无法创建拉料单。'
+	from #tempDuplicateOpRef
+	-------------------↑更新工位-----------------------	
+	
 	-------------------↓获取订单Bom用量-----------------------
-	insert into #tempOrderBomDetTotal(Item, Location, OpRef, OrderQty, ManufactureParty)
-	select bom.Item, bom.Location, ISNULL(bom.OpRef, ''), SUM(bom.OrderQty) as OrderQty, bom.ManufactureParty 
+	insert into #tempOrderBomDetTotal(Item, Location, OpRef, RefOpRef, OrderQty, ManufactureParty)
+	select bom.Item, bom.Location, ISNULL(bom.OpRef, ''), bom.RefOpRef, SUM(bom.OrderQty) as OrderQty, bom.ManufactureParty 
 	from ORD_OrderBomDet as bom
 	left join CUST_ManualGenOrderIgnoreWorkCenter as wc on bom.WorkCenter = wc.WorkCenter
+	left join #tempDuplicateOpRef as te on bom.Item = te.Item and bom.Location = te.Location  --过滤掉工位重复的物料
 	where bom.OrderNo = @ProdOrderNo and bom.OrderQty > 0 and wc.WorkCenter is null
-	group by bom.Item, bom.Location, ISNULL(bom.OpRef, ''), bom.ManufactureParty
+	and te.Item is null
+	group by bom.Item, bom.Location, ISNULL(bom.OpRef, ''), bom.RefOpRef, bom.ManufactureParty
 	-------------------↑获取订单Bom用量-----------------------
 	
 	-------------------↓获取已创建的拉料单-----------------------
@@ -277,23 +388,76 @@ BEGIN
 	-------------------↑获取已创建的拉料单-----------------------
 	
 	-------------------↓获取已占用的工位余量-----------------------
-	--insert into #tempConsumedOpRefBalance(Item, OpRef, ConsumeQty)
-	--select Item, OpRef, SUM(Qty) from CUST_ManualGenOrderOpRefBalanceTrace 
-	--where ProdOrderNo = @ProdOrderNo
-	--group by Item, OpRef
+	insert into #tempConsumedOpRefBalance(Item, OpRef, ConsumeQty)
+	select Item, OpRef, SUM(Qty) from CUST_ManualGenOrderOpRefBalanceTrace 
+	where ProdOrderNo = @ProdOrderNo
+	group by Item, OpRef
 	-------------------↑获取已占用的工位余量-----------------------
 	
 	-------------------↓获取未创建的拉料需求-----------------------
-	insert into #tempOrderBomDetTBD(Item, Location, OpRef, OrderQty, IsMatch, ManufactureParty)
-	--select bom.Item, bom.Location, bom.OpRef, bom.OrderQty - ISNULL(det.OrderQty, 0) - ISNULL(opRef.ConsumeQty, 0) as ReqQty, 0 as IsMatch, bom.ManufactureParty 
-	select bom.Item, bom.Location, bom.OpRef, bom.OrderQty - ISNULL(det.OrderQty, 0) as ReqQty, 0 as IsMatch, bom.ManufactureParty 
+	insert into #tempOrderBomDetTBD(Item, Location, OpRef, RefOpRef, OrderQty, IsMatch, ManufactureParty)
+	select bom.Item, bom.Location, bom.OpRef, bom.RefOpRef, bom.OrderQty - ISNULL(det.OrderQty, 0) - ISNULL(opRef.ConsumeQty, 0) as ReqQty, 0 as IsMatch, bom.ManufactureParty 
 	from #tempOrderBomDetTotal as bom
 	left join #tempCreatedOrderDet as det on bom.Item = det.Item and bom.Location = det.LocTo and bom.OpRef = det.OpRef
 	and ((bom.ManufactureParty = det.ManufactureParty) or (ISNULL(bom.ManufactureParty, '') = '' and ISNULL(det.ManufactureParty, '') = ''))
-	--left join #tempConsumedOpRefBalance as opRef on bom.Item = OpRef.Item and bom.OpRef = opRef.OpRef and ISNULL(bom.ManufactureParty, '') = ''
-	--where (bom.OrderQty - ISNULL(det.OrderQty, 0) - ISNULL(opRef.ConsumeQty, 0)) > 0
-	where (bom.OrderQty - ISNULL(det.OrderQty, 0)) > 0
+	left join #tempConsumedOpRefBalance as opRef on bom.Item = OpRef.Item and bom.OpRef = opRef.OpRef and ISNULL(bom.ManufactureParty, '') = ''
+	where (bom.OrderQty - ISNULL(det.OrderQty, 0) - ISNULL(opRef.ConsumeQty, 0)) > 0
 	-------------------↑获取未创建的拉料需求-----------------------
+	
+	-------------------↓先考虑使用工位余量-----------------------
+	insert into #tempThisConsumeOpRefBalance(Item, OpRef, ConsumeQty)
+	select opRef.Item, opRef.OpRef, CASE WHEN tbd.OrderQty >= opRef.Qty THEN opRef.Qty ELSE OrderQty END
+	from SCM_OpRefBalance as opRef
+	inner join #tempOrderBomDetTBD as tbd on opRef.Item = tbd.Item and opRef.OpRef = tbd.OpRef
+	where opRef.Qty > 0 and ISNULL(tbd.OpRef, '') <> '' and ISNULL(tbd.ManufactureParty, '') = ''
+										
+	if exists(select top 1 1 from #tempThisConsumeOpRefBalance)
+	begin										
+		update tbd set OrderQty = OrderQty - cOpRef.ConsumeQty
+		from #tempOrderBomDetTBD as tbd 
+		inner join #tempThisConsumeOpRefBalance as cOpRef on tbd.Item = cOpRef.Item and tbd.OpRef = cOpRef.OpRef 
+		where ISNULL(tbd.OpRef, '') <> '' and ISNULL(tbd.ManufactureParty, '') = ''
+		
+		delete from #tempOrderBomDetTBD where OrderQty = 0										
+												
+		set @trancount = @@trancount
+		begin try
+			if @trancount = 0
+			begin
+				begin tran
+			end
+					
+			--更新工位余量
+			update opRef set Qty = opRef.Qty - cOpRef.ConsumeQty, LastModifyDate = @DateTimeNow, LastModifyUser = @CreateUserId, LastModifyUserNm = @CreateUserNm, [Version] = [Version] + 1
+			from SCM_OpRefBalance as opRef
+			inner join #tempThisConsumeOpRefBalance as cOpRef on opRef.Item = cOpRef.Item and opRef.OpRef = cOpRef.OpRef
+			
+			--更新工位余量日志
+			insert into LOG_OpRefBalanceChange(Item, OpRef, Qty, [Status], [Version], CreateDate, CreateUserId, CreateUserNm)
+			select opRef.Item, opRef.OpRef, opRef.Qty, 1, opRef.[Version], @DateTimeNow, @CreateUserId, @CreateUserNm
+			from SCM_OpRefBalance as opRef
+			inner join #tempThisConsumeOpRefBalance as cOpRef on opRef.Item = cOpRef.Item and opRef.OpRef = cOpRef.OpRef 
+			
+			--记录工位余量的消耗
+			insert into CUST_ManualGenOrderOpRefBalanceTrace(ProdOrderNo, Item, OpRef, Qty, CreateUser, CreateUserNm, CreateDate)
+			select @ProdOrderNo, Item, OpRef, ConsumeQty, @CreateUserId, @CreateUserNm, @DateTimeNow from #tempThisConsumeOpRefBalance
+			
+			if @trancount = 0 
+			begin  
+				commit
+			end
+		end try
+		begin catch
+			if @trancount = 0
+			begin
+				rollback
+			end
+			
+			set @Msg = N'更新工位余量失败，失败信息：' + Error_Message()
+			insert into #tempMsg(Lvl, Msg) values(1, @Msg)
+		end catch
+	end
+	-------------------↑先考虑使用工位余量-----------------------
 	
 	if exists(select top 1 1 from #tempOrderBomDetTBD)
 	begin				
@@ -413,7 +577,7 @@ BEGIN
 		if exists (select top 1 1 from #tempFlowDet where Flow is null)
 		begin
 			--记录日志
-			insert into #tempMsg(Lvl,Msg)
+			insert into #tempMsg(Lvl, Msg)
 			select 1, N'零件' + Item + N'没有维护从库位' + LocFrom + '到库位' + LocTo + '的移库路线，无法创建拉料单。'
 			from #tempFlowDet where Flow is null
 			
@@ -449,7 +613,7 @@ BEGIN
 		if exists (select top 1 1 from #tempOrderBomDetTBD where IsMatch = 0)
 		begin
 			--记录日志
-			insert into #tempMsg(Lvl,Msg)
+			insert into #tempMsg(Lvl, Msg)
 			select 1, N'零件' + Item + N'消耗库位' + Location + N'没有拉料路线也没有采购入库地点，无法创建拉料单。'
 			from #tempOrderBomDetTBD where IsMatch = 0
 		end
@@ -496,178 +660,12 @@ BEGIN
 		-------------------↓创建要货单-----------------------
 		insert into #tempOrderDet(Flow, FlowDetId,
 		Item, Uom, UC, MinUC, UCDesc, Container, ContainerDesc, LocFrom, LocTo,
-		NetReqQty, ReqQty, OpRefQty, OrderQty, OpRef, MrpTotal, MrpTotalAdj, MrpWeight, ManufactureParty, RoundUpOpt)
+		ReqQty, OrderQty, OpRef, RefOpRef, MrpTotal, MrpTotalAdj, MrpWeight, ManufactureParty, RoundUpOpt)
 		select det.Flow, det.FlowDetId, 
 		det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.LocFrom, det.LocTo,
-		tbd.OrderQty, 0, 0, 0, tbd.OpRef, det.MrpTotal, det.MrpTotalAdj, det.MrpWeight, tbd.ManufactureParty, det.RoundUpOpt
+		tbd.OrderQty, 0, tbd.OpRef, tbd.RefOpRef, det.MrpTotal, det.MrpTotalAdj, det.MrpWeight, tbd.ManufactureParty, det.RoundUpOpt
 		from #tempFlowDet as det 
 		inner join #tempOrderBomDetTBD as tbd on det.Item = tbd.Item and det.LocTo = tbd.Location
-		
-		set @trancount = @@trancount
-		begin try
-			if @trancount = 0
-			begin
-				begin tran
-			end
-		
-			-------------------↓查找工位-----------------------
-			if @SAPProdline is not null
-			begin
-				-------------------↓先用首选工位查找-----------------------
-				--记录多个工位的物料的日志
-				insert into #tempMsg(Lvl,Msg)
-				select 1, N'零件' + det.Item + N'库位' + det.LocTo + N'找到多个工位，无法创建拉料单。'
-				from #tempOrderDet as det
-				inner join CUST_OpRefMap as map on det.Item = map.Item and det.LocTo = map.Location
-				where map.SAPProdLine = @SAPProdline and map.IsPrimary = 1
-				and (det.OpRef is null or det.OpRef = '')
-				group by det.Item, det.LocTo 
-				having COUNT(1) > 1
-				
-				--删除找到多个工位的物料
-				delete from det
-				from #tempOrderDet as det inner join (select det.Item, det.LocTo
-														from #tempOrderDet as det
-														inner join CUST_OpRefMap as map on det.Item = map.Item and det.LocTo = map.Location
-														where map.SAPProdLine = @SAPProdline and map.IsPrimary = 1
-														and (det.OpRef is null or det.OpRef = '')
-														group by det.Item, det.LocTo having COUNT(distinct map.OpRef) > 1) as t
-														on det.Item = t.Item  and det.LocTo = t.LocTo
-					
-				--更新工位和参考工位
-				update det set OpRef = map.OpRef, RefOpRef = map.RefOpRef
-				from #tempOrderDet as det
-				inner join CUST_OpRefMap as map on det.Item = map.Item and det.LocTo = map.Location
-				where map.SAPProdLine = @SAPProdline and map.IsPrimary = 1
-				and (det.OpRef is null or det.OpRef = '')
-				
-				--更新Bom工位
-				update ORD_OrderBomDet set OpRef = map.OpRef, RefOpRef = map.RefOpRef
-				from ORD_OrderBomDet as bom
-				inner join CUST_OpRefMap as map on bom.Item = map.Item and bom.Location = map.Location
-				where map.SAPProdLine = @SAPProdline and map.IsPrimary = 1
-				and bom.OrderNo = @ProdOrderNo and (bom.OpRef is null or bom.OpRef = '')
-				-------------------↑先用首选工位查找-----------------------
-				
-				-------------------↓不考虑首选工位查找-----------------------
-				--记录多个工位的物料的日志
-				insert into #tempMsg(Lvl,Msg)
-				select 1, N'零件' + det.Item + N'库位' + det.LocTo + N'找到多个工位，无法创建拉料单。'
-				from #tempOrderDet as det
-				inner join CUST_OpRefMap as map on det.Item = map.Item and det.LocTo = map.Location
-				where map.SAPProdLine = @SAPProdline
-				and (det.OpRef is null or det.OpRef = '')
-				group by det.Item, det.LocTo 
-				having COUNT(1) > 1
-				
-				--删除找到多个工位的物料
-				delete from det
-				from #tempOrderDet as det inner join (select det.Item, det.LocTo
-														from #tempOrderDet as det
-														inner join CUST_OpRefMap as map on det.Item = map.Item and det.LocTo = map.Location
-														where map.SAPProdLine = @SAPProdline
-														and (det.OpRef is null or det.OpRef = '')
-														group by det.Item, det.LocTo having COUNT(distinct map.OpRef) > 1) as t
-														on det.Item = t.Item  and det.LocTo = t.LocTo
-					
-				--更新工位和参考工位
-				update det set OpRef = map.OpRef, RefOpRef = map.RefOpRef
-				from #tempOrderDet as det
-				inner join CUST_OpRefMap as map on det.Item = map.Item and det.LocTo = map.Location
-				where map.SAPProdLine = @SAPProdline
-				and (det.OpRef is null or det.OpRef = '')
-				
-				--更新Bom工位
-				update ORD_OrderBomDet set OpRef = map.OpRef, RefOpRef = map.RefOpRef
-				from ORD_OrderBomDet as bom
-				inner join CUST_OpRefMap as map on bom.Item = map.Item and bom.Location = map.Location
-				where map.SAPProdLine = @SAPProdline
-				and bom.OrderNo = @ProdOrderNo and (bom.OpRef is null or bom.OpRef = '')
-				-------------------↑不考虑首选工位查找-----------------------
-			end
-			-------------------↑查找工位-----------------------	
-		if @trancount = 0 
-			begin  
-				commit
-			end
-		end try
-		begin catch
-			if @trancount = 0
-			begin
-				rollback
-			end
-			
-			set @Msg = N'更新工位余量失败，失败信息：' + Error_Message()
-			insert into #tempMsg(Lvl, Msg) values(1, @Msg)
-		end catch
-			
-		set @trancount = @@trancount
-		begin try
-			if @trancount = 0
-			begin
-				begin tran
-			end	
-			-------------------↓毛需求扣减掉已占用的工位余量-----------------------
-			truncate table #tempConsumedOpRefBalance
-			insert into #tempConsumedOpRefBalance(Item, OpRef, ConsumeQty)
-			select Item, OpRef, SUM(Qty) 
-			from CUST_ManualGenOrderOpRefBalanceTrace 
-			where ProdOrderNo = @ProdOrderNo
-			group by Item, OpRef
-			
-			update det set NetReqQty = det.NetReqQty - bal.ConsumeQty
-			from #tempOrderDet as det inner join #tempConsumedOpRefBalance as bal 
-			on det.Item = bal.Item and det.OpRef = bal.OpRef and ISNULL(det.ManufactureParty, '') = ''
-			
-			--删除毛需求小于等于0的明细
-			delete from #tempOrderDet where NetReqQty <= 0
-			-------------------↑毛需求扣减掉已占用的工位余量-----------------------
-			
-			
-			-------------------↓更新工位余量-----------------------
-			--获取工位余量计算净需求
-			update det set OpRefQty = ISNULL(orb.Qty, 0), ReqQty = det.NetReqQty - (CASE WHEN ISNULL(det.ManufactureParty, '') = '' THEN ISNULL(orb.Qty, 0) ELSE 0 END)
-			from #tempOrderDet as det 
-			left join SCM_OpRefBalance as orb on det.Item = orb.Item and det.OpRef = orb.OpRef
-					
-			--更新工位余量，净需求小于等于0
-			update orb set Qty = OpRefQty - NetReqQty, [Version] = [Version] + 1, LastModifyDate = @DateTimeNow, LastModifyUser = @CreateUserId, LastModifyUserNm = @CreateUserNm
-			from SCM_OpRefBalance as orb 
-			inner join #tempOrderDet as det on orb.Item = det.Item and orb.OpRef = det.OpRef
-			where ReqQty <= 0
-										
-			--更新工位余量日志，净需求小于等于0
-			insert into LOG_OpRefBalanceChange(Item, OpRef, Qty, [Status], [Version], CreateDate, CreateUserId, CreateUserNm)
-			select orb.Item, orb.OpRef, OpRefQty - NetReqQty, 1, orb.[Version], @DateTimeNow, @CreateUserId, @CreateUserNm
-			from SCM_OpRefBalance as orb 
-			inner join #tempOrderDet as det on orb.Item = det.Item and orb.OpRef = det.OpRef
-			where ReqQty <= 0
-			
-			--记录工位余量的消耗
-			insert into CUST_ManualGenOrderOpRefBalanceTrace(ProdOrderNo, Item, OpRef, Qty, CreateUser, CreateUserNm, CreateDate)
-			select @ProdOrderNo, orb.Item, orb.OpRef, det.NetReqQty, @CreateUserId, @CreateUserNm, @DateTimeNow 
-			from SCM_OpRefBalance as orb 
-			inner join #tempOrderDet as det on orb.Item = det.Item and orb.OpRef = det.OpRef
-			where ReqQty <= 0
-			
-			--删除净需求小于等于0的明细
-			delete from #tempOrderDet where ReqQty <= 0
-			-------------------↑更新工位余量-----------------------			
-			
-			if @trancount = 0 
-			begin  
-				commit
-			end
-		end try
-		begin catch
-			if @trancount = 0
-			begin
-				rollback
-			end
-			
-			set @Msg = N'更新工位余量失败，失败信息：' + Error_Message()
-			insert into #tempMsg(Lvl, Msg) values(1, @Msg)
-		end catch
 		
 		insert into #tempFlowMstr(Flow, LocTo) select distinct Flow, LocTo from #tempOrderDet
 		
@@ -1024,47 +1022,6 @@ BEGIN
 				--查找开始标识
 				set @BeginOrderDetId = @EndOrderDetId - @OrderDetCount
 				
-				--按包装圆整
-				update #tempOrderDet set OrderQty = ReqQty, Balance = 0 where OrderNo = @OrderNo and RoundUpOpt in (0, 2)  --不圆整
-				update #tempOrderDet set OrderQty = ReqQty, Balance = 0 where OrderNo = @OrderNo and UC <= 0  --不圆整
-				--update #tempOrderDet set OrderQty = ReqQty where OrderNo = @OrderNo and ReqQty > 0 and RoundUpOpt = 1 and UC > 0 --向上圆整
-				update #tempOrderDet set OrderQty = ceiling(ReqQty / UC) * UC, Balance = ceiling(ReqQty / UC) * UC - ReqQty where OrderNo = @OrderNo and RoundUpOpt = 1 and UC > 0 --向上圆整
-				--update #tempOrderDet set OrderQty = floor(ReqQty / UC) * UC where OrderNo = @OrderNo and ReqQty > 0 and RoundUpOpt = 2 and UC > 0  --向下圆整
-				
-				--更新工位余量
-				update orb set Qty = det.Balance, [Version] = [Version] + 1, LastModifyDate = @DateTimeNow, LastModifyUser = @CreateUserId, LastModifyUserNm = @CreateUserNm
-				from SCM_OpRefBalance as orb 
-				inner join #tempOrderDet as det on orb.Item = det.Item and orb.OpRef = det.OpRef
-				where det.OrderNo = @OrderNo and det.Balance > 0
-											
-				--更新工位余量日志
-				insert into LOG_OpRefBalanceChange(Item, OpRef, Qty, [Status], [Version], CreateDate, CreateUserId, CreateUserNm)
-				select orb.Item, orb.OpRef, det.Balance, 1, orb.[Version], @DateTimeNow, @CreateUserId, @CreateUserNm
-				from SCM_OpRefBalance as orb 
-				inner join #tempOrderDet as det on orb.Item = det.Item and orb.OpRef = det.OpRef
-				where det.OrderNo = @OrderNo and det.Balance > 0
-				
-				--新增不存在的工位余量
-				insert into SCM_OpRefBalance(Item, OpRef, Qty, CreateUser, CreateUserNm, CreateDate, LastModifyUser, LastModifyUserNm, LastModifyDate, [Version])
-				select det.Item, det.OpRef, det.Balance, @CreateUserId, @CreateUserNm, @DateTimeNow, @CreateUserId, @CreateUserNm, @DateTimeNow, 1
-				from #tempOrderDet as det
-				left join SCM_OpRefBalance as orb on orb.Item = det.Item and orb.OpRef = det.OpRef
-				where det.OrderNo = @OrderNo and det.Balance > 0 and orb.Id is null
-						
-				--新增工位余量日志
-				insert into LOG_OpRefBalanceChange(Item, OpRef, Qty, [Status], [Version], CreateDate, CreateUserId, CreateUserNm)
-				select det.Item, det.OpRef, det.Balance, 0, 1, @DateTimeNow, @CreateUserId, @CreateUserNm
-				from #tempOrderDet as det
-				left join SCM_OpRefBalance as orb on orb.Item = det.Item and orb.OpRef = det.OpRef
-				where det.OrderNo = @OrderNo and det.Balance > 0 and orb.Id is null
-				
-				--记录工位余量的消耗
-				insert into CUST_ManualGenOrderOpRefBalanceTrace(ProdOrderNo, Item, OpRef, Qty, CreateUser, CreateUserNm, CreateDate)
-				select @ProdOrderNo, orb.Item, orb.OpRef, det.NetReqQty - det.ReqQty, @CreateUserId, @CreateUserNm, @DateTimeNow 
-				from SCM_OpRefBalance as orb 
-				inner join #tempOrderDet as det on orb.Item = det.Item and orb.OpRef = det.OpRef
-				where det.OrderNo = @OrderNo and det.NetReqQty > det.ReqQty
-				
 				--缓存订单ID
 				truncate table #tempOrderDetId
 				insert into #tempOrderDetId(RowId, OrderDetId, OrderDetSeq)
@@ -1075,6 +1032,42 @@ BEGIN
 				update det set OrderDetId = id.OrderDetId, OrderDetSeq = id.OrderDetSeq
 				from #tempOrderDet as det inner join #tempOrderDetId as id on det.RowId = id.RowId
 				where OrderNo = @OrderNo
+				
+				--按包装圆整
+				update #tempOrderDet set OrderQty = ReqQty where OrderNo = @OrderNo and RoundUpOpt in (0, 2)  --不圆整
+				update #tempOrderDet set OrderQty = ReqQty where OrderNo = @OrderNo and UC <= 0  --不圆整
+				--update #tempOrderDet set OrderQty = ReqQty where OrderNo = @OrderNo and ReqQty > 0 and RoundUpOpt = 1 and UC > 0 --向上圆整
+				update #tempOrderDet set OrderQty = ceiling(ReqQty / UC) * UC where OrderNo = @OrderNo and RoundUpOpt = 1 and UC > 0 --向上圆整
+				--update #tempOrderDet set OrderQty = floor(ReqQty / UC) * UC where OrderNo = @OrderNo and ReqQty > 0 and RoundUpOpt = 2 and UC > 0  --向下圆整
+				
+				--更新工位余量
+				update orb set Qty = ISNULL(tod.Balance, 0), [Version] = [Version] + 1, LastModifyDate = @DateTimeNow, LastModifyUser = @CreateUserId, LastModifyUserNm = @CreateUserNm
+				from SCM_OpRefBalance as orb 
+				inner join (select Item, OpRef, SUM(OrderQty - ReqQty) as Balance from #tempOrderDet 
+							where OrderQty > ReqQty and ISNULL(OpRef, '') <> '' group by Item, OpRef) as tod on orb.Item = tod.Item and orb.OpRef = tod.OpRef
+									
+				--更新工位余量日志
+				insert into LOG_OpRefBalanceChange(Item, OpRef, Qty, [Status], [Version], CreateDate, CreateUserId, CreateUserNm)
+				select orb.Item, orb.OpRef, ISNULL(tod.Balance, 0), 1, orb.[Version], @DateTimeNow, @CreateUserId, @CreateUserNm
+				from SCM_OpRefBalance as orb 
+				inner join (select Item, OpRef, SUM(OrderQty - ReqQty) as Balance from #tempOrderDet 
+							where OrderQty > ReqQty and ISNULL(OpRef, '') <> '' group by Item, OpRef) as tod on orb.Item = tod.Item and orb.OpRef = tod.OpRef
+				
+				--新增不存在的工位余量
+				insert into SCM_OpRefBalance (Item, OpRef, Qty, CreateUser, CreateUserNm, CreateDate, LastModifyUser, LastModifyUserNm, LastModifyDate, [Version])
+				select tod.Item, tod.OpRef, ISNULL(tod.Balance, 0), @CreateUserId, @CreateUserNm, @DateTimeNow, @CreateUserId, @CreateUserNm, @DateTimeNow, 1
+				from (select Item, OpRef, SUM(OrderQty - ReqQty) as Balance from #tempOrderDet 
+						where OrderQty > ReqQty and ISNULL(OpRef, '') <> '' group by Item, OpRef) as tod 
+				left join SCM_OpRefBalance as orb on orb.Item = tod.Item and orb.OpRef = tod.OpRef
+				where orb.Id is null
+				
+				--新增工位余量日志
+				insert into LOG_OpRefBalanceChange(Item, OpRef, Qty, [Status], [Version], CreateDate, CreateUserId, CreateUserNm)
+				select tod.Item, tod.OpRef, ISNULL(tod.Balance, 0), 0, 1, @DateTimeNow, @CreateUserId, @CreateUserNm
+				from (select Item, OpRef, SUM(OrderQty - ReqQty) as Balance from #tempOrderDet 
+						where OrderQty > ReqQty and ISNULL(OpRef, '') <> '' group by Item, OpRef) as tod 
+				left join SCM_OpRefBalance as orb on orb.Item = tod.Item and orb.OpRef = tod.OpRef
+				where orb.Id is null
 				
 				--创建订单明细
 				if @FlowType = 1
@@ -1379,5 +1372,6 @@ BEGIN
 	drop table #tempMultiSupplierGroup
 	drop table #tempMultiSupplierItem
 	drop table #tempSortedMultiSupplierItem
+	drop table #tempDuplicateOpRef
 END
 

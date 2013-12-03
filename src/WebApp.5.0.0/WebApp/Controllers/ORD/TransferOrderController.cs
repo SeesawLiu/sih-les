@@ -29,7 +29,7 @@ namespace com.Sconit.Web.Controllers.ORD
     {
         //public IIpMgr ipMgr { get; set; }
         public IOrderMgr orderMgr { get; set; }
-        public IStockTakeMgr stockTakeMgr { get; set; }
+        //public IStockTakeMgr stockTakeMgr { get; set; }
         public IReportGen reportGen { get; set; }
         public TransferOrderController()
         {

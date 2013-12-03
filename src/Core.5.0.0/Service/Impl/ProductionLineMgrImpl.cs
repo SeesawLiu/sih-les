@@ -2322,7 +2322,8 @@ namespace com.Sconit.Service.Impl
             int colItem = 3;//物料
             int colOpReference = 4;//工位
             int colRefOpReference = 5;//工位
-            int colIsPrimary = 6;//是否主键
+            int colLocation = 6;//是否主键
+            int colIsPrimary = 7;//是否主键
             #endregion
             IList<OpRefMap> exactOpRefMapList = new List<OpRefMap>();
             //IList<Item> allItemList = this.genericMgr.FindAll<Item>();
@@ -2342,6 +2343,7 @@ namespace com.Sconit.Service.Impl
                 string itemCode = string.Empty;
                 string opReference = string.Empty;
                 string refOpReference = string.Empty;
+                string location = string.Empty;
                 string isPrimary = string.Empty;
                 OpRefMap opRefMap = new OpRefMap();
                 #region 读取数据
@@ -2424,6 +2426,26 @@ namespace com.Sconit.Service.Impl
                 {
 
                     opRefMap.RefOpReference = refOpReference;
+                }
+                #endregion
+
+                #region 库位
+                location = ImportHelper.GetCellStringValue(row.GetCell(colLocation));
+                if (string.IsNullOrWhiteSpace(location))
+                {
+                    businessException.AddMessage(string.Format("第{0}库位不能为空", i));
+                }
+                else
+                {
+                    var locs = this.genericMgr.FindAll<Location>(" from Location as l where l.Code=? ", location);
+                    if (locs == null || locs.Count == 0)
+                    {
+                        businessException.AddMessage(string.Format("第{0}行库位{1}不存在", i, location));
+                    }
+                    else
+                    {
+                        opRefMap.Location = location;
+                    }
                 }
                 #endregion
 

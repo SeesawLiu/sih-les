@@ -1,0 +1,67 @@
+﻿@using com.Sconit.Web.Models.SearchModels.MRP
+<fieldset>
+    @using (Html.BeginForm("SupplierCycleList", "Quota"))
+    {   
+        <div class="search">
+            <div class="search-label">
+                <label for="Item">
+                    @Resources.MRP.Quota.Quota_Item
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_ItemComboBox", "Common",
+            new
+            {
+                controlName = "ItemCode",
+                includeBlankOption = true,
+                selectedValue = TempData["QuotaSearchModel"] != null ? ((QuotaSearchModel)TempData["QuotaSearchModel"]).ItemCode : string.Empty
+            });
+                }
+            </div>
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            <button type="submit" id="btnSearch" >
+                @Resources.Global.Button_Search</button>
+        </div>
+    }
+</fieldset>
+<script type="text/javascript">
+    function onSearchClick(e) {
+    debugger
+    if ($("#Item").val() == "" || $("#Location").val() == "")
+        {
+            alert('@Resources.MRP.Quota.Quota_LocationAndItemMustSelect');
+            return;
+        }
+        var data = {
+            Location: $("#Location").val(),
+            Item: $("#Item").val(),
+            isFromList: $("#isFromList").is(':checked')
+        };
+        $.ajax({
+            type: "post",
+            dataType: "html",
+            url: "/Quota/List/",
+            data: data,
+            cache: false,
+            success: function (data, textStatus) {
+                  var $tGrid = $("#content");
+                  $($tGrid).html(data);
+//                $("#ndFlowDetails").html(data);
+//                $("#ndFlowDetails").show();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+            }
+        });
+    }
+
+    function FlowDetailGrid_OnDataBinding(e) {
+        e.data = {
+            Location: $('#Location').val(),
+            Item: $('#Item').val()
+        };
+    } 
+</script>

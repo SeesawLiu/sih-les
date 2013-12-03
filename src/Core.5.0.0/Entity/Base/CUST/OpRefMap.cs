@@ -50,6 +50,8 @@ namespace com.Sconit.Entity.CUST
 		public Int32 LastModifyUserId { get; set; }
 		public string LastModifyUserName { get; set; }
 		public DateTime LastModifyDate { get; set; }
+        [Required(AllowEmptyStrings = false, ErrorMessageResourceName = "Errors_Common_FieldRequired", ErrorMessageResourceType = typeof(Resources.ErrorMessage))]
+        [Display(Name = "OpRefMap_Location", ResourceType = typeof(Resources.CUST.OpRefMap))]
         public string Location { get; set; }
         
         #endregion

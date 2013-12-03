@@ -115,6 +115,15 @@ namespace Resources.CUST {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Location.
+        /// </summary>
+        public static string OpRefMap_Location {
+            get {
+                return ResourceManager.GetString("OpRefMap_Location", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to OpReference.
         /// </summary>
         public static string OpRefMap_OpReference {

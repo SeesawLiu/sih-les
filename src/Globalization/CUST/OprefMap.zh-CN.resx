@@ -135,6 +135,9 @@
   <data name="OpRefMap_ItemRefCode" xml:space="preserve">
     <value>旧图号</value>
   </data>
+  <data name="OpRefMap_Location" xml:space="preserve">
+    <value>库位</value>
+  </data>
   <data name="OpRefMap_OpReference" xml:space="preserve">
     <value>JIT计算工位</value>
   </data>

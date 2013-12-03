@@ -485,7 +485,6 @@ namespace com.Sconit.Web.Controllers.ORD
         #endregion
 
         #region 检查库存
-        [SconitAuthorize(Permissions = "Url_SequenceMaster_Ship")]
         public ActionResult CheckInventory(string orderNo)
         {
             string hql = " select d from OrderDetail as d where d.OrderNo=? ";

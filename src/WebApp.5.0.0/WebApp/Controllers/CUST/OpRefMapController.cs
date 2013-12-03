@@ -140,7 +140,7 @@ namespace com.Sconit.Web.Controllers.CUST
                     {
                         if (oprefMap.IsPrimary.HasValue && oprefMap.IsPrimary.Value)
                         {
-                            var checkPrimary = this.genericMgr.FindAll<OpRefMap>(" from OpRefMap as o where o.Item=? and o.OpReference=? and o.IsPrimary=? ", new object[] { oprefMap.Item, oprefMap.OpReference, true });
+                            var checkPrimary = this.genericMgr.FindAll<OpRefMap>(" from OpRefMap as o where o.Item=? and o.OpReference=? and o.IsPrimary=?  and  o.Id <> ? ", new object[] { oprefMap.Item, oprefMap.OpReference, true, oprefMap.Id });
                             if (checkPrimary != null && checkPrimary.Count > 0)
                             {
                                 throw new BusinessException(string.Format("【物料编号{0}+JIT计算工位{1}】在数据库中已经存在优先的", oprefMap.Item, oprefMap.OpReference));
@@ -148,6 +148,7 @@ namespace com.Sconit.Web.Controllers.CUST
                         }
                         OpRefMap upOpRefMap = base.genericMgr.FindById<OpRefMap>(Convert.ToInt32(id));
                         Item item = this.genericMgr.FindById<Item>(oprefMap.Item);
+                        upOpRefMap.Location = oprefMap.Location;
                         upOpRefMap.ProdLine = oprefMap.ProdLine;
                         upOpRefMap.SAPProdLine = oprefMap.SAPProdLine;
                         upOpRefMap.Item = item.Code;

@@ -457,6 +457,14 @@
             </div>
             <div class="search-label">
                 <label for="OrderMaster_Operation">
+                    SAP生产线
+                </label>
+            </div>
+            <div class="search-field">
+            @Html.TextBox("SAPProdLine")
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_Operation">
                 优先级
                 </label>
             </div>
@@ -486,12 +494,17 @@
         var data = {
             "orderNo": $("#OrderNo").val(),
             "windowTime": $("#CreateRequisitionWindowTime").val(),
-            "priority": $("input[type=radio][name=Priority]:checked").val()
+            "priority": $("input[type=radio][name=Priority]:checked").val(),
+            "sapProdLine": $("#SAPProdLine").val()
         };
         if (data["orderNo"] == null || data["orderNo"] == "") {
             $message.error("单号不能为空。");
             return;
         }
+//        if (data["sapProdLine"] == null || data["sapProdLine"] == "") {
+//            $message.error("SAP生产线不能为空。");
+//            return;
+//        }
         if (data["windowTime"] == null || data["windowTime"] == "") {
             $message.error("窗口时间不能为空。");
             return;

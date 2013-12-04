@@ -1625,13 +1625,19 @@
     <None Include="Resource\Templates\Excel\ScheduleLineReport.xls" />
     <None Include="Resource\Templates\Excel\WMSDatFile.xls" />
     <None Include="Resource\Templates\UploadTemplate\BatchUpdateItem.xls" />
+    <None Include="Resource\Templates\UploadTemplate\DeleteVanOrder.xls" />
+    <None Include="Resource\Templates\UploadTemplate\GetCurrentVanOrder.xls" />
+    <None Include="Resource\Templates\UploadTemplate\Import261262MiscOrder.xls" />
     <None Include="Resource\Templates\UploadTemplate\ImportCreateRequisition.xls" />
+    <None Include="Resource\Templates\UploadTemplate\ImportQuotaCycleQty.xls" />
     <None Include="Resource\Templates\UploadTemplate\InMiscOrder.xls" />
     <None Include="Resource\Templates\UploadTemplate\ItemTrace.xls" />
     <None Include="Resource\Templates\UploadTemplate\KanBanFlow.xls" />
     <None Include="Resource\Templates\UploadTemplate\LocationDetailPref.xls" />
     <None Include="Resource\Templates\UploadTemplate\MultiSupplyGroup.xls" />
+    <None Include="Resource\Templates\UploadTemplate\OpReferenceBalanceAdjust.xls" />
     <None Include="Resource\Templates\UploadTemplate\OpReferenceBalanceStock.xls" />
+    <None Include="Resource\Templates\UploadTemplate\OpRefMap.xls" />
     <None Include="Resource\Templates\UploadTemplate\OrderDetail.xls" />
     <None Include="Resource\Templates\UploadTemplate\OutMiscOrder.xls" />
     <None Include="Resource\Templates\UploadTemplate\Procurement.xls" />
@@ -2226,6 +2232,10 @@
     <Content Include="Views\com.Sconit.Web.Controllers.CUST\OpRefMap\_SearchResult.cshtml" />
     <Content Include="Views\com.Sconit.Web.Controllers.CUST\OpRefMap\Index.cshtml" />
     <Content Include="Views\com.Sconit.Web.Controllers.CUST\OpRefMap\List.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.MRP\Quota\SupplierCycle.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.MRP\Quota\SupplierCycleList.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.MRP\Quota\_SupplierCycleResult.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.MRP\Quota\_SupplierCycleSearch.cshtml" />
     <None Include="Web References\EncryptDencryptService\EncryptDencryptService.wsdl" />
     <None Include="Web References\EncryptDencryptService\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>

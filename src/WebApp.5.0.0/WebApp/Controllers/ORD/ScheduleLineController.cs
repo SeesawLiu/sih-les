@@ -370,12 +370,7 @@ namespace com.Sconit.Web.Controllers.ORD
                     Title = Resources.ORD.OrderDetail.OrderDetail_OrderNo,
                     Sortable = false
                 });
-                columns.Add(new GridColumnSettings
-                {
-                    Member = scheduleView.ScheduleHead.FlowHead,
-                    Title = Resources.ORD.OrderDetail.OrderDetail_Flow,
-                    Sortable = false
-                });
+                
                 columns.Add(new GridColumnSettings
                 {
                     Member = scheduleView.ScheduleHead.SupplierHead,
@@ -410,12 +405,6 @@ namespace com.Sconit.Web.Controllers.ORD
                 {
                     Member = scheduleView.ScheduleHead.UnitCountHead,
                     Title = Resources.ORD.OrderDetail.OrderDetail_UnitCount,
-                    Sortable = false
-                });
-                columns.Add(new GridColumnSettings
-                {
-                    Member = scheduleView.ScheduleHead.LocationToHead,
-                    Title = Resources.ORD.OrderDetail.OrderDetail_LocationTo,
                     Sortable = false
                 });
                 //columns.Add(new GridColumnSettings
@@ -484,6 +473,19 @@ namespace com.Sconit.Web.Controllers.ORD
                     Title = "已处理数",
                     Sortable = false,
                     Visible = false
+                });
+
+                columns.Add(new GridColumnSettings
+                {
+                    Member = scheduleView.ScheduleHead.FlowHead,
+                    Title = Resources.ORD.OrderDetail.OrderDetail_Flow,
+                    Sortable = false
+                });
+                columns.Add(new GridColumnSettings
+                {
+                    Member = scheduleView.ScheduleHead.LocationToHead,
+                    Title = Resources.ORD.OrderDetail.OrderDetail_LocationTo,
+                    Sortable = false
                 });
                 #endregion
 

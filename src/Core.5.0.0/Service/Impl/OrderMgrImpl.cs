@@ -2582,10 +2582,6 @@ namespace com.Sconit.Service.Impl
             TryLoadPickListDetails(pickListMaster);
             #endregion
 
-            #region 获取订单明细
-            IList<OrderDetail> orderDetailList = TryLoadOrderDetails(pickListMaster);
-            #endregion
-
             #region 获取订单头
             //IList<OrderMaster> orderMasterList = LoadOrderMasters(orderDetailList.Select(det => det.OrderNo).Distinct().ToArray());
             #endregion
@@ -2600,11 +2596,19 @@ namespace com.Sconit.Service.Impl
                     if (int.Parse(pickListDetailIdArray[i]) == pickListDetail.Id)
                     {
                         pickListDetail.PickedQty = decimal.Parse(shipQtyArray[i]);
-                        pickListDetail.CurrentOrderDetail = orderDetailList.Where(d => d.Id == pickListDetail.OrderDetailId).Single();
+                        //pickListDetail.CurrentOrderDetail = orderDetailList.Where(d => d.Id == pickListDetail.OrderDetailId).Single();
                     }
                 }
                 this.genericMgr.Update(pickListDetail);
             }
+            #endregion
+            return ShipQtyPickList(pickListMaster);
+        }
+
+        private ReceiptMaster ShipQtyPickList(PickListMaster pickListMaster)
+        {
+            #region 获取订单明细
+            IList<OrderDetail> orderDetailList = TryLoadOrderDetails(pickListMaster);
             #endregion
 
             #region 更新捡货单头
@@ -8816,7 +8820,7 @@ namespace com.Sconit.Service.Impl
             string[] successNos = new string[2];
             try
             {
-                IList<OrderDetail> orderDetailList = new List<OrderDetail>();
+                //IList<OrderDetail> orderDetailList = new List<OrderDetail>();
                 if (!string.IsNullOrEmpty(idStr))
                 {
                     string[] idArray = idStr.Split(',');
@@ -8828,8 +8832,24 @@ namespace com.Sconit.Service.Impl
                         successNos[0] = pickNo;
                         if (isAutoReceive)
                         {
-                            IList<PickListDetail> detailList = this.genericMgr.FindAll<PickListDetail>(" select pd from PickListDetail as pd where pd.PickListNo=? ", pickNo);
-                            ReceiptMaster receiptMaster = ShipPickList(pickNo, detailList.Select(d => d.Id.ToString()).ToArray(), detailList.Select(d => d.Qty.ToString()).ToArray());
+                            PickListMaster pickListMaster = this.genericMgr.FindById<PickListMaster>(pickNo);
+                            if (pickListMaster == null)
+                            {
+                                throw new BusinessException("拣货单号{0}不存在。", pickNo);
+                            }
+                            #region 获取捡货单明细
+                            TryLoadPickListDetails(pickListMaster);
+                            #endregion
+                            foreach (var pickListDetail in pickListMaster.PickListDetails)
+                            {
+                                pickListDetail.IsClose = true;
+                                pickListDetail.PickedQty = pickListDetail.Qty;
+                                this.genericMgr.Update(pickListDetail);
+                            }
+                            ReceiptMaster receiptMaster = ShipQtyPickList(pickListMaster);
+
+                            //IList<PickListDetail> detailList = this.genericMgr.FindAll<PickListDetail>(" select pd from PickListDetail as pd where pd.PickListNo=? ", pickNo);
+                            //ReceiptMaster receiptMaster = ShipPickList(pickNo, detailList.Select(d => d.Id.ToString()).ToArray(), detailList.Select(d => d.Qty.ToString()).ToArray());
                             successNos[1] = receiptMaster.ReceiptNo;
                         }
                     }

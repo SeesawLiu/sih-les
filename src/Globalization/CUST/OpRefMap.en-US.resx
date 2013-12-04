@@ -135,6 +135,9 @@
   <data name="OpRefMap_ItemRefCode" xml:space="preserve">
     <value>ItemRefCode</value>
   </data>
+  <data name="OpRefMap_Location" xml:space="preserve">
+    <value>Location</value>
+  </data>
   <data name="OpRefMap_OpReference" xml:space="preserve">
     <value>OpReference</value>
   </data>

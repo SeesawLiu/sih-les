@@ -4599,6 +4599,7 @@ namespace com.Sconit.Service.Impl
                     Message = errorMessage,
                 });
 
+                this.SendShortMessage(errorMessageList);
                 this.SendErrorMessage(errorMessageList);
                 #endregion
 
@@ -4883,6 +4884,7 @@ namespace com.Sconit.Service.Impl
                         }
                     }
 
+                    SendShortMessage(errorMessageList);
                     SendErrorMessage(errorMessageList);
                 }
             }
@@ -10108,39 +10110,58 @@ namespace com.Sconit.Service.Impl
 
         private void SendShortMessage(IList<ErrorMessage> errorMessageList)
         {
-            var distinctTemplates = errorMessageList.Select(t => t.Template).Distinct();
-            foreach (var nVelocityTemplate in distinctTemplates)
+            try
             {
-                MessageSubscirber messageSubscriber = genericMgr.FindById<MessageSubscirber>((int)nVelocityTemplate);
-                var q_ItemErrors = errorMessageList.Where(t => (int)t.Template == (int)nVelocityTemplate).Take(messageSubscriber.MaxMessageSize);
-
-                if (!string.IsNullOrWhiteSpace(messageSubscriber.Mobiles))
+                var distinctTemplates = errorMessageList.Select(t => t.Template).Distinct();
+                foreach (var nVelocityTemplate in distinctTemplates)
                 {
-                    IDictionary<string, object> data = new Dictionary<string, object>();
-                    data.Add("Title", messageSubscriber.Description);
-                    data.Add("ItemErrors", q_ItemErrors);
-                    string content = vmReporsitory.RenderTemplate(nVelocityTemplate, data);
-                    shortMessageMgr.AsyncSendMessage(messageSubscriber.Mobiles.Split(';'), content);
+                    MessageSubscirber messageSubscriber = genericMgr.FindById<MessageSubscirber>((int)nVelocityTemplate);
+                    var q_ItemErrors = errorMessageList.Where(t => (int)t.Template == (int)nVelocityTemplate).Take(messageSubscriber.MaxMessageSize);
+
+                    if (!string.IsNullOrWhiteSpace(messageSubscriber.Mobiles))
+                    {
+                        IDictionary<string, object> data = new Dictionary<string, object>();
+                        data.Add("ItemErrors", q_ItemErrors);
+                        StringBuilder content = new StringBuilder();
+                        foreach (var itemError in q_ItemErrors)
+                        {
+                            content.Append(itemError.Message);
+                        }
+
+                        if (content.Length > 0)
+                        {
+                            shortMessageMgr.AsyncSendMessage(messageSubscriber.Mobiles.Split(';'), content.ToString());
+                        }
+                    }
                 }
+            }
+            catch (Exception)
+            {
             }
         }
 
         private void SendErrorMessage(IList<ErrorMessage> errorMessageList)
         {
-            var distinctTemplates = errorMessageList.Select(t => t.Template).Distinct();
-            foreach (var nVelocityTemplate in distinctTemplates)
+            try
             {
-                MessageSubscirber messageSubscriber = genericMgr.FindById<MessageSubscirber>((int)nVelocityTemplate);
-                var q_ItemErrors = errorMessageList.Where(t => (int)t.Template == (int)nVelocityTemplate).Take(messageSubscriber.MaxMessageSize);
-
-                if (!string.IsNullOrWhiteSpace(messageSubscriber.Emails))
+                var distinctTemplates = errorMessageList.Select(t => t.Template).Distinct();
+                foreach (var nVelocityTemplate in distinctTemplates)
                 {
-                    IDictionary<string, object> data = new Dictionary<string, object>();
-                    data.Add("Title", messageSubscriber.Description);
-                    data.Add("ItemErrors", q_ItemErrors);
-                    string content = vmReporsitory.RenderTemplate(nVelocityTemplate, data);
-                    emailMgr.AsyncSendEmail(messageSubscriber.Description, content, messageSubscriber.Emails, MailPriority.High);
+                    MessageSubscirber messageSubscriber = genericMgr.FindById<MessageSubscirber>((int)nVelocityTemplate);
+                    var q_ItemErrors = errorMessageList.Where(t => (int)t.Template == (int)nVelocityTemplate).Take(messageSubscriber.MaxMessageSize);
+
+                    if (!string.IsNullOrWhiteSpace(messageSubscriber.Emails))
+                    {
+                        IDictionary<string, object> data = new Dictionary<string, object>();
+                        data.Add("Title", messageSubscriber.Description);
+                        data.Add("ItemErrors", q_ItemErrors);
+                        string content = vmReporsitory.RenderTemplate(nVelocityTemplate, data);
+                        emailMgr.AsyncSendEmail(messageSubscriber.Description, content, messageSubscriber.Emails, MailPriority.High);
+                    }
                 }
+            }
+            catch (Exception)
+            {
             }
         }
         #endregion

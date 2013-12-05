@@ -713,6 +713,14 @@ namespace com.Sconit.Web.Controllers.ORD
                 {
                     throw new BusinessException("单号不能为空。");
                 }
+                
+                else
+                {
+                    if (this.genericMgr.FindAll<int>("select COUNT(*) from CUST_ProductLineMap where type = 1 and SAPProdLine=?", sapProdLine)[0] == 0)
+                    {
+                        throw new BusinessException(string.Format("SAP生产线{0}无效。", sapProdLine));
+                    }
+                }
                 if (windowTime == null)
                 {
                     throw new BusinessException("窗口时间不能为空。");
@@ -722,7 +730,13 @@ namespace com.Sconit.Web.Controllers.ORD
                 {
                     sapProdLine = this.systemMgr.GetEntityPreferenceValue(EntityPreference.CodeEnum.DefaultSAPProdLine);
                 }
-
+                else
+                {
+                    if (this.genericMgr.FindAll<int>("select COUNT(*) from CUST_ProductLineMap where type = 1 and SAPProdLine=?", sapProdLine)[0] == 0)
+                    {
+                        throw new BusinessException(string.Format("SAP生产线{0}无效,请重新输入。", sapProdLine));
+                    }
+                }
                 IList<object[]> returnMessages = this.genericMgr.FindAllWithNativeSql<object[]>("exec USP_LE_ManualGenOrder ?,?,?,?,?,?",
                     new object[] { orderNo, windowTime.Value, priority, sapProdLine, CurrentUser.Id, CurrentUser.FullName },
                     new IType[] { NHibernateUtil.String, NHibernateUtil.DateTime, NHibernateUtil.Int16, NHibernateUtil.String, NHibernateUtil.Int32, NHibernateUtil.String });

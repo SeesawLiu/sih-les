@@ -876,6 +876,7 @@
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
+    <Content Include="WebService\ShortMessageService.asmx" />
     <Content Include="WebService\FISService.asmx" />
     <Content Include="WebService\OrderService.asmx" />
     <Content Include="WebService\EmailService.asmx" />

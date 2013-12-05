@@ -16,6 +16,7 @@ namespace com.Sconit.Web.SI.Installer
                     && !t.Name.Equals("GenericMgrImpl")
                     && !t.Name.Equals("QueryImpl")
                     && !t.Name.Equals("EmailMgrImpl")
+                    && !t.Name.Equals("ShortMessageMgrImpl")
                     && !t.Name.Equals("PubSubMgrImpl"))
                 .Configure(c => c.LifeStyle.Singleton)
                 .WithService.DefaultInterface()

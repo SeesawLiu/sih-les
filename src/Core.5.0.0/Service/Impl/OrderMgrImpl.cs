@@ -54,6 +54,7 @@ namespace com.Sconit.Service.Impl
         public IPickListMgr pickListMgr { get; set; }
         public IHuMgr huMgr { get; set; }
         public IEmailMgr emailMgr { get; set; }
+        public IShortMessageMgr shortMessageMgr { get; set; }
         public IWorkingCalendarMgr workingCalendarMgr { get; set; }
         public IPickTaskMgr pickTaskMgr { get; set; }
         public NVelocityTemplateRepository vmReporsitory { get; set; }
@@ -4708,6 +4709,7 @@ namespace com.Sconit.Service.Impl
                     }
                     #endregion
 
+                    this.SendShortMessage(errorMessageList);
                     this.SendErrorMessage(errorMessageList);
                 }
             }
@@ -4770,6 +4772,7 @@ namespace com.Sconit.Service.Impl
                     }
                 }
 
+                SendShortMessage(errorMessageList);
                 SendErrorMessage(errorMessageList);
             }
             catch (Exception ex)
@@ -10101,6 +10104,25 @@ namespace com.Sconit.Service.Impl
             }
 
             return null;
+        }
+
+        private void SendShortMessage(IList<ErrorMessage> errorMessageList)
+        {
+            var distinctTemplates = errorMessageList.Select(t => t.Template).Distinct();
+            foreach (var nVelocityTemplate in distinctTemplates)
+            {
+                MessageSubscirber messageSubscriber = genericMgr.FindById<MessageSubscirber>((int)nVelocityTemplate);
+                var q_ItemErrors = errorMessageList.Where(t => (int)t.Template == (int)nVelocityTemplate).Take(messageSubscriber.MaxMessageSize);
+
+                if (!string.IsNullOrWhiteSpace(messageSubscriber.Mobiles))
+                {
+                    IDictionary<string, object> data = new Dictionary<string, object>();
+                    data.Add("Title", messageSubscriber.Description);
+                    data.Add("ItemErrors", q_ItemErrors);
+                    string content = vmReporsitory.RenderTemplate(nVelocityTemplate, data);
+                    shortMessageMgr.AsyncSendMessage(messageSubscriber.Mobiles.Split(';'), content);
+                }
+            }
         }
 
         private void SendErrorMessage(IList<ErrorMessage> errorMessageList)

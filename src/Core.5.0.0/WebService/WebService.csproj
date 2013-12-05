@@ -60,7 +60,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SMSService.cs">
+    <Compile Include="ShortMessageService.cs">
       <SubType>Component</SubType>
     </Compile>
   </ItemGroup>

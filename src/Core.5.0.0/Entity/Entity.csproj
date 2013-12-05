@@ -165,7 +165,9 @@
     <EmbeddedResource Include="Base\ORD\OrderBackflushDetail.hbm.xml" />
     <EmbeddedResource Include="Base\ORD\OrderBinding.hbm.xml" />
     <EmbeddedResource Include="Base\ORD\OrderBindingDetail.hbm.xml" />
-    <EmbeddedResource Include="Base\ORD\OrderBomDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\ORD\OrderBomDetail.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Base\ORD\OrderDetail.hbm.xml" />
     <EmbeddedResource Include="Base\ORD\OrderDetailTrace.hbm.xml" />
     <EmbeddedResource Include="Base\ORD\OrderItemTrace.hbm.xml" />

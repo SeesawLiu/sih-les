@@ -8,5 +8,8 @@
     <Setting Name="com_Sconit_Service_SAPService_SAPService" Type="(Web Service URL)" Scope="Application">
       <Value Profile="(Default)">http://localhost:1122/Webservice/SAPService.asmx</Value>
     </Setting>
+    <Setting Name="com_Sconit_Service_MSWebService_MSWebService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://10.86.128.72/SihWebService/Message/MSWebService.asmx</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

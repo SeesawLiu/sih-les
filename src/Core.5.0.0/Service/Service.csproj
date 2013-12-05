@@ -76,6 +76,8 @@
   <ItemGroup>
     <Compile Include="AutoMapperInstaller.cs" />
     <Compile Include="BaseMgr.cs" />
+    <Compile Include="Impl\ShortMessageMgrImpl.cs" />
+    <Compile Include="IShortMessageMgr.cs" />
     <Compile Include="IBillMgr.cs" />
     <Compile Include="IBomMgr.cs" />
     <Compile Include="ICurrencyMgr.cs" />
@@ -158,6 +160,11 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="IReportMgr.cs" />
+    <Compile Include="Web References\MSWebService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
     <Compile Include="Web References\SAPService\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -210,6 +217,17 @@
     <WebReferences Include="Web References\" />
   </ItemGroup>
   <ItemGroup>
+    <WebReferenceUrl Include="G:\Project\sih\10.Interface\WSDL\MSWebService.wsdl">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\MSWebService\</RelPath>
+      <UpdateFromURL>G:\Project\sih\10.Interface\WSDL\MSWebService.wsdl</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>com_Sconit_Service_MSWebService_MSWebService</CachedSettingsPropName>
+    </WebReferenceUrl>
     <WebReferenceUrl Include="http://10.86.128.72/SIHWEBSERVICE/SendMail/SendMail.asmx%3fwsdl">
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\SendMail\</RelPath>
@@ -221,10 +239,10 @@
       <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
       <CachedSettingsPropName>com_Sconit_Service_SendMail_SendMailV2</CachedSettingsPropName>
     </WebReferenceUrl>
-    <WebReferenceUrl Include="http://localhost:1122/Webservice/SAPService.asmx">
+    <WebReferenceUrl Include="http://10.86.128.72/SihWebService/Message/MSWebService.asmx">
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\SAPService\</RelPath>
-      <UpdateFromURL>http://localhost:1122/Webservice/SAPService.asmx</UpdateFromURL>
+      <UpdateFromURL>http://10.86.128.72/SihWebService/Message/MSWebService.asmx</UpdateFromURL>
       <ServiceLocationURL>
       </ServiceLocationURL>
       <CachedDynamicPropName>
@@ -240,6 +258,11 @@
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\MSWebService\MSWebService.wsdl" />
+    <None Include="Web References\MSWebService\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
     <None Include="Web References\SAPService\OrderDetail.datasource">
       <DependentUpon>Reference.map</DependentUpon>

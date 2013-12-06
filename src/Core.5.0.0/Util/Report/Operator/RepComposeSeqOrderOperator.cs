@@ -13,7 +13,7 @@ namespace com.Sconit.Utility.Report.Operator
             //明细部分的行数
             this.pageDetailRowCount = 30;
             //列数   1起始
-            this.columnCount = 7;
+            this.columnCount = 8;
             //报表头的行数  1起始
             this.headRowCount = 7;
             //报表尾的行数  1起始
@@ -147,9 +147,9 @@ namespace com.Sconit.Utility.Report.Operator
            */
         public override void CopyPageValues(int pageIndex)
         {
-            this.CopyCell(pageIndex, 37, 0, "A38");
-            this.CopyCell(pageIndex, 37, 4, "E38");
-            this.CopyCell(pageIndex, 37, 8, "I38");
+            //this.CopyCell(pageIndex, 37, 0, "A38");
+            //this.CopyCell(pageIndex, 37, 4, "E38");
+            //this.CopyCell(pageIndex, 37, 8, "I38");
         }
 
 

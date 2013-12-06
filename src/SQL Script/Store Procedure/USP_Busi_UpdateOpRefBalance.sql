@@ -75,12 +75,12 @@ BEGIN
 		from (select SUM(det.OrderQty - det.RecQty) as OrderQty
 			from ORD_OrderDet_1 as det
 			inner join ORD_OrderMstr_1 as mstr on det.OrderNo = mstr.OrderNo
-			where det.Item = @Item and det.BinTo = @OpRef and mstr.[Status] in (1, 2) and mstr.OrderStrategy = 3
+			where det.Item = @Item and ((det.WMSSeq is null and det.BinTo = @OpRef) or det.WMSSeq = @OpRef) and mstr.[Status] in (1, 2) and mstr.OrderStrategy = 3
 			union all
 			select SUM(det.OrderQty - det.RecQty) as OrderQty
 			from ORD_OrderDet_2 as det
 			inner join ORD_OrderMstr_2 as mstr on det.OrderNo = mstr.OrderNo
-			where det.Item = @Item and det.BinTo = @OpRef and mstr.[Status] in (1, 2) and mstr.OrderStrategy = 3) as det
+			where det.Item = @Item and ((det.WMSSeq is null and det.BinTo = @OpRef) or det.WMSSeq = @OpRef) and mstr.[Status] in (1, 2) and mstr.OrderStrategy = 3) as det
 			
 		declare @DateTimeNow datetime = GETDATE()
 		if @Version is not null

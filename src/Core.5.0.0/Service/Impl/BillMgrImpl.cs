@@ -53,9 +53,12 @@ namespace com.Sconit.Service.Impl
 
                     if (planBill.BillTerm != receiptDetail.BillTerm)
                     {
+                        //throw new BusinessException("物料{0}的结算方式（{1}）和寄售结算方式（{2}）不一致。", receiptDetail.Item,
+                        //   systemMgr.GetCodeDetailDescription(CodeMaster.CodeMaster.BillTerm, (int)receiptDetail.BillTerm),
+                        //   systemMgr.GetCodeDetailDescription(CodeMaster.CodeMaster.BillTerm, (int)planBill.BillTerm));
                         throw new BusinessException("物料{0}的结算方式（{1}）和寄售结算方式（{2}）不一致。", receiptDetail.Item,
-                           systemMgr.GetCodeDetailDescription(CodeMaster.CodeMaster.BillTerm, (int)receiptDetail.BillTerm),
-                           systemMgr.GetCodeDetailDescription(CodeMaster.CodeMaster.BillTerm, (int)planBill.BillTerm));
+                           systemMgr.GetCodeDetailDescription(CodeMaster.CodeMaster.OrderBillTerm, (int)receiptDetail.BillTerm),
+                           systemMgr.GetCodeDetailDescription(CodeMaster.CodeMaster.OrderBillTerm, (int)planBill.BillTerm));
                     }
                 }
 

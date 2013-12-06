@@ -213,7 +213,7 @@ namespace com.Sconit.Web.Controllers.ORD
             //    ordDet.ItemCode = ordDet.Item;
             //    returnDetList.Add(ordDet);
             //}
-            return PartialView(new GridModel<OrderDetail>(returnDetList));
+            return PartialView(new GridModel<OrderDetail>(returnDetList.Take(500)));
         }
 
         public ActionResult Preview()
@@ -1046,7 +1046,7 @@ namespace com.Sconit.Web.Controllers.ORD
                 if (orderMaster.OrderDetails.Count > 0)
                 {
                     PrintOrderMaster printOrderMstr = Mapper.Map<OrderMaster, PrintOrderMaster>(orderMaster);
-                    printOrderMstr.VanNoCount = orderDetails.Select(o => o.ReserveNo).Count() + "";
+                    printOrderMstr.VanNoCount = printOrderMstr.OrderDetails.Select(o => o.ReserveNo).Count() + "";
                     IList<object> data = new List<object>();
                     data.Add(printOrderMstr);
                     data.Add(printOrderMstr.OrderDetails);

@@ -2629,7 +2629,9 @@
                 }
                 else if (orderNo.Substring(0, 1) == "A")
                 {
-                    string whereStatement = " select i from IpMaster as i where i.IpNo=?   and i.IsReceiveScanHu=0 and i.Status in(0,1) and exists (select 1 from IpDetail as d where d.IsClose = 0 and d.Type = 0 and d.IpNo = i.IpNo)";
+                    //and i.IsReceiveScanHu=0
+                    //扫描条码收货的限制去掉
+                    string whereStatement = " select i from IpMaster as i where i.IpNo=?    and i.Status in(0,1) and exists (select 1 from IpDetail as d where d.IsClose = 0 and d.Type = 0 and d.IpNo = i.IpNo)";
                     IList<IpMaster> ipMasterList = this.genericMgr.FindAll<IpMaster>(whereStatement, orderNo);
                     if (ipMasterList == null || ipMasterList.Count == 0)
                     {

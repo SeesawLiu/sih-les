@@ -1310,7 +1310,8 @@ BEGIN
 								LastModifyDate,             --最后修改日期
 								[Version],					--版本，1
 								IsChangeUC,					--是否修改单包装，0
-								BinTo,						--工位
+								WMSSeq,						--JIT计算工位
+								BinTo,						--配送工位
 								--LocFrom,					--出库库位
 								--LocFromNm,					--出库库位名称
 								LocTo,						--入库库位
@@ -1358,7 +1359,8 @@ BEGIN
 								@DateTimeNow,				--最后修改日期
 								1,							--版本，1
 								0,							--是否修改单包装，0
-								det.OpRef,					--工位
+								det.OpRef,					--JIT计算工位
+								ISNULL(det.RefOpRef, det.OpRef),--配送工位
 								--det.LocFrom,				--出库库位
 								--lf.Name,					--出库库位名称
 								ISNULL(det.LocTo, mstr.LocTo),	--入库库位
@@ -1421,7 +1423,8 @@ BEGIN
 								LastModifyDate,             --最后修改日期
 								[Version],					--版本，1
 								IsChangeUC,					--是否修改单包装，0
-								BinTo,						--工位
+								WMSSeq,						--JIT计算工位
+								BinTo,						--配送工位
 								LocFrom,					--出库库位
 								LocFromNm,					--出库库位名称
 								LocTo,						--入库库位
@@ -1468,7 +1471,8 @@ BEGIN
 								@DateTimeNow,				--最后修改日期
 								1,							--版本，1
 								0,							--是否修改单包装，0
-								det.OpRef,					--工位
+								det.OpRef,					--JIT计算工位
+								ISNULL(det.RefOpRef, det.OpRef),--配送工位
 								ISNULL(det.LocFrom, mstr.LocFrom),--出库库位
 								ISNULL(lf.Name, mstr.LocFromNm),--出库库位
 								ISNULL(det.LocTo, mstr.LocTo),	--入库库位
@@ -1504,7 +1508,7 @@ BEGIN
 									LocationTo, Bin, OrderedQty, IsShipExceed, FileName, IsCreateDat)
 									select det.OrderNo, '', mstr.OrderStrategy, mstr.StartTime, mstr.WindowTime, mstr.Priority,
 									'', ISNULL(det.LocFrom, mstr.LocFrom), ISNULL(det.LocTo, mstr.LocTo), mstr.Dock, mstr.CreateDate, mstr.Flow, det.OrderDetId, det.Item, det.ManufactureParty, 
-									det.OpRef, '', det.OrderQty, mstr.IsShipExceed, '', 0
+									ISNULL(det.RefOpRef, det.OpRef), '', det.OrderQty, mstr.IsShipExceed, '', 0
 									from #tempOrderDet as det
 									inner join ORD_OrderMstr_2 as mstr on mstr.OrderNo = det.OrderNo
 								end

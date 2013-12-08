@@ -45,7 +45,7 @@ namespace com.Sconit.Service.FIS
 
         public virtual void ProcessInboundFile(InboundControl InboundControl, string[] files)
         {
-            log.Info("Start process inbound ");
+            //log.Info("Start process inbound ");
 
             // IList<FormatControl> lenArray = this.genericMgr.FindAll<FormatControl>("from FormatControl f where f.SystemCode=? order by Sequence asc", InboundControl.SystemCode);
 
@@ -55,7 +55,7 @@ namespace com.Sconit.Service.FIS
                 {
                     this.LESINbound(InboundControl, fileName);
                     this.genericMgr.FlushSession();
-                    log.Info(fileName + " successful.");
+                    //log.Info(fileName + " successful.");
                     ArchiveFile(fileName, InboundControl.ArchiveFloder);
                 }
                 catch (Exception ex)
@@ -64,7 +64,7 @@ namespace com.Sconit.Service.FIS
                     try
                     {
                         ArchiveFile(fileName, InboundControl.ErrorFloder);
-                        log.Info(" file success: " + fileName, ex);
+                        //log.Info(" file success: " + fileName, ex);
                     }
                     catch (Exception)
                     {
@@ -137,7 +137,7 @@ namespace com.Sconit.Service.FIS
             string fomatedFileFullPath = fileFullPath.Replace("\\", "/");
             string fileName = fomatedFileFullPath.Substring(fomatedFileFullPath.LastIndexOf("/") + 1);
 
-            log.Info("Archive file : " + archiveFloder + fileName);
+            //log.Info("Archive file : " + archiveFloder + fileName);
             archiveFloder = archiveFloder.Replace("\\", "/");
             if (!archiveFloder.EndsWith("/"))
             {
@@ -153,7 +153,7 @@ namespace com.Sconit.Service.FIS
             {
                 File.Delete(archiveFloder + fileName);
             }
-            log.Info("文件读完存档: " + archiveFloder + fileName);
+            //log.Info("文件读完存档: " + archiveFloder + fileName);
             File.Move(fileFullPath, archiveFloder + fileName);
             string fileFullPathCTL = fileFullPath.ToUpper().Replace(".DAT", ".ctl");
             if (File.Exists(fileFullPathCTL))
@@ -184,7 +184,7 @@ namespace com.Sconit.Service.FIS
 
                 if (fileName.Substring(0, 4) == "MIGO")
                 {
-                    log.Info("开始读文件" + fileName);
+                    //log.Info("开始读文件" + fileName);
                     int rowCount = 0;
                     #region 供应商采购
                     foreach (var datLine in datStr) //循环每一行
@@ -335,11 +335,11 @@ namespace com.Sconit.Service.FIS
                     {
                         throw new BusinessException("文件读取行数不对，处理失败。");
                     }
-                    log.Info("文件" + fileName + "读完成功。");
+                    //log.Info("文件" + fileName + "读完成功。");
                 }
                 else if (fileName.Substring(0, 4) == "MB1B")
                 {
-                    log.Info("开始读文件" + fileName);
+                    //log.Info("开始读文件" + fileName);
                     int rowCount = 0;
                     #region 安吉移库
                     var Query = from dat in datStr
@@ -460,7 +460,7 @@ namespace com.Sconit.Service.FIS
                     {
                         throw new BusinessException("文件读取行数不对，处理失败。");
                     }
-                    log.Info("文件" + fileName + "读完成功。");
+                    //log.Info("文件" + fileName + "读完成功。");
                 }
                 else
                 {

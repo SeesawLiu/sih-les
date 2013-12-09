@@ -43,7 +43,6 @@ BEGIN
 		LocTo varchar(50),
 		OpRef varchar(50),
 		RefOpRef varchar(256),
-		DeliveryOpRef varchar(256),
 		NetOrderQty decimal(18, 8),
 		OpRefQty decimal(18, 8),
 		OrderQty decimal(18, 8),
@@ -76,6 +75,7 @@ BEGIN
 		OrderDetId int,
 		OrderDetSeq int,
 		OpRef varchar(50)
+		RefOpRef varchar(50)
 	)
 	
 	Create table #tempOrderDetId
@@ -221,15 +221,12 @@ BEGIN
 					
 					if exists(select top 1 1 from #tempOrderBomDet where OrderQty > 0)
 					begin
-						--更新配送工位，先去参考工位再取工位
-						update #tempOrderBomDet set DeliveryOpRef = ISNULL(RefOpRef, OpRef)
-						
 						--汇总订单明细
 						truncate table #tempOrderDet
-						insert into #tempOrderDet(Flow, FlowDetId, Item, Uom, UC, MinUC, UCDesc, Container, ContainerDesc, ManufactureParty, LocFrom, LocTo, OpRef, ReqQty, OrderQty)
-						select det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.DeliveryOpRef, SUM(det.NetOrderQty), SUM(det.OrderQty)
+						insert into #tempOrderDet(Flow, FlowDetId, Item, Uom, UC, MinUC, UCDesc, Container, ContainerDesc, ManufactureParty, LocFrom, LocTo, OpRef, RefOpRef, ReqQty, OrderQty)
+						select det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.OpRef, det.RefOpRef SUM(det.NetOrderQty), SUM(det.OrderQty)
 						from #tempOrderBomDet as det
-						group by det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.DeliveryOpRef having SUM(det.OrderQty) > 0
+						group by det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.OpRef, det.RefOpRef having SUM(det.OrderQty) > 0
 						
 						--获取订单号
 						exec USP_GetDocNo_ORD @Flow, 3, @FlowType, 0, 0, 1, @FlowPartyFrom, @FlowPartyTo, @FlowLocTo, @FlowLocFrom, @FlowDock, 0, @OrderNo output
@@ -922,15 +919,12 @@ BEGIN
 						
 						if exists(select top 1 1 from #tempOrderBomDet where OrderQty > 0)
 						begin
-							--更新配送工位，先去参考工位再取工位
-							update #tempOrderBomDet set DeliveryOpRef = ISNULL(RefOpRef, OpRef)
-						
 							--汇总订单明细
 							truncate table #tempOrderDet
-							insert into #tempOrderDet(Flow, FlowDetId, Item, Uom, UC, MinUC, UCDesc, Container, ContainerDesc, ManufactureParty, LocFrom, LocTo, OpRef, ReqQty, OrderQty)
-							select det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.DeliveryOpRef, SUM(det.NetOrderQty), SUM(det.OrderQty)
+							insert into #tempOrderDet(Flow, FlowDetId, Item, Uom, UC, MinUC, UCDesc, Container, ContainerDesc, ManufactureParty, LocFrom, LocTo, OpRef, RefOpRef, ReqQty, OrderQty)
+							select det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.OpRef, det.RefOpRef, SUM(det.NetOrderQty), SUM(det.OrderQty)
 							from #tempOrderBomDet as det
-							group by det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.DeliveryOpRef having SUM(det.OrderQty) > 0
+							group by det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.OpRef, det.RefOpRef having SUM(det.OrderQty) > 0
 							
 							--获取订单号
 							exec USP_GetDocNo_ORD @Flow, 3, @FlowType, 0, 0, 0, @FlowPartyFrom, @FlowPartyTo, @FlowLocTo, @FlowLocFrom, @FlowDock, 0, @OrderNo output

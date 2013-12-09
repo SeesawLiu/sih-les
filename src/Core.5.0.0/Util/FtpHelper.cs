@@ -61,12 +61,12 @@ namespace com.Sconit.Utility
         /// <param name="filename"></param>
         public void Upload(string filename)
         {
-            log.Info("Start upload file: " + filename);
+            //log.Info("Start upload file: " + filename);
             FileInfo fileInf = new FileInfo(filename);
             string uri = ftpURI + fileInf.Name;
             FtpWebRequest reqFTP;
 
-            log.Info("Start connect ftp server: " + ftpURI);
+            //log.Info("Start connect ftp server: " + ftpURI);
             reqFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri(uri));
             reqFTP.Credentials = new NetworkCredential(ftpUser, ftpPassword);
             reqFTP.KeepAlive = false;
@@ -89,7 +89,7 @@ namespace com.Sconit.Utility
                 }
                 strm.Close();
                 fs.Close();
-                log.Info("Upload file: " + filename + " successful.");
+                //log.Info("Upload file: " + filename + " successful.");
 
                 // 查找FTP服务器上是否存在该文件
                 if (!FileExist(fileInf.Name))
@@ -114,10 +114,10 @@ namespace com.Sconit.Utility
             FtpWebRequest reqFTP;
             try
             {
-                log.Info("Start download file: " + ftpURI + fileName + ", to local directory: " + filePath);
+                //log.Info("Start download file: " + ftpURI + fileName + ", to local directory: " + filePath);
                 FileStream outputStream = new FileStream(filePath + "\\" + fileName, FileMode.Create);
 
-                log.Info("Start connect ftp server: " + ftpURI);
+                //log.Info("Start connect ftp server: " + ftpURI);
                 reqFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri(ftpURI + fileName));
                 reqFTP.Method = WebRequestMethods.Ftp.DownloadFile;
                 reqFTP.UseBinary = true;
@@ -139,7 +139,7 @@ namespace com.Sconit.Utility
                 ftpStream.Close();
                 outputStream.Close();
                 response.Close();
-                log.Info("Download file: " + ftpURI + fileName + ", to local directory: " + filePath + " successful.");
+                //log.Info("Download file: " + ftpURI + fileName + ", to local directory: " + filePath + " successful.");
             }
             catch (Exception ex)
             {
@@ -156,10 +156,10 @@ namespace com.Sconit.Utility
         {
             try
             {
-                log.Info("Start delete file: " + ftpURI + fileName);
+                //log.Info("Start delete file: " + ftpURI + fileName);
                 string uri = ftpURI + fileName;
 
-                log.Info("Start connect ftp server: " + ftpURI);
+                //log.Info("Start connect ftp server: " + ftpURI);
                 FtpWebRequest reqFTP;
                 reqFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri(uri));
                 reqFTP.Credentials = new NetworkCredential(ftpUser, ftpPassword);
@@ -176,7 +176,7 @@ namespace com.Sconit.Utility
                 sr.Close();
                 datastream.Close();
                 response.Close();
-                log.Info("Delete file: " + ftpURI + fileName + " successful.");
+                //log.Info("Delete file: " + ftpURI + fileName + " successful.");
             }
             catch (Exception ex)
             {
@@ -240,11 +240,11 @@ namespace com.Sconit.Utility
         {
             try
             {
-                log.Info("Start get files detail list using pattern: " + pattern);
+                //log.Info("Start get files detail list using pattern: " + pattern);
                 StringBuilder result = new StringBuilder();
                 FtpWebRequest reqFTP;
 
-                log.Info("Start connect ftp server: " + ftpURI);
+                //log.Info("Start connect ftp server: " + ftpURI);
                 reqFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri(ftpURI));
                 reqFTP.UseBinary = true;
                 reqFTP.Credentials = new NetworkCredential(ftpUser, ftpPassword);
@@ -277,7 +277,7 @@ namespace com.Sconit.Utility
                 }
                 reader.Close();
                 response.Close();
-                log.Info("Get files detail list using pattern: " + pattern + " successful.");
+                //log.Info("Get files detail list using pattern: " + pattern + " successful.");
                 return result.ToString().Split('\n');
             }
             catch (Exception ex)
@@ -349,8 +349,8 @@ namespace com.Sconit.Utility
             FtpWebRequest reqFTP;
             try
             {
-                log.Info("Start makeDir: " + dirName);
-                log.Info("Start connect ftp server: " + ftpURI);
+                //log.Info("Start makeDir: " + dirName);
+                //log.Info("Start connect ftp server: " + ftpURI);
                 // dirName = name of the directory to create.
                 reqFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri(ftpURI + dirName));
                 reqFTP.Method = WebRequestMethods.Ftp.MakeDirectory;
@@ -362,7 +362,7 @@ namespace com.Sconit.Utility
 
                 ftpStream.Close();
                 response.Close();
-                log.Info("MakeDir: " + dirName + " successful.");
+                //log.Info("MakeDir: " + dirName + " successful.");
             }
             catch (Exception ex)
             {
@@ -382,8 +382,8 @@ namespace com.Sconit.Utility
             long fileSize = 0;
             try
             {
-                log.Info("Start get file size: " + filename);
-                log.Info("Start connect ftp server: " + ftpURI);
+                //log.Info("Start get file size: " + filename);
+                //log.Info("Start connect ftp server: " + ftpURI);
                 reqFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri(ftpURI + filename));
                 reqFTP.Method = WebRequestMethods.Ftp.GetFileSize;
                 reqFTP.UseBinary = true;
@@ -395,7 +395,7 @@ namespace com.Sconit.Utility
 
                 ftpStream.Close();
                 response.Close();
-                log.Info("Get file size: " + filename + " successful.");
+                //log.Info("Get file size: " + filename + " successful.");
             }
             catch (Exception ex)
             {
@@ -476,7 +476,7 @@ namespace com.Sconit.Utility
                 ftpRemoteDirectory += directory + "/";
             }
             ftpURI = "ftp://" + ftpServer + "/" + ftpRemoteDirectory + "/";
-            log.Info("Change directory to " + ftpURI);
+            //log.Info("Change directory to " + ftpURI);
         }
     }
 }

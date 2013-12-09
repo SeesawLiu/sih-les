@@ -27,7 +27,7 @@ namespace com.Sconit.Service.FIS
         public void ProcessOutbound(OutboundControl outboundControl)
         {
 
-            log.Info("Start process outbound.");
+            //log.Info("Start process outbound.");
            
             string outFolder = outboundControl.OutFolder;
             //string serviceName = dssOutboundControl.ServiceName;
@@ -38,42 +38,42 @@ namespace com.Sconit.Service.FIS
             string filePrefix = this.GetFilePrefix(outboundControl);
 
             #region 初始化本地目录
-            outFolder = outFolder.Replace("\\", "/");
-            if (!outFolder.EndsWith("/"))
-            {
-                outFolder += "/";
-            }
+            //outFolder = outFolder.Replace("\\", "/");
+            //if (!outFolder.EndsWith("/"))
+            //{
+            //    outFolder += "/";
+            //}
 
-            if (!Directory.Exists(outFolder))
-            {
-                Directory.CreateDirectory(outFolder);
-            }
+            //if (!Directory.Exists(outFolder))
+            //{
+            //    Directory.CreateDirectory(outFolder);
+            //}
 
-            archiveFolder = archiveFolder.Replace("\\", "/");
-            if (!archiveFolder.EndsWith("/"))
-            {
-                archiveFolder += "/";
-            }
+            //archiveFolder = archiveFolder.Replace("\\", "/");
+            //if (!archiveFolder.EndsWith("/"))
+            //{
+            //    archiveFolder += "/";
+            //}
 
-            if (!Directory.Exists(archiveFolder))
-            {
-                Directory.CreateDirectory(archiveFolder);
-            }
+            //if (!Directory.Exists(archiveFolder))
+            //{
+            //    Directory.CreateDirectory(archiveFolder);
+            //}
 
-            tempFolder = tempFolder.Replace("\\", "/");
-            if (!tempFolder.EndsWith("/"))
-            {
-                tempFolder += "/";
-            }
+            //tempFolder = tempFolder.Replace("\\", "/");
+            //if (!tempFolder.EndsWith("/"))
+            //{
+            //    tempFolder += "/";
+            //}
 
-            if (Directory.Exists(tempFolder))
-            {
-                var d = new DirectoryInfo(tempFolder);
-                //则删除此目录、其子目录以及所有文件
-                d.Delete(true);
-                //Directory.Delete(tempFolder);
-            }
-            Directory.CreateDirectory(tempFolder);
+            //if (Directory.Exists(tempFolder))
+            //{
+            //    var d = new DirectoryInfo(tempFolder);
+            //    //则删除此目录、其子目录以及所有文件
+            //    d.Delete(true);
+            //    //Directory.Delete(tempFolder);
+            //}
+            //Directory.CreateDirectory(tempFolder);
             #endregion
 
             #region 抽取数据
@@ -314,9 +314,9 @@ namespace com.Sconit.Service.FIS
                 try
                 {
                     File.Copy(tempFolder + fileName, archiveFolder + fileName);  //备份目录
-                    log.Debug(archiveFolder + fileName + " 备份成功。 ");
+                    //log.Debug(archiveFolder + fileName + " 备份成功。 ");
                     File.Move(tempFolder + fileName, outFolder + fileName);     //导出目录
-                    log.Debug(archiveFolder + fileName + " 导出目录成功。 ");
+                    //log.Debug(archiveFolder + fileName + " 导出目录成功。 ");
                     SaveOutboundData(key, true);
                     SaveOutboundData(key, true, fileName);
                 }

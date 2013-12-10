@@ -60,5 +60,12 @@ namespace com.Sconit.Service
 
         int UpdateWithNativeQuery(string queryString, object[] values, IType[] types);
 
+
+        IList<T> FindAllIn<T>(string hql, IEnumerable<object> inParam, IEnumerable<object> param = null);
+
+        IList<T> FindEntityWithNativeSqlIn<T>(string sql, IEnumerable<object> inValues, IEnumerable<object> values = null);
+
+        IList<T> FindAllWithNativeSqlIn<T>(string sql, IEnumerable<object> inValues, IEnumerable<object> values = null);
+
     }
 }

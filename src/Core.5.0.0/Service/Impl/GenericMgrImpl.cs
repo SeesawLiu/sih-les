@@ -15,6 +15,9 @@ namespace com.Sconit.Service.Impl
     using com.Sconit.Persistence;
     using NHibernate.Criterion;
     using NHibernate.Type;
+    using System.Linq;
+    using System.Text;
+
     #endregion
 
     /// <summary>
@@ -598,6 +601,136 @@ namespace com.Sconit.Service.Impl
         public int UpdateWithNativeQuery(string queryString, object[] values, IType[] types)
         {
             return dao.ExecuteUpdateWithNativeQuery(queryString, values, types);
+        }
+
+        public IList<T> FindAllIn<T>(string hql, IEnumerable<object> inParam, IEnumerable<object> param = null)
+        {
+            if (inParam == null || inParam.Count() == 0)
+            {
+                return null;
+            }
+            List<T> tList = new List<T>();
+
+            int inParamCount = 2000;//每次最多2000
+            if (param != null)
+            {
+                inParamCount -= param.Count();
+            }
+
+            int skipCount = 0;
+            while (true)
+            {
+                var hqlStr = new StringBuilder(hql);
+                var paramList = new List<object>();
+                if (param != null) //其他的查询参数
+                {
+                    paramList.AddRange(param);
+                }
+
+                var batchinParam = inParam.Skip(skipCount).Take(inParamCount).ToList();//得到in参数
+                if (batchinParam.Count() == 0)
+                {
+                    break;
+                }
+                skipCount += inParamCount;
+
+                for (int i = 0; i < batchinParam.Count(); i++)
+                {
+                  hqlStr.Append("?,");
+                }
+                hqlStr = hqlStr.Remove(hqlStr.Length - 1, 1);
+                hqlStr.Append(")");
+                paramList.AddRange(batchinParam);
+                tList.AddRange(dao.FindAllWithCustomQuery<T>(hqlStr.ToString(), paramList.ToArray()));
+            }
+            return tList;
+        }
+
+        public IList<T> FindEntityWithNativeSqlIn<T>(string sql, IEnumerable<object> inValues, IEnumerable<object> values = null)
+        {
+            if (inValues == null || inValues.Count() == 0)
+            {
+                return null;
+            }
+            List<T> tList = new List<T>();
+
+            int inParamCount = 2000;
+            if (values != null)
+            {
+                inParamCount -= values.Count();
+            }
+
+            int skipCount = 0;
+            while (true)
+            {
+                var sqlStr = new StringBuilder(sql);
+                List<object> paramValue = new List<object>();
+                var batchinParam = inValues.Skip(skipCount).Take(inParamCount).ToList();
+                if (batchinParam.Count() == 0)
+                {
+                    break;
+                }
+                skipCount += inParamCount;
+
+                for (int i = 0; i < batchinParam.Count(); i++)
+                {
+                    sqlStr.Append("?,");
+                }
+                sqlStr = sqlStr.Remove(sqlStr.Length - 1, 1);
+                sqlStr.Append(")");
+
+                if (values != null)
+                {
+                    paramValue.AddRange(values);
+                }
+                paramValue.AddRange(batchinParam);
+                tList.AddRange(dao.FindEntityWithNativeSql<T>(sqlStr.ToString(), paramValue.ToArray()));
+            }
+            return tList;
+        }
+
+        public IList<T> FindAllWithNativeSqlIn<T>(string sql, IEnumerable<object> inValues, IEnumerable<object> values = null)
+        {
+            if (inValues == null || inValues.Count() == 0)
+            {
+                return null;
+            }
+            List<T> tList = new List<T>();
+
+            int inParamCount = 1000;
+            if (values != null)
+            {
+                inParamCount -= values.Count();
+            }
+
+            int skipCount = 0;
+
+            while (true)
+            {
+                List<object> paramValue = new List<object>();
+                var sqlStr = new StringBuilder(sql);
+                var batchinParam = inValues.Skip(skipCount).Take(inParamCount);
+                if (batchinParam.Count() == 0)
+                {
+                    break;
+                }
+                skipCount += inParamCount;
+
+                for (int i = 0; i < batchinParam.Count(); i++)
+                {
+                    sqlStr.Append("?,");
+                }
+                sqlStr = sqlStr.Remove(sqlStr.Length - 1, 1);
+                sqlStr.Append(")");
+
+                if (values != null)
+                {
+                    paramValue.AddRange(values);
+                }
+                paramValue.AddRange(batchinParam);
+                tList.AddRange(dao.FindAllWithNativeSql<T>(sqlStr.ToString(), paramValue.ToArray()));
+            }
+            return tList;
         }
     }
 }

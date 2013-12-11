@@ -39,7 +39,7 @@ namespace com.Sconit.Service.FIS
 
         public void UploadFile()
         {
-            log.Info("Start upload file to ftp according to FtpControl table.");
+            //log.Info("Start upload file to ftp according to FtpControl table.");
             IList<FtpControl> ftpControlList = this.genericMgr.FindAll<FtpControl>("from FtpControl fc where IOType=? ", BusinessConstants.IO_TYPE_OUT);
 
             if (ftpControlList != null && ftpControlList.Count > 0)
@@ -143,7 +143,7 @@ namespace com.Sconit.Service.FIS
                                         //    localTempFolder = localTempFolder.Replace("\\", "/");
                                         //    File.Copy(fomatedFileFullPath, localTempFolder+"/" + fileName);  //备份目录
                                         //}
-                                        log.Info("Delete file: " + fomatedFileFullPath);
+                                        //log.Info("Delete file: " + fomatedFileFullPath);
                                         File.Delete(fomatedFileFullPath);
                                     }
                                     else
@@ -213,7 +213,7 @@ namespace com.Sconit.Service.FIS
                 log.Info("No record found in FtpControl table.");
             }
 
-            log.Info("End upload file to ftp according to FtpControl table.");
+            //log.Info("End upload file to ftp according to FtpControl table.");
         }
 
         private void CreateCTL(string Url)

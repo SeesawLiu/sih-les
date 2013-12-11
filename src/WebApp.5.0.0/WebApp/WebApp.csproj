@@ -1614,6 +1614,7 @@
     <Content Include="Resource\Templates\Excel\LocationDetailView.xls" />
     <Content Include="Resource\Templates\Excel\ScheduleLineItem.xls" />
     <Content Include="Resource\Templates\Excel\ORD_BatchProduction.xls" />
+    <None Include="Resource\Templates\Excel\ComposeSequenceOrder.xls" />
     <None Include="Resource\Templates\Excel\InspectOrder1.xls" />
     <None Include="Resource\Templates\Excel\InvTrans.xls" />
     <None Include="Resource\Templates\Excel\IpDetView.xls" />

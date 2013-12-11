@@ -193,7 +193,9 @@
             <div class="editor-field-2">
                 @Html.Telerik().DateTimePickerFor(model => model.EndDate)
             </div>
-            <div class="editor-label-2">
+             @Html.HiddenFor(model => model.SafeStock)
+            @Html.HiddenFor(model => model.MaxStock)
+            @*<div class="editor-label-2">
                 @Html.LabelFor(model => model.SafeStock)
             </div>
             <div class="editor-field-2">
@@ -204,7 +206,7 @@
             </div>
             <div class="editor-field-2">
                 @Html.Telerik().NumericTextBoxFor(model => model.MaxStock).DecimalDigits(2).MinValue(0)
-            </div>
+            </div>*@
             <div class="editor-label-2">
                 @Html.LabelFor(model => model.MinLotSize)
             </div>
@@ -235,13 +237,13 @@
             </div>
             <div class="editor-field-2">
                @{
-    Html.RenderAction("_CodeMasterDropDownList", "Common", new
-    {
-        code = com.Sconit.CodeMaster.CodeMaster.RoundUpOption,
-        controlName = "RoundUpOption",
-        selectedValue = Model != null ? (Int16)Model.RoundUpOption : 0
+           Html.RenderAction("_CodeMasterDropDownList", "Common", new
+           {
+               code = com.Sconit.CodeMaster.CodeMaster.RoundUpOption,
+               controlName = "RoundUpOption",
+               selectedValue = Model != null ? (Int16)Model.RoundUpOption : 0
 
-    });
+           });
                 }
                 @Html.ValidationMessageFor(model => model.RoundUpOption)
             </div>
@@ -250,29 +252,29 @@
             </div>
             <div class="editor-field-2">
              @{
-    if (Model.Strategy != null)
-    {
-        Html.RenderAction("_CodeMasterDropDownList", "Common", new
-        {
-            code = com.Sconit.CodeMaster.CodeMaster.FlowStrategy,
-            controlName = "Strategy",
-            controlId = "FlowDetailStrategy",
-            selectedValue = (Int16)Model.Strategy,
-            includeBlankOption = true
+           if (Model.Strategy != null)
+           {
+               Html.RenderAction("_CodeMasterDropDownList", "Common", new
+               {
+                   code = com.Sconit.CodeMaster.CodeMaster.FlowStrategy,
+                   controlName = "Strategy",
+                   controlId = "FlowDetailStrategy",
+                   selectedValue = (Int16)Model.Strategy,
+                   includeBlankOption = true
 
-        });
-    }
-    else
-    {
-        Html.RenderAction("_CodeMasterDropDownList", "Common", new
-        {
-            code = com.Sconit.CodeMaster.CodeMaster.FlowStrategy,
-            controlName = "Strategy",
-            controlId = "FlowDetailStrategy",
-            includeBlankOption = true
+               });
+           }
+           else
+           {
+               Html.RenderAction("_CodeMasterDropDownList", "Common", new
+               {
+                   code = com.Sconit.CodeMaster.CodeMaster.FlowStrategy,
+                   controlName = "Strategy",
+                   controlId = "FlowDetailStrategy",
+                   includeBlankOption = true
 
-        });
-    }
+               });
+           }
                 }
             </div>
               <div class="editor-label-2">
@@ -280,13 +282,13 @@
             </div>
             <div class="editor-field-2">
                @{
-    Html.RenderAction("_PickStrategyComboBox", "Common",
-     new
-     {
-         ControlId = "Pickid",
-         controlName = "PickStrategy",
-         selectedValue = Model != null ? Model.PickStrategy : string.Empty
-     });
+                  Html.RenderAction("_PickStrategyComboBox", "Common",
+                   new
+                   {
+                       ControlId = "Pickid",
+                       controlName = "PickStrategy",
+                       selectedValue = Model != null ? Model.PickStrategy : string.Empty
+                   });
              }
             </div>  
                 <div class="editor-label-2">
@@ -294,13 +296,13 @@
             </div>
             <div class="editor-field-2">
                @{
-    Html.RenderAction("_RoutingComboBox", "Common",
-     new
-     {
-         ControlId = "Rouid",
-         controlName = "Routing",
-         selectedValue = Model != null ? Model.Routing : string.Empty
-     });
+           Html.RenderAction("_RoutingComboBox", "Common",
+            new
+            {
+                ControlId = "Rouid",
+                controlName = "Routing",
+                selectedValue = Model != null ? Model.Routing : string.Empty
+            });
              }
             </div>
 
@@ -329,13 +331,13 @@
             </div>
             <div class="editor-field-2">
                 @{
-    Html.RenderAction("_LocationComboBox", "Common",
-        new
-        {
-            controlName = "LocationFrom",
-            controlId = "FlowDetailLocationFrom",
-            selectedValue = Model.LocationFrom
-        });
+           Html.RenderAction("_LocationComboBox", "Common",
+               new
+               {
+                   controlName = "LocationFrom",
+                   controlId = "FlowDetailLocationFrom",
+                   selectedValue = Model.LocationFrom
+               });
                 }
             </div>
              <div class="editor-label-2">
@@ -343,13 +345,13 @@
             </div>
             <div class="editor-field-2">
                 @{
-    Html.RenderAction("_LocationComboBox", "Common",
-        new
-        {
-            controlName = "LocationTo",
-            controlId = "FlowDetailLocationTo",
-            selectedValue = Model.LocationTo
-        });
+           Html.RenderAction("_LocationComboBox", "Common",
+               new
+               {
+                   controlName = "LocationTo",
+                   controlId = "FlowDetailLocationTo",
+                   selectedValue = Model.LocationTo
+               });
                 }
             </div>
             

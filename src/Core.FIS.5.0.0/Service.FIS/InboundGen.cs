@@ -19,7 +19,7 @@ namespace com.Sconit.Service.FIS
 
         public void DownloadFile()
         {
-            log.Info("Start download file from ftp according to FtpControl table.");
+            //log.Info("Start download file from ftp according to FtpControl table.");
             IList<FtpControl> ftpControlList = this.genericMgr.FindAll<FtpControl>("from FtpControl fc where IOType=?", BusinessConstants.IO_TYPE_IN);
             //dssFtpControlMgr.GetDssFtpControl(BusinessConstants.IO_TYPE_IN);
 
@@ -99,7 +99,7 @@ namespace com.Sconit.Service.FIS
                                     ftp.Download(inFolder, vaildFileName);//CTL
                                     ftp.Download(inFolder, fileName);//DAT
                                     
-                                    log.Info("Move file from folder: " + localTempFolder + vaildFileName + " to folder: " + localFolder + vaildFileName);
+                                    //log.Info("Move file from folder: " + localTempFolder + vaildFileName + " to folder: " + localFolder + vaildFileName);
                                     File.Copy(inFolder + fileName, localTempFolder + fileName);
                                     //if (ftpBackupFolder != null && ftpBackupFolder.Length > 0)
                                     //{
@@ -137,12 +137,12 @@ namespace com.Sconit.Service.FIS
                 log.Info("No record found in FtpControl table.");
             }
 
-            log.Info("End download file from ftp according to FtpControl table.");
+            //log.Info("End download file from ftp according to FtpControl table.");
         }
 
         public void ImportData(IWindsorContainer container)
         {
-            log.Info("Start import data file according to DssInboundControl table.");
+            //log.Info("Start import data file according to DssInboundControl table.");
             IList<InboundControl> inboundControlList = this.genericMgr.FindAll<InboundControl>().OrderBy(o => o.Sequence).ToList();
             //this.dssInboundControlMgr.GetDssInboundControl();
 
@@ -157,7 +157,7 @@ namespace com.Sconit.Service.FIS
                     string errorFloder = inboundControl.ErrorFloder;
                     string fileEncoding = inboundControl.FileEncoding;
 
-                    log.Info("Start import data, floder: " + inFloder + ", filePattern: " + filePattern + ", serviceName: " + serviceName);
+                    //log.Info("Start import data, floder: " + inFloder + ", filePattern: " + filePattern + ", serviceName: " + serviceName);
 
                     string[] files = null;
 
@@ -196,7 +196,7 @@ namespace com.Sconit.Service.FIS
                 log.Info("No record found in DssInboundControl table.");
             }
 
-            log.Info("End import data file according to DssInboundControl table.");
+            //log.Info("End import data file according to DssInboundControl table.");
         }
     }
 }

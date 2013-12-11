@@ -59,6 +59,7 @@ namespace com.Sconit.Web.Controllers.SYS
             try
             {
                 ViewBag.PageSize = 50;
+                //^[a-z0-9_\-]+(\.[_a-z0-9\-]+)*@([_a-z0-9\-]+\.)+([a-z]{2}|aero|arpa|biz|com|coop|edu|gov|info|int|jobs|mil|museum|name|nato|net|org|pro|travel)$
                 this.genericMgr.Update(messageSubscirber);
                 SaveSuccessMessage("修改成功。");
             }

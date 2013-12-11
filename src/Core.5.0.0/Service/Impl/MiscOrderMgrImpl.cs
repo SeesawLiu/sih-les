@@ -965,7 +965,8 @@ namespace com.Sconit.Service.Impl
 
                 IList<MiscOrderLocationDetail> miscOrderLocationDetailList = new List<MiscOrderLocationDetail>();
 
-                string hql = string.Empty;
+                //string hql = string.Empty;
+                string hql = "from MiscOrderLocationDetail where MiscOrderDetailId in (";
                 IList<object> para = new List<object>();
                 foreach (MiscOrderDetail miscOrderDetail in miscOrderMaster.MiscOrderDetails)
                 {
@@ -975,23 +976,28 @@ namespace com.Sconit.Service.Impl
                     }
                     else
                     {
-                        if (hql == string.Empty)
-                        {
-                            hql = "from MiscOrderLocationDetail where MiscOrderDetailId in (?";
-                        }
-                        else
-                        {
-                            hql += ",?";
-                        }
+                        //if (hql == string.Empty)
+                        //{
+                        //    hql = "from MiscOrderLocationDetail where MiscOrderDetailId in (?";
+                        //}
+                        //else
+                        //{
+                        //    hql += ",?";
+                        //}
                         para.Add(miscOrderDetail.Id);
                     }
                 }
 
-                if (hql != string.Empty)
-                {
-                    hql += ") order by MiscOrderDetailId";
+                //if (hql != string.Empty)
+                //{
+                //    hql += ") order by MiscOrderDetailId";
 
-                    ((List<MiscOrderLocationDetail>)miscOrderLocationDetailList).AddRange(this.genericMgr.FindAll<MiscOrderLocationDetail>(hql, para.ToArray()));
+                //    ((List<MiscOrderLocationDetail>)miscOrderLocationDetailList).AddRange(this.genericMgr.FindAll<MiscOrderLocationDetail>(hql, para.ToArray()));
+                //}
+                if (para != null && para.Count>0)
+                {
+
+                    ((List<MiscOrderLocationDetail>)miscOrderLocationDetailList).AddRange(this.genericMgr.FindAllIn<MiscOrderLocationDetail>(hql, para.ToArray(),null).OrderBy(m=>m.MiscOrderDetailId));
                 }
 
                 foreach (MiscOrderDetail miscOrderDetail in miscOrderMaster.MiscOrderDetails)
@@ -1063,6 +1069,9 @@ namespace com.Sconit.Service.Impl
             int rowCount = 10;
             IList<MiscOrderDetail> activeDetailList = new List<MiscOrderDetail>();
             IList<MiscOrderMaster> activeMasterList = new List<MiscOrderMaster>();
+            IList<Region> regionList = this.genericMgr.FindAll<Region>();
+            IList<Item> itemList = this.genericMgr.FindAll<Item>();
+            IList<Location> locationList = this.genericMgr.FindAll<Location>();
             while (rows.MoveNext())
             {
                 rowCount++;
@@ -1133,7 +1142,7 @@ namespace com.Sconit.Service.Impl
                 {
                     if (string.IsNullOrWhiteSpace(prevRegion))
                     {
-                        var regions = this.genericMgr.FindAll<Region>(" select r from Region as r where r.Code=? ", regionCode);
+                        var regions = regionList.Where(l => l.Code == regionCode).ToList();
                         if (regions == null || regions.Count == 0)
                         {
                             businessException.AddMessage(string.Format("第{0}行:区域{1}填写有误.", rowCount, regionCode));
@@ -1155,7 +1164,7 @@ namespace com.Sconit.Service.Impl
                 locationCode = ImportHelper.GetCellStringValue(row.GetCell(colLocation));
                 if (!string.IsNullOrEmpty(locationCode))
                 {
-                    var locations = genericMgr.FindAll<Location>(" select l from Location as l where l.Code=? ", locationCode);
+                    var locations = locationList.Where(l=>l.Code==locationCode).ToList();
                     if (locations == null || locations.Count == 0)
                     {
                         businessException.AddMessage(string.Format("第{0}行:库位{1}不存在。", rowCount, locationCode));
@@ -1194,7 +1203,7 @@ namespace com.Sconit.Service.Impl
                 }
                 else
                 {
-                    var items = this.genericMgr.FindAll<Item>(" select i from Item as i where i.Code=? ", itemCode);
+                    var items = itemList.Where(l => l.Code == itemCode).ToList();
                     if (items == null || items.Count == 0)
                     {
                         businessException.AddMessage(string.Format("第{0}行:物料编号{1}不存在.", rowCount, itemCode));

@@ -43,7 +43,6 @@ BEGIN
 		LocTo varchar(50),
 		OpRef varchar(50),
 		RefOpRef varchar(256),
-		DeliveryOpRef varchar(256),
 		NetOrderQty decimal(18, 8),
 		OpRefQty decimal(18, 8),
 		OrderQty decimal(18, 8),
@@ -76,6 +75,7 @@ BEGIN
 		OrderDetId int,
 		OrderDetSeq int,
 		OpRef varchar(50)
+		RefOpRef varchar(50)
 	)
 	
 	Create table #tempOrderDetId
@@ -221,15 +221,12 @@ BEGIN
 					
 					if exists(select top 1 1 from #tempOrderBomDet where OrderQty > 0)
 					begin
-						--更新配送工位，先去参考工位再取工位
-						update #tempOrderBomDet set DeliveryOpRef = ISNULL(RefOpRef, OpRef)
-						
 						--汇总订单明细
 						truncate table #tempOrderDet
-						insert into #tempOrderDet(Flow, FlowDetId, Item, Uom, UC, MinUC, UCDesc, Container, ContainerDesc, ManufactureParty, LocFrom, LocTo, OpRef, ReqQty, OrderQty)
-						select det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.DeliveryOpRef, SUM(det.NetOrderQty), SUM(det.OrderQty)
+						insert into #tempOrderDet(Flow, FlowDetId, Item, Uom, UC, MinUC, UCDesc, Container, ContainerDesc, ManufactureParty, LocFrom, LocTo, OpRef, RefOpRef, ReqQty, OrderQty)
+						select det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.OpRef, det.RefOpRef SUM(det.NetOrderQty), SUM(det.OrderQty)
 						from #tempOrderBomDet as det
-						group by det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.DeliveryOpRef having SUM(det.OrderQty) > 0
+						group by det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.OpRef, det.RefOpRef having SUM(det.OrderQty) > 0
 						
 						--获取订单号
 						exec USP_GetDocNo_ORD @Flow, 3, @FlowType, 0, 0, 1, @FlowPartyFrom, @FlowPartyTo, @FlowLocTo, @FlowLocFrom, @FlowDock, 0, @OrderNo output
@@ -609,7 +606,8 @@ BEGIN
 							LastModifyDate,             --最后修改日期
 							[Version],					--版本，1
 							IsChangeUC,					--是否修改单包装，0
-							BinTo,						--工位
+							WMSSeq,						--JIT计算工位
+							BinTo,						--配送工位
 							--LocFrom,					--出库库位
 							--LocFromNm,				--出库库位名称
 							LocTo,						--入库库位
@@ -657,7 +655,8 @@ BEGIN
 							@DateTimeNow,				--最后修改日期
 							1,							--版本，1
 							0,							--是否修改单包装，0
-							det.OpRef,					--工位
+							det.OpRef,					--JIT计算工位
+							ISNULL(det.RefOpRef, det.OpRef),	--配送工位
 							--det.LocFrom,				--出库库位
 							--lf.Name,					--出库库位名称
 							ISNULL(det.LocTo, mstr.LocTo),	--入库库位
@@ -720,7 +719,8 @@ BEGIN
 							LastModifyDate,             --最后修改日期
 							[Version],					--版本，1
 							IsChangeUC,					--是否修改单包装，0
-							BinTo,						--工位
+							WMSSeq,						--JIT计算工位
+							BinTo,						--配送工位
 							LocFrom,					--出库库位
 							LocFromNm,					--出库库位名称
 							LocTo,						--入库库位
@@ -767,7 +767,8 @@ BEGIN
 							@DateTimeNow,				--最后修改日期
 							1,							--版本，1
 							0,							--是否修改单包装，0
-							det.OpRef,					--工位
+							det.OpRef,					--JIT计算工位
+							ISNULL(det.RefOpRef, det.OpRef),--配送工位
 							ISNULL(det.LocFrom, mstr.LocFrom),--出库库位
 							ISNULL(lf.Name, mstr.LocFromNm),--出库库位
 							ISNULL(det.LocTo, mstr.LocTo),	--入库库位
@@ -803,7 +804,7 @@ BEGIN
 								LocationTo, Bin, OrderedQty, IsShipExceed, FileName, IsCreateDat)
 								select det.OrderNo, '', mstr.OrderStrategy, mstr.StartTime, mstr.WindowTime, mstr.Priority,
 								'', ISNULL(det.LocFrom, mstr.LocFrom), ISNULL(det.LocTo, mstr.LocTo), mstr.Dock, mstr.CreateDate, mstr.Flow, det.OrderDetId, det.Item, det.ManufactureParty, 
-								det.OpRef, '', det.OrderQty, mstr.IsShipExceed, '', 0
+								ISNULL(det.RefOpRef, det.OpRef), '', det.OrderQty, mstr.IsShipExceed, '', 0
 								from #tempOrderDet as det
 								inner join ORD_OrderMstr_2 as mstr on mstr.OrderNo = det.OrderNo
 							end
@@ -918,15 +919,12 @@ BEGIN
 						
 						if exists(select top 1 1 from #tempOrderBomDet where OrderQty > 0)
 						begin
-							--更新配送工位，先去参考工位再取工位
-							update #tempOrderBomDet set DeliveryOpRef = ISNULL(RefOpRef, OpRef)
-						
 							--汇总订单明细
 							truncate table #tempOrderDet
-							insert into #tempOrderDet(Flow, FlowDetId, Item, Uom, UC, MinUC, UCDesc, Container, ContainerDesc, ManufactureParty, LocFrom, LocTo, OpRef, ReqQty, OrderQty)
-							select det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.DeliveryOpRef, SUM(det.NetOrderQty), SUM(det.OrderQty)
+							insert into #tempOrderDet(Flow, FlowDetId, Item, Uom, UC, MinUC, UCDesc, Container, ContainerDesc, ManufactureParty, LocFrom, LocTo, OpRef, RefOpRef, ReqQty, OrderQty)
+							select det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.OpRef, det.RefOpRef, SUM(det.NetOrderQty), SUM(det.OrderQty)
 							from #tempOrderBomDet as det
-							group by det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.DeliveryOpRef having SUM(det.OrderQty) > 0
+							group by det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.OpRef, det.RefOpRef having SUM(det.OrderQty) > 0
 							
 							--获取订单号
 							exec USP_GetDocNo_ORD @Flow, 3, @FlowType, 0, 0, 0, @FlowPartyFrom, @FlowPartyTo, @FlowLocTo, @FlowLocFrom, @FlowDock, 0, @OrderNo output
@@ -1306,7 +1304,8 @@ BEGIN
 								LastModifyDate,             --最后修改日期
 								[Version],					--版本，1
 								IsChangeUC,					--是否修改单包装，0
-								BinTo,						--工位
+								WMSSeq,						--JIT计算工位
+								BinTo,						--配送工位
 								--LocFrom,					--出库库位
 								--LocFromNm,					--出库库位名称
 								LocTo,						--入库库位
@@ -1354,7 +1353,8 @@ BEGIN
 								@DateTimeNow,				--最后修改日期
 								1,							--版本，1
 								0,							--是否修改单包装，0
-								det.OpRef,					--工位
+								det.OpRef,					--JIT计算工位
+								ISNULL(det.RefOpRef, det.OpRef),--配送工位
 								--det.LocFrom,				--出库库位
 								--lf.Name,					--出库库位名称
 								ISNULL(det.LocTo, mstr.LocTo),	--入库库位
@@ -1417,7 +1417,8 @@ BEGIN
 								LastModifyDate,             --最后修改日期
 								[Version],					--版本，1
 								IsChangeUC,					--是否修改单包装，0
-								BinTo,						--工位
+								WMSSeq,						--JIT计算工位
+								BinTo,						--配送工位
 								LocFrom,					--出库库位
 								LocFromNm,					--出库库位名称
 								LocTo,						--入库库位
@@ -1464,7 +1465,8 @@ BEGIN
 								@DateTimeNow,				--最后修改日期
 								1,							--版本，1
 								0,							--是否修改单包装，0
-								det.OpRef,					--工位
+								det.OpRef,					--JIT计算工位
+								ISNULL(det.RefOpRef, det.OpRef),--配送工位
 								ISNULL(det.LocFrom, mstr.LocFrom),--出库库位
 								ISNULL(lf.Name, mstr.LocFromNm),--出库库位
 								ISNULL(det.LocTo, mstr.LocTo),	--入库库位
@@ -1500,7 +1502,7 @@ BEGIN
 									LocationTo, Bin, OrderedQty, IsShipExceed, FileName, IsCreateDat)
 									select det.OrderNo, '', mstr.OrderStrategy, mstr.StartTime, mstr.WindowTime, mstr.Priority,
 									'', ISNULL(det.LocFrom, mstr.LocFrom), ISNULL(det.LocTo, mstr.LocTo), mstr.Dock, mstr.CreateDate, mstr.Flow, det.OrderDetId, det.Item, det.ManufactureParty, 
-									det.OpRef, '', det.OrderQty, mstr.IsShipExceed, '', 0
+									ISNULL(det.RefOpRef, det.OpRef), '', det.OrderQty, mstr.IsShipExceed, '', 0
 									from #tempOrderDet as det
 									inner join ORD_OrderMstr_2 as mstr on mstr.OrderNo = det.OrderNo
 								end

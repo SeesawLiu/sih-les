@@ -185,7 +185,7 @@
         {
             columns.Bound(o => o.Sequence).ReadOnly(ViewBag.status != com.Sconit.CodeMaster.OrderStatus.Create);
             //ViewBag.isManualCreateDetail ||
-            if (ViewBag.status == com.Sconit.CodeMaster.OrderStatus.Create && !string.IsNullOrEmpty(ViewBag.OrderNo))
+            if (ViewBag.status == com.Sconit.CodeMaster.OrderStatus.Create && !string.IsNullOrEmpty(ViewBag.OrderNo) || ViewBag.isManualCreateDetail)
             {
 
                 columns.Bound(o => o.Item).EditorTemplateName("ItemGridForeignKey").Width(200);

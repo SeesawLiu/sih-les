@@ -79,15 +79,20 @@ BEGIN
 		truncate table LE_OrderBomCPTimeSnapshot
 
 		insert into LE_OrderBomCPTimeSnapshot(OrderNo, VanProdLine, AssProdLine, Seq, SubSeq, VanOp, AssOp, Op, OpTaktTime, 
-		CPTime, Item, OpRef, RefOpRef, OrderQty, Location, IsCreateOrder, BomId, DISPO, ManufactureParty, Uom, WorkCenter, BESKZ, SOBSL, 
+		CPTime, Item, OpRef, OrderQty, Location, IsCreateOrder, BomId, DISPO, ManufactureParty, Uom, WorkCenter, BESKZ, SOBSL, 
 		TraceCode, ZOPWZ, ZOPID, ZOPDS)
 		select tcpt.OrderNo, tcpt.VanProdLine, tcpt.AssProdLine, tcpt.Seq, tcpt.SubSeq, tcpt.VanOp, tcpt.AssOp, tcpt.Op, tcpt.OpTaktTime, 
-		tcpt.CPTime, bom.Item, bom.OpRef, bom.RefOpRef, bom.OrderQty, bom.Location, bom.IsCreateOrder, bom.Id as BomId, bom.DISPO, bom.ManufactureParty, bom.Uom, bom.WorkCenter, bom.BESKZ, bom.SOBSL,
+		tcpt.CPTime, bom.Item, bom.OpRef, bom.OrderQty, bom.Location, bom.IsCreateOrder, bom.Id as BomId, bom.DISPO, bom.ManufactureParty, bom.Uom, bom.WorkCenter, bom.BESKZ, bom.SOBSL,
 		mstr.TraceCode, bom.ZOPWZ, bom.ZOPID, bom.ZOPDS
 		from ORD_OrderOpCPTime as tcpt WITH(NOLOCK)
 		inner join ORD_OrderBomDet as bom WITH(NOLOCK) on tcpt.OrderNo = bom.OrderNo and tcpt.AssProdLine = bom.AssProdLine and tcpt.AssOp = bom.Op
 		inner join ORD_OrderMstr_4 as mstr WITH(NOLOCK) on bom.OrderNo = mstr.OrderNo
 		where mstr.[Status] in (0, 1, 2)
+		
+		--按工位映射表更新
+		update bom set OpRef = map.OpRef, RefOpRef = map.RefOpRef
+		from LE_OrderBomCPTimeSnapshot as bom
+		inner join CUST_OpRefMap as map on bom.Item = map.Item and bom.VanProdLine = map.ProdLine
 		
 		--insert into LE_OrderBomCPTimeSnapshot_Arch(BatchNo, OrderNo, VanProdLine, AssProdLine, Seq, SubSeq, VanOp, AssOp, Op, OpTaktTime, 
 		--CPTime, Item, OpRef, OrderQty, Location, IsCreateOrder, BomId, DISPO, ManufactureParty, Uom, WorkCenter, BESKZ, SOBSL, 

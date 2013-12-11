@@ -219,9 +219,9 @@ namespace com.Sconit.Service.SAP.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://10.86.128.31:8000/XISOAPAdapter/MessageServlet?channel=:LES01:CC_SOAPP9&ve" +
-            "rsion=3.0&Sender.Service=LES01&Interface=http%3A%2F%2Fwww.sih.cq.cn%2Fsap%2Fpp%2" +
-            "F09%5EMI_PO_LES")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://10.8http://10.86.128.31:8000/XISOAPAdapter/MessageServlet?channel=:LES01:C" +
+            "C_SOAPP9&version=3.0&Sender.Service=LES01&Interface=http%3A%2F%2Fwww.sih.cq.cn%2" +
+            "Fsap%2Fpp%2F09%5EMI_PO_LES")]
         public string com_Sconit_Service_SAP_MI_PO_LES_MI_PO_LESService {
             get {
                 return ((string)(this["com_Sconit_Service_SAP_MI_PO_LES_MI_PO_LESService"]));

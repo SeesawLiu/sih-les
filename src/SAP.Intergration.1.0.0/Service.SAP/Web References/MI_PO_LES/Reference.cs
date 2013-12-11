@@ -741,6 +741,14 @@ namespace com.Sconit.Service.SAP.MI_PO_LES {
         
         private string vERSIONField;
         
+        private string vHVINField;
+        
+        private string zENGINEField;
+        
+        private string lTEXT1Field;
+        
+        private string lTEXT2Field;
+        
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
         public string AUFNR {
@@ -936,6 +944,50 @@ namespace com.Sconit.Service.SAP.MI_PO_LES {
             }
             set {
                 this.vERSIONField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string VHVIN {
+            get {
+                return this.vHVINField;
+            }
+            set {
+                this.vHVINField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string ZENGINE {
+            get {
+                return this.zENGINEField;
+            }
+            set {
+                this.zENGINEField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string LTEXT1 {
+            get {
+                return this.lTEXT1Field;
+            }
+            set {
+                this.lTEXT1Field = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string LTEXT2 {
+            get {
+                return this.lTEXT2Field;
+            }
+            set {
+                this.lTEXT2Field = value;
             }
         }
     }

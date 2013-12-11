@@ -40,9 +40,13 @@ BEGIN
 		declare @AssemblyProdLine varchar(50)  --LES总装生产线代码
 		declare @SpecialProdLine varchar(50)  --LES特装生产线代码
 		declare @CheckProdLine varchar(50)  --LES检测生产线代码
+		declare @VHVIN varchar(50)
+		declare @ZENGINE varchar(50)
 		
 		--查找生产单记录
-		select @SapProdLine = ZLINE, @SapOrderNo = AUFNR, @SapVAN = CHARG, @SapVersion=[VERSION] from SAP_ProdOrder where BatchNo = @BatchNo
+		select @SapProdLine = ZLINE, @SapOrderNo = AUFNR, @SapVAN = CHARG, @SapVersion=[VERSION],
+		@VHVIN = VHVIN, @ZENGINE = ZENGINE
+		from SAP_ProdOrder where BatchNo = @BatchNo
 		
 		select @CabProdLine = CabProdLine, @ChassisProdLine = ChassisProdLine, 
 		@AssemblyProdLine = AssemblyProdLine, @SpecialProdLine = SpecialProdLine,
@@ -91,8 +95,17 @@ BEGIN
 		declare @CheckOrderNo varchar(50)
 		exec USP_Busi_CreateOrUpdateVanProdOrder @BatchNo, @CheckProdLine, N'检测生产线', null, @CreateUserId, @CreateUserNm, @CheckOrderNo output
 		-----------------------------↑生成检测生产单-----------------------------
-	
 		
+		if not exists(select top 1 1 from CUST_EngineTrace where TraceCode = @SapVAN)
+		begin
+			INSERT INTO CUST_EngineTrace(TraceCode, VHVIN, ZENGINE, CreateDate, CreateUser, CreateUserNm, LastModifyDate, LastModifyUser, LastModifyUserNm)
+			values(@SapVAN, @VHVIN, @ZENGINE, @DateTimeNow, @CreateUserId, @CreateUserNm,  @DateTimeNow, @CreateUserId, @CreateUserNm)
+		end
+		else
+		begin
+			update CUST_EngineTrace set VHVIN = @VHVIN, ZENGINE = @ZENGINE, LastModifyDate = @DateTimeNow, LastModifyUser = @CreateUserId, LastModifyUserNm = @CreateUserNm 
+			where TraceCode = @SapVAN
+		end
 		
 		if @trancount = 0 
 		begin  

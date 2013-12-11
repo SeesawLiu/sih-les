@@ -38,9 +38,13 @@ BEGIN
 		declare @SpecialProdLine varchar(50)  --LES特装生产线代码
 		declare @CheckProdLine varchar(50)  --LES检测生产线代码
 		declare @CY_SEQNR bigint  --SAP车序
+		declare @VHVIN varchar(50)
+		declare @ZENGINE varchar(50)
 
 		--查找生产单记录
-		select @SapProdLine = ZLINE, @SapOrderNo = AUFNR, @SapVAN = CHARG, @SapVersion = [VERSION], @CY_SEQNR = CY_SEQNR from SAP_ProdOrder where BatchNo = @BatchNo
+		select @SapProdLine = ZLINE, @SapOrderNo = AUFNR, @SapVAN = CHARG, @SapVersion = [VERSION], @CY_SEQNR = CY_SEQNR,
+		@VHVIN = VHVIN, @ZENGINE = ZENGINE
+		from SAP_ProdOrder where BatchNo = @BatchNo
 	
 		select @CabProdLine = CabProdLine, @ChassisProdLine = ChassisProdLine, 
 		@AssemblyProdLine = AssemblyProdLine, @SpecialProdLine = SpecialProdLine,
@@ -98,6 +102,17 @@ BEGIN
 			
 			
 			update CUST_ProductLineMap set InitVanOrder = @SapOrderNo where SapProdLine = @SapProdLine and [Type] = 1 
+			
+			if not exists(select top 1 1 from CUST_EngineTrace where TraceCode = @SapVAN)
+			begin
+				INSERT INTO CUST_EngineTrace(TraceCode, VHVIN, ZENGINE, CreateDate, CreateUser, CreateUserNm, LastModifyDate, LastModifyUser, LastModifyUserNm)
+				values(@SapVAN, @VHVIN, @ZENGINE, @DateTimeNow, @CreateUserId, @CreateUserNm,  @DateTimeNow, @CreateUserId, @CreateUserNm)
+			end
+			else
+			begin
+				update CUST_EngineTrace set VHVIN = @VHVIN, ZENGINE = @ZENGINE, LastModifyDate = @DateTimeNow, LastModifyUser = @CreateUserId, LastModifyUserNm = @CreateUserNm 
+				where TraceCode = @SapVAN
+			end
 		
 		--end
 		--else

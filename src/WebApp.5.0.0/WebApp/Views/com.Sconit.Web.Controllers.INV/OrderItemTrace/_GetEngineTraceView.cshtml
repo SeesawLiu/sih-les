@@ -1,0 +1,22 @@
+﻿@model IList<com.Sconit.Entity.CUST.EngineTraceDet>
+<fieldset>
+    <legend>选择替换条码</legend>
+    @(Html.Telerik().Grid(Model)
+                .Name("EngineTraceDetGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.TraceCode).Title("Van号");
+            columns.Bound(o => o.ZENGINE).Title("发动机条码");
+            //columns.Bound(o => o.VHVIN);
+            columns.Bound(o => o.CreateDate).Title("扫描时间");
+            columns.Bound(o => o.CreateUserName).Title("扫描用户");
+        })
+                .Scrollable(c => c.Enabled(false))
+                .EnableCustomBinding(true)
+                .Resizable(resizing => resizing.Columns(true))
+            )
+</fieldset>

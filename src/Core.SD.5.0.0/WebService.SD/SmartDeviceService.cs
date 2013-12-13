@@ -948,6 +948,22 @@
         }
         #endregion
 
+        #region 扫描发动机
+        [WebMethod]
+        public void ScanEngineTraceBarCode(string engineTrace, string traceCode, string userCode)
+        {
+            try
+            {
+                SecurityContextHolder.Set(sdSecurityMgr.GetBaseUser(userCode));
+                this.orderMgr.ScanEngineTraceBarCode( engineTrace,  traceCode);
+            }
+            catch (BusinessException ex)
+            {
+                throw new SoapException(GetBusinessExMessage(ex), SoapException.ServerFaultCode, string.Empty);
+            }
+        }
+        #endregion
+
         private string GetBusinessExMessage(BusinessException ex)
         {
             string messageString = "";

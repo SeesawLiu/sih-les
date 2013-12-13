@@ -44,6 +44,7 @@
             this.btnPickList = new System.Windows.Forms.Button();
             this.btnReceive = new System.Windows.Forms.Button();
             this.tabProduction = new System.Windows.Forms.TabPage();
+            this.btnScanEngine = new System.Windows.Forms.Button();
             this.btnScanForce = new System.Windows.Forms.Button();
             this.btnCabOnline = new System.Windows.Forms.Button();
             this.btnSubAssemblyOffLine = new System.Windows.Forms.Button();
@@ -257,6 +258,7 @@
             // 
             // tabProduction
             // 
+            this.tabProduction.Controls.Add(this.btnScanEngine);
             this.tabProduction.Controls.Add(this.btnScanForce);
             this.tabProduction.Controls.Add(this.btnCabOnline);
             this.tabProduction.Controls.Add(this.btnSubAssemblyOffLine);
@@ -271,6 +273,16 @@
             this.tabProduction.Name = "tabProduction";
             this.tabProduction.Size = new System.Drawing.Size(226, 229);
             this.tabProduction.Text = "生产";
+            // 
+            // btnScanEngine
+            // 
+            this.btnScanEngine.Location = new System.Drawing.Point(16, 197);
+            this.btnScanEngine.Name = "btnScanEngine";
+            this.btnScanEngine.Size = new System.Drawing.Size(194, 20);
+            this.btnScanEngine.TabIndex = 11;
+            this.btnScanEngine.Text = "11.扫描发动机";
+            this.btnScanEngine.Click += new System.EventHandler(this.UCModuleSelect_Click);
+            this.btnScanEngine.KeyUp += new System.Windows.Forms.KeyEventHandler(this.UCModuleSelect_KeyUp);
             // 
             // btnScanForce
             // 
@@ -289,7 +301,6 @@
             this.btnCabOnline.Size = new System.Drawing.Size(194, 20);
             this.btnCabOnline.TabIndex = 9;
             this.btnCabOnline.Text = "10.驾驶室上线";
-            this.btnCabOnline.Visible = false;
             this.btnCabOnline.Click += new System.EventHandler(this.UCModuleSelect_Click);
             this.btnCabOnline.KeyUp += new System.Windows.Forms.KeyEventHandler(this.UCModuleSelect_KeyUp);
             // 
@@ -300,7 +311,6 @@
             this.btnSubAssemblyOffLine.Size = new System.Drawing.Size(195, 20);
             this.btnSubAssemblyOffLine.TabIndex = 8;
             this.btnSubAssemblyOffLine.Text = "9.分装生产单下线";
-            this.btnSubAssemblyOffLine.Visible = false;
             this.btnSubAssemblyOffLine.Click += new System.EventHandler(this.UCModuleSelect_Click);
             this.btnSubAssemblyOffLine.KeyUp += new System.Windows.Forms.KeyEventHandler(this.UCModuleSelect_KeyUp);
             // 
@@ -361,7 +371,6 @@
             this.btnTransKeyScan.Size = new System.Drawing.Size(194, 20);
             this.btnTransKeyScan.TabIndex = 7;
             this.btnTransKeyScan.Text = "8.变速器关键件扫描";
-            this.btnTransKeyScan.Visible = false;
             this.btnTransKeyScan.Click += new System.EventHandler(this.UCModuleSelect_Click);
             this.btnTransKeyScan.KeyUp += new System.Windows.Forms.KeyEventHandler(this.UCModuleSelect_KeyUp);
             // 
@@ -729,5 +738,6 @@
         private System.Windows.Forms.Button btnCabOnline;
         private System.Windows.Forms.Button btnScanForce;
         private System.Windows.Forms.Button btnLotNoScan;
+        private System.Windows.Forms.Button btnScanEngine;
     }
 }

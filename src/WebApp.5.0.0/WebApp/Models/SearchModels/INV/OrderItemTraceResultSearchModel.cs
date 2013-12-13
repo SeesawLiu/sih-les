@@ -11,6 +11,8 @@ namespace com.Sconit.Web.Models.SearchModels.INV
         public string OpRefArea { get; set; }
         public DateTime? TraceDateFrom { get; set; }
         public DateTime? TraceDateTo { get; set; }
+        public string TraceCodeSearch { get; set; }
+        public string EngineCodeSearch { get; set; }
 
     }
 }

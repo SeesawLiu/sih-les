@@ -244,6 +244,8 @@ namespace com.Sconit.Entity.ORD
         [Display(Name = "OrderDetail_IsCreateSeq", ResourceType = typeof(Resources.ORD.OrderDetail))]
         public Boolean IsCreateSeq { get; set; }
 
+        public string ZENGINE { get; set; }
+
         
         #endregion
 

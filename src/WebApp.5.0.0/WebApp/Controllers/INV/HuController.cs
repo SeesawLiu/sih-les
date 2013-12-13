@@ -675,6 +675,95 @@ namespace com.Sconit.Web.Controllers.INV
 
         #endregion
 
+        #region SortOrder
+
+        [SconitAuthorize(Permissions = "Url_Inventory_Hu_New")]
+        public ActionResult SortOrderHu()
+        {
+            return PartialView();
+        }
+
+
+        [SconitAuthorize(Permissions = "Url_Inventory_Hu_New")]
+        public JsonResult onCreateHuBySortOrder(string orderNo, bool isExport)
+        {
+           
+                IList<OrderDetail> orderDetails = new List<OrderDetail>();
+                string hqlDet = @"select  m.PartyFrom,det.OrderQty,ce.ZENGINE,i.Code,i.Desc1,i.RefCode,i.Uom,i.UC,hu.HuId 
+                            from ORD_OrderDet_2 as det with(nolock) 
+                            left join CUST_EngineTrace as ce  with(nolock)  on ce.TraceCode=det.ReserveNo 
+                            inner join md_item as i  with(nolock)  on det.Item=i.Code
+                            inner join ord_ordermstr_2 as m  with(nolock)  on det.OrderNo=m.OrderNo
+                            left join INV_Hu as hu  with(nolock)  on ce.ZENGINE=hu.HuId  
+                            where ce.ZENGINE is not null and det.OrderNo=?
+                            union all
+                            select  m.PartyFrom,det.OrderQty,ce.ZENGINE,i.Code,i.Desc1,i.RefCode,i.Uom,i.UC,hu.HuId 
+                            from ORD_OrderDet_1 as det with(nolock) 
+                            left join CUST_EngineTrace as ce  with(nolock)  on ce.TraceCode=det.ReserveNo 
+                            inner join md_item as i  with(nolock)  on det.Item=i.Code
+                            inner join ord_ordermstr_1 as m  with(nolock)  on det.OrderNo=m.OrderNo
+                            left join INV_Hu as hu  with(nolock)  on ce.ZENGINE=hu.HuId  
+                            where ce.ZENGINE is not null and det.OrderNo=?";
+                IList<object[]> searResultList = this.genericMgr.FindAllWithNativeSql<object[]>(hqlDet,new object[]{ orderNo,orderNo});
+                //det.ManufactureParty,det.OrderQty,ce.ZENGINE,i.Code,i.Desc1,i.RefCode,i.Uom,i.UC
+                if (searResultList == null || searResultList.Count == 0)
+                {
+                    SaveErrorMessage(string.Format("排序单号{0}没有找到要打印的明细。",orderNo));
+                    return Json(null);
+                }
+                var itmeList = (from tak in searResultList
+                                select new Item
+                                {
+                                    ManufactureParty = (string)tak[0],
+                                    HuQty = (decimal)tak[1],
+                                    ZENGINE = (string)tak[2],
+                                    Code = (string)tak[3],
+                                    Description = (string)tak[4],
+                                    ReferenceCode = (string)tak[5],
+                                    HuUom = (string)tak[6],
+                                    Uom = (string)tak[6],
+                                    HuUnitCount = (decimal)tak[7],
+                                    HuId = (string)tak[8],
+                                }).ToList();
+                IList<Hu> huList = new List<Hu>();
+                foreach (var item in itmeList)
+                {
+                    if (string.IsNullOrWhiteSpace(item.HuId))
+                    {
+                        huList.Add(huMgr.CreateHu(item, item.ZENGINE));
+                    }
+                    else
+                    {
+                        huList.Add(this.genericMgr.FindById<Hu>(item.HuId));
+                    }
+                }
+                foreach (var hu in huList)
+                {
+                    if (!string.IsNullOrWhiteSpace(hu.ManufactureParty))
+                    {
+                        hu.ManufacturePartyDescription = base.genericMgr.FindById<Party>(hu.ManufactureParty).Name;
+                    }
+                }
+                string huTemplate = this.systemMgr.GetEntityPreferenceValue(Entity.SYS.EntityPreference.CodeEnum.DefaultBarCodeTemplate);
+                if (isExport)
+                {
+                    IList<PrintHu> printHuList = Mapper.Map<IList<Hu>, IList<PrintHu>>(huList);
+                    IList<object> data = new List<object>();
+                    data.Add(printHuList);
+                    data.Add(CurrentUser.FullName);
+                    reportGen.WriteToClient(huTemplate, data, huTemplate);
+                    return Json(null);
+                }
+                else
+                {
+                    string printUrl = PrintHuList(huList, huTemplate);
+                    SaveSuccessMessage(Resources.INV.Hu.Hu_Template_Point, huList.Count.ToString());
+                    return Json(new { PrintUrl = printUrl });
+                }
+        }
+
+        #endregion
+
 
 
         #region 打印导出

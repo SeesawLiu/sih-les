@@ -262,6 +262,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Base\CUST\OpRefMap.hbm.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\CUST\EngineTrace.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\CUST\EngineTraceDet.hbm.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

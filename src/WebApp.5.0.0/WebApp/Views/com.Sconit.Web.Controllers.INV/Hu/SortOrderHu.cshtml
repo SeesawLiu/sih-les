@@ -1,0 +1,110 @@
+﻿@model com.Sconit.Entity.SCM.FlowMaster
+@using com.Sconit.Web.Models.SearchModels.SCM
+@Html.Partial("_AjaxMessage")
+<script type="text/javascript">
+    $(function () {
+        $("#OrderNo").focus().keydown(function () {
+            if (event.keyCode == 13) {
+                var orderNo = $(this).val();
+                $(this).val("");
+                $("#OrderNoHidden").val(orderNo);
+                $("#btnPrint").attr("checked", false);
+                $("#btnExport").attr("checked", false);
+                $("#OrderNo").attr("checked", false);
+                if (orderNo == "") {
+                    $message.error("请扫描排序单号。");
+                    $("#btnPrint").attr("checked", true);
+                    $("#btnExport").attr("checked", true);
+                    $("#OrderNo").attr("checked", true);
+                    return;
+                }
+                else {
+                    onCreateHu(false);
+                }
+            }
+
+        });
+    })
+
+
+    function onCreateHu(isExport) {
+        if ($("#OrderNo").val() != null && $("#OrderNo").val() != "") {
+            $("#OrderNoHidden").val($("#OrderNo").val());
+        }
+        if ($("#OrderNoHidden").val() == null || $("#OrderNoHidden").val() == "") { 
+            $message.error("请扫描排序单号。");
+            return;
+        }
+        $("#btnPrint").attr("checked", false);
+        $("#btnExport").attr("checked", false);
+        $("#OrderNo").attr("checked", false);
+
+        var data = {
+            "orderNo": $("#OrderNoHidden").val(),
+            "isExport": isExport
+        }
+        if (isExport) {
+            location.href = "/Hu/onCreateHuBySortOrder/orderNo=" + $("#OrderNoHidden").val() + "& isExport=" + isExport;
+        } else {
+            $.ajax({
+                type: "post",
+                dataType: "Json",
+                url: "/Hu/onCreateHuBySortOrder/",
+                data: data,
+                cache: false,
+                success: function (data) {
+                    DisplayJsonMessages(data);
+                    if (data != null) {
+                        if (data.Data.PrintUrl != "") {
+                            PrintOrder(data.Data.PrintUrl);
+                        }
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    DisplayTextMessages(XMLHttpRequest.responseText);
+                }
+            });
+        }
+
+    }
+</script>
+<fieldset>
+    <div class="search">
+        <div class="search-label">
+            <label for="Hu_Flow">
+                请扫描排序单号
+            </label>
+        </div>
+        <div class="search-field">
+            @Html.TextBox("OrderNo")
+        </div>
+        <div class="search-label">
+            <label for="Hu_Flow">
+                本次扫描单号
+            </label>
+        </div>
+        <div class="search-field">
+            @Html.TextBox("OrderNoHidden",string.Empty, new {disabled=true })
+        </div>
+        
+    </div>
+    <div class="editor-footer">
+        @Html.Button(Resources.Global.Button_Print, "Url_Inventory_Hu_New", new Dictionary<string, string>()
+	            {
+	                {"type", "button"},
+	                {"id", "btnPrint"},
+                    {"needconfirm","true"},
+                    {"onclick","onCreateHu(false)"}
+	            })
+       @* @Html.Button(Resources.Global.Button_Export, "Url_Inventory_Hu_New", new Dictionary<string, string>()
+	            {
+	                {"type", "button"},
+	                {"id", "btnExport"},
+                    {"needconfirm","true"},
+                    {"onclick","onCreateHu(true)"}
+	            })*@
+    </div>
+</fieldset>
+
+
+

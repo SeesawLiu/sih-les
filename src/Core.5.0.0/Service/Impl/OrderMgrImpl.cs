@@ -6100,7 +6100,7 @@ namespace com.Sconit.Service.Impl
                             if (shiftDet != null || shiftDet.Count > 0)
                             {
                                 DateTime nowTime = this.ParseDateTime(times);
-                                bool isTure = true;
+                                bool isTure = false;
                                 foreach (var det in shiftDet)
                                 {
                                     DateTime prevTime = this.ParseDateTime(det.StartTime);
@@ -8800,7 +8800,7 @@ namespace com.Sconit.Service.Impl
             this.genericMgr.Update(ordDetail);
             this.genericMgr.FlushSession();
             bool allowColse = this.genericMgr.FindAllWithNativeSql<int>("select COUNT(*) as sumCount from ORD_OrderDet_2 where OrderQty>RecQty and OrderNo=?", ordMaster.OrderNo)[0] == 0;
-            if (ordMaster.Status == com.Sconit.CodeMaster.OrderStatus.InProcess && allowColse)
+            if ((ordMaster.Status == com.Sconit.CodeMaster.OrderStatus.InProcess || ordMaster.Status == com.Sconit.CodeMaster.OrderStatus.Submit) && allowColse)
             {
                 this.CloseOrder(ordMaster, false);
             }
@@ -9011,6 +9011,43 @@ namespace com.Sconit.Service.Impl
                 return DateTime.MinValue;
 
             return new DateTime(System.DateTime.Now.Year, System.DateTime.Now.Month, System.DateTime.Now.Day, h, m, 0);
+        }
+        #endregion
+
+        #region 扫描发动机
+        public void ScanEngineTraceBarCode(string engineTrace, string traceCode)
+        {
+            try
+            {
+                IList<EngineTrace> engineTraceList = this.genericMgr.FindAll<EngineTrace>("from EngineTrace as e where e.TraceCode=? and e.ZENGINE=?", new object[] { traceCode, engineTrace });
+                if (engineTraceList == null || engineTraceList.Count == 0)
+                {
+                    throw new BusinessException(string.Format("发动机条码{0}Van号{1}没有匹配的数据。", engineTrace, traceCode));
+                }
+                IList<EngineTraceDet> engineTraceDetList = this.genericMgr.FindAll<EngineTraceDet>("from EngineTraceDet as e where e.TraceCode=? and e.ZENGINE=?", new object[] { traceCode, engineTrace });
+                if (engineTraceDetList != null && engineTraceDetList.Count > 0)
+                {
+                    throw new BusinessException(string.Format("发动机条码{0}Van号{1}已经扫描过。", engineTrace, traceCode));
+                }
+                EngineTrace engineTraces = engineTraceList.FirstOrDefault();
+                User user = SecurityContextHolder.Get();
+
+                EngineTraceDet engineTraceDet = new EngineTraceDet
+                    {
+                        TraceCode = engineTraces.TraceCode,
+                        VHVIN = engineTraces.VHVIN,
+                        ZENGINE = engineTraces.ZENGINE,
+                        ScanZENGINE = string.Empty,
+                        CreateUserId = user.Id,
+                        CreateUserName = user.Name,
+                        CreateDate = System.DateTime.Now,
+                    };
+                this.genericMgr.Create(engineTraceDet);
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException(ex.Message);
+            }
         }
         #endregion
         #endregion

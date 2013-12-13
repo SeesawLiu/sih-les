@@ -1,0 +1,43 @@
+﻿@model com.Sconit.Entity.ORD.OrderMaster
+@{
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_OrderMstr_Production_Import" });
+
+}
+
+    <fieldset>
+        <div class="editor">
+            <div class="search-label">
+                <label>
+                    <a href='/Resource/Templates/UploadTemplate/ShipOrderLeadTime.xls'>模板下载</a>
+                </label>
+            </div>
+            <div class="search-field">
+                     @(Html.Telerik().Upload()
+                    .Name("attachments")
+                    .Multiple(false)
+                    .Async(async => async
+                    .Save("ImportShipOrderTime", "ProductionFlow")
+                    .AutoUpload(true))
+                    .ClientEvents(e => e.OnSuccess("ImportShipOrderTime_OnSuccess")))
+            </div>
+        </div>
+    </fieldset>
+    <div id="IportResult"></div>
+
+    <script type="text/javascript">
+        function ImportShipOrderTime_OnSuccess(e) {
+            $("#IportResult").html(e.XMLHttpRequest.responseText);
+            $('.t-upload-files').remove();
+            $.ajax({
+                type: "Get",
+                dataType: "html",
+                url: "/ProductionFlow/ShipOrderTimeView/",
+                cache: false,
+                success: function (data, textStatus) {
+                    var $tGrid = $("#IportResult");
+                    $($tGrid).html(data);
+                }
+            });
+        }
+    </script>
+

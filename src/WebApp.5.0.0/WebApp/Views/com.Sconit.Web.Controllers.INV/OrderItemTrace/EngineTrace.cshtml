@@ -1,0 +1,175 @@
+﻿@using com.Sconit.Web.Models.SearchModels.INV
+@{
+    ViewBag.Title = "";
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_OrderItemTrace_EngineTrace" });
+}
+<fieldset>
+    <legend>扫描替换</legend>
+    <div class="search">
+        <div id="TraceCodeDiv">
+            <div class="search-label">
+                <label>
+                    扫描Van号
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("TraceCode", string.Empty, new { onkeydown = "doTraceCodeKeyDowm()" })
+                <input type="hidden" id="TraceCodehidden" />
+            </div>
+        </div>
+        <div id="EngineTraceDiv" style="display:none">
+            <div class="search-label">
+                <label>
+                    扫描发动机条码
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("EngineTrace", string.Empty, new { onkeydown = "doKeyDowm()" })
+                <input type="hidden" id="EngineTracehidden" />
+            </div>
+        </div>
+    </div>
+</fieldset>
+
+<fieldset>
+ <legend>查询</legend>
+        <div class="search">
+            <div class="search-label">
+                <label for="OrderItemTraceResult_TraceCode">
+                    @Resources.ORD.OrderItemTraceResult.OrderItemTraceResult_TraceCode
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("TraceCodeSearch", TempData["OrderItemTraceResultSearchModel"] != null ? ((OrderItemTraceResultSearchModel)TempData["OrderItemTraceResultSearchModel"]).TraceCodeSearch : string.Empty)
+            </div>
+            <div class="search-label">
+                <label for="OrderItemTraceResult_TraceCode">
+                    发动机条码
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("EngineCodeSearch", TempData["OrderItemTraceResultSearchModel"] != null ? ((OrderItemTraceResultSearchModel)TempData["OrderItemTraceResultSearchModel"]).EngineCodeSearch : string.Empty)
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_DateFrom">
+                    扫描日期 从
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DatePicker()
+                .Format(com.Sconit.Entity.BusinessConstants.SHORT_DATE_FORMAT)
+                .Name("TraceDateFrom")
+                .Value(TempData["OrderItemTraceResultSearchModel"] != null ? ((OrderItemTraceResultSearchModel)TempData["OrderItemTraceResultSearchModel"]).TraceDateFrom : null)
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_DateTo">
+                    @*@Resources.ORD.OrderMaster.OrderMaster_DateTo*@
+                    至
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DatePicker()
+                .Format(com.Sconit.Entity.BusinessConstants.SHORT_DATE_FORMAT)
+                .Name("TraceDateTo").Value(TempData["OrderItemTraceResultSearchModel"] != null ? ((OrderItemTraceResultSearchModel)TempData["OrderItemTraceResultSearchModel"]).TraceDateTo : null)
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+            </div>
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            <button type="button" id="btnSearch" onclick="searchClick()">
+            @Resources.Global.Button_Search</button>
+        </div>
+        <br />
+        <div id="GetEngineTraceViewDiv">
+        </div>
+</fieldset>
+
+<script type="text/javascript">
+    function searchClick() {
+        var param = {
+            "TraceCodeSearch": $("#TraceCodeSearch").val(),
+            "EngineCodeSearch": $("#EngineCodeSearch").val(),
+            "TraceDateFrom": $("#TraceDateFrom").val(),
+            "TraceDateTo": $("#TraceDateTo").val()
+        }
+
+        $.ajax({
+            type: "post",
+            dataType: "html",
+            data: param,
+            cache: false,
+            url: "/OrderItemTrace/_GetEngineTraceView/",
+            success: function (data) {
+                $("#GetEngineTraceViewDiv").html(data);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
+                $("#GetEngineTraceViewDiv").html("");
+            }
+        });
+    }
+
+    //扫描物条码
+    function doTraceCodeKeyDowm() {
+        if (event.keyCode == 13) {
+            var barCode = $("#TraceCode").val();
+            $("#TraceCodehidden").val(barCode);
+            $("#TraceCode").val("");
+            if (barCode == "") {
+                $message.error("Van号不能为空。");
+                return;
+            } 
+            else {
+                $("#TraceCodeDiv").hide();
+                $("#EngineTraceDiv").show();
+                $("#EngineTrace").focus();
+            }
+        }
+    }
+    function doKeyDowm() {
+        if (event.keyCode == 13) {
+            var engineTraceCode = $("#EngineTrace").val();
+            $("#EngineTracehidden").val(engineTraceCode);
+            $("#EngineTrace").val("");
+            if ($("#TraceCodehidden").val() == "") {
+                $message.error("请先扫描Van号。");
+                $("#EngineTracehidden").val("");
+                $("#EngineTraceDiv").hide();
+                $("#TraceCodeDiv").show();
+                $("#TraceCode").focus();
+                return;
+            }
+            else {
+                $.ajax({
+                    type: 'post',
+                    dataType: "json",
+                    url: "/OrderItemTrace/ScanEngineTraceBarCode/",
+                    data: { "engineTrace": $("#EngineTracehidden").val(), "traceCode": $("#TraceCodehidden").val() },
+                    success: function (dd) {
+                        DisplayJsonMessages(dd);
+                        $message.success("Van号：" + $("#TraceCodehidden").val() + " 发动机：" + $("#EngineTracehidden").val() + " 扫描成功.");
+                        $("#EngineTraceDiv").hide();
+                        $("#TraceCodeDiv").show();
+                        $("#TraceCode").focus();
+                        $("#EngineTrace").val("");
+                        $("#TraceCode").val("");
+                        $("#TraceCodehidden").val("");
+                        $("#EngineTracehidden").val("");
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        $("#EngineTraceDiv").hide();
+                        $("#TraceCodeDiv").show();
+                        $("#TraceCode").focus();
+                        $("#EngineTrace").val("");
+                        $("#TraceCode").val("");
+                        $("#TraceCodehidden").val("");
+                        $("#EngineTracehidden").val("");
+                        DisplayTextMessages(XMLHttpRequest.responseText);
+                    }
+                });
+            }
+        }
+    }
+  
+</script>

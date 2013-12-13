@@ -1599,6 +1599,13 @@
         }
         #endregion
 
+        #region 扫描发动机
+        public void ScanEngineTraceBarCode(string engineTrace, string traceCode)
+        {
+            this.orderMgr.ScanEngineTraceBarCode(engineTrace, traceCode);
+        }
+        #endregion
+
         [Transaction(TransactionMode.Requires)]
         public void ReceiveVanOrder(string orderNo, bool isCheckIssue, bool isCheckItemTrace)
         {

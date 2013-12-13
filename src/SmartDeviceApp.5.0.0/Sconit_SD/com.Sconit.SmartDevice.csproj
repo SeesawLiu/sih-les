@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{939563B8-BEA3-4692-A8A8-43F974123CBC}</ProjectGuid>
     <OutputType>WinExe</OutputType>
@@ -65,6 +65,12 @@
     </Compile>
     <Compile Include="CodeMaster.cs" />
     <Compile Include="BusinessException.cs" />
+    <Compile Include="UCScanEngine.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCScanEngine.Designer.cs">
+      <DependentUpon>UCScanEngine.cs</DependentUpon>
+    </Compile>
     <Compile Include="UCLotNoScan.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -201,6 +207,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="AssemblyOffline.resx">
       <DependentUpon>AssemblyOffline.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UCScanEngine.resx">
+      <DependentUpon>UCScanEngine.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="UCLotNoScan.resx">
@@ -597,10 +607,10 @@
     <WebReferences Include="Web References\" />
   </ItemGroup>
   <ItemGroup>
-    <WebReferenceUrl Include="http://10.86.128.138:1122/WebService/SmartDeviceService.asmx">
+    <WebReferenceUrl Include="http://localhost:1122/WebService/SmartDeviceService.asmx">
       <UrlBehavior>Static</UrlBehavior>
       <RelPath>Web References\SmartDeviceRef\</RelPath>
-      <UpdateFromURL>http://10.86.128.138:1122/WebService/SmartDeviceService.asmx</UpdateFromURL>
+      <UpdateFromURL>http://localhost:1122/WebService/SmartDeviceService.asmx</UpdateFromURL>
       <ServiceLocationURL>
       </ServiceLocationURL>
       <CachedDynamicPropName>

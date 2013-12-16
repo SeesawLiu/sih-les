@@ -779,7 +779,7 @@ namespace com.Sconit.Web.Controllers.SCM
                         
                         if (windowTime >= prevTime && windowTime <= nextTime)
                         {
-                            double minutes = (nextTime - windowTime).Minutes + (windowTime - prevTime).Hours * 60;
+                            double minutes = (nextTime - windowTime).Minutes + (nextTime - windowTime).Hours * 60;
                             leadTimeMinutes = leadTimeMinutes - minutes;
                             if (leadTimeMinutes > 0 && (i + 1) < shiftDet.Count)
                             {

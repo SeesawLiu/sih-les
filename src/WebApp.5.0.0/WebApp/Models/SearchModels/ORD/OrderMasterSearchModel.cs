@@ -70,6 +70,11 @@ namespace com.Sconit.Web.Models.SearchModels.ORD
         public bool CloseDet { get; set; }
         public bool JITClose { get; set; }
         public string MultiStatus { get; set; }
+        public DateTime? CloseTimeFrom { get; set; }
+        public DateTime? CloseTimeTo { get; set; }
+        public string MultiPartyFrom { get; set; }
+        public string MultiPartyTo { get; set; }
+        public string MultiFlow { get; set; }
 
     }
 }

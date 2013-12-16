@@ -2,42 +2,6 @@
 <wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://com.Sconit.WebService.SD.SmartDeviceService/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://com.Sconit.WebService.SD.SmartDeviceService/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
   <wsdl:types>
     <s:schema elementFormDefault="qualified" targetNamespace="http://com.Sconit.WebService.SD.SmartDeviceService/">
-      <s:element name="LotNoScan">
-        <s:complexType>
-          <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="opRef" type="s:string" />
-            <s:element minOccurs="0" maxOccurs="1" name="traceCode" type="s:string" />
-            <s:element minOccurs="0" maxOccurs="1" name="barCode" type="s:string" />
-            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
-          </s:sequence>
-        </s:complexType>
-      </s:element>
-      <s:element name="LotNoScanResponse">
-        <s:complexType />
-      </s:element>
-      <s:element name="LotNoDelete">
-        <s:complexType>
-          <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="barCode" type="s:string" />
-            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
-          </s:sequence>
-        </s:complexType>
-      </s:element>
-      <s:element name="LotNoDeleteResponse">
-        <s:complexType />
-      </s:element>
-      <s:element name="ScanEngineTraceBarCode">
-        <s:complexType>
-          <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="engineTrace" type="s:string" />
-            <s:element minOccurs="0" maxOccurs="1" name="traceCode" type="s:string" />
-            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
-          </s:sequence>
-        </s:complexType>
-      </s:element>
-      <s:element name="ScanEngineTraceBarCodeResponse">
-        <s:complexType />
-      </s:element>
       <s:element name="GetUser">
         <s:complexType>
           <s:sequence>
@@ -336,23 +300,8 @@
         <s:complexContent mixed="false">
           <s:extension base="tns:EntityBase">
             <s:sequence>
-              <s:element minOccurs="0" maxOccurs="1" name="ReferenceItemCode" type="s:string" />
-              <s:element minOccurs="0" maxOccurs="1" name="ItemDescription" type="s:string" />
-              <s:element minOccurs="1" maxOccurs="1" name="OrderQty" type="s:decimal" />
-              <s:element minOccurs="1" maxOccurs="1" name="ReceivedQty" type="s:decimal" />
-              <s:element minOccurs="1" maxOccurs="1" name="CurrentReceiveQty" type="s:decimal" />
-              <s:element minOccurs="0" maxOccurs="1" name="HandResult" type="s:string" />
-              <s:element minOccurs="0" maxOccurs="1" name="ErrorCause" type="s:string" />
-              <s:element minOccurs="0" maxOccurs="1" name="RecNo" type="s:string" />
-              <s:element minOccurs="0" maxOccurs="1" name="OrderNo" type="s:string" />
-              <s:element minOccurs="0" maxOccurs="1" name="LocationTo" type="s:string" />
-              <s:element minOccurs="1" maxOccurs="1" name="CreateDateFormat" nillable="true" type="s:dateTime" />
-              <s:element minOccurs="1" maxOccurs="1" name="RequirementDate" nillable="true" type="s:dateTime" />
-              <s:element minOccurs="0" maxOccurs="1" name="PartyTo" type="s:string" />
-              <s:element minOccurs="0" maxOccurs="1" name="PartyFrom" type="s:string" />
-              <s:element minOccurs="1" maxOccurs="1" name="WindowTime" type="s:dateTime" />
-              <s:element minOccurs="0" maxOccurs="1" name="OrderStrategyDescription" type="s:string" />
               <s:element minOccurs="1" maxOccurs="1" name="Id" type="s:int" />
+              <s:element minOccurs="1" maxOccurs="1" name="Version" type="s:int" />
               <s:element minOccurs="0" maxOccurs="1" name="MoveType" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="BLDAT" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="BUDAT" type="s:string" />
@@ -386,9 +335,24 @@
               <s:element minOccurs="0" maxOccurs="1" name="FileName" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="WBS" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="HuId" type="s:string" />
-              <s:element minOccurs="1" maxOccurs="1" name="Version" type="s:int" />
               <s:element minOccurs="1" maxOccurs="1" name="ReceiveTotal" type="s:decimal" />
               <s:element minOccurs="1" maxOccurs="1" name="CancelQty" type="s:decimal" />
+              <s:element minOccurs="0" maxOccurs="1" name="ReferenceItemCode" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ItemDescription" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="OrderQty" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="ReceivedQty" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="CurrentReceiveQty" type="s:decimal" />
+              <s:element minOccurs="0" maxOccurs="1" name="HandResult" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ErrorCause" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="RecNo" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="OrderNo" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="LocationTo" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="CreateDateFormat" nillable="true" type="s:dateTime" />
+              <s:element minOccurs="1" maxOccurs="1" name="RequirementDate" nillable="true" type="s:dateTime" />
+              <s:element minOccurs="0" maxOccurs="1" name="PartyTo" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="PartyFrom" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="WindowTime" type="s:dateTime" />
+              <s:element minOccurs="0" maxOccurs="1" name="OrderStrategyDescription" type="s:string" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
@@ -1821,26 +1785,44 @@
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:element name="LotNoScan">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="opRef" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="traceCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="barCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="LotNoScanResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="LotNoDelete">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="barCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="LotNoDeleteResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="ScanEngineTraceBarCode">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="engineTrace" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="traceCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ScanEngineTraceBarCodeResponse">
+        <s:complexType />
+      </s:element>
     </s:schema>
   </wsdl:types>
-  <wsdl:message name="LotNoScanSoapIn">
-    <wsdl:part name="parameters" element="tns:LotNoScan" />
-  </wsdl:message>
-  <wsdl:message name="LotNoScanSoapOut">
-    <wsdl:part name="parameters" element="tns:LotNoScanResponse" />
-  </wsdl:message>
-  <wsdl:message name="LotNoDeleteSoapIn">
-    <wsdl:part name="parameters" element="tns:LotNoDelete" />
-  </wsdl:message>
-  <wsdl:message name="LotNoDeleteSoapOut">
-    <wsdl:part name="parameters" element="tns:LotNoDeleteResponse" />
-  </wsdl:message>
-  <wsdl:message name="ScanEngineTraceBarCodeSoapIn">
-    <wsdl:part name="parameters" element="tns:ScanEngineTraceBarCode" />
-  </wsdl:message>
-  <wsdl:message name="ScanEngineTraceBarCodeSoapOut">
-    <wsdl:part name="parameters" element="tns:ScanEngineTraceBarCodeResponse" />
-  </wsdl:message>
   <wsdl:message name="GetUserSoapIn">
     <wsdl:part name="parameters" element="tns:GetUser" />
   </wsdl:message>
@@ -2225,19 +2207,25 @@
   <wsdl:message name="GetUnpickedHuSoapOut">
     <wsdl:part name="parameters" element="tns:GetUnpickedHuResponse" />
   </wsdl:message>
+  <wsdl:message name="LotNoScanSoapIn">
+    <wsdl:part name="parameters" element="tns:LotNoScan" />
+  </wsdl:message>
+  <wsdl:message name="LotNoScanSoapOut">
+    <wsdl:part name="parameters" element="tns:LotNoScanResponse" />
+  </wsdl:message>
+  <wsdl:message name="LotNoDeleteSoapIn">
+    <wsdl:part name="parameters" element="tns:LotNoDelete" />
+  </wsdl:message>
+  <wsdl:message name="LotNoDeleteSoapOut">
+    <wsdl:part name="parameters" element="tns:LotNoDeleteResponse" />
+  </wsdl:message>
+  <wsdl:message name="ScanEngineTraceBarCodeSoapIn">
+    <wsdl:part name="parameters" element="tns:ScanEngineTraceBarCode" />
+  </wsdl:message>
+  <wsdl:message name="ScanEngineTraceBarCodeSoapOut">
+    <wsdl:part name="parameters" element="tns:ScanEngineTraceBarCodeResponse" />
+  </wsdl:message>
   <wsdl:portType name="SmartDeviceServiceSoap">
-    <wsdl:operation name="LotNoScan">
-      <wsdl:input message="tns:LotNoScanSoapIn" />
-      <wsdl:output message="tns:LotNoScanSoapOut" />
-    </wsdl:operation>
-    <wsdl:operation name="LotNoDelete">
-      <wsdl:input message="tns:LotNoDeleteSoapIn" />
-      <wsdl:output message="tns:LotNoDeleteSoapOut" />
-    </wsdl:operation>
-    <wsdl:operation name="ScanEngineTraceBarCode">
-      <wsdl:input message="tns:ScanEngineTraceBarCodeSoapIn" />
-      <wsdl:output message="tns:ScanEngineTraceBarCodeSoapOut" />
-    </wsdl:operation>
     <wsdl:operation name="GetUser">
       <wsdl:input message="tns:GetUserSoapIn" />
       <wsdl:output message="tns:GetUserSoapOut" />
@@ -2494,36 +2482,21 @@
       <wsdl:input message="tns:GetUnpickedHuSoapIn" />
       <wsdl:output message="tns:GetUnpickedHuSoapOut" />
     </wsdl:operation>
+    <wsdl:operation name="LotNoScan">
+      <wsdl:input message="tns:LotNoScanSoapIn" />
+      <wsdl:output message="tns:LotNoScanSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="LotNoDelete">
+      <wsdl:input message="tns:LotNoDeleteSoapIn" />
+      <wsdl:output message="tns:LotNoDeleteSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ScanEngineTraceBarCode">
+      <wsdl:input message="tns:ScanEngineTraceBarCodeSoapIn" />
+      <wsdl:output message="tns:ScanEngineTraceBarCodeSoapOut" />
+    </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="SmartDeviceServiceSoap" type="tns:SmartDeviceServiceSoap">
     <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
-    <wsdl:operation name="LotNoScan">
-      <soap:operation soapAction="http://com.Sconit.WebService.SD.SmartDeviceService/LotNoScan" style="document" />
-      <wsdl:input>
-        <soap:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="LotNoDelete">
-      <soap:operation soapAction="http://com.Sconit.WebService.SD.SmartDeviceService/LotNoDelete" style="document" />
-      <wsdl:input>
-        <soap:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="ScanEngineTraceBarCode">
-      <soap:operation soapAction="http://com.Sconit.WebService.SD.SmartDeviceService/ScanEngineTraceBarCode" style="document" />
-      <wsdl:input>
-        <soap:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
     <wsdl:operation name="GetUser">
       <soap:operation soapAction="http://com.Sconit.WebService.SD.SmartDeviceService/GetUser" style="document" />
       <wsdl:input>
@@ -3100,36 +3073,36 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-  </wsdl:binding>
-  <wsdl:binding name="SmartDeviceServiceSoap12" type="tns:SmartDeviceServiceSoap">
-    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
     <wsdl:operation name="LotNoScan">
-      <soap12:operation soapAction="http://com.Sconit.WebService.SD.SmartDeviceService/LotNoScan" style="document" />
+      <soap:operation soapAction="http://com.Sconit.WebService.SD.SmartDeviceService/LotNoScan" style="document" />
       <wsdl:input>
-        <soap12:body use="literal" />
+        <soap:body use="literal" />
       </wsdl:input>
       <wsdl:output>
-        <soap12:body use="literal" />
+        <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="LotNoDelete">
-      <soap12:operation soapAction="http://com.Sconit.WebService.SD.SmartDeviceService/LotNoDelete" style="document" />
+      <soap:operation soapAction="http://com.Sconit.WebService.SD.SmartDeviceService/LotNoDelete" style="document" />
       <wsdl:input>
-        <soap12:body use="literal" />
+        <soap:body use="literal" />
       </wsdl:input>
       <wsdl:output>
-        <soap12:body use="literal" />
+        <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="ScanEngineTraceBarCode">
-      <soap12:operation soapAction="http://com.Sconit.WebService.SD.SmartDeviceService/ScanEngineTraceBarCode" style="document" />
+      <soap:operation soapAction="http://com.Sconit.WebService.SD.SmartDeviceService/ScanEngineTraceBarCode" style="document" />
       <wsdl:input>
-        <soap12:body use="literal" />
+        <soap:body use="literal" />
       </wsdl:input>
       <wsdl:output>
-        <soap12:body use="literal" />
+        <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="SmartDeviceServiceSoap12" type="tns:SmartDeviceServiceSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
     <wsdl:operation name="GetUser">
       <soap12:operation soapAction="http://com.Sconit.WebService.SD.SmartDeviceService/GetUser" style="document" />
       <wsdl:input>
@@ -3706,13 +3679,40 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="LotNoScan">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SD.SmartDeviceService/LotNoScan" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="LotNoDelete">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SD.SmartDeviceService/LotNoDelete" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ScanEngineTraceBarCode">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SD.SmartDeviceService/ScanEngineTraceBarCode" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="SmartDeviceService">
     <wsdl:port name="SmartDeviceServiceSoap" binding="tns:SmartDeviceServiceSoap">
-      <soap:address location="http://localhost:1122/WebService/SmartDeviceService.asmx" />
+      <soap:address location="http://10.86.128.138:1122/WebService/SmartDeviceService.asmx" />
     </wsdl:port>
     <wsdl:port name="SmartDeviceServiceSoap12" binding="tns:SmartDeviceServiceSoap12">
-      <soap12:address location="http://localhost:1122/WebService/SmartDeviceService.asmx" />
+      <soap12:address location="http://10.86.128.138:1122/WebService/SmartDeviceService.asmx" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

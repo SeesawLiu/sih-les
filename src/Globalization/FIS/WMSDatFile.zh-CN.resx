@@ -180,4 +180,7 @@
   <data name="WMSDatFile_RequirementDate" xml:space="preserve">
     <value>创建时间</value>
   </data>
+  <data name="WMSDatFile_ReceiveLotSize" xml:space="preserve">
+    <value>是否手工关闭</value>
+  </data>
 </root>

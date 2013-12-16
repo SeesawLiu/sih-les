@@ -2242,6 +2242,7 @@
     <Content Include="Views\com.Sconit.Web.Controllers.INV\Hu\SortOrderHu.cshtml" />
     <Content Include="Views\com.Sconit.Web.Controllers.INV\OrderItemTrace\EngineTrace.cshtml" />
     <None Include="Views\com.Sconit.Web.Controllers.INV\OrderItemTrace\_GetEngineTraceView.cshtml" />
+    <Content Include="Views\Common\_RegionMultiSelectBox.cshtml" />
     <None Include="Web References\EncryptDencryptService\EncryptDencryptService.wsdl" />
     <None Include="Web References\EncryptDencryptService\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>

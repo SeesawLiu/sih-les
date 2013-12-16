@@ -36,7 +36,7 @@
             columns.Bound(o => o.ReferenceItemCode);
             columns.Bound(o => o.ItemDescription);
             columns.Bound(o => o.Uom);
-            
+
             columns.Bound(o => o.OrderQty);
             columns.Bound(o => o.Qty);
             columns.Bound(o => o.ReceiveTotal);
@@ -49,6 +49,8 @@
             columns.Bound(o => o.WMSId);
             columns.Bound(o => o.LGORT);
             columns.Bound(o => o.UMLGO);
+            columns.Bound(p => p.ReceiveLotSize).Title("是否手工关闭")
+                     .ClientTemplate("<input type='checkbox' disabled='disabled' name='IsDefault' <#= ReceiveLotSize==true? checked='checked' : '' #> />");
             
 
 

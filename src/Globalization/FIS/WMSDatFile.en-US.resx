@@ -180,4 +180,7 @@
   <data name="WMSDatFile_RequirementDate" xml:space="preserve">
     <value>RequirementDate</value>
   </data>
+  <data name="WMSDatFile_ReceiveLotSize" xml:space="preserve">
+    <value>ReceiveLotSize</value>
+  </data>
 </root>

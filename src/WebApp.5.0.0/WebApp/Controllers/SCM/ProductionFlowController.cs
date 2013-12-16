@@ -711,12 +711,19 @@ namespace com.Sconit.Web.Controllers.SCM
             {
                 if (calcuType == "0")
                 {
-                    for (int i = 0; i <= shiftDet.Count;i++ )
+                    for (int i = 0; i < shiftDet.Count;i++ )
                     {
                         var det=shiftDet[i];
                         DateTime prevTime = this.ParseDateTime(det.StartTime, windowTime);
                         DateTime nextTime = this.ParseDateTime(det.EndTime, windowTime);
-                        if (nextTime < prevTime) nextTime = nextTime.AddDays(1);
+                        if (nextTime < prevTime)
+                        {
+                            nextTime = nextTime.AddDays(1);
+                        }
+                        if (windowTime.AddDays(1) == nextTime)
+                        {
+                            windowTime = windowTime.AddDays(1);
+                        }
                         if (windowTime >= prevTime && windowTime <= nextTime)
                         {
                             double minutes = (windowTime - prevTime).Minutes + (windowTime - prevTime).Hours*60;
@@ -735,7 +742,8 @@ namespace com.Sconit.Web.Controllers.SCM
                             }
                             else if (leadTimeMinutes > 0 && (i + 1) == shiftDet.Count)
                             {
-                                workingCalendars = this.genericMgr.FindAll<WorkingCalendar>(" select w from WorkingCalendar as w where w.Region=? and w.WorkingDate=? and w.Type=? ", new object[] { region, isChangeWindowTime ? windowTime : windowTime.AddDays(-1).Date, com.Sconit.CodeMaster.WorkingCalendarType.Work });
+                                windowTime=isChangeWindowTime ? windowTime : windowTime.AddDays(-1);
+                                workingCalendars = this.genericMgr.FindAll<WorkingCalendar>(" select w from WorkingCalendar as w where w.Region=? and w.WorkingDate=? and w.Type=? ", new object[] { region, windowTime.Date, com.Sconit.CodeMaster.WorkingCalendarType.Work });
                                 if (workingCalendars == null || workingCalendars.Count == 0)
                                 {
                                     return GetShipOrderTime(windowTime.AddDays(-1), leadTimeMinutes, region, calcuType);
@@ -754,7 +762,7 @@ namespace com.Sconit.Web.Controllers.SCM
                             }
                             else
                             {
-                                return windowTime.AddMinutes(-leadTimeMinutes);
+                                return windowTime.AddMinutes(-(leadTimeMinutes + minutes));
                             }
                         }
                     }
@@ -762,12 +770,13 @@ namespace com.Sconit.Web.Controllers.SCM
                 else
                 {
                     shiftDet = shiftDet.OrderBy(s => s.Sequence).ToList();
-                    for (int i = 0; i <= shiftDet.Count; i++)
+                    for (int i = 0; i < shiftDet.Count; i++)
                     {
                         var det = shiftDet[i];
                         DateTime prevTime = this.ParseDateTime(det.StartTime, windowTime);
                         DateTime nextTime = this.ParseDateTime(det.EndTime, windowTime);
                         if (nextTime < prevTime) nextTime = nextTime.AddDays(1);
+                        
                         if (windowTime >= prevTime && windowTime <= nextTime)
                         {
                             double minutes = (nextTime - windowTime).Minutes + (windowTime - prevTime).Hours * 60;
@@ -786,7 +795,8 @@ namespace com.Sconit.Web.Controllers.SCM
                             }
                             else if (leadTimeMinutes > 0 && (i + 1) == shiftDet.Count)
                             {
-                                workingCalendars = this.genericMgr.FindAll<WorkingCalendar>(" select w from WorkingCalendar as w where w.Region=? and w.WorkingDate=? and w.Type=? ", new object[] { region,isChangeWindowTime?windowTime: windowTime.AddDays(1).Date, com.Sconit.CodeMaster.WorkingCalendarType.Work });
+                                windowTime =isChangeWindowTime?windowTime: windowTime.AddDays(1);
+                                workingCalendars = this.genericMgr.FindAll<WorkingCalendar>(" select w from WorkingCalendar as w where w.Region=? and w.WorkingDate=? and w.Type=? ", new object[] { region, windowTime.Date, com.Sconit.CodeMaster.WorkingCalendarType.Work });
                                 if (workingCalendars == null || workingCalendars.Count == 0)
                                 {
                                     return GetShipOrderTime(windowTime.AddDays(1), leadTimeMinutes, region, calcuType);
@@ -805,7 +815,7 @@ namespace com.Sconit.Web.Controllers.SCM
                             }
                             else
                             {
-                                return windowTime.AddMinutes(minutes);
+                                return windowTime.AddMinutes(leadTimeMinutes + minutes);
                             }
                         }
                     }
@@ -913,6 +923,7 @@ namespace com.Sconit.Web.Controllers.SCM
                         if (string.IsNullOrWhiteSpace(regionCode))
                         {
                             businessException.AddMessage(string.Format("第{0}行：区域不能为空。", rowCount));
+                            flowStrategyList.Add(flowStrategy);
                             continue;
                         }
                         else
@@ -925,6 +936,7 @@ namespace com.Sconit.Web.Controllers.SCM
                             else
                             {
                                 businessException.AddMessage(string.Format("第{0}行：区域{1}不存在", rowCount, regionCode));
+                                flowStrategyList.Add(flowStrategy);
                                 continue;
                             }
                         }
@@ -937,6 +949,7 @@ namespace com.Sconit.Web.Controllers.SCM
                         if (string.IsNullOrWhiteSpace(readWindowTime))
                         {
                             businessException.AddMessage(string.Format("第{0}行：窗口时间不能为空。", rowCount));
+                            flowStrategyList.Add(flowStrategy);
                             continue;
                         }
                         else
@@ -944,6 +957,7 @@ namespace com.Sconit.Web.Controllers.SCM
                             if (!DateTime.TryParse(readWindowTime, out windowTime))
                             {
                                 businessException.AddMessage(string.Format("第{0}行：窗口时间{1}填写有误", rowCount, readWindowTime));
+                                flowStrategyList.Add(flowStrategy);
                                 continue;
                             }
                             var workingCalendars = this.genericMgr.FindAll<WorkingCalendar>(" select w from WorkingCalendar as w where w.Region=? and w.WorkingDate=? ", new object[] { regionCode, windowTime.Date });
@@ -952,6 +966,7 @@ namespace com.Sconit.Web.Controllers.SCM
                                 if (workingCalendars.First().Type == com.Sconit.CodeMaster.WorkingCalendarType.Rest)
                                 {
                                     businessException.AddMessage(string.Format("第{0}行：窗口时间{1}是休息时间，请确认。", rowCount, readWindowTime));
+                                    flowStrategyList.Add(flowStrategy);
                                     continue;
                                 }
                                 var shiftDet = this.genericMgr.FindAll<ShiftDetail>(" select s from ShiftDetail as s where s.Shift=? ", new object[] { workingCalendars.FirstOrDefault().Shift });
@@ -974,6 +989,7 @@ namespace com.Sconit.Web.Controllers.SCM
                                     if (!isTure)
                                     {
                                         businessException.AddMessage(string.Format("窗口时间{0}是休息时间，请确认。", windowTime));
+                                        flowStrategyList.Add(flowStrategy);
                                         continue;
                                     }
                                 }
@@ -991,7 +1007,8 @@ namespace com.Sconit.Web.Controllers.SCM
                             #region 发单提前期
                             try
                             {
-                                leadTime = Convert.ToDecimal(row.GetCell(colleadTime).NumericCellValue);
+                                string leadTimeRead = ImportHelper.GetCellStringValue(row.GetCell(colleadTime));
+                                leadTime = Convert.ToDecimal(leadTimeRead);
                                 flowStrategy.LeadTime = leadTime;
                                 flowStrategy.ShipOrderTime = GetShipOrderTime(windowTime, Convert.ToDouble(leadTime)*60, regionCode, flowStrategy.CalculateType);
                                 //IList<WorkingCalendarView> workingCalendarViewList = this.workingCalendarMgr.GetWorkingCalendarView(regionCode, windowTime.Add(TimeSpan.FromDays(-7)), windowTime);
@@ -1000,6 +1017,7 @@ namespace com.Sconit.Web.Controllers.SCM
                             catch
                             {
                                 businessException.AddMessage(string.Format("第{0}行：发单提前期{1}填写有误", rowCount, leadTime));
+                                flowStrategyList.Add(flowStrategy);
                                 continue;
                             }
                             #endregion
@@ -1009,7 +1027,7 @@ namespace com.Sconit.Web.Controllers.SCM
                             #region 进料提前期
                             try
                             {
-                                winTimeDiff = Convert.ToDecimal(row.GetCell(colWinTimeDiff).NumericCellValue);
+                                winTimeDiff = Convert.ToDecimal(ImportHelper.GetCellStringValue(row.GetCell(colWinTimeDiff)));
                                 flowStrategy.WinTimeDiff = winTimeDiff;
                                 flowStrategy.ReqStartTime = GetShipOrderTime(windowTime, Convert.ToDouble(winTimeDiff) * 60, regionCode, flowStrategy.CalculateType);
                                 //IList<WorkingCalendarView> workingCalendarViewList = this.workingCalendarMgr.GetWorkingCalendarView(regionCode, windowTime, windowTime.Add(TimeSpan.FromDays(7)));
@@ -1019,6 +1037,7 @@ namespace com.Sconit.Web.Controllers.SCM
                             catch
                             {
                                 businessException.AddMessage(string.Format("第{0}行：进料提前期{1}填写有误", rowCount, winTimeDiff));
+                                flowStrategyList.Add(flowStrategy);
                                 continue;
                             }
                             #endregion
@@ -1029,12 +1048,13 @@ namespace com.Sconit.Web.Controllers.SCM
                             #region 进料提前期
                             try
                             {
-                                winTimeDiff = Convert.ToDecimal(row.GetCell(colWinTimeDiff).NumericCellValue);
+                                winTimeDiff = Convert.ToDecimal(ImportHelper.GetCellStringValue(row.GetCell(colWinTimeDiff)));
                                 flowStrategy.WinTimeDiff = winTimeDiff;
                             }
                             catch
                             {
                                 businessException.AddMessage(string.Format("第{0}行：进料提前期{1}填写有误", rowCount, winTimeDiff));
+                                flowStrategyList.Add(flowStrategy);
                                 continue;
                             }
                             #endregion
@@ -1042,12 +1062,13 @@ namespace com.Sconit.Web.Controllers.SCM
                             #region 安全提前期
                             try
                             {
-                                safeTime = Convert.ToDecimal(row.GetCell(colSafeTime).NumericCellValue);
+                                safeTime = Convert.ToDecimal(ImportHelper.GetCellStringValue(row.GetCell(colSafeTime)));
                                 flowStrategy.SafeTime = safeTime;
                             }
                             catch
                             {
                                 businessException.AddMessage(string.Format("第{0}行：安全提前期{1}填写有误", rowCount, safeTime));
+                                flowStrategyList.Add(flowStrategy);
                                 continue;
                             }
                             #endregion
@@ -1062,12 +1083,12 @@ namespace com.Sconit.Web.Controllers.SCM
                     }
 
                         #endregion
+                    TempData["ShipOrderTimeView"] = flowStrategyList;
 
                     if (businessException.HasMessage)
                     {
                         throw businessException;
                     }
-                    TempData["ShipOrderTimeView"] = flowStrategyList;
                 }
             }
             catch (BusinessException ex)

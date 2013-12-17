@@ -66,6 +66,11 @@ namespace com.Sconit.Entity.FIS
         [Display(Name = "OrderMaster_OrderStrategy", ResourceType = typeof(Resources.ORD.OrderMaster))]
         public string OrderStrategyDescription { get; set; }
 
+        [Export(ExportName = "ExportWMSDatFile", ExportSeq = 160)]
+        [Display(Name = "WMSDatFile_ReceiveLotSize", ResourceType = typeof(Resources.FIS.WMSDatFile))]
+        public bool ReceiveLotSize { get; set; }
+
+
 
 
     }

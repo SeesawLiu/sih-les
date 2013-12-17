@@ -244,13 +244,13 @@ namespace com.Sconit.Service.Impl
         {
             Hu hu = new Hu();
             hu.HuId = huId;
-            hu.LotNo = item.LotNo;
+            hu.LotNo = string.IsNullOrWhiteSpace(item.LotNo) ? com.Sconit.Utility.LotNoHelper.GenerateLotNo() : item.LotNo;
             hu.Item = item.Code;
             hu.ItemDescription = item.Description;
             hu.BaseUom = item.Uom;
             hu.Qty = item.HuQty;
             hu.ManufactureParty = item.ManufactureParty;
-            hu.ManufactureDate = LotNoHelper.ResolveLotNo(item.LotNo);
+            hu.ManufactureDate = LotNoHelper.ResolveLotNo(hu.LotNo);
             hu.PrintCount = 0;
             hu.ConcessionCount = 0;
             hu.ReferenceItemCode = item.ReferenceCode;

@@ -105,6 +105,9 @@ namespace com.Sconit.PrintModel.ORD
         [DataMember]
         public string ICHARG { get; set; }
 
+        [DataMember]
+        public string ZENGINE { get; set; }
+
         #endregion
     }
 

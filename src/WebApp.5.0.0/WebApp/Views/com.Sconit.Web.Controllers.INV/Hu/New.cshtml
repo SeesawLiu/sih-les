@@ -24,6 +24,11 @@
             .Text(Resources.INV.Hu.Hu_Tab_IPMaster)
             .LoadContentFrom("IpMaster", "Hu")
             .HtmlAttributes(new { onclick = "CleanTabMessage()" });
+
+            tabstrip.Add()
+            .Text("按排序单")
+            .LoadContentFrom("SortOrderHu", "Hu")
+            .HtmlAttributes(new { onclick = "CleanTabMessage()" });
             
             
         })

@@ -61,6 +61,7 @@ namespace com.Sconit.SmartDevice.CodeMaster
         Client_ForceMaterialIn,     //车架追溯
         Client_VanOrderReceive,     //整车入库
         Client_ForceScanMaterialIn,     //强制扫描
+        Client_ScanEngine,     //扫描发动机条码
 
         //周转箱
         Client_EmptyContainerShip,//空箱发货

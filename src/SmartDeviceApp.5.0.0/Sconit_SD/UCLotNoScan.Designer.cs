@@ -64,7 +64,6 @@
             this.lblBarCodeInfo.Location = new System.Drawing.Point(47, 104);
             this.lblBarCodeInfo.Name = "lblBarCodeInfo";
             this.lblBarCodeInfo.Size = new System.Drawing.Size(173, 16);
-            this.lblBarCodeInfo.Text = "123456789012345678901234567890";
             // 
             // lblWo
             // 
@@ -79,7 +78,6 @@
             this.lblTraceCodeInfo.Location = new System.Drawing.Point(47, 84);
             this.lblTraceCodeInfo.Name = "lblTraceCodeInfo";
             this.lblTraceCodeInfo.Size = new System.Drawing.Size(170, 18);
-            this.lblTraceCodeInfo.Text = "0070126259";
             // 
             // lblFlow
             // 
@@ -94,7 +92,6 @@
             this.lblOpRefInfo.Location = new System.Drawing.Point(47, 65);
             this.lblOpRefInfo.Name = "lblOpRefInfo";
             this.lblOpRefInfo.Size = new System.Drawing.Size(170, 18);
-            this.lblOpRefInfo.Text = "AA01L";
             // 
             // lblSeq
             // 

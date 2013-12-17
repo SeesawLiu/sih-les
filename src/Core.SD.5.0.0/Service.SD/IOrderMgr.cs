@@ -126,5 +126,9 @@ namespace com.Sconit.Service.SD
         void LotNoScan(string opRef, string traceCode, string barCode);
         void LotNoDelete(string barCode);
         #endregion
+
+        #region 扫描发动机
+        void ScanEngineTraceBarCode(string engineTrace, string traceCode);
+        #endregion
     }
 }

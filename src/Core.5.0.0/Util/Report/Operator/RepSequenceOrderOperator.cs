@@ -13,7 +13,7 @@ namespace com.Sconit.Utility.Report.Operator
             //明细部分的行数
             this.pageDetailRowCount = 30;
             //列数   1起始
-            this.columnCount = 11;
+            this.columnCount = 12;
             //报表头的行数  1起始
             this.headRowCount = 7;
             //报表尾的行数  1起始
@@ -85,6 +85,7 @@ namespace com.Sconit.Utility.Report.Operator
 
                     //VAN
                     this.SetRowCell(pageIndex, rowIndex, 10, sequenceDetail.ReserveNo);
+                    this.SetRowCell(pageIndex, rowIndex, 11, sequenceDetail.ZENGINE);
 
                     if (this.isPageBottom(rowIndex, rowTotal))//页的最后一行
                     {

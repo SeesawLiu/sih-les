@@ -244,4 +244,22 @@
   <data name="FlowStrategy_IsOrderNow" xml:space="preserve">
     <value>IsOrderNow</value>
   </data>
+  <data name="FlowStrategy_ReqEndTime" xml:space="preserve">
+    <value>ReqEndTime</value>
+  </data>
+  <data name="FlowStrategy_ReqStartTime" xml:space="preserve">
+    <value>ReqStartTime</value>
+  </data>
+  <data name="FlowStrategy_ShipOrderTime" xml:space="preserve">
+    <value>ShipOrderTime</value>
+  </data>
+  <data name="FlowStrategy_WindowTime" xml:space="preserve">
+    <value>WindowTime</value>
+  </data>
+  <data name="FlowStrategy_CalculateType" xml:space="preserve">
+    <value>CalculateType</value>
+  </data>
+  <data name="FlowStrategy_Region" xml:space="preserve">
+    <value>Region</value>
+  </data>
 </root>

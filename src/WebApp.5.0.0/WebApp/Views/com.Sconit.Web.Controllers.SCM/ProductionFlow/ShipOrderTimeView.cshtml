@@ -1,0 +1,28 @@
+﻿@model IEnumerable<com.Sconit.Entity.SCM.FlowStrategy>
+
+<fieldset>
+    @(Html.Telerik().Grid(Model)
+        .Name("FlowMasterGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Flow);
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.WindowTime);
+            columns.Bound(o => o.Region);
+            columns.Bound(o=>o.LeadTime).Title("发单提前期");
+            columns.Bound(o => o.WinTimeDiff);
+            columns.Bound(o => o.SafeTime);
+            columns.Bound(o => o.ShipOrderTime);
+            columns.Bound(o => o.ReqStartTime);
+            columns.Bound(o => o.ReqEndTime);
+            
+        })
+       
+        .Scrollable(c => c.Enabled(false))
+        .EnableCustomBinding(true)
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+    )
+</fieldset>

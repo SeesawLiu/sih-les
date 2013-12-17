@@ -486,6 +486,10 @@ namespace com.Sconit.Service.SAP.Impl
                         insertSql.Append("'" + (head.ZLINE != null ? head.ZLINE : string.Empty) + "',");
                         insertSql.Append("'" + (head.RSNUM != null ? head.RSNUM : string.Empty) + "',");
                         insertSql.Append("'" + (head.AUFPL != null ? head.AUFPL : string.Empty) + "',");
+                        insertSql.Append("'" + (head.VHVIN != null ? head.VHVIN : string.Empty) + "',");
+                        insertSql.Append("'" + (head.ZENGINE != null ? head.ZENGINE : string.Empty) + "',");
+                        insertSql.Append("'" + (head.LTEXT1 != null ? head.LTEXT1 : string.Empty) + "',");
+                        insertSql.Append("'" + (head.LTEXT2 != null ? head.LTEXT2 : string.Empty) + "',");
                         insertSql.Append("'" + (head.VERSION != null ? head.VERSION : string.Empty) + "'");
                         insertSql.Append(")");
                         recordaccumulateCount++;
@@ -634,7 +638,7 @@ namespace com.Sconit.Service.SAP.Impl
         private void PrepareInsertProdOrderSql(StringBuilder insertSql)
         {
             //insertSql.Append("INSERT INTO SAP_ProdOrder(BatchNo,CreateDate,AUFNR,WERKS,DAUAT,MATNR,MAKTX,DISPO,CHARG,GSTRS,CY_SEQNR,GMEIN,GAMNG,LGORT,LTEXT,ZLINE,RSNUM,AUFPL)VALUES(");
-            insertSql.Append("INSERT INTO SAP_ProdOrder(BatchNo,AUFNR,WERKS,DAUAT,MATNR,MAKTX,DISPO,CHARG,GSTRS,CY_SEQNR,GMEIN,GAMNG,LGORT,LTEXT,ZLINE,RSNUM,AUFPL,[VERSION])VALUES");
+            insertSql.Append("INSERT INTO SAP_ProdOrder(BatchNo,AUFNR,WERKS,DAUAT,MATNR,MAKTX,DISPO,CHARG,GSTRS,CY_SEQNR,GMEIN,GAMNG,LGORT,LTEXT,ZLINE,RSNUM,AUFPL,VHVIN,ZENGINE,LTEXT1,LTEXT2,[VERSION])VALUES");
         }
 
         private void PrepareInsertProdBomDetSql(StringBuilder insertSql)

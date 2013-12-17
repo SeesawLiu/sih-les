@@ -37,6 +37,11 @@ namespace com.Sconit.Entity.MD
         [Display(Name = "Item_ManufactureParty", ResourceType = typeof(Resources.MD.Item))]
         public string ManufactureParty { get; set; }
 
+        public string ZENGINE { get; set; }
+
+        public string HuId { get; set; }
+
+
         public string CodeDescription
         {
             get

@@ -85,7 +85,7 @@ namespace com.Sconit.Web.Controllers.FIS
                                     CreateDateFormat = tak[11] != null ? (DateTime?)tak[11] : null,
                                     ItemDescription = tak[12] != null ? (string)tak[12] : string.Empty,
                                     ReferenceItemCode = (string)tak[13],
-                                    OrderQty = tak[14] != null ? (decimal)tak[14] : 0,
+                                    OrderQty = tak[24]!=null && (decimal?)tak[24]==1?(decimal)tak[25]:(decimal)tak[14],
                                     ReceiveTotal = tak[15] != null ? (decimal)tak[15] : 0,
                                     CancelQty = tak[16] != null ? (decimal)tak[16] : 0,
                                     LGORT = tak[17] != null?(string)tak[17]:string.Empty,
@@ -95,7 +95,7 @@ namespace com.Sconit.Web.Controllers.FIS
                                     PartyFrom = (string)tak[21],
                                     WindowTime = (DateTime)tak[22],
                                     OrderStrategyDescription = systemMgr.GetCodeDetailDescription(Sconit.CodeMaster.CodeMaster.FlowStrategy, int.Parse((tak[23]).ToString())),
-                                    //RecNo = tak[19] != null?(string)tak[19]:string.Empty,
+                                    ReceiveLotSize = tak[24]!=null && (decimal?)tak[24]==1?true:false,
                                 }).ToList();
                 #endregion
 
@@ -197,7 +197,7 @@ namespace com.Sconit.Web.Controllers.FIS
                                           PartyFrom = (string)tak[21],
                                           WindowTime = (DateTime)tak[22],
                                           OrderStrategyDescription = systemMgr.GetCodeDetailDescription(Sconit.CodeMaster.CodeMaster.FlowStrategy, int.Parse((tak[23]).ToString())),
-                                          //RecNo = tak[19] != null ? (string)tak[19] : string.Empty,
+                                          ReceiveLotSize = tak[24] != null && (decimal?)tak[24] == 1 ? true : false,
                                       }).ToList();
                     #endregion
 
@@ -325,7 +325,7 @@ namespace com.Sconit.Web.Controllers.FIS
             sb.Append(@" select orderDet.Id,dat.Id,dat.WmsNo,dat.MoveType,dat.SOBKZ,dat.WMSId,orderDet.Item,orderDet.Uom,dat.UMLGO,dat.Qty,dat.IsHand,dat.CreateDate,
 orderDet.ItemDesc as ItemDescription,orderDet.RefItemCode as ReferenceItemCode,
 orderDet.OrderQty as OrderQty,
-dat.ReceiveTotal,dat.CancelQty,dat.LGORT,orderDet.CreateDate as RequirementDate,orderDet.OrderNo,m.PartyTo,m.PartyFrom,m.WindowTime,m.OrderStrategy
+dat.ReceiveTotal,dat.CancelQty,dat.LGORT,orderDet.CreateDate as RequirementDate,orderDet.OrderNo,m.PartyTo,m.PartyFrom,m.WindowTime,m.OrderStrategy,orderDet.UnitPrice,orderDet.RecLotSize
  from Ord_OrderDet_2 as orderDet with(nolock) 
  inner join Ord_OrderMstr_2 as m with(nolock) on orderDet.OrderNo=m.OrderNo
  left join FIS_WMSDatFile as dat with(nolock) on dat.OrderDetId=orderDet.Id

@@ -54,6 +54,7 @@ namespace com.Sconit.SmartDevice
             dicObject.Add(CodeMaster.TerminalPermission.Client_ForceMaterialIn, new List<object> { this.btnForceMaterialIn, 1, Keys.D5, Keys.NumPad5 });
             dicObject.Add(CodeMaster.TerminalPermission.Client_SubAssemblyOffLine, new List<object> { this.btnSubAssemblyOffLine, 1, Keys.D8, Keys.NumPad8 });                            dicObject.Add(CodeMaster.TerminalPermission.Client_CabOnline, new List<object> { this.btnCabOnline, 1, Keys.D9, Keys.NumPad9 });
             dicObject.Add(CodeMaster.TerminalPermission.Client_ForceScanMaterialIn, new List<object> { this.btnScanForce, 1, Keys.D0, Keys.NumPad0 });
+            dicObject.Add(CodeMaster.TerminalPermission.Client_ScanEngine, new List<object> { this.btnScanEngine, 1, Keys.A, Keys.A });
             
 
             //仓库

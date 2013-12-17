@@ -1958,6 +1958,80 @@ namespace com.Sconit.Web.Controllers
         }
         #endregion
 
+        #region _RegionMultiSelectBox
+        public ActionResult _RegionMultiSelectBox(int? orderType, string controlName, string controlId, string checkedValues)
+        {
+            ViewBag.ControlName = controlName;
+            ViewBag.ControlId = controlId;
+
+            List<Party> partyList = new List<Party>();
+
+            //su特殊处理
+            User user = SecurityContextHolder.Get();
+            if (user.Code.Trim().ToLower() == "su")
+            {
+                if (orderType == (int)com.Sconit.CodeMaster.OrderType.Procurement)
+                {
+                    partyList = base.genericMgr.FindAll<Party>("from Region as r where r.IsActive = 1 ",firstRow, maxRow).ToList();
+                }
+                else if (orderType == (int)com.Sconit.CodeMaster.OrderType.Distribution)
+                {
+                    IList<Customer> customerList = base.genericMgr.FindAll<Customer>("from Customer as c where c.IsActive = ? ", true, firstRow, maxRow);
+                    if (customerList != null)
+                    {
+                        partyList.AddRange(customerList);
+                    }
+                    if (partyList.Count < maxRow)
+                    {
+                        IList<Region> regionList = base.genericMgr.FindAll<Region>("from Region as r where r.IsActive = ? ", true, firstRow, maxRow - partyList.Count);
+                        if (regionList != null)
+                        {
+                            partyList.AddRange(regionList);
+                        }
+                    }
+                }
+                else if (orderType == (int)com.Sconit.CodeMaster.OrderType.Production)
+                {
+                    partyList = base.genericMgr.FindAll<Party>("from Region as r where r.IsActive = ? ", true, firstRow, maxRow).ToList();
+                }
+                else
+                {
+                    partyList = base.genericMgr.FindAll<Party>("from Region as r where r.IsActive = ? ", true, firstRow, maxRow).ToList();
+                }
+            }
+            else
+            {
+                string hql = "from Party as p where p.IsActive = ? ";
+                
+                if (orderType == (int)com.Sconit.CodeMaster.OrderType.Procurement)
+                {
+                    hql += " and exists (select 1 from UserPermissionView as u where u.UserId =" + user.Id + "and  u.PermissionCategoryType =" + (int)com.Sconit.CodeMaster.PermissionCategoryType.Region + " and u.PermissionCode = p.Code)";
+                }
+                else if (orderType == (int)com.Sconit.CodeMaster.OrderType.Distribution)
+                {
+                    hql += " and exists (select 1 from UserPermissionView as u where u.UserId =" + user.Id + "and  u.PermissionCategoryType in (" + (int)com.Sconit.CodeMaster.PermissionCategoryType.Region + "," + (int)com.Sconit.CodeMaster.PermissionCategoryType.Customer + ") and u.PermissionCode = p.Code)";
+                }
+                else if (orderType == (int)com.Sconit.CodeMaster.OrderType.Production)
+                {
+                    hql += " and exists (select 1 from UserPermissionView as u where u.UserId =" + user.Id + "and  u.PermissionCategoryType =" + (int)com.Sconit.CodeMaster.PermissionCategoryType.Region + " and u.PermissionCode = p.Code)";
+                }
+                else
+                {
+                    hql += " and exists (select 1 from UserPermissionView as u where  u.UserId =" + user.Id + "and u.PermissionCategoryType in (" + (int)com.Sconit.CodeMaster.PermissionCategoryType.Supplier + "," + (int)com.Sconit.CodeMaster.PermissionCategoryType.Customer + "," + (int)com.Sconit.CodeMaster.PermissionCategoryType.Region + ") and u.PermissionCode = p.Code)";
+                }
+                partyList = base.genericMgr.FindAll<Party>(hql, true, firstRow, maxRow).ToList();
+            }
+            if (!string.IsNullOrWhiteSpace(checkedValues))
+            {
+                ViewBag.CheckedValues = checkedValues.Split(',').ToList();
+            }
+            ViewBag.Values = partyList;
+
+            return PartialView();
+        }
+
+        #endregion
+
         #region Currency
         public ActionResult _CurrencyDropDownList(string controlName, string controlId, string selectedValue, bool? includeBlankOption, string blankOptionDescription, string blankOptionValue, bool? enable)
         {

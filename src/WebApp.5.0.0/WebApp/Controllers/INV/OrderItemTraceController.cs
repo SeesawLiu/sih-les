@@ -12,6 +12,7 @@ using com.Sconit.Web.Util;
 using com.Sconit.Web.Models.SearchModels.INV;
 using com.Sconit.Entity.MD;
 using com.Sconit.Web.Models.SearchModels.ORD;
+using com.Sconit.Entity.CUST;
 
 namespace com.Sconit.Web.Controllers.INV
 {
@@ -638,6 +639,69 @@ Qty>( select isnull(COUNT(*),0)from ORD_OrderItemTraceResult as result where tra
                 SaveErrorMessage(ex.Message);
             }
             return Json(null);
+        }
+
+        #endregion
+
+        #region 扫描发动机
+        [SconitAuthorize(Permissions = "Url_OrderItemTrace_EngineTrace")]
+        public ActionResult EngineTrace()
+        {
+            return View();
+        }
+
+        [SconitAuthorize(Permissions = "Url_OrderItemTrace_EngineTrace")]
+        public JsonResult ScanEngineTraceBarCode(string engineTrace, string traceCode)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(engineTrace))
+                {
+                    throw new BusinessException ("发动机条码不能为空。");
+                }
+                 if (string.IsNullOrWhiteSpace(traceCode))
+                {
+                    throw new BusinessException("Van号不能为空。");
+                }
+                 this.orderMgr.ScanEngineTraceBarCode(engineTrace, traceCode);
+                 SaveSuccessMessage("扫描成功。");
+                 return Json(new { });
+            }
+            catch (BusinessException ex)
+            {
+                SaveBusinessExceptionMessage(ex);
+            }
+            return Json(null);
+        }
+
+        [SconitAuthorize(Permissions = "Url_OrderItemTrace_EngineTrace")]
+        public ActionResult _GetEngineTraceView(OrderItemTraceResultSearchModel searchModel)
+        {
+                string hql = " select e from EngineTraceDet as e where 1=1";
+                IList<object> parameters = new List<object>();
+                if (!string.IsNullOrWhiteSpace(searchModel.EngineCodeSearch))
+                {
+                    hql += " and  EngineCode=?";
+                    parameters.Add(searchModel.EngineCodeSearch);
+                }
+                if (!string.IsNullOrWhiteSpace(searchModel.TraceCodeSearch))
+                {
+                    hql += " and  TraceCode=?";
+                    parameters.Add(searchModel.TraceCodeSearch);
+                }
+                if (searchModel.TraceDateFrom != null)
+                {
+                    hql += " and  CreateDate>= ?";
+                    parameters.Add(searchModel.TraceDateFrom.Value);
+                }
+                if (searchModel.TraceDateTo != null)
+                {
+                    hql += " and  CreateDate <= ?";
+                    parameters.Add(searchModel.TraceDateTo.Value);
+                }
+                var returnList = this.genericMgr.FindAll<EngineTraceDet>(hql, parameters.ToArray());
+
+                return View(returnList.OrderBy(r => r.TraceCode).ToList());
         }
 
         #endregion

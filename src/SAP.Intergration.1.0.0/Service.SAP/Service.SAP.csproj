@@ -278,10 +278,10 @@
       <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
       <CachedSettingsPropName>com_Sconit_Service_SAP_MI_PO_CFR_LES_MI_PO_CFR_LESService</CachedSettingsPropName>
     </WebReferenceUrl>
-    <WebReferenceUrl Include="G:\Project\sih\10.Interface\WSDL\MI_PO_LES.wsdl">
+    <WebReferenceUrl Include="D:\MI_PO_LES.wsdl">
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\MI_PO_LES\</RelPath>
-      <UpdateFromURL>G:\Project\sih\10.Interface\WSDL\MI_PO_LES.wsdl</UpdateFromURL>
+      <UpdateFromURL>D:\MI_PO_LES.wsdl</UpdateFromURL>
       <ServiceLocationURL>
       </ServiceLocationURL>
       <CachedDynamicPropName>

@@ -13,12 +13,22 @@ using com.Sconit.Entity.MD;
 using com.Sconit.Entity.BIL;
 using com.Sconit.Entity.SYS;
 using com.Sconit.Utility;
+using System;
+using com.Sconit.Entity.Exception;
+using com.Sconit.Entity.PRD;
+using com.Sconit.Entity.VIEW;
+using System.Web;
+using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
 
 namespace com.Sconit.Web.Controllers.SCM
 {
     public class ProductionFlowController : WebAppBaseController
     {
         public IFlowMgr flowMgr { get; set; }
+
+        public IWorkingCalendarMgr workingCalendarMgr { get; set; }
+
 
         private static string selectCountStatement = "select count(*) from FlowMaster as f ";
         private static string selectStatement = "select f from FlowMaster as f";
@@ -682,8 +692,423 @@ namespace com.Sconit.Web.Controllers.SCM
 
         #endregion
 
+        #region 发单时间计算
+        public ActionResult ShipOrderTimeIndex()
+        {
+            return View();
+        }
+
+        public DateTime GetShipOrderTime(DateTime windowTime, double leadTimeMinutes, string region, string calcuType)
+        {
+            bool isChangeWindowTime = false;
+            var workingCalendars = this.genericMgr.FindAll<WorkingCalendar>(" select w from WorkingCalendar as w where w.Region=? and w.WorkingDate=? and w.Type=? ", new object[] { region, windowTime.Date,com.Sconit.CodeMaster.WorkingCalendarType.Work });
+            if (workingCalendars == null || workingCalendars.Count == 0)
+            {
+                return GetShipOrderTime(windowTime.AddDays(-1), leadTimeMinutes, region, calcuType);
+            }
+            var shiftDet = this.genericMgr.FindAll<ShiftDetail>(" select s from ShiftDetail as s where s.Shift=? order by s.Sequence desc ", new object[] { workingCalendars.FirstOrDefault().Shift });
+            if (shiftDet != null || shiftDet.Count > 0)
+            {
+                if (calcuType == "0")
+                {
+                    for (int i = 0; i < shiftDet.Count;i++ )
+                    {
+                        var det=shiftDet[i];
+                        DateTime prevTime = this.ParseDateTime(det.StartTime, windowTime);
+                        DateTime nextTime = this.ParseDateTime(det.EndTime, windowTime);
+                        if (nextTime < prevTime)
+                        {
+                            nextTime = nextTime.AddDays(1);
+                        }
+                        if (windowTime.AddDays(1) == nextTime)
+                        {
+                            windowTime = windowTime.AddDays(1);
+                        }
+                        if (windowTime >= prevTime && windowTime <= nextTime)
+                        {
+                            double minutes = (windowTime - prevTime).Minutes + (windowTime - prevTime).Hours*60;
+                            leadTimeMinutes = leadTimeMinutes - minutes;
+                            if (leadTimeMinutes > 0 && (i + 1) < shiftDet.Count)
+                            {
+                                var prevDet = shiftDet[i + 1];
+                                windowTime = this.ParseDateTime(prevDet.EndTime, windowTime);
+                                if (windowTime > prevTime)
+                                {
+                                    windowTime = windowTime.AddDays(-1);
+                                    isChangeWindowTime = true;
+                                }
+                                continue;
+                                //return GetShipOrderTime(prevTime, leadTime, region, calcuType);
+                            }
+                            else if (leadTimeMinutes > 0 && (i + 1) == shiftDet.Count)
+                            {
+                                windowTime=isChangeWindowTime ? windowTime : windowTime.AddDays(-1);
+                                workingCalendars = this.genericMgr.FindAll<WorkingCalendar>(" select w from WorkingCalendar as w where w.Region=? and w.WorkingDate=? and w.Type=? ", new object[] { region, windowTime.Date, com.Sconit.CodeMaster.WorkingCalendarType.Work });
+                                if (workingCalendars == null || workingCalendars.Count == 0)
+                                {
+                                    return GetShipOrderTime(windowTime.AddDays(-1), leadTimeMinutes, region, calcuType);
+                                }
+                                shiftDet = this.genericMgr.FindAll<ShiftDetail>(" select s from ShiftDetail as s where s.Shift=? order by s.Sequence desc ", new object[] { workingCalendars.FirstOrDefault().Shift });
+                                if (shiftDet == null || shiftDet.Count == 0)
+                                {
+                                    return GetShipOrderTime(windowTime.AddDays(-1), leadTimeMinutes, region, calcuType);
+                                }
+                                else
+                                {
+                                    DateTime thisWindowTime = this.ParseDateTime(shiftDet.FirstOrDefault().EndTime, windowTime);
+                                    if (thisWindowTime > windowTime) thisWindowTime = thisWindowTime.AddDays(-1);
+                                    return GetShipOrderTime(thisWindowTime, leadTimeMinutes, region, calcuType);
+                                }
+                            }
+                            else
+                            {
+                                return windowTime.AddMinutes(-(leadTimeMinutes + minutes));
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    shiftDet = shiftDet.OrderBy(s => s.Sequence).ToList();
+                    for (int i = 0; i < shiftDet.Count; i++)
+                    {
+                        var det = shiftDet[i];
+                        DateTime prevTime = this.ParseDateTime(det.StartTime, windowTime);
+                        DateTime nextTime = this.ParseDateTime(det.EndTime, windowTime);
+                        if (nextTime < prevTime) nextTime = nextTime.AddDays(1);
+                        
+                        if (windowTime >= prevTime && windowTime <= nextTime)
+                        {
+                            double minutes = (nextTime - windowTime).Minutes + (nextTime - windowTime).Hours * 60;
+                            leadTimeMinutes = leadTimeMinutes - minutes;
+                            if (leadTimeMinutes > 0 && (i + 1) < shiftDet.Count)
+                            {
+                                var nextDet = shiftDet[i + 1];
+                                windowTime = this.ParseDateTime(nextDet.StartTime, windowTime);
+                                if (windowTime < nextTime)
+                                {
+                                    windowTime = windowTime.AddDays(1);
+                                    isChangeWindowTime = true;
+                                }
+                                continue;
+                                //return GetShipOrderTime(prevTime, leadTime, region, calcuType);
+                            }
+                            else if (leadTimeMinutes > 0 && (i + 1) == shiftDet.Count)
+                            {
+                                windowTime =isChangeWindowTime?windowTime: windowTime.AddDays(1);
+                                workingCalendars = this.genericMgr.FindAll<WorkingCalendar>(" select w from WorkingCalendar as w where w.Region=? and w.WorkingDate=? and w.Type=? ", new object[] { region, windowTime.Date, com.Sconit.CodeMaster.WorkingCalendarType.Work });
+                                if (workingCalendars == null || workingCalendars.Count == 0)
+                                {
+                                    return GetShipOrderTime(windowTime.AddDays(1), leadTimeMinutes, region, calcuType);
+                                }
+                                shiftDet = this.genericMgr.FindAll<ShiftDetail>(" select s from ShiftDetail as s where s.Shift=? order by s.Sequence asc ", new object[] { workingCalendars.FirstOrDefault().Shift });
+                                if (shiftDet == null || shiftDet.Count == 0)
+                                {
+                                    return GetShipOrderTime(windowTime.AddDays(1), leadTimeMinutes, region, calcuType);
+                                }
+                                else
+                                {
+                                    DateTime thisWindowTime = this.ParseDateTime(shiftDet.FirstOrDefault().StartTime, windowTime);
+                                    if (thisWindowTime < windowTime) thisWindowTime = thisWindowTime.AddDays(1);
+                                    return GetShipOrderTime(thisWindowTime, leadTimeMinutes, region, calcuType);
+                                }
+                            }
+                            else
+                            {
+                                return windowTime.AddMinutes(leadTimeMinutes + minutes);
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                return GetShipOrderTime(windowTime.AddDays(-1), leadTimeMinutes, region, calcuType);
+            }
+            return System.DateTime.Now;
+        }
+
+        private DateTime ParseDateTime(string time, DateTime windowTime)
+        {
+            if (string.IsNullOrWhiteSpace(time))
+                return DateTime.MinValue;
+
+            var t = time.Split(':');
+            if (t.Length != 2)
+                return DateTime.MinValue;
+
+            int h;
+            int.TryParse(t[0], out h);
+            if (h >= 24)
+                return DateTime.MinValue;
+
+            int m;
+            int.TryParse(t[1], out m);
+
+            if (h > 59)
+                return DateTime.MinValue;
+
+            return new DateTime(windowTime.Year, windowTime.Month, windowTime.Day, h, m, 0);
+        }
+
+        #region 获取发单时间
+        public ActionResult ImportShipOrderTime(IEnumerable<HttpPostedFileBase> attachments)
+        {
+            try
+            {
+                IList<FlowStrategy> flowStrategyList = new List<FlowStrategy>();
+                foreach (var file in attachments)
+                {
+
+                    if (file.InputStream.Length == 0)
+                    {
+                        throw new BusinessException("Import.Stream.Empty");
+                    }
+
+                    HSSFWorkbook workbook = new HSSFWorkbook(file.InputStream);
+
+                    ISheet sheet = workbook.GetSheetAt(0);
+                    IEnumerator rows = sheet.GetRowEnumerator();
+
+                    BusinessException businessException = new BusinessException();
+
+                    ImportHelper.JumpRows(rows, 10);
+
+                    #region 列定义
+                    int colWindowTime = 1;//窗口时间
+                    int colRegion = 2;//区域
+                    int colleadTime = 3;//发单提前期
+                    int colWinTimeDiff = 4;// 进料提前期
+                    int colSafeTime = 5;// 安全提前期
+                    int colCalculateType = 6;//计算类型
+                    #endregion
+
+                    DateTime dateTimeNow = DateTime.Now;
+
+                    int rowCount = 10;
 
 
+                    while (rows.MoveNext())
+                    {
+                        rowCount++;
+                        HSSFRow row = (HSSFRow)rows.Current;
+                        if (!ImportHelper.CheckValidDataRow(row, 1, 6))
+                        {
+                            break;//边界
+                        }
+                        FlowStrategy flowStrategy = new FlowStrategy();
+                        DateTime windowTime = System.DateTime.Now;
+                        string regionCode = string.Empty;
+                        decimal leadTime = 0;
+                        decimal winTimeDiff = 0;
+                        decimal safeTime = 0;
+                        string calculateType = string.Empty;
+
+                        #region 读取数据
+                        #region 计算类型
+                        calculateType = ImportHelper.GetCellStringValue(row.GetCell(colCalculateType));
+                        if (string.IsNullOrWhiteSpace(calculateType))
+                        {
+                            businessException.AddMessage(string.Format("第{0}行：计算类型不能为空。", rowCount));
+                            continue;
+                        }
+                        else
+                        {
+                            flowStrategy.CalculateType = calculateType;
+                        }
+                        #endregion
+
+                        #region 读取区域
+                        regionCode = ImportHelper.GetCellStringValue(row.GetCell(colRegion));
+                        if (string.IsNullOrWhiteSpace(regionCode))
+                        {
+                            businessException.AddMessage(string.Format("第{0}行：区域不能为空。", rowCount));
+                            flowStrategyList.Add(flowStrategy);
+                            continue;
+                        }
+                        else
+                        {
+                            IList<Region> regionList = genericMgr.FindAll<Region>("select l from Region as l where l.Code=?", regionCode);
+                            if (regionList != null && regionList.Count > 0)
+                            {
+                                flowStrategy.Region = regionCode;
+                            }
+                            else
+                            {
+                                businessException.AddMessage(string.Format("第{0}行：区域{1}不存在", rowCount, regionCode));
+                                flowStrategyList.Add(flowStrategy);
+                                continue;
+                            }
+                        }
+
+                        #endregion
+
+                        #region 窗口时间
+
+                        string readWindowTime = ImportHelper.GetCellStringValue(row.GetCell(colWindowTime));
+                        if (string.IsNullOrWhiteSpace(readWindowTime))
+                        {
+                            businessException.AddMessage(string.Format("第{0}行：窗口时间不能为空。", rowCount));
+                            flowStrategyList.Add(flowStrategy);
+                            continue;
+                        }
+                        else
+                        {
+                            if (!DateTime.TryParse(readWindowTime, out windowTime))
+                            {
+                                businessException.AddMessage(string.Format("第{0}行：窗口时间{1}填写有误", rowCount, readWindowTime));
+                                flowStrategyList.Add(flowStrategy);
+                                continue;
+                            }
+                            var workingCalendars = this.genericMgr.FindAll<WorkingCalendar>(" select w from WorkingCalendar as w where w.Region=? and w.WorkingDate=? ", new object[] { regionCode, windowTime.Date });
+                            if (workingCalendars != null && workingCalendars.Count > 0)
+                            {
+                                if (workingCalendars.First().Type == com.Sconit.CodeMaster.WorkingCalendarType.Rest)
+                                {
+                                    businessException.AddMessage(string.Format("第{0}行：窗口时间{1}是休息时间，请确认。", rowCount, readWindowTime));
+                                    flowStrategyList.Add(flowStrategy);
+                                    continue;
+                                }
+                                var shiftDet = this.genericMgr.FindAll<ShiftDetail>(" select s from ShiftDetail as s where s.Shift=? ", new object[] { workingCalendars.FirstOrDefault().Shift });
+                                if (shiftDet != null || shiftDet.Count > 0)
+                                {
+                                    DateTime nowTime = windowTime;
+                                    bool isTure = false;
+                                    foreach (var det in shiftDet)
+                                    {
+                                        DateTime prevTime = this.ParseDateTime(det.StartTime, windowTime);
+                                        DateTime nextTime = this.ParseDateTime(det.EndTime, windowTime);
+                                        if (nextTime < prevTime) nextTime = nextTime.AddDays(1);
+                                        if (nowTime >= prevTime && nowTime <= nextTime)
+                                        {
+                                            isTure = true;
+                                            break;
+                                        }
+
+                                    }
+                                    if (!isTure)
+                                    {
+                                        businessException.AddMessage(string.Format("窗口时间{0}是休息时间，请确认。", windowTime));
+                                        flowStrategyList.Add(flowStrategy);
+                                        continue;
+                                    }
+                                }
+                                else
+                                {
+                                    businessException.AddMessage(string.Format("没有找到区域的工作日历。"));
+                                }
+                            }
+                        }
+                        flowStrategy.WindowTime = windowTime;
+                        #endregion
+
+                        if (flowStrategy.CalculateType == "0")
+                        {
+                            #region 发单提前期
+                            try
+                            {
+                                string leadTimeRead = ImportHelper.GetCellStringValue(row.GetCell(colleadTime));
+                                leadTime = Convert.ToDecimal(leadTimeRead);
+                                flowStrategy.LeadTime = leadTime;
+                                flowStrategy.ShipOrderTime = GetShipOrderTime(windowTime, Convert.ToDouble(leadTime)*60, regionCode, flowStrategy.CalculateType);
+                                //IList<WorkingCalendarView> workingCalendarViewList = this.workingCalendarMgr.GetWorkingCalendarView(regionCode, windowTime.Add(TimeSpan.FromDays(-7)), windowTime);
+                                //flowStrategy.ShipOrderTime = this.workingCalendarMgr.GetStartTimeAtWorkingDate(windowTime, Convert.ToDouble(leadTime), CodeMaster.TimeUnit.Hour, regionCode, workingCalendarViewList);
+                            }
+                            catch
+                            {
+                                businessException.AddMessage(string.Format("第{0}行：发单提前期{1}填写有误", rowCount, leadTime));
+                                flowStrategyList.Add(flowStrategy);
+                                continue;
+                            }
+                            #endregion
+                        }
+                        else if (flowStrategy.CalculateType == "1")
+                        {
+                            #region 进料提前期
+                            try
+                            {
+                                winTimeDiff = Convert.ToDecimal(ImportHelper.GetCellStringValue(row.GetCell(colWinTimeDiff)));
+                                flowStrategy.WinTimeDiff = winTimeDiff;
+                                flowStrategy.ReqStartTime = GetShipOrderTime(windowTime, Convert.ToDouble(winTimeDiff) * 60, regionCode, flowStrategy.CalculateType);
+                                //IList<WorkingCalendarView> workingCalendarViewList = this.workingCalendarMgr.GetWorkingCalendarView(regionCode, windowTime, windowTime.Add(TimeSpan.FromDays(7)));
+                                //flowStrategy.ShipOrderTime = this.workingCalendarMgr.GetStartTimeAtWorkingDate(windowTime, Convert.ToDouble(-winTimeDiff), CodeMaster.TimeUnit.Hour, regionCode, workingCalendarViewList);
+
+                            }
+                            catch
+                            {
+                                businessException.AddMessage(string.Format("第{0}行：进料提前期{1}填写有误", rowCount, winTimeDiff));
+                                flowStrategyList.Add(flowStrategy);
+                                continue;
+                            }
+                            #endregion
+
+                        }
+                        else if (flowStrategy.CalculateType == "2")
+                        {
+                            #region 进料提前期
+                            try
+                            {
+                                winTimeDiff = Convert.ToDecimal(ImportHelper.GetCellStringValue(row.GetCell(colWinTimeDiff)));
+                                flowStrategy.WinTimeDiff = winTimeDiff;
+                            }
+                            catch
+                            {
+                                businessException.AddMessage(string.Format("第{0}行：进料提前期{1}填写有误", rowCount, winTimeDiff));
+                                flowStrategyList.Add(flowStrategy);
+                                continue;
+                            }
+                            #endregion
+
+                            #region 安全提前期
+                            try
+                            {
+                                safeTime = Convert.ToDecimal(ImportHelper.GetCellStringValue(row.GetCell(colSafeTime)));
+                                flowStrategy.SafeTime = safeTime;
+                            }
+                            catch
+                            {
+                                businessException.AddMessage(string.Format("第{0}行：安全提前期{1}填写有误", rowCount, safeTime));
+                                flowStrategyList.Add(flowStrategy);
+                                continue;
+                            }
+                            #endregion
+
+                            flowStrategy.ReqEndTime = GetShipOrderTime(windowTime, Convert.ToDouble(flowStrategy.WinTimeDiff + flowStrategy.SafeTime) * 60, regionCode, flowStrategy.CalculateType);
+                        }
+
+                        #region 填充数据
+                        flowStrategyList.Add(flowStrategy);
+                        #endregion
+
+                    }
+
+                        #endregion
+                    TempData["ShipOrderTimeView"] = flowStrategyList;
+
+                    if (businessException.HasMessage)
+                    {
+                        throw businessException;
+                    }
+                }
+            }
+            catch (BusinessException ex)
+            {
+                SaveBusinessExceptionMessage(ex);
+            }
+            catch (Exception ex)
+            {
+                SaveErrorMessage("导入失败。 - " + ex.Message);
+            }
+            return Content(string.Empty);
+        }
+        #endregion
+
+        public ActionResult ShipOrderTimeView()
+        {
+            return PartialView((IList<FlowStrategy>)TempData["ShipOrderTimeView"]);
+        }
+
+        #endregion
 
     }
 }

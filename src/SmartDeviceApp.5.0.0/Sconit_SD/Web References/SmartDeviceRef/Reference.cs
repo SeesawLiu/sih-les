@@ -1454,6 +1454,28 @@ namespace com.Sconit.SmartDevice.SmartDeviceRef {
         public void EndLotNoDelete(System.IAsyncResult asyncResult) {
             this.EndInvoke(asyncResult);
         }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://com.Sconit.WebService.SD.SmartDeviceService/ScanEngineTraceBarCode", RequestNamespace="http://com.Sconit.WebService.SD.SmartDeviceService/", ResponseNamespace="http://com.Sconit.WebService.SD.SmartDeviceService/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public void ScanEngineTraceBarCode(string engineTrace, string traceCode, string userCode) {
+            this.Invoke("ScanEngineTraceBarCode", new object[] {
+                        engineTrace,
+                        traceCode,
+                        userCode});
+        }
+        
+        /// <remarks/>
+        public System.IAsyncResult BeginScanEngineTraceBarCode(string engineTrace, string traceCode, string userCode, System.AsyncCallback callback, object asyncState) {
+            return this.BeginInvoke("ScanEngineTraceBarCode", new object[] {
+                        engineTrace,
+                        traceCode,
+                        userCode}, callback, asyncState);
+        }
+        
+        /// <remarks/>
+        public void EndScanEngineTraceBarCode(System.IAsyncResult asyncResult) {
+            this.EndInvoke(asyncResult);
+        }
     }
     
     /// <remarks/>
@@ -6366,6 +6388,18 @@ namespace com.Sconit.SmartDevice.SmartDeviceRef {
         
         private string locationToField;
         
+        private System.Nullable<System.DateTime> createDateFormatField;
+        
+        private System.Nullable<System.DateTime> requirementDateField;
+        
+        private string partyToField;
+        
+        private string partyFromField;
+        
+        private System.DateTime windowTimeField;
+        
+        private string orderStrategyDescriptionField;
+        
         /// <remarks/>
         public int Id {
             get {
@@ -6833,6 +6867,68 @@ namespace com.Sconit.SmartDevice.SmartDeviceRef {
             }
             set {
                 this.locationToField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<System.DateTime> CreateDateFormat {
+            get {
+                return this.createDateFormatField;
+            }
+            set {
+                this.createDateFormatField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public System.Nullable<System.DateTime> RequirementDate {
+            get {
+                return this.requirementDateField;
+            }
+            set {
+                this.requirementDateField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string PartyTo {
+            get {
+                return this.partyToField;
+            }
+            set {
+                this.partyToField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string PartyFrom {
+            get {
+                return this.partyFromField;
+            }
+            set {
+                this.partyFromField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public System.DateTime WindowTime {
+            get {
+                return this.windowTimeField;
+            }
+            set {
+                this.windowTimeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string OrderStrategyDescription {
+            get {
+                return this.orderStrategyDescriptionField;
+            }
+            set {
+                this.orderStrategyDescriptionField = value;
             }
         }
     }
@@ -7816,6 +7912,21 @@ namespace com.Sconit.SmartDevice.SmartDeviceRef {
         
         /// <remarks/>
         ANDON,
+        
+        /// <remarks/>
+        TRIAL,
+        
+        /// <remarks/>
+        SPARTPART,
+        
+        /// <remarks/>
+        REPAIR,
+        
+        /// <remarks/>
+        CKD,
+        
+        /// <remarks/>
+        Semi,
     }
     
     /// <remarks/>
@@ -7851,6 +7962,9 @@ namespace com.Sconit.SmartDevice.SmartDeviceRef {
         
         /// <remarks/>
         Check,
+        
+        /// <remarks/>
+        CKD,
     }
     
     /// <remarks/>
@@ -8018,5 +8132,8 @@ namespace com.Sconit.SmartDevice.SmartDeviceRef {
         
         /// <remarks/>
         SystemFlag,
+        
+        /// <remarks/>
+        DefaultSAPProdLine,
     }
 }

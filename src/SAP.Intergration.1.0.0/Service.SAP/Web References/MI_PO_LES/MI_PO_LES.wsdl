@@ -652,7 +652,7 @@
   </wsdl:binding>
   <wsdl:service name="MI_PO_LESService">
     <wsdl:port name="MI_PO_LESPort" binding="p1:MI_PO_LESBinding">
-      <address location="http://10.8http://10.86.128.31:8000/XISOAPAdapter/MessageServlet?channel=:LES01:CC_SOAPP9&amp;version=3.0&amp;Sender.Service=LES01&amp;Interface=http%3A%2F%2Fwww.sih.cq.cn%2Fsap%2Fpp%2F09%5EMI_PO_LES" xmlns="http://schemas.xmlsoap.org/wsdl/soap/" />
+      <address location="http://10.86.128.31:8000/XISOAPAdapter/MessageServlet?channel=:LES01:CC_SOAPP9&amp;version=3.0&amp;Sender.Service=LES01&amp;Interface=http%3A%2F%2Fwww.sih.cq.cn%2Fsap%2Fpp%2F09%5EMI_PO_LES" xmlns="http://schemas.xmlsoap.org/wsdl/soap/" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

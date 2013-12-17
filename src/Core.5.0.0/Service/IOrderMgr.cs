@@ -285,5 +285,9 @@ namespace com.Sconit.Service
         #region 00:02 转换时间
         DateTime ParseDateTime(string time);
         #endregion
+
+        #region 扫描发动机
+        void ScanEngineTraceBarCode(string engineTrace, string traceCode);
+        #endregion
     }
 }

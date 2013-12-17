@@ -321,6 +321,14 @@ namespace com.Sconit.SmartDevice
                 ucCabOnline.tbBarCode.Focus();
                 this.Text = "驾驶室上线";
             }
+            else if (module == CodeMaster.TerminalPermission.Client_ScanEngine)
+            {
+                UCScanEngine ucScanEngine = UCScanEngine.GetUCScanEngine(this.user);
+                ucScanEngine.ModuleSelectionEvent += new ModuleSelectHandler(this.SwitchModule);
+                this.AddModule(ucScanEngine);
+                ucScanEngine.tbBarCode.Focus();
+                this.Text = "扫描发动机";
+            }
             else if (module == CodeMaster.TerminalPermission.Client_ProductionOnline)
             {
                 UCProductOrderOnline ucProductOrderOnline = UCProductOrderOnline.GetUCProductOrderOnline(this.user);

@@ -21,11 +21,11 @@
             </div>
             <div class="search-label">
                 <label for="OrderMaster_Flow">
-                    @Resources.ORD.IpMaster.IpMaster_Flow
+                   @* @Resources.ORD.IpMaster.IpMaster_Flow*@
                 </label>
             </div>
             <div class="search-field">
-                @{
+                @*@{
         Html.RenderAction("_FlowComboBox", "Common",
             new
             {
@@ -33,7 +33,7 @@
                 type = (int)com.Sconit.CodeMaster.OrderType.Procurement,
                 selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).Flow : string.Empty
             });
-                }
+                }*@
             </div>
             
             <div class="search-label">
@@ -42,7 +42,7 @@
                 </label>
             </div>
             <div class="search-field">
-                @{
+              @*  @{
                Html.RenderAction("_OrderMasterPartyFromComboBox", "Common",
                    new
                    {
@@ -51,7 +51,17 @@
                        orderType = (int)com.Sconit.CodeMaster.OrderType.Procurement,
                        selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).PartyFrom : string.Empty
                    });
-                }
+                }*@
+                 @{
+        Html.RenderAction("_RegionMultiSelectBox", "Common", new
+         {
+             checkedValues = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).MultiPartyFrom : null,
+             orderType = (int)com.Sconit.CodeMaster.OrderType.Procurement,
+             controlName = "MultiPartyFroms",
+             controlId = "MultiPartyFroms"
+         });
+          }
+          @Html.Hidden("MultiPartyFrom")
             </div>
             <div class="search-label">
                 <label for="OrderMaster_PartyTo">
@@ -59,7 +69,7 @@
                 </label>
             </div>
             <div class="search-field">
-                @{
+               @* @{
                Html.RenderAction("_OrderMasterPartyToComboBox", "Common",
                                new
                                {
@@ -67,7 +77,17 @@
                                    orderType = (int)com.Sconit.CodeMaster.OrderType.Procurement,
                                    selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).PartyTo : string.Empty
                                });
-                }
+                }*@
+                 @{
+        Html.RenderAction("_RegionMultiSelectBox", "Common", new
+         {
+             checkedValues = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).MultiPartyTo : null,
+             orderType = (int)com.Sconit.CodeMaster.OrderType.Procurement,
+             controlName = "MultiPartyTos",
+             controlId = "MultiPartyTos"
+         });
+          }
+          @Html.Hidden("MultiPartyTo")
             </div>
              <div class="search-label">
               <label>
@@ -263,6 +283,29 @@
                 .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
             </div>
 
+             <div class="search-label">
+                <label for="OrderMaster_DateFrom">
+                     关闭日期 从
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DateTimePicker().Format(com.Sconit.Entity.BusinessConstants.LONG_DATE_FORMAT)
+        .Name("CloseTimeFrom")
+        .Value(TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).CloseTimeFrom : null)
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_DateTo">
+                   至
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DateTimePicker().Format(com.Sconit.Entity.BusinessConstants.LONG_DATE_FORMAT)
+        .Name("CloseTimeTo")
+        .Value(TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).CloseTimeTo : null)
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+            </div>
+
             <div class="search-label">
                 <label for="OrderMaster_DateTo">
                     @Resources.ORD.OrderDetail.OrderDetail_Remark
@@ -297,6 +340,23 @@
                 &nbsp 已关闭
                 @Html.CheckBox("IsClsoe", TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).IsClsoe : false)
             </div>
+             <div class="search-label">
+                <label for="OrderMaster_Flow">
+                    @Resources.ORD.IpMaster.IpMaster_Flow
+                </label>
+            </div>
+            <div class="search-field">
+            @Html.TextArea("MultiFlow", TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).MultiFlow : string.Empty, new { rows = 2, style = "min-height:0;width:60%" })
+                @*@{
+        Html.RenderAction("_FlowComboBox", "Common",
+            new
+            {
+                controlName = "Flow",
+                type = (int)com.Sconit.CodeMaster.OrderType.Procurement,
+                selectedValue = TempData["OrderMasterSearchModel"] != null ? ((OrderMasterSearchModel)TempData["OrderMasterSearchModel"]).Flow : string.Empty
+            });
+                }*@
+            </div>
         </div>
         <div class="search-footer">
             @Html.Hidden("isFromList", true)
@@ -325,22 +385,93 @@ method="post">
             uncheckAllText: "取消全选",
             selectedList: 3,
             click: function (event, ui) {
-                $('#MultiStatus').attr("value", getMultiRegions());
+                $('#MultiStatus').attr("value", getMultiStatus());
             },
             checkAll: function () {
-                $('#MultiStatus').attr("value", getMultiRegions());
+                $('#MultiStatus').attr("value", getMultiStatus());
             },
             uncheckAll: function () {
-                $('#MultiStatus').attr("value", getMultiRegions());
+                $('#MultiStatus').attr("value", getMultiStatus());
             }
         });
     });
 
 
 
-    function getMultiRegions() {
+    function getMultiStatus() {
         var m = "";
         var array_of_checked_values = $("#MultiSelectStatus").multiselect("getChecked").map(function () {
+            return this.value;
+        }).get();
+        if (array_of_checked_values != null) {
+            if (array_of_checked_values.length > 0) {
+                m = array_of_checked_values[0];
+                for (var i = 1; i < array_of_checked_values.length; i++) {
+                    m = m + "," + array_of_checked_values[i];
+                };
+            }
+        }
+        return m;
+    }
+
+    $(function () {
+        $('#MultiPartyFroms').multiselect({
+            noneSelectedText: "选择发货方代码...",
+            selectedText: "已选#个状态",
+            checkAllText: "全选",
+            uncheckAllText: "取消全选",
+            selectedList: 3,
+            click: function (event, ui) {
+                $('#MultiPartyFrom').attr("value", getMultiPartyFroms());
+            },
+            checkAll: function () {
+                $('#MultiPartyFrom').attr("value", getMultiPartyFroms());
+            },
+            uncheckAll: function () {
+                $('#MultiPartyFrom').attr("value", getMultiPartyFroms());
+            }
+        });
+    });
+
+    function getMultiPartyFroms() {
+        var m = "";
+        var array_of_checked_values = $("#MultiPartyFroms").multiselect("getChecked").map(function () {
+            return this.value;
+        }).get();
+        if (array_of_checked_values != null) {
+            if (array_of_checked_values.length > 0) {
+                m = array_of_checked_values[0];
+                for (var i = 1; i < array_of_checked_values.length; i++) {
+                    m = m + "," + array_of_checked_values[i];
+                };
+            }
+        }
+        return m;
+    }
+
+
+    $(function () {
+        $('#MultiPartyTos').multiselect({
+            noneSelectedText: "选择收货方代码...",
+            selectedText: "已选#个状态",
+            checkAllText: "全选",
+            uncheckAllText: "取消全选",
+            selectedList: 3,
+            click: function (event, ui) {
+                $('#MultiPartyTo').attr("value", getMultiPartyTos());
+            },
+            checkAll: function () {
+                $('#MultiPartyTo').attr("value", getMultiPartyTos());
+            },
+            uncheckAll: function () {
+                $('#MultiPartyTo').attr("value", getMultiPartyTos());
+            }
+        });
+    });
+
+    function getMultiPartyTos() {
+        var m = "";
+        var array_of_checked_values = $("#MultiPartyTos").multiselect("getChecked").map(function () {
             return this.value;
         }).get();
         if (array_of_checked_values != null) {

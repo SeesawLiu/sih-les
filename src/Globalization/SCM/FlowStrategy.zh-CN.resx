@@ -244,4 +244,22 @@
   <data name="FlowStrategy_IsOrderNow" xml:space="preserve">
     <value>是否立即创建订单</value>
   </data>
+  <data name="FlowStrategy_ReqEndTime" xml:space="preserve">
+    <value>需求时段结束时间</value>
+  </data>
+  <data name="FlowStrategy_ReqStartTime" xml:space="preserve">
+    <value>需求时段开始时间</value>
+  </data>
+  <data name="FlowStrategy_ShipOrderTime" xml:space="preserve">
+    <value>发单时间</value>
+  </data>
+  <data name="FlowStrategy_WindowTime" xml:space="preserve">
+    <value>窗口时间</value>
+  </data>
+  <data name="FlowStrategy_CalculateType" xml:space="preserve">
+    <value>计算类型</value>
+  </data>
+  <data name="FlowStrategy_Region" xml:space="preserve">
+    <value>区域</value>
+  </data>
 </root>

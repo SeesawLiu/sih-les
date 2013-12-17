@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="com.Sconit.Entity.CUST.EngineTraceDet, com.Sconit.Entity" table="CUST_EngineTraceDet" lazy="false">
+    <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      <generator class="identity" />
+    </id>
+    <property name="TraceCode" column="TraceCode" type="String" length="50"/>
+    <property name="VHVIN" column="VHVIN" type="String" length="50"/>
+    <property name="ZENGINE" column="ZENGINE" type="String" length="50"/>
+    <property name="ScanZENGINE" column="ScanZENGINE" type="String" length="50"/>
+    <property name="CreateUserId" column="CreateUser" type="Int32" update="false"/>
+    <property name="CreateUserName" column="CreateUserNm" type="String" length="100" update="false"/>
+    <property name="CreateDate" column="CreateDate" type="DateTime" update="false"/>
+  </class>
+</hibernate-mapping>

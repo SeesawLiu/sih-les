@@ -224,16 +224,48 @@
             }
             if (!string.IsNullOrWhiteSpace(searchModel.MultiStatus))
             {
-                string statusSql = "  and exists (select 1 from OrderMaster as o  with(nolock) where  o.OrderNo=d.OrderNo  and o.Status in( ";
+                string statusSql = "  and exists (select 1 from OrderMaster as o  with(nolock) where  o.OrderNo=d.OrderNo  and o.Status in( '";
                 string[] statusArr = searchModel.MultiStatus.Split(',');
-                for (int st = 0; st < statusArr.Length; st++)
-                {
-                    statusSql += "'" + statusArr[st] + "',";
-                }
-                statusSql = statusSql.Substring(0, statusSql.Length - 1) + "))";
+
+                statusSql += string.Join("','", statusArr)+"'))";
                 whereStatement += statusSql;
             }
+            if (!string.IsNullOrWhiteSpace(searchModel.MultiFlow))
+            {
+                string flows = searchModel.MultiFlow.Replace("\r\n", ",");
+                flows = flows.Replace("\n", ",");
+                string[] flowArr = flows.Split(',');
+                string flowSql = "  and exists (select 1 from OrderMaster as o  with(nolock) where  o.OrderNo=d.OrderNo  and o.Flow in( '";
+                flowSql += string.Join("','", flows) + "'))";
+                whereStatement += flowSql;
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.MultiPartyFrom))
+            {
+                string partyFromSql = "  and exists (select 1 from OrderMaster as o  with(nolock) where  o.OrderNo=d.OrderNo  and o.PartyFrom in( '";
+                string[] partyFromArr = searchModel.MultiPartyFrom.Split(',');
+                partyFromSql += string.Join("','", partyFromArr) + "'))";
+                whereStatement += partyFromSql;
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.MultiPartyTo))
+            {
+                string partyToSql = "  and exists (select 1 from OrderMaster as o  with(nolock) where  o.OrderNo=d.OrderNo  and o.PartyTo in( '";
+                string[] partyToArr = searchModel.MultiPartyTo.Split(',');
 
+                partyToSql += string.Join("','", partyToArr) + "'))";
+                whereStatement += partyToSql;
+            }
+            if (searchModel.CloseTimeFrom!=null && searchModel.CloseTimeTo!=null)
+            {
+                whereStatement += string.Format(" and exists (select 1 from OrderMaster as o  with(nolock) where    o.OrderNo=d.OrderNo and o.CloseDate between '{0}' and '{1}' ) ", searchModel.CloseTimeFrom.Value, searchModel.CloseTimeTo.Value);
+            }
+            else if (searchModel.CloseTimeFrom != null && searchModel.CloseTimeTo == null)
+            {
+                whereStatement += string.Format(" and exists (select 1 from OrderMaster as o  with(nolock) where  o.OrderNo=d.OrderNo and   o.CloseDate>= '{10}' ) ", searchModel.CloseTimeFrom.Value);
+            }
+            else if (searchModel.CloseTimeFrom == null && searchModel.CloseTimeTo != null)
+            {
+                whereStatement += string.Format(" and exists (select 1 from OrderMaster as o  with(nolock) where  o.OrderNo=d.OrderNo and   o.CloseDate <= '{0}'  ) ", searchModel.CloseTimeTo.Value);
+            }
             IList<OrderDetail> orderDetList = new List<OrderDetail>();
             ProcedureSearchStatementModel procedureSearchStatementModel = PrepareSearchDetailStatement(command, searchModel, whereStatement);
             procedureSearchStatementModel.SelectProcedure = "USP_Search_PrintOrderDet";

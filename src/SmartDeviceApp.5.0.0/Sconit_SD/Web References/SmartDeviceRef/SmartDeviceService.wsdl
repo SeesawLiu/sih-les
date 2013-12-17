@@ -206,6 +206,11 @@
           <s:enumeration value="JIT" />
           <s:enumeration value="SEQ" />
           <s:enumeration value="ANDON" />
+          <s:enumeration value="TRIAL" />
+          <s:enumeration value="SPARTPART" />
+          <s:enumeration value="REPAIR" />
+          <s:enumeration value="CKD" />
+          <s:enumeration value="Semi" />
         </s:restriction>
       </s:simpleType>
       <s:simpleType name="ProdLineType">
@@ -220,6 +225,7 @@
           <s:enumeration value="Trial" />
           <s:enumeration value="Subassembly" />
           <s:enumeration value="Check" />
+          <s:enumeration value="CKD" />
         </s:restriction>
       </s:simpleType>
       <s:complexType name="ArrayOfOrderDetail">
@@ -341,6 +347,12 @@
               <s:element minOccurs="0" maxOccurs="1" name="RecNo" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="OrderNo" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="LocationTo" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="CreateDateFormat" nillable="true" type="s:dateTime" />
+              <s:element minOccurs="1" maxOccurs="1" name="RequirementDate" nillable="true" type="s:dateTime" />
+              <s:element minOccurs="0" maxOccurs="1" name="PartyTo" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="PartyFrom" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="WindowTime" type="s:dateTime" />
+              <s:element minOccurs="0" maxOccurs="1" name="OrderStrategyDescription" type="s:string" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
@@ -1133,6 +1145,7 @@
           <s:enumeration value="CheckItemTrace" />
           <s:enumeration value="FilterVanLogistic" />
           <s:enumeration value="SystemFlag" />
+          <s:enumeration value="DefaultSAPProdLine" />
         </s:restriction>
       </s:simpleType>
       <s:element name="GetEntityPreferenceResponse">
@@ -1796,6 +1809,18 @@
       <s:element name="LotNoDeleteResponse">
         <s:complexType />
       </s:element>
+      <s:element name="ScanEngineTraceBarCode">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="engineTrace" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="traceCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ScanEngineTraceBarCodeResponse">
+        <s:complexType />
+      </s:element>
     </s:schema>
   </wsdl:types>
   <wsdl:message name="GetUserSoapIn">
@@ -2194,6 +2219,12 @@
   <wsdl:message name="LotNoDeleteSoapOut">
     <wsdl:part name="parameters" element="tns:LotNoDeleteResponse" />
   </wsdl:message>
+  <wsdl:message name="ScanEngineTraceBarCodeSoapIn">
+    <wsdl:part name="parameters" element="tns:ScanEngineTraceBarCode" />
+  </wsdl:message>
+  <wsdl:message name="ScanEngineTraceBarCodeSoapOut">
+    <wsdl:part name="parameters" element="tns:ScanEngineTraceBarCodeResponse" />
+  </wsdl:message>
   <wsdl:portType name="SmartDeviceServiceSoap">
     <wsdl:operation name="GetUser">
       <wsdl:input message="tns:GetUserSoapIn" />
@@ -2458,6 +2489,10 @@
     <wsdl:operation name="LotNoDelete">
       <wsdl:input message="tns:LotNoDeleteSoapIn" />
       <wsdl:output message="tns:LotNoDeleteSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ScanEngineTraceBarCode">
+      <wsdl:input message="tns:ScanEngineTraceBarCodeSoapIn" />
+      <wsdl:output message="tns:ScanEngineTraceBarCodeSoapOut" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="SmartDeviceServiceSoap" type="tns:SmartDeviceServiceSoap">
@@ -3056,6 +3091,15 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="ScanEngineTraceBarCode">
+      <soap:operation soapAction="http://com.Sconit.WebService.SD.SmartDeviceService/ScanEngineTraceBarCode" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:binding name="SmartDeviceServiceSoap12" type="tns:SmartDeviceServiceSoap">
     <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
@@ -3646,6 +3690,15 @@
     </wsdl:operation>
     <wsdl:operation name="LotNoDelete">
       <soap12:operation soapAction="http://com.Sconit.WebService.SD.SmartDeviceService/LotNoDelete" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ScanEngineTraceBarCode">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SD.SmartDeviceService/ScanEngineTraceBarCode" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

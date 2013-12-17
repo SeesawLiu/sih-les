@@ -391,7 +391,7 @@ namespace com.Sconit.Web.Controllers.SCM
             if (ModelState.IsValid)
             {
                 Item item = this.genericMgr.FindById<Item>(flowDetail.Item);
-                flowDetail.UnitCount = item.UnitCount;
+                flowDetail.UnitCount = item.MinUnitCount;
                 flowDetail.MinUnitCount = item.MinUnitCount;
                 flowDetail.ItemDescription = item.Description;
                 flowDetail.ReferenceItemCode = item.ReferenceCode;
@@ -515,7 +515,7 @@ namespace com.Sconit.Web.Controllers.SCM
                         throw new BusinessException(string.Format("来源区域{0}+物料{1}+目的区域{2}已经存在数据库。", flow.PartyFrom, flowDetail.Item, flow.PartyTo));
                     }
                     Item item = this.genericMgr.FindById<Item>(flowDetail.Item);
-                    flowDetail.UnitCount = item.UnitCount;
+                    flowDetail.UnitCount = item.MinUnitCount;
                     flowDetail.MinUnitCount = item.MinUnitCount;
                     flowDetail.ItemDescription = item.Description;
                     flowDetail.ReferenceItemCode = item.ReferenceCode;

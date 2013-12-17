@@ -30,6 +30,7 @@ BEGIN
 			DateFrom datetime, 
 			DateTo datetime, 
 		) 
+		set @BaseDate = CONVERT(DATETIME, CONVERT(varchar(50), @BaseDate, 120))  --去掉毫秒，保证@TargetDate >= @DateFrom这句话因为出现毫秒没有匹配，导致@ReturnDate没有赋值
 		Declare @ToDate datetime = @BaseDate 
 		Declare @TargetDate datetime = @BaseDate 
 		Declare @CycleWDRowId int = 1 

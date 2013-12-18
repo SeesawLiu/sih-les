@@ -1988,7 +1988,7 @@ namespace com.Sconit.Service.SAP.Impl
 
         private string GetSapLocation(IList<Entity.MD.Location> locationList, string location)
         {
-            var q_location = locationList.Where(r => r.Code == location);
+            var q_location = locationList.Where(r => r.Code.ToUpper() == location.ToUpper());
             if (q_location != null && q_location.Count() > 0)
             {
                 return q_location.First().SAPLocation;

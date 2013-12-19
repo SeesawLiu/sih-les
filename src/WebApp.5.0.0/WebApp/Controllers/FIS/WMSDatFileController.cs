@@ -85,7 +85,7 @@ namespace com.Sconit.Web.Controllers.FIS
                                     CreateDateFormat = tak[11] != null ? (DateTime?)tak[11] : null,
                                     ItemDescription = tak[12] != null ? (string)tak[12] : string.Empty,
                                     ReferenceItemCode = (string)tak[13],
-                                    OrderQty = tak[24]!=null && (decimal?)tak[24]==1?(decimal)tak[25]:(decimal)tak[14],
+                                    OrderQty = tak[25]!=null && (decimal?)tak[25]==1?(decimal)tak[24]:(decimal)tak[14],
                                     ReceiveTotal = tak[15] != null ? (decimal)tak[15] : 0,
                                     CancelQty = tak[16] != null ? (decimal)tak[16] : 0,
                                     LGORT = tak[17] != null?(string)tak[17]:string.Empty,
@@ -95,7 +95,7 @@ namespace com.Sconit.Web.Controllers.FIS
                                     PartyFrom = (string)tak[21],
                                     WindowTime = (DateTime)tak[22],
                                     OrderStrategyDescription = systemMgr.GetCodeDetailDescription(Sconit.CodeMaster.CodeMaster.FlowStrategy, int.Parse((tak[23]).ToString())),
-                                    ReceiveLotSize = tak[24]!=null && (decimal?)tak[24]==1?true:false,
+                                    ReceiveLotSize = tak[25]!=null && (decimal?)tak[25]==1?true:false,
                                 }).ToList();
                 #endregion
 
@@ -187,7 +187,7 @@ namespace com.Sconit.Web.Controllers.FIS
                                           CreateDateFormat = tak[11] != null ? (DateTime?)tak[11] : null,
                                           ItemDescription = tak[12] != null ? (string)tak[12] : string.Empty,
                                           ReferenceItemCode = (string)tak[13],
-                                          OrderQty = tak[14] != null ? (decimal)tak[14] : 0,
+                                          OrderQty = tak[25] != null && (decimal?)tak[25] == 1 ? (decimal)tak[24] : (decimal)tak[14],
                                           ReceiveTotal = tak[15] != null ? (decimal)tak[15] : 0,
                                           CancelQty = tak[16] != null ? (decimal)tak[16] : 0,
                                           LGORT = tak[17] != null ? (string)tak[17] : string.Empty,
@@ -197,7 +197,7 @@ namespace com.Sconit.Web.Controllers.FIS
                                           PartyFrom = (string)tak[21],
                                           WindowTime = (DateTime)tak[22],
                                           OrderStrategyDescription = systemMgr.GetCodeDetailDescription(Sconit.CodeMaster.CodeMaster.FlowStrategy, int.Parse((tak[23]).ToString())),
-                                          ReceiveLotSize = tak[24] != null && (decimal?)tak[24] == 1 ? true : false,
+                                          ReceiveLotSize = tak[25] != null && (decimal?)tak[25] == 1 ? true : false,
                                       }).ToList();
                     #endregion
 

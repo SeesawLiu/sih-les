@@ -1585,7 +1585,7 @@ namespace com.Sconit.Service.SAP.Impl
                             // 跨工厂移库 来源工厂
                             invTrans.WERKS = GetPlant(regionList, miscOrderMaster.Region);//0084
                             ////库存地点	
-                            invTrans.LGORT = GetSapLocation(locationList, miscOrderMaster.Location);//1000
+                            invTrans.LGORT = GetSapLocation(locationList, miscOrderLocationDetail.Location);//1000
                             ////跨工厂移库 收货地点	
                             invTrans.UMLGO = miscOrderMaster.ReceiveLocation;//0085
                             ////收货工厂	
@@ -1603,7 +1603,7 @@ namespace com.Sconit.Service.SAP.Impl
                             ////收货工厂	
                             invTrans.UMWRK = GetPlant(regionList, miscOrderMaster.Region);//0084
                             ////跨工厂移库 收货地点	
-                            invTrans.UMLGO = GetSapLocation(locationList, miscOrderMaster.Location);//1000
+                            invTrans.UMLGO = GetSapLocation(locationList, miscOrderLocationDetail.Location);//1000
                         }
                     }
                     else
@@ -1611,7 +1611,7 @@ namespace com.Sconit.Service.SAP.Impl
                         ////跨工厂移库 来源工厂
                         invTrans.WERKS = GetPlant(regionList, miscOrderMaster.Region);
                         ////库存地点	
-                        invTrans.LGORT = GetSapLocation(locationList, miscOrderMaster.Location);
+                        invTrans.LGORT = GetSapLocation(locationList, miscOrderLocationDetail.Location);
                     }
 
                     ////操作类型	

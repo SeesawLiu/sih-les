@@ -74,7 +74,7 @@ BEGIN
 		OrderNo varchar(50),
 		OrderDetId int,
 		OrderDetSeq int,
-		OpRef varchar(50)
+		OpRef varchar(50),
 		RefOpRef varchar(50)
 	)
 	
@@ -224,7 +224,7 @@ BEGIN
 						--»ã×Ü¶©µ¥Ã÷Ï¸
 						truncate table #tempOrderDet
 						insert into #tempOrderDet(Flow, FlowDetId, Item, Uom, UC, MinUC, UCDesc, Container, ContainerDesc, ManufactureParty, LocFrom, LocTo, OpRef, RefOpRef, ReqQty, OrderQty)
-						select det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.OpRef, det.RefOpRef SUM(det.NetOrderQty), SUM(det.OrderQty)
+						select det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.OpRef, det.RefOpRef, SUM(det.NetOrderQty), SUM(det.OrderQty)
 						from #tempOrderBomDet as det
 						group by det.Flow, det.FlowDetId, det.Item, det.Uom, det.UC, det.MinUC, det.UCDesc, det.Container, det.ContainerDesc, det.ManufactureParty, det.LocFrom, det.LocTo, det.OpRef, det.RefOpRef having SUM(det.OrderQty) > 0
 						

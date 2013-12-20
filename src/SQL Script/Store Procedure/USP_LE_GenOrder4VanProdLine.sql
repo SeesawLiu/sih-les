@@ -187,6 +187,16 @@ BEGIN
 				
 				if exists(select top 1 1 from #tempOrderBomDet)
 				begin
+					--如果同一个工位+物料有两条以上明细的话
+					--只能保留一条的初始工位余量，另外的都要update成0
+					--避免工位余量增多
+					update bom set OpRefQty = 0
+					from #tempOrderBomDet as bom inner join
+					--根据零件和工位再按制造商分组排序（null和empty的制造商在前面），把分组号大于1的工位余量全部置为0
+					(select ROW_NUMBER() over(Partition by Item, OpRef order by t.ManufactureParty) as PtRowNum, RowId from #tempOrderBomDet) as t 
+					on bom.RowId = t.RowId
+					where t.PtRowNum > 1
+					
 					--按包装圆整
 					update #tempOrderBomDet set OrderQty = ceiling(OrderQty / UC) * UC, Balance = ceiling(OrderQty / UC) * UC - OrderQty where OrderQty >= 0 and RoundUpOpt = 1 and UC > 0 and ISNULL(ManufactureParty, '') = ''
 					update #tempOrderBomDet set OrderQty = 0, Balance = 0 - OrderQty where OrderQty < 0 and ISNULL(ManufactureParty, '') = ''
@@ -885,6 +895,16 @@ BEGIN
 					
 					if exists(select top 1 1 from #tempOrderBomDet)
 					begin
+						--如果同一个工位+物料有两条以上明细的话
+						--只能保留一条的初始工位余量，另外的都要update成0
+						--避免工位余量增多
+						update bom set OpRefQty = 0
+						from #tempOrderBomDet as bom inner join
+						--根据零件和工位再按制造商分组排序（null和empty的制造商在前面），把分组号大于1的工位余量全部置为0
+						(select ROW_NUMBER() over(Partition by Item, OpRef order by t.ManufactureParty) as PtRowNum, RowId from #tempOrderBomDet) as t 
+						on bom.RowId = t.RowId
+						where t.PtRowNum > 1
+						
 						--按包装圆整
 						update #tempOrderBomDet set OrderQty = ceiling(OrderQty / UC) * UC, Balance = ceiling(OrderQty / UC) * UC - OrderQty where OrderQty >= 0 and RoundUpOpt = 1 and UC > 0 and ISNULL(ManufactureParty, '') = ''
 						update #tempOrderBomDet set OrderQty = 0, Balance = 0 - OrderQty where OrderQty < 0 and ISNULL(ManufactureParty, '') = ''

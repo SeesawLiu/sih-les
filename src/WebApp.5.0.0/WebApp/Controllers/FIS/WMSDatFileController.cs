@@ -331,7 +331,7 @@ namespace com.Sconit.Web.Controllers.FIS
             //{
             //    sb.Append("select RowId=ROW_NUMBER()OVER( order by WindowTime asc),* from");
             //}
-            sb.Append(@" select orderDet.Id,dat.Id,dat.WmsNo,dat.MoveType,dat.SOBKZ,dat.WMSId,orderDet.Item,orderDet.Uom,dat.UMLGO,dat.Qty,dat.IsHand,dat.CreateDate,
+            sb.Append(@" select orderDet.Id,dat.Id  as datId,dat.WmsNo,dat.MoveType,dat.SOBKZ,dat.WMSId,orderDet.Item,orderDet.Uom,dat.UMLGO,dat.Qty,dat.IsHand,dat.CreateDate,
 orderDet.ItemDesc as ItemDescription,orderDet.RefItemCode as ReferenceItemCode,
 orderDet.OrderQty as OrderQty,
 dat.ReceiveTotal,dat.CancelQty,dat.LGORT,orderDet.CreateDate as RequirementDate,orderDet.OrderNo,m.PartyTo,m.PartyFrom,m.WindowTime,m.OrderStrategy,orderDet.UnitPrice,orderDet.RecLotSize

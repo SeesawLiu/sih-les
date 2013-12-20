@@ -162,41 +162,86 @@
             {
                 return PartialView(new GridModel(new List<OrderDetail>()));
             }
-            string whereStatement = string.Format(" and exists (select 1 from OrderMaster as o  with(nolock) where  o.SubType ={0} and o.OrderNo=d.OrderNo ) ",
+            string whereStatement = string.Format(" and exists (select 1 from OrderMaster as o  with(nolock) where o.SubType ={0} and o.OrderNo=d.OrderNo  ",
                (int)com.Sconit.CodeMaster.OrderSubType.Normal);
-            if (searchModel.OrderStrategy != null && !string.IsNullOrWhiteSpace(searchModel.Shift))
-            {
 
-                if (searchModel.OrderStrategy.Value == 1 || searchModel.OrderStrategy.Value == 0)
+            #region masterPrepare
+            if (!string.IsNullOrWhiteSpace(searchModel.MultiStatus) || !string.IsNullOrWhiteSpace(searchModel.MultiFlow)
+                || !string.IsNullOrWhiteSpace(searchModel.MultiPartyFrom) || !string.IsNullOrWhiteSpace(searchModel.MultiPartyTo)
+                || !string.IsNullOrWhiteSpace(searchModel.Shift) || searchModel.OrderStrategy != null
+                || searchModel.CloseTimeFrom != null || searchModel.CloseTimeTo != null)
+            {
+                string allMasterSql = string.Empty;
+                if (searchModel.IsNoneClsoe)
                 {
-                    whereStatement = string.Format(" and exists (select 1 from OrderMaster as o  with(nolock) where  o.SubType ={0} and o.OrderStrategy in (0,1) and o.OrderNo=d.OrderNo and o.Shift={1} ) ",
-                (int)com.Sconit.CodeMaster.OrderSubType.Normal, searchModel.Shift);
+                    //whereStatement += " and d.OrderQty>d.RecQty and exists(select 1 from OrderMaster as o  with(nolock) where   o.Status not in (4,5) and o.OrderNo=d.OrderNo ) ";
+                    whereStatement = "  and d.OrderQty>d.RecQty  " + whereStatement;
+                    allMasterSql += " and  o.Status not in (4,5) ";
                 }
-                else
+                if (searchModel.OrderStrategy != null)
                 {
-                    whereStatement = string.Format(" and exists (select 1 from OrderMaster as o  with(nolock) where  o.SubType ={0} and o.OrderStrategy={1} and o.OrderNo=d.OrderNo  and o.Shift={2}) ",
-                (int)com.Sconit.CodeMaster.OrderSubType.Normal, searchModel.OrderStrategy, searchModel.Shift);
+                    if (searchModel.OrderStrategy.Value == 1 || searchModel.OrderStrategy.Value == 0)
+                    {
+                        allMasterSql += string.Format(" and o.OrderStrategy in (0,1) ");
+                    }
+                    else
+                    {
+                        allMasterSql += string.Format(" and o.OrderStrategy={0} ", searchModel.OrderStrategy);
+                    }
+                }
+                if (!string.IsNullOrWhiteSpace(searchModel.Shift))
+                {
+                    allMasterSql += string.Format(" and o.Shift={0} ", searchModel.Shift);
                 }
 
-            }
-            else if (searchModel.OrderStrategy == null && !string.IsNullOrWhiteSpace(searchModel.Shift))
-            {
-                whereStatement = string.Format(" and exists (select 1 from OrderMaster as o  with(nolock) where  o.SubType ={0} and o.OrderNo=d.OrderNo and o.Shift={1} ) ",
-               (int)com.Sconit.CodeMaster.OrderSubType.Normal, searchModel.Shift);
-            }
-            else if (searchModel.OrderStrategy != null && string.IsNullOrWhiteSpace(searchModel.Shift))
-            {
-                if (searchModel.OrderStrategy.Value == 1 || searchModel.OrderStrategy.Value == 0)
+                if (!string.IsNullOrWhiteSpace(searchModel.MultiStatus))
                 {
-                    whereStatement = string.Format(" and exists (select 1 from OrderMaster as o  with(nolock) where  o.SubType ={0} and o.OrderStrategy in (0,1) and o.OrderNo=d.OrderNo ) ",
-                (int)com.Sconit.CodeMaster.OrderSubType.Normal);
+                    string statusSql = " and o.Status in( ";
+                    string[] statusArr = searchModel.MultiStatus.Split(',');
+                    statusSql += string.Join(",", statusArr) + ") ";
+                    allMasterSql += statusSql;
                 }
-                else
+                if (!string.IsNullOrWhiteSpace(searchModel.MultiFlow))
                 {
-                    whereStatement = string.Format(" and exists (select 1 from OrderMaster as o  with(nolock) where  o.SubType ={0} and o.OrderStrategy={1} and o.OrderNo=d.OrderNo ) ",
-                (int)com.Sconit.CodeMaster.OrderSubType.Normal, searchModel.OrderStrategy);
+                    string flows = searchModel.MultiFlow.Replace("\r\n", ",");
+                    flows = flows.Replace("\n", ",");
+                    string[] flowArr = flows.Split(',');
+                    string flowSql = " and o.Flow in( '";
+                    flowSql += string.Join("','", flowArr) + "') ";
+                    allMasterSql += flowSql;
                 }
+                if (!string.IsNullOrWhiteSpace(searchModel.MultiPartyFrom))
+                {
+                    string partyFromSql = "   and o.PartyFrom in( '";
+                    string[] partyFromArr = searchModel.MultiPartyFrom.Split(',');
+                    partyFromSql += string.Join("','", partyFromArr) + "') ";
+                    allMasterSql += partyFromSql;
+                }
+                if (!string.IsNullOrWhiteSpace(searchModel.MultiPartyTo))
+                {
+                    string partyToSql = "  and o.PartyTo in( '";
+                    string[] partyToArr = searchModel.MultiPartyTo.Split(',');
+
+                    partyToSql += string.Join("','", partyToArr) + "') ";
+                    allMasterSql += partyToSql;
+                }
+                if (searchModel.CloseTimeFrom != null && searchModel.CloseTimeTo != null)
+                {
+                    allMasterSql += string.Format("and o.CloseDate between '{0}' and '{1}'  ", searchModel.CloseTimeFrom.Value, searchModel.CloseTimeTo.Value);
+                }
+                else if (searchModel.CloseTimeFrom != null && searchModel.CloseTimeTo == null)
+                {
+                    allMasterSql += string.Format(" and   o.CloseDate>= '{0}'  ", searchModel.CloseTimeFrom.Value);
+                }
+                else if (searchModel.CloseTimeFrom == null && searchModel.CloseTimeTo != null)
+                {
+                    allMasterSql += string.Format(" and   o.CloseDate <= '{0}'   ", searchModel.CloseTimeTo.Value);
+                }
+                whereStatement += allMasterSql;
             }
+            #endregion
+            whereStatement += ")";
+
 
             if (!string.IsNullOrWhiteSpace(searchModel.TraceCode))
             {
@@ -206,10 +251,7 @@
             {
                 whereStatement += " and d.ZOPWZ like '" + searchModel.ZOPWZ + "%' ";
             }
-            if (searchModel.IsNoneClsoe)
-            {
-                whereStatement += " and d.OrderQty>d.RecQty and exists(select 1 from OrderMaster as o  with(nolock) where   o.Status not in (4,5) and o.OrderNo=d.OrderNo ) ";
-            }
+            
             if (!string.IsNullOrWhiteSpace(searchModel.LocationTo))
             {
                 whereStatement += " and d.LocTo='" + searchModel.LocationTo + "' ";
@@ -222,50 +264,7 @@
             {
                 whereStatement += " and d.RecLotSize=1 ";
             }
-            if (!string.IsNullOrWhiteSpace(searchModel.MultiStatus))
-            {
-                string statusSql = "  and exists (select 1 from OrderMaster as o  with(nolock) where  o.OrderNo=d.OrderNo  and o.Status in( '";
-                string[] statusArr = searchModel.MultiStatus.Split(',');
-
-                statusSql += string.Join("','", statusArr)+"'))";
-                whereStatement += statusSql;
-            }
-            if (!string.IsNullOrWhiteSpace(searchModel.MultiFlow))
-            {
-                string flows = searchModel.MultiFlow.Replace("\r\n", ",");
-                flows = flows.Replace("\n", ",");
-                string[] flowArr = flows.Split(',');
-                string flowSql = "  and exists (select 1 from OrderMaster as o  with(nolock) where  o.OrderNo=d.OrderNo  and o.Flow in( '";
-                flowSql += string.Join("','", flows) + "'))";
-                whereStatement += flowSql;
-            }
-            if (!string.IsNullOrWhiteSpace(searchModel.MultiPartyFrom))
-            {
-                string partyFromSql = "  and exists (select 1 from OrderMaster as o  with(nolock) where  o.OrderNo=d.OrderNo  and o.PartyFrom in( '";
-                string[] partyFromArr = searchModel.MultiPartyFrom.Split(',');
-                partyFromSql += string.Join("','", partyFromArr) + "'))";
-                whereStatement += partyFromSql;
-            }
-            if (!string.IsNullOrWhiteSpace(searchModel.MultiPartyTo))
-            {
-                string partyToSql = "  and exists (select 1 from OrderMaster as o  with(nolock) where  o.OrderNo=d.OrderNo  and o.PartyTo in( '";
-                string[] partyToArr = searchModel.MultiPartyTo.Split(',');
-
-                partyToSql += string.Join("','", partyToArr) + "'))";
-                whereStatement += partyToSql;
-            }
-            if (searchModel.CloseTimeFrom!=null && searchModel.CloseTimeTo!=null)
-            {
-                whereStatement += string.Format(" and exists (select 1 from OrderMaster as o  with(nolock) where    o.OrderNo=d.OrderNo and o.CloseDate between '{0}' and '{1}' ) ", searchModel.CloseTimeFrom.Value, searchModel.CloseTimeTo.Value);
-            }
-            else if (searchModel.CloseTimeFrom != null && searchModel.CloseTimeTo == null)
-            {
-                whereStatement += string.Format(" and exists (select 1 from OrderMaster as o  with(nolock) where  o.OrderNo=d.OrderNo and   o.CloseDate>= '{10}' ) ", searchModel.CloseTimeFrom.Value);
-            }
-            else if (searchModel.CloseTimeFrom == null && searchModel.CloseTimeTo != null)
-            {
-                whereStatement += string.Format(" and exists (select 1 from OrderMaster as o  with(nolock) where  o.OrderNo=d.OrderNo and   o.CloseDate <= '{0}'  ) ", searchModel.CloseTimeTo.Value);
-            }
+            
             IList<OrderDetail> orderDetList = new List<OrderDetail>();
             ProcedureSearchStatementModel procedureSearchStatementModel = PrepareSearchDetailStatement(command, searchModel, whereStatement);
             procedureSearchStatementModel.SelectProcedure = "USP_Search_PrintOrderDet";

@@ -41,7 +41,7 @@
             columns.Bound(o => o.Qty);
             columns.Bound(o => o.ReceiveTotal);
             columns.Bound(o => o.CancelQty);
-            columns.Bound(o => o.WindowTime);
+            columns.Bound(o => o.WindowTime).ClientTemplate("<div style='<#=ColorStyle #>'><#= WindowTimeFromat #></div>"); 
             columns.Bound(o => o.RequirementDate);
             columns.Bound(o => o.CreateDateFormat);
             columns.Bound(o => o.WmsNo);

@@ -894,7 +894,7 @@ namespace com.Sconit.Web.Controllers.ORD
             parasDet.AddRange(paras);
             IList<OrderMaster> orderMasterList = this.genericMgr.FindAll<OrderMaster>(hqlMstr, paras.ToArray());
             IList<object[]> searResultList = this.genericMgr.FindAllWithNativeSql<object[]>(hqlDet + " union all " + hqlDet.Replace("ORD_OrderDet_2", "ORD_OrderDet_1"), parasDet.ToArray());
-            ((List<object[]>)searResultList).AddRange(this.genericMgr.FindAllWithNativeSql<object[]>(hqlDet, paras.ToArray()));
+            //((List<object[]>)searResultList).AddRange(this.genericMgr.FindAllWithNativeSql<object[]>(hqlDet, paras.ToArray()));
             //det.Seq,det.OrderNo,det.Item,det.ItemDesc,det.RefItemCode,det.ManufactureParty,det.Uom,det.BinTo,
             //det.StartDate,det.ReqQty,det.ReserveNo,det.ReserveLine ,det.OrderQty,ce.ZENGINE
             var orderDetailList = (from tak in searResultList

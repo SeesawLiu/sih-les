@@ -60,6 +60,42 @@ namespace com.Sconit.Entity.FIS
         [Display(Name = "OrderMaster_WindowTime", ResourceType = typeof(Resources.ORD.OrderMaster))]
         public DateTime WindowTime { get; set; }
 
+        [Display(Name = "OrderMaster_WindowTime", ResourceType = typeof(Resources.ORD.OrderMaster))]
+        public string WindowTimeFromat { get { return this.WindowTime.ToString(); } }
+
+        public string ColorStyle
+        {
+            get
+            {
+                if (this.Id==1 && !this.ReceiveLotSize)//Î´³ö¿â
+                {
+                    if (this.WindowTime < System.DateTime.Now)
+                    {
+                        return "Color:red";
+                    }
+                    else
+                    {
+                        return "Color:green";
+                    }
+                }
+                else if (this.Qty > 0 && !this.ReceiveLotSize && (this.Qty + this.CancelQty) > this.ReceiveTotal)//Î´ÇåµÄ
+                {
+                    if (this.WindowTime < System.DateTime.Now)
+                    {
+                        return "Color:orange";
+                    }
+                    else
+                    {
+                        return "Color:green";
+                    }
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
+
        
 
         [Export(ExportName = "ExportWMSDatFile", ExportSeq = 2)]

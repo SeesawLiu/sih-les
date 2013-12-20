@@ -65,6 +65,7 @@ namespace com.Sconit.Web.Controllers.FIS
             //IList<object[]> searchList = base.genericMgr.FindAllWithNativeSql<object[]>(lesInLogSql + string.Format(") as t2 where t2.RowId between {0} and {1}", (command.Page - 1) * command.PageSize, command.Page * command.PageSize));
             IList<object[]> searchList = base.genericMgr.FindAllWithNativeSql<object[]>(sql);
             IList<WMSDatFile> wMSDatFileList = new List<WMSDatFile>();
+            var returnlList = new List<WMSDatFile>();
             if (searchList != null && searchList.Count > 0)
             {
                 #region
@@ -85,7 +86,7 @@ namespace com.Sconit.Web.Controllers.FIS
                                     CreateDateFormat = tak[11] != null ? (DateTime?)tak[11] : null,
                                     ItemDescription = tak[12] != null ? (string)tak[12] : string.Empty,
                                     ReferenceItemCode = (string)tak[13],
-                                    OrderQty = tak[24]!=null && (decimal?)tak[24]==1?(decimal)tak[25]:(decimal)tak[14],
+                                    OrderQty = tak[25]!=null && (decimal?)tak[25]==1?(decimal)tak[24]:(decimal)tak[14],
                                     ReceiveTotal = tak[15] != null ? (decimal)tak[15] : 0,
                                     CancelQty = tak[16] != null ? (decimal)tak[16] : 0,
                                     LGORT = tak[17] != null?(string)tak[17]:string.Empty,
@@ -95,65 +96,92 @@ namespace com.Sconit.Web.Controllers.FIS
                                     PartyFrom = (string)tak[21],
                                     WindowTime = (DateTime)tak[22],
                                     OrderStrategyDescription = systemMgr.GetCodeDetailDescription(Sconit.CodeMaster.CodeMaster.FlowStrategy, int.Parse((tak[23]).ToString())),
-                                    ReceiveLotSize = tak[24]!=null && (decimal?)tak[24]==1?true:false,
+                                    ReceiveLotSize = tak[25]!=null && (decimal?)tak[25]==1?true:false,
                                 }).ToList();
                 #endregion
 
                 #region
 
-                #region 冲销的相互抵消
-                foreach (WMSDatFile wMSDatFile in wMSDatFileList)
+                var cancelList = wMSDatFileList.Where(w => w.MoveType == "312" || w.MoveType == "412").ToList();
+                 returnlList = wMSDatFileList.Where(w => w.MoveType != "312" && w.MoveType != "412").ToList();
+                if (cancelList != null && cancelList.Count > 0)
                 {
-                    if (wMSDatFile.MoveType == null)
+                    foreach (WMSDatFile c in cancelList)
                     {
-                        continue;
-                    }
-                    foreach (WMSDatFile wmsFile in wMSDatFileList)
-                    {
-                        if (wmsFile.MoveType == null)
+                        if (c.MoveType == "312")
                         {
-                            continue;
+                            var cancelFile = returnlList.Where(r => r.MoveType == "311" && c.MoveType == "312" && r.SOBKZ == c.SOBKZ && r.Qty == c.Qty && r.WmsLine == c.WmsLine
+                                && r.ReceiveTotal - r.CancelQty == 0 && r.WmsNo == c.WmsNo).ToList();
+                            if (cancelFile != null && cancelFile.Count > 0)
+                            {
+                                returnlList.Remove(cancelFile.First());
+                            }
                         }
-                        if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "311" && wmsFile.MoveType + wmsFile.SOBKZ == "312" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine
-                            && wmsFile.ReceiveTotal - wmsFile.CancelQty == 0 && wMSDatFile.ReceiveTotal - wMSDatFile.CancelQty == 0 && wmsFile.WmsNo==wMSDatFile.WmsNo)
+                        else if (c.MoveType == "412")
                         {
-                            wmsFile.MoveType = null;
-                            wMSDatFile.MoveType = null;
-                            break;
-                        }
-                        else if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "311K" && wmsFile.MoveType + wmsFile.SOBKZ == "312K" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine
-                            && wmsFile.ReceiveTotal - wmsFile.CancelQty == 0 && wMSDatFile.ReceiveTotal - wMSDatFile.CancelQty == 0 && wmsFile.WmsNo == wMSDatFile.WmsNo)
-                        {
-                            wmsFile.MoveType = null;
-                            wMSDatFile.MoveType = null;
-                            break;
-                        }
-
-                        else if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "411" && wmsFile.MoveType + wMSDatFile.SOBKZ == "412" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine
-                            && wmsFile.ReceiveTotal - wmsFile.CancelQty == 0 && wMSDatFile.ReceiveTotal - wMSDatFile.CancelQty == 0 && wmsFile.WmsNo == wMSDatFile.WmsNo)
-                        {
-                            wmsFile.MoveType = null;
-                            wMSDatFile.MoveType = null;
-                            break;
-                        }
-                        else if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "411K" && wmsFile.MoveType + wMSDatFile.SOBKZ == "412K" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine
-                            && wmsFile.ReceiveTotal - wmsFile.CancelQty == 0 && wMSDatFile.ReceiveTotal - wMSDatFile.CancelQty == 0 && wmsFile.WmsNo == wMSDatFile.WmsNo)
-                        {
-                            wmsFile.MoveType = null;
-                            wMSDatFile.MoveType = null;
-                            break;
+                            var cancelFile = returnlList.Where(r => r.MoveType == "411" && c.MoveType == "412" && r.SOBKZ == c.SOBKZ && r.Qty == c.Qty && r.WmsLine == c.WmsLine
+                                && r.ReceiveTotal - r.CancelQty == 0 && r.WmsNo == c.WmsNo).ToList();
+                            if (cancelFile != null && cancelFile.Count > 0)
+                            {
+                                returnlList.Remove(cancelFile.First());
+                            }
                         }
                     }
                 }
+
+                #region 冲销的相互抵消
+                //foreach (WMSDatFile wMSDatFile in wMSDatFileList)
+                //{
+                //    if (wMSDatFile.MoveType == null)
+                //    {
+                //        continue;
+                //    }
+                //    foreach (WMSDatFile wmsFile in wMSDatFileList)
+                //    {
+                //        if (wmsFile.MoveType == null)
+                //        {
+                //            continue;
+                //        }
+                //        if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "311" && wmsFile.MoveType + wmsFile.SOBKZ == "312" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine
+                //            && wmsFile.ReceiveTotal - wmsFile.CancelQty == 0 && wMSDatFile.ReceiveTotal - wMSDatFile.CancelQty == 0 && wmsFile.WmsNo==wMSDatFile.WmsNo)
+                //        {
+                //            wmsFile.MoveType = null;
+                //            wMSDatFile.MoveType = null;
+                //            break;
+                //        }
+                //        else if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "311K" && wmsFile.MoveType + wmsFile.SOBKZ == "312K" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine
+                //            && wmsFile.ReceiveTotal - wmsFile.CancelQty == 0 && wMSDatFile.ReceiveTotal - wMSDatFile.CancelQty == 0 && wmsFile.WmsNo == wMSDatFile.WmsNo)
+                //        {
+                //            wmsFile.MoveType = null;
+                //            wMSDatFile.MoveType = null;
+                //            break;
+                //        }
+
+                //        else if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "411" && wmsFile.MoveType + wMSDatFile.SOBKZ == "412" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine
+                //            && wmsFile.ReceiveTotal - wmsFile.CancelQty == 0 && wMSDatFile.ReceiveTotal - wMSDatFile.CancelQty == 0 && wmsFile.WmsNo == wMSDatFile.WmsNo)
+                //        {
+                //            wmsFile.MoveType = null;
+                //            wMSDatFile.MoveType = null;
+                //            break;
+                //        }
+                //        else if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "411K" && wmsFile.MoveType + wMSDatFile.SOBKZ == "412K" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine
+                //            && wmsFile.ReceiveTotal - wmsFile.CancelQty == 0 && wMSDatFile.ReceiveTotal - wMSDatFile.CancelQty == 0 && wmsFile.WmsNo == wMSDatFile.WmsNo)
+                //        {
+                //            wmsFile.MoveType = null;
+                //            wMSDatFile.MoveType = null;
+                //            break;
+                //        }
+                //    }
+                //}
                 #endregion
                 #endregion
 
             }
-            IEnumerable<WMSDatFile> wmsList = wMSDatFileList.Where(o => o.MoveType != null && o.MoveType != "312" && o.MoveType != "412");
+            //IEnumerable<WMSDatFile> wmsList = wMSDatFileList.Where(o => o.MoveType != null && o.MoveType != "312" && o.MoveType != "412");
             //var count = wMSDatFileList.Where(o => o.MoveType == null || o.MoveType == "312" || o.MoveType == "412");
             GridModel<WMSDatFile> gridModelOrderDet = new GridModel<WMSDatFile>();
-            gridModelOrderDet.Total = wmsList.Count();
-            gridModelOrderDet.Data = wmsList.Skip((command.Page-1)*command.PageSize).Take(command.PageSize);
+            gridModelOrderDet.Total = returnlList.Count;
+            gridModelOrderDet.Data = returnlList.Skip((command.Page - 1) * command.PageSize).Take(command.PageSize);
             return PartialView(gridModelOrderDet);
         }
 
@@ -167,6 +195,7 @@ namespace com.Sconit.Web.Controllers.FIS
 
                 IList<object[]> searchList = base.genericMgr.FindAllWithNativeSql<object[]>(sql);
                 IList<WMSDatFile> wMSDatFileList = new List<WMSDatFile>();
+                var returnlList = new List<WMSDatFile>();
                 if (searchList != null && searchList.Count > 0)
                 {
                     #region
@@ -187,7 +216,7 @@ namespace com.Sconit.Web.Controllers.FIS
                                           CreateDateFormat = tak[11] != null ? (DateTime?)tak[11] : null,
                                           ItemDescription = tak[12] != null ? (string)tak[12] : string.Empty,
                                           ReferenceItemCode = (string)tak[13],
-                                          OrderQty = tak[14] != null ? (decimal)tak[14] : 0,
+                                          OrderQty = tak[25] != null && (decimal?)tak[25] == 1 ? (decimal)tak[24] : (decimal)tak[14],
                                           ReceiveTotal = tak[15] != null ? (decimal)tak[15] : 0,
                                           CancelQty = tak[16] != null ? (decimal)tak[16] : 0,
                                           LGORT = tak[17] != null ? (string)tak[17] : string.Empty,
@@ -197,62 +226,42 @@ namespace com.Sconit.Web.Controllers.FIS
                                           PartyFrom = (string)tak[21],
                                           WindowTime = (DateTime)tak[22],
                                           OrderStrategyDescription = systemMgr.GetCodeDetailDescription(Sconit.CodeMaster.CodeMaster.FlowStrategy, int.Parse((tak[23]).ToString())),
-                                          ReceiveLotSize = tak[24] != null && (decimal?)tak[24] == 1 ? true : false,
+                                          ReceiveLotSize = tak[25] != null && (decimal?)tak[25] == 1 ? true : false,
                                       }).ToList();
                     #endregion
 
-                    #region 冲销的相互抵消
-                    foreach (WMSDatFile wMSDatFile in wMSDatFileList)
+                    var cancelList = wMSDatFileList.Where(w => w.MoveType == "312" || w.MoveType == "412").ToList();
+                    returnlList = wMSDatFileList.Where(w => w.MoveType != "312" && w.MoveType != "412").ToList();
+                    if (cancelList != null && cancelList.Count > 0)
                     {
-                        if (wMSDatFile.MoveType == null)
+                        foreach (WMSDatFile c in cancelList)
                         {
-                            continue;
-                        }
-                        foreach (WMSDatFile wmsFile in wMSDatFileList)
-                        {
-                            if (wmsFile.MoveType == null)
+                            if (c.MoveType == "312")
                             {
-                                continue;
+                                var cancelFile = returnlList.Where(r => r.MoveType == "311" && c.MoveType == "312" && r.SOBKZ == c.SOBKZ && r.Qty == c.Qty && r.WmsLine == c.WmsLine
+                                    && r.ReceiveTotal - r.CancelQty == 0 && r.WmsNo == c.WmsNo).ToList();
+                                if (cancelFile != null && cancelFile.Count > 0)
+                                {
+                                    returnlList.Remove(cancelFile.First());
+                                }
                             }
-                            if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "311" && wmsFile.MoveType + wmsFile.SOBKZ == "312" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine
-                                && wmsFile.ReceiveTotal - wmsFile.CancelQty == 0 && wMSDatFile.ReceiveTotal - wMSDatFile.CancelQty == 0 && wmsFile.WmsNo == wMSDatFile.WmsNo)
+                            else if (c.MoveType == "412")
                             {
-                                wmsFile.MoveType = null;
-                                wMSDatFile.MoveType = null;
-                                break;
-                            }
-                            else if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "311K" && wmsFile.MoveType + wmsFile.SOBKZ == "312K" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine
-                                && wmsFile.ReceiveTotal - wmsFile.CancelQty == 0 && wMSDatFile.ReceiveTotal - wMSDatFile.CancelQty == 0 && wmsFile.WmsNo == wMSDatFile.WmsNo)
-                            {
-                                wmsFile.MoveType = null;
-                                wMSDatFile.MoveType = null;
-                                break;
-                            }
-
-                            else if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "411" && wmsFile.MoveType + wMSDatFile.SOBKZ == "412" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine
-                                && wmsFile.ReceiveTotal - wmsFile.CancelQty == 0 && wMSDatFile.ReceiveTotal - wMSDatFile.CancelQty == 0 && wmsFile.WmsNo == wMSDatFile.WmsNo)
-                            {
-                                wmsFile.MoveType = null;
-                                wMSDatFile.MoveType = null;
-                                break;
-                            }
-                            else if (wMSDatFile.MoveType + wMSDatFile.SOBKZ == "411K" && wmsFile.MoveType + wMSDatFile.SOBKZ == "412K" && wmsFile.Qty == wMSDatFile.Qty && wmsFile.WmsLine == wMSDatFile.WmsLine
-                                && wmsFile.ReceiveTotal - wmsFile.CancelQty == 0 && wMSDatFile.ReceiveTotal - wMSDatFile.CancelQty == 0 && wmsFile.WmsNo == wMSDatFile.WmsNo)
-                            {
-                                wmsFile.MoveType = null;
-                                wMSDatFile.MoveType = null;
-                                break;
+                                var cancelFile = returnlList.Where(r => r.MoveType == "411" && c.MoveType == "412" && r.SOBKZ == c.SOBKZ && r.Qty == c.Qty && r.WmsLine == c.WmsLine
+                                    && r.ReceiveTotal - r.CancelQty == 0 && r.WmsNo == c.WmsNo).ToList();
+                                if (cancelFile != null && cancelFile.Count > 0)
+                                {
+                                    returnlList.Remove(cancelFile.First());
+                                }
                             }
                         }
                     }
-                    #endregion
                 }
                 //IList<object> data = new List<object>();
                 //data.Add(wMSDatFileList);
                 //reportGen.WriteToClient("WMSDatFile.xls", data, "WMSDatFile.xls");
-                IList<WMSDatFile> wmsList = wMSDatFileList.Where(o => o.MoveType != null && o.MoveType != "312" && o.MoveType != "412").ToList();
 
-                ExportToXLS<WMSDatFile>("ExportWMSDatFile", "XLS", wmsList.Take(65000).ToList());
+                ExportToXLS<WMSDatFile>("ExportWMSDatFile", "XLS", returnlList.Take(65000).ToList());
             }
             catch (Exception)
             {
@@ -322,7 +331,7 @@ namespace com.Sconit.Web.Controllers.FIS
             //{
             //    sb.Append("select RowId=ROW_NUMBER()OVER( order by WindowTime asc),* from");
             //}
-            sb.Append(@" select orderDet.Id,dat.Id,dat.WmsNo,dat.MoveType,dat.SOBKZ,dat.WMSId,orderDet.Item,orderDet.Uom,dat.UMLGO,dat.Qty,dat.IsHand,dat.CreateDate,
+            sb.Append(@" select orderDet.Id,dat.Id  as datId,dat.WmsNo,dat.MoveType,dat.SOBKZ,dat.WMSId,orderDet.Item,orderDet.Uom,dat.UMLGO,dat.Qty,dat.IsHand,dat.CreateDate,
 orderDet.ItemDesc as ItemDescription,orderDet.RefItemCode as ReferenceItemCode,
 orderDet.OrderQty as OrderQty,
 dat.ReceiveTotal,dat.CancelQty,dat.LGORT,orderDet.CreateDate as RequirementDate,orderDet.OrderNo,m.PartyTo,m.PartyFrom,m.WindowTime,m.OrderStrategy,orderDet.UnitPrice,orderDet.RecLotSize

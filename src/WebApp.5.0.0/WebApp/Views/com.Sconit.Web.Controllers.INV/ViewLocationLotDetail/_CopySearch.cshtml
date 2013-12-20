@@ -111,13 +111,17 @@
         if (items == "") {
             items = ",";
         }
-
-        location.href = "/ViewLocationLotDetail/ExportLocationDetailXLS/?locations=" + locations + "&items=" + items;
+        $("#locationshidden").val(locations);
+        $("#itemshidden").val(items);
+        $("#isSapLocationhidden").val($("#IsSapLocation").is(":checked"));
+        $("#isShowCSSupplierhidden").val($("#IsShowCSSupplier").is(":checked"));
+        $("#ExportForm").submit();
+//        location.href = "/ViewLocationLotDetail/ExportLocationDetailXLS/?locations=" + locations + "&items=" + items;
     }
 
-    $(function () {
-        $message.success("请注意：每个数据之间必须以逗号(,)或者按回车进行区分，否则将无法查询出您想要的信息！！");
-    });
+//    $(function () {
+//        $message.success("请注意：每个数据之间必须以逗号(,)或者按回车进行区分，否则将无法查询出您想要的信息！！");
+//    });
 
 </script>
  
@@ -208,6 +212,12 @@
         </div>
           }
 </fieldset>
+ <form id="ExportForm" action="/ViewLocationLotDetail/ExportLocationDetailXLS" target="_blank"  method="post">
+        <input id="locationshidden" name="locationshidden" type="hidden" />
+        <input id="itemshidden"  name="itemshidden" type="hidden" />
+        <input id="isSapLocationhidden"  name="isSapLocationhidden" type="hidden" />
+        <input id="isShowCSSupplierhidden"  name="isShowCSSupplierhidden" type="hidden" />
+    </form>
 @* <script type="text/javascript" data-jsfiddle="Locaiontexample">
      var locdata = [[" "], [" "], [" "], [" "], [" "], [" "], [" "]];
      if ('@ViewBag.Locations' != "" && '@ViewBag.Locations' != null && '@ViewBag.Locations' != undefined) {

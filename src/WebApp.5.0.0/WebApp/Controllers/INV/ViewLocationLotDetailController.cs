@@ -298,14 +298,14 @@ namespace com.Sconit.Web.Controllers.INV
             reportGen.WriteToClient("LocationDetailView.xls", data, "LocationDetailView.xls");
         }
 
-        public void ExportLocationDetailXLS(LocationLotDetailSearchModel searchModel)
+        public void ExportLocationDetailXLS(string locationshidden, string itemshidden, bool isSapLocationhidden, bool isShowCSSupplierhidden)
         {
 
             DataTable locationArrayTable = new DataTable("LocationArrayTable");
             locationArrayTable.Columns.Add("Field", typeof(string));
-            if (!string.IsNullOrEmpty(searchModel.locations))
+            if (!string.IsNullOrEmpty(locationshidden))
             {
-                string loctions = searchModel.locations.Replace("\r\n", ",");
+                string loctions = locationshidden.Replace("\r\n", ",");
                 loctions = loctions.Replace("\n", ",");
                 string[] locationArr = loctions.Split(',');
                 for (int i = 0; i < locationArr.Length; i++)
@@ -319,9 +319,9 @@ namespace com.Sconit.Web.Controllers.INV
 
             DataTable itemArrayTable = new DataTable("ItemArrayTable");
             itemArrayTable.Columns.Add("Field", typeof(string));
-            if (!string.IsNullOrEmpty(searchModel.items))
+            if (!string.IsNullOrEmpty(itemshidden))
             {
-                string items = searchModel.items.Replace("\r\n", ",");
+                string items = itemshidden.Replace("\r\n", ",");
                 items = items.Replace("\n", ",");
                 string[] itemArr = items.Split(',');
                 for (int i = 0; i < itemArr.Length; i++)
@@ -338,13 +338,13 @@ namespace com.Sconit.Web.Controllers.INV
             parameters[0].Value = locationArrayTable;
 
             parameters[1] = new SqlParameter("@IsSapLocation", System.Data.SqlDbType.Bit);
-            parameters[1].Value = searchModel.IsSapLocation;
+            parameters[1].Value = isSapLocationhidden;
 
             parameters[2] = new SqlParameter("@ItemArrayTable", System.Data.SqlDbType.Structured);
             parameters[2].Value = itemArrayTable;
 
             parameters[3] = new SqlParameter("@IsShowCSSupplier", System.Data.SqlDbType.Bit);
-            parameters[3].Value = searchModel.IsShowCSSupplier;
+            parameters[3].Value = isShowCSSupplierhidden;
 
             parameters[4] = new SqlParameter("@SortCloumn", System.Data.SqlDbType.VarChar,50);
             parameters[4].Value =string.Empty;
@@ -383,7 +383,7 @@ namespace com.Sconit.Web.Controllers.INV
                         lotDet.Uom = row.ItemArray[3].ToString();
                         lotDet.Location = row.ItemArray[4].ToString();
                         lotDet.Qty = Convert.ToDecimal(row.ItemArray[5]);
-                        if (searchModel.IsShowCSSupplier)
+                        if (isShowCSSupplierhidden)
                         {
                             lotDet.suppliers = row.ItemArray[6].ToString();
                         }

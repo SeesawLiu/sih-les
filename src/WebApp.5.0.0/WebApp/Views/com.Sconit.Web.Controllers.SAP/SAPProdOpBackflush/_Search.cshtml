@@ -1,0 +1,87 @@
+﻿@using System.Data;
+@using com.Sconit.Web.Models.SearchModels.SI
+<fieldset>
+    @using (Html.BeginForm("List", "SAPProdOpBackflush"))
+    {   
+        <div class="search">
+            <div class="search-label">
+                <label for="Status">
+                    状态
+                </label>
+            </div>
+            <div class="search-field">
+                @{Html.RenderAction("_StatusDropDownList", "Common", new
+                  {
+                      controlName = "Status",
+                      selectedValue = TempData["SearchModel"] != null ? ((SearchModel)TempData["SearchModel"]).Status : null
+                  });
+                }
+            </div>
+            <div class="search-label">
+                <label>
+                     SAP生产单号
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("AUFNR", TempData["SearchModel"] != null ? ((SearchModel)TempData["SearchModel"]).AUFNR : string.Empty)
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_DateFrom">
+                    创建时间 从
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DateTimePicker().Name("StartDate").Format("yyyy-MM-dd HH:mm").Value(TempData["SearchModel"] != null ? ((SearchModel)TempData["SearchModel"]).StartDate : null)
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+            </div>
+            <div class="search-label">
+                <label for="OrderMaster_DateTo">
+                    至
+                </label>
+            </div>
+            <div class="search-field">
+                @(Html.Telerik().DateTimePicker().Name("EndDate").Format("yyyy-MM-dd HH:mm").Value(TempData["SearchModel"] != null ? ((SearchModel)TempData["SearchModel"]).EndDate : DateTime.Now)
+                .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px" }))
+            </div>
+            <div class="search-label">
+                <label>
+                     生产单号
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("OrderNo", TempData["SearchModel"] != null ? ((SearchModel)TempData["SearchModel"]).OrderNo : string.Empty)
+            </div>
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            <button type="submit" id="btnSearch">
+                @Resources.Global.Button_Search</button>
+             <button type="button" id="btnExport" onclick="ExportClick()">
+                @Resources.Global.Button_SearchExport</button>
+            <button type="button" id="btnReSend" onclick="btnReSendClick()">
+               重发</button>
+        </div>
+    }
+</fieldset>
+<script type="text/javascript">
+    function ExportClick() {
+        location.href = '/SAPProdOpBackflush/ExportXLS/?Status=' + $('#Status').val() + '&AUFNR=' + $('#AUFNR').val()
+        + '&StartDate=' + $('#StartDate').val() + '&EndDate=' + $('#EndDate').val() + '&OrderNo=' + $('#OrderNo').val();
+    }
+    function btnReSendClick() {
+        var $checkRecords = $("input[name='checkedRecords']");
+        var idStr = "";
+        for (var i = 0; i < $checkRecords.length; i++) {
+            if ($checkRecords[i].checked) {
+                var id = $checkRecords[i].value ;
+                if (idStr == "") {
+                    idStr = id;
+                } else {
+                    idStr += "," + id;
+                }
+            }
+        }
+        location.href = "/SAPProdOpBackflush/ReSendSAPProdOpBackflush/?idStr=" + idStr;
+    }
+   
+</script>

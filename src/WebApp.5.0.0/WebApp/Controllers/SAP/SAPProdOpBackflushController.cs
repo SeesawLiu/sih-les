@@ -46,44 +46,86 @@ namespace com.Sconit.Web.Controllers.SAP
         [SconitAuthorize(Permissions = "Url_SI_SAP_ProdOpBackflush_View")]
         public ActionResult _AjaxList(GridCommand command, SearchModel searchModel)
         {
-
-            SearchStatementModel searchStatementModel = PrepareSearchStatement(command, searchModel);
-            GridModel<ProdOpBackflush> gridlist = GetAjaxPageData<ProdOpBackflush>(searchStatementModel, command);
-            return PartialView(gridlist);
-        }
-
-        public void ExportXLS(SearchModel searchModel)
-        {
-            string hql = selectStatement;
-            hql += string.Format("where exists (select 1 from OrderMaster as o  with(nolock) where o.OrderNo=t.OrderNo and o.ProdLineType not in (1,2,3,4,9) and o.Type={0}) ", (int)com.Sconit.CodeMaster.OrderType.Production);
+            #region
+            string hql = @"select sp.* from SAP_ProdOpBackflush as sp with(nolock) inner join ORD_OrderMstr_4 as o  with(nolock) on sp.OrderNo=o.OrderNo
+where   o.ProdLineType not in  (1 , 2 , 3 , 4 , 9) ";
             IList<object> paramArr = new List<object>();
             if (!string.IsNullOrWhiteSpace(searchModel.OrderNo))
             {
-                hql += " and t.OrderNo = ? ";
+                hql += " and o.OrderNo = ? ";
                 paramArr.Add(searchModel.OrderNo);
             }
             if (!string.IsNullOrWhiteSpace(searchModel.AUFNR))
             {
-                hql += " and t.AUFNR = ? ";
+                hql += " and sp.AUFNR = ? ";
+                paramArr.Add(searchModel.AUFNR);
+            }
+            if (searchModel.Status != null)
+            {
+                hql += " and sp.Status = ? ";
+                paramArr.Add(searchModel.Status);
+            }
+            if (searchModel.StartDate != null)
+            {
+                hql += " and sp.CreateDate >= ? ";
+                paramArr.Add(searchModel.StartDate.Value);
+            }
+            if (searchModel.EndDate != null)
+            {
+                hql += " and sp.CreateDate <= ? ";
+                paramArr.Add(searchModel.EndDate);
+            }
+            string sortingStatement = HqlStatementHelper.GetSortingStatement(command.SortDescriptors);
+            if (command.SortDescriptors.Count == 0)
+            {
+                sortingStatement = " order by CreateDate desc ";
+            }
+            #endregion
+
+            IList<object> countList = this.genericMgr.FindAllWithNativeSql<object>("select count(*) from (" + hql + ") as tt3", paramArr.ToArray());
+
+            IList<ProdOpBackflush> searchResultList = this.genericMgr.FindEntityWithNativeSql<ProdOpBackflush>("select * from ( select RowId=ROW_NUMBER()OVER(" + sortingStatement + "),* from (" + hql + " ) as tt2 ) as tt3 where tt3.RowId between " + (command.Page - 1) * command.PageSize + " and " + command.Page * command.PageSize + "", paramArr.ToArray());
+
+
+            ViewBag.Total = Convert.ToInt32(countList[0]);
+            GridModel<ProdOpBackflush> gridModel = new GridModel<ProdOpBackflush>();
+            gridModel.Total = Convert.ToInt32(countList[0]);
+            gridModel.Data = searchResultList;
+            return PartialView(gridModel); 
+        }
+
+        public void ExportXLS(SearchModel searchModel)
+        {
+            string hql = @"select sp.* from SAP_ProdOpBackflush as sp with(nolock) inner join ORD_OrderMstr_4 as o  with(nolock) on sp.OrderNo=o.OrderNo
+where   o.ProdLineType not in  (1 , 2 , 3 , 4 , 9) ";
+            IList<object> paramArr = new List<object>();
+            if (!string.IsNullOrWhiteSpace(searchModel.OrderNo))
+            {
+                hql += " and o.OrderNo = ? ";
+                paramArr.Add(searchModel.OrderNo);
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.AUFNR))
+            {
+                hql += " and sp.AUFNR = ? ";
                 paramArr.Add(searchModel.AUFNR);
             }
             if (searchModel.Status!=null)
             {
-                hql += " and t.Status = ? ";
+                hql += " and sp.Status = ? ";
                 paramArr.Add(searchModel.Status);
             }
             if (searchModel.StartDate!=null)
             {
-                hql += " and t.StartDate >= ? ";
+                hql += " and sp.CreateDate >= ? ";
                 paramArr.Add(searchModel.StartDate.Value);
             }
             if (searchModel.EndDate!=null )
             {
-                hql += " and t.EndDate <= ? ";
+                hql += " and sp.CreateDate <= ? ";
                 paramArr.Add(searchModel.EndDate);
             }
-            hql += " order by i.CreateDate desc ";
-            IList<ProdOpBackflush> exportList = this.genericMgr.FindAll<ProdOpBackflush>(hql, paramArr.ToArray());
+            hql += " order by sp.CreateDate desc ";
+            IList<ProdOpBackflush> exportList = this.genericMgr.FindEntityWithNativeSql<ProdOpBackflush>(hql, paramArr.ToArray());
             ExportToXLS<ProdOpBackflush>("ExportProdOpBackflush", "xls", exportList);
         }
 
@@ -93,11 +135,13 @@ namespace com.Sconit.Web.Controllers.SAP
             {
                 if (!string.IsNullOrWhiteSpace(idStr))
                 {
-                    this.genericMgr.UpdateWithNativeQuery("update SAP_ProdOpBackflush set ErrorCount=0 where id in(?)", idStr);
+                    this.genericMgr.UpdateWithNativeQuery(string.Format(@"update sp set sp.ErrorCount=0 from SAP_ProdOpBackflush as sp,ORD_OrderMstr_4 as o  where sp.OrderNo=o.OrderNo
+and   o.ProdLineType not in  (1 , 2 , 3 , 4 , 9) and sp.Status=2 and sp.id in({0})", idStr));
                 }
                 else
                 {
-                    this.genericMgr.UpdateWithNativeQuery("update SAP_ProdOpBackflush set ErrorCount=0 ");
+                    this.genericMgr.UpdateWithNativeQuery(@"update sp set sp.ErrorCount=0 from SAP_ProdOpBackflush as sp,ORD_OrderMstr_4 as o  where sp.OrderNo=o.OrderNo
+and   o.ProdLineType not in  (1 , 2 , 3 , 4 , 9) and sp.Status=2");
                 }
                 SaveSuccessMessage("重发成功。");
 
@@ -110,40 +154,43 @@ namespace com.Sconit.Web.Controllers.SAP
         }
 
 
-        private SearchStatementModel PrepareSearchStatement(GridCommand command, SearchModel searchModel)
+        private string PrepareSearchStatement(GridCommand command, SearchModel searchModel)
         {
-            string whereStatement = string.Format("where exists (select 1 from OrderMaster as o  with(nolock) where o.OrderNo=t.OrderNo and o.ProdLineType not in (1,2,3,4,9) and o.Type={0}) ", (int)com.Sconit.CodeMaster.OrderType.Production);
-
-            IList<object> param = new List<object>();
-            HqlStatementHelper.AddEqStatement("Status", searchModel.Status, "t", ref whereStatement, param);
-            HqlStatementHelper.AddEqStatement("OrderNo", searchModel.OrderNo, "t", ref whereStatement, param);
-            HqlStatementHelper.AddEqStatement("AUFNR", searchModel.AUFNR, "t", ref whereStatement, param);
-
-            if (searchModel.StartDate != null & searchModel.EndDate != null)
+            string hql = @"select sp.* from SAP_ProdOpBackflush as sp with(nolock) inner join ORD_OrderMstr_4 as o  with(nolock) on sp.OrderNo=o.OrderNo
+where   o.ProdLineType not in  (1 , 2 , 3 , 4 , 9) ";
+            IList<object> paramArr = new List<object>();
+            if (!string.IsNullOrWhiteSpace(searchModel.OrderNo))
             {
-                HqlStatementHelper.AddBetweenStatement("CreateDate", searchModel.StartDate, searchModel.EndDate, "t", ref whereStatement, param);
+                hql += " and o.OrderNo = ? ";
+                paramArr.Add(searchModel.OrderNo);
             }
-            else if (searchModel.StartDate != null & searchModel.EndDate == null)
+            if (!string.IsNullOrWhiteSpace(searchModel.AUFNR))
             {
-                HqlStatementHelper.AddGeStatement("CreateDate", searchModel.StartDate, "t", ref whereStatement, param);
+                hql += " and sp.AUFNR = ? ";
+                paramArr.Add(searchModel.AUFNR);
             }
-            else if (searchModel.StartDate == null & searchModel.EndDate != null)
+            if (searchModel.Status != null)
             {
-                HqlStatementHelper.AddLeStatement("CreateDate", searchModel.EndDate, "t", ref whereStatement, param);
+                hql += " and sp.Status = ? ";
+                paramArr.Add(searchModel.Status);
+            }
+            if (searchModel.StartDate != null)
+            {
+                hql += " and sp.CreateDate >= ? ";
+                paramArr.Add(searchModel.StartDate.Value);
+            }
+            if (searchModel.EndDate != null)
+            {
+                hql += " and sp.CreateDate <= ? ";
+                paramArr.Add(searchModel.EndDate);
             }
             string sortingStatement = HqlStatementHelper.GetSortingStatement(command.SortDescriptors);
             if (command.SortDescriptors.Count == 0)
             {
-                sortingStatement = " order by t.CreateDate desc";
+                sortingStatement = " order by sp.CreateDate desc ";
             }
-            SearchStatementModel searchStatementModel = new SearchStatementModel();
-            searchStatementModel.SelectCountStatement = selectCountStatement;
-            searchStatementModel.SelectStatement = selectStatement;
-            searchStatementModel.WhereStatement = whereStatement;
-            searchStatementModel.SortingStatement = sortingStatement;
-            searchStatementModel.Parameters = param.ToArray<object>();
 
-            return searchStatementModel;
+            return hql;
         }
 
     }

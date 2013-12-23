@@ -270,7 +270,7 @@ namespace com.Sconit.Service.SAP.Impl
             string selectMiscOrderMstrSql = "select top 1 * from ORD_MiscOrderMstr WITH(NOLOCK) where LastModifyDate > ? and MoveType <> '999' and (Status = ? or (Status = ? and CloseDate <= ? )) order by LastModifyDate";
             string selectMiscOrderDetSql = "select * from ORD_MiscOrderDet WITH(NOLOCK) where MiscOrderNo = ?";
             string selectMiscOrderLocationDetSql = "select * from ORD_MiscOrderLocationDet WITH(NOLOCK) where MiscOrderNo = ?";
-            
+
             object[] pamaDate = new object[] { tableIndex.LastModifyDate, CodeMaster.MiscOrderStatus.Close, CodeMaster.MiscOrderStatus.Cancel, tableIndex.LastModifyDate };
             MiscOrderMaster miscOrderMaster = this.genericMgr.FindEntityWithNativeSql<MiscOrderMaster>(selectMiscOrderMstrSql, pamaDate).SingleOrDefault();
 
@@ -694,7 +694,7 @@ namespace com.Sconit.Service.SAP.Impl
                     && plantFrom == plantTo && sapLocationFrom != sapLocationTo)//&& SihLoc.Contains(sapLocationTo)
                 {
                     //安吉或双桥-buff的移库事务做特殊处理
-                    if ((locTrans.PartyFrom.ToUpper() == "LOC" || locTrans.PartyFrom.ToUpper() == "SQC") 
+                    if ((locTrans.PartyFrom.ToUpper() == "LOC" || locTrans.PartyFrom.ToUpper() == "SQC")
                         && locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR
                         && locTrans.IpDetailId != 0)
                     {
@@ -812,7 +812,7 @@ namespace com.Sconit.Service.SAP.Impl
                     && plantFrom == plantTo && sapLocationFrom != sapLocationTo) //&& SihLoc.Contains(sapLocationTo)
                 {
                     //安吉-buff的移库冲销要特殊处理
-                    if ((locTrans.PartyFrom.ToUpper() == "LOC" || locTrans.PartyFrom.ToUpper() == "SQC") 
+                    if ((locTrans.PartyFrom.ToUpper() == "LOC" || locTrans.PartyFrom.ToUpper() == "SQC")
                         && locTrans.TransactionType == CodeMaster.TransactionType.RCT_TR_VOID
                         && locTrans.IpDetailId > 0)
                     {
@@ -1585,7 +1585,7 @@ namespace com.Sconit.Service.SAP.Impl
                             // 跨工厂移库 来源工厂
                             invTrans.WERKS = GetPlant(regionList, miscOrderMaster.Region);//0084
                             ////库存地点	
-                            invTrans.LGORT = GetSapLocation(locationList, miscOrderLocationDetail.Location);//1000
+                            invTrans.LGORT = GetSapLocation(locationList, miscOrderDetail.Location == null ? miscOrderMaster.Location : miscOrderDetail.Location);//1000
                             ////跨工厂移库 收货地点	
                             invTrans.UMLGO = miscOrderMaster.ReceiveLocation;//0085
                             ////收货工厂	
@@ -1603,7 +1603,7 @@ namespace com.Sconit.Service.SAP.Impl
                             ////收货工厂	
                             invTrans.UMWRK = GetPlant(regionList, miscOrderMaster.Region);//0084
                             ////跨工厂移库 收货地点	
-                            invTrans.UMLGO = GetSapLocation(locationList, miscOrderLocationDetail.Location);//1000
+                            invTrans.UMLGO = GetSapLocation(locationList, miscOrderDetail.Location == null ? miscOrderMaster.Location : miscOrderDetail.Location);//1000
                         }
                     }
                     else
@@ -1611,7 +1611,7 @@ namespace com.Sconit.Service.SAP.Impl
                         ////跨工厂移库 来源工厂
                         invTrans.WERKS = GetPlant(regionList, miscOrderMaster.Region);
                         ////库存地点	
-                        invTrans.LGORT = GetSapLocation(locationList, miscOrderLocationDetail.Location);
+                        invTrans.LGORT = GetSapLocation(locationList, miscOrderDetail.Location == null ? miscOrderMaster.Location : miscOrderDetail.Location);
                     }
 
                     ////操作类型	
@@ -1829,7 +1829,7 @@ namespace com.Sconit.Service.SAP.Impl
                 }
 
                 sql.Append("insert into SAP_InvLoc(SourceType,SourceId,FRBNR,SGTXT,BWART,CreateUser,CreateDate) select SourceType,SourceId,FRBNR,SGTXT,BWART,'" + user.FullName + "',GETDATE() from #tempInvLoc;drop table #tempInvLoc;");
-                
+
                 count = 1;
                 foreach (InvTrans invTrans in invTransList)
                 {

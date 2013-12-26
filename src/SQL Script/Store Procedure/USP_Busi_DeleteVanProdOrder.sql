@@ -30,7 +30,21 @@ BEGIN
             begin tran
         end
         
-		select OrderNo into #tempOrderNo from ORD_OrderSeq where TraceCode = @TraceCode
+        Create table #tempOrderNo
+		(
+			RowId int identity(1, 1),
+			OrderNo varchar(50),
+			ProdLine varchar(50)
+		)
+		
+		Create table #tempSeqGroup
+		(
+			SeqGroup varchar(50),
+			[Version] int	
+		)
+        
+        insert into #tempOrderNo(OrderNo, ProdLine)
+		select OrderNo, ProdLine from ORD_OrderSeq where TraceCode = @TraceCode
 		
 		if not exists(select top 1 1 from #tempOrderNo)
 		begin
@@ -59,6 +73,53 @@ BEGIN
 		where bom.OrderNo in (select OrderNo from #tempOrderNo) and bom.IsCreateOrder = 1 and bom.IsCreateSeq <> 1 and orb.Id is null
 		group by bom.Item, bom.OpRef
 		
+		--检查删除车是否排序组中记录的最后一台车，如果是要把排序组中的更新成最后一台车的前一台，避免排序单结转出错
+		declare @OrderNoRowId int
+		declare @OrderNoMaxRowId int
+		select @OrderNoRowId = MIN(RowId), @OrderNoMaxRowId = MAX(RowId) from #tempOrderNo
+		
+		while (@OrderNoRowId <= @OrderNoMaxRowId)
+		begin
+			declare @OrderNo varchar(50)
+			declare @ProdLine varchar(50)
+			select @OrderNo = OrderNo, @ProdLine = ProdLine from #tempOrderNo where RowId = @OrderNoRowId
+			
+			if exists(select top 1 1 from SCM_SeqGroup where PrevOrderNo = @OrderNo)
+			begin
+				declare @Seq bigint
+				declare @SubSeq int
+				declare @PrevOrderNo varchar(50)
+				declare @PrevTraceCode varchar(50)
+				declare @PrevSeq bigint
+				declare @PrevSubSeq int
+				
+				--查找排序组中最后一台车的前一台
+				select @Seq = Seq, @SubSeq = SubSeq from ORD_OrderSeq where OrderNo = @OrderNo
+				
+				select top 1 @PrevOrderNo = OrderNo, @PrevTraceCode = TraceCode, @PrevSeq = Seq, @PrevSubSeq = SubSeq
+				from ORD_OrderSeq where (Seq < @Seq or (Seq = @Seq and SubSeq < @SubSeq)) and ProdLine = @ProdLine 
+				order by Seq desc, SubSeq desc
+			
+				truncate table #tempSeqGroup
+				insert into #tempSeqGroup(SeqGroup, [Version])
+				select Code, [Version] from SCM_SeqGroup where PrevOrderNo = @OrderNo
+				
+				if exists(select top 1 1 from #tempSeqGroup)
+				begin
+					update seq set PrevOrderNo = @PrevOrderNo, PrevTraceCode = @PrevTraceCode, PrevSeq = @PrevSeq, PrevSubSeq = @PrevSubSeq, [Version] = seq.[Version] + 1
+					from SCM_SeqGroup as seq inner join #tempSeqGroup as tSeq on seq.Code = tSeq.SeqGroup and seq.[Version] = tSeq.[Version]
+					
+					if (@@ROWCOUNT <> (select COUNT(1) from #tempSeqGroup))
+					begin
+						set @ErrorMsg = N'整车生产单' + @OrderNo + N' Van号' + @TraceCode + N'已经更新，请重新删除。'
+						RAISERROR(@ErrorMsg, 16, 1)
+					end
+				end
+			end
+			
+			set @OrderNoRowId = @OrderNoRowId + 1
+		end
+		
 		delete from CUST_CabOut where OrderNo in (select OrderNo from #tempOrderNo)
 		delete from ORD_OrderItemTraceResult where OrderNo in (select OrderNo from #tempOrderNo)
 		delete from ORD_OrderItemTrace where OrderNo in (select OrderNo from #tempOrderNo)
@@ -69,6 +130,9 @@ BEGIN
 		delete from ORD_OrderMstr_4 where OrderNo in (select OrderNo from #tempOrderNo)
 		
 		insert into LOG_DeleteVanProdOrder(TraceCode, CreateUser, CreateUserNm, CreateDate) values(@TraceCode, @CreateUserId, @CreateUserNm, @DateTimeNow)
+		
+		drop table #tempOrderNo
+		drop table #tempSeqGroup
 		
 		if @trancount = 0 
 		begin  

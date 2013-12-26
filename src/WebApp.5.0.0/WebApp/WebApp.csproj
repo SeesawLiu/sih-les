@@ -305,6 +305,7 @@
     <Compile Include="Controllers\PRD\WorkingCalendarReportController.cs" />
     <Compile Include="Controllers\Report\OrderOperationReportController.cs" />
     <Compile Include="Controllers\SAP\CancelProdOpReportController.cs" />
+    <Compile Include="Controllers\SAP\SAPProdOpBackflushController.cs" />
     <Compile Include="Controllers\SAP\PostDOController.cs" />
     <Compile Include="Controllers\SAP\CreateScheduleLineController.cs" />
     <Compile Include="Controllers\SAP\SAPProdOpReportController.cs" />
@@ -2243,6 +2244,10 @@
     <Content Include="Views\com.Sconit.Web.Controllers.INV\OrderItemTrace\EngineTrace.cshtml" />
     <None Include="Views\com.Sconit.Web.Controllers.INV\OrderItemTrace\_GetEngineTraceView.cshtml" />
     <Content Include="Views\Common\_RegionMultiSelectBox.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.SAP\SAPProdOpBackflush\_Search.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.SAP\SAPProdOpBackflush\_SearchResult.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.SAP\SAPProdOpBackflush\Index.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.SAP\SAPProdOpBackflush\List.cshtml" />
     <None Include="Web References\EncryptDencryptService\EncryptDencryptService.wsdl" />
     <None Include="Web References\EncryptDencryptService\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>

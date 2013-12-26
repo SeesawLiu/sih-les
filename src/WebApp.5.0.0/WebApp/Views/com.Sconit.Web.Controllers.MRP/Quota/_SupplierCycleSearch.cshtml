@@ -24,12 +24,16 @@
             @Html.Hidden("isFromList", true)
             <button type="submit" id="btnSearch" >
                 @Resources.Global.Button_Search</button>
+             <button type="button" id="btnExport" onclick="ExportClick()">
+                @Resources.Global.Button_SearchExport</button>
         </div>
     }
 </fieldset>
 <script type="text/javascript">
+    function ExportClick() {
+        location.href = '/Quota/ExportSupplierXLS/?ItemCode=' + $('#ItemCode').val();
+    }
     function onSearchClick(e) {
-    debugger
     if ($("#Item").val() == "" || $("#Location").val() == "")
         {
             alert('@Resources.MRP.Quota.Quota_LocationAndItemMustSelect');

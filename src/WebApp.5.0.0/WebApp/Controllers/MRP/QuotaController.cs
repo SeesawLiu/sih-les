@@ -638,11 +638,34 @@ using com.Sconit.Utility;
             gridModel.Data = allResult.Skip((command.Page - 1) * command.PageSize).Take(command.PageSize);
             return PartialView(gridModel);
         }
+
+        public void ExportSupplierXLS(QuotaSearchModel searchModel)
+        {
+            string searchSql = SupplierCycleSearchStatement(searchModel);
+            var searchResult = this.genericMgr.FindAllWithNativeSql<object[]>(searchSql);
+            //quota.Supplier,quota.SupplierNm,quota.SupplierShortCode,quota.Item,quota.ItemDesc,
+            //quota.RefItemCode,quota.Weight,quota.AccumulateQty,quota.AdjQty,qc.CycleQty 
+            var allResult = (from tak in searchResult
+                             select new Quota
+                             {
+                                 Supplier = (string)tak[0],
+                                 SupplierName = (string)tak[1],
+                                 SupplierShortCode = (string)tak[2],
+                                 Item = (string)tak[3],
+                                 ItemDesc = (string)tak[4],
+                                 RefItemCode = (string)tak[5],
+                                 Weight = (decimal?)tak[6],
+                                 AccumulateQty = (decimal?)tak[7],
+                                 AdjQty = (decimal?)tak[8],
+                                 CycleQty = (decimal?)tak[9],
+                             }).ToList();
+            ExportToXLS<Quota>("ExportSupplierXLS", "xls", allResult);
+        }
         #endregion
 
         private string SupplierCycleSearchStatement(QuotaSearchModel searchModel)
         {
-            string searchSql = " select quota.Supplier,quota.SupplierNm,quota.SupplierShortCode,quota.Item,quota.ItemDesc,quota.RefItemCode,quota.Weight,quota.AccumulateQty,quota.AdjQty,qc.CycleQty from SCM_Quota as quota left join SCM_QuotaCycleQty as qc on quota.Item=qc.Item  where 1=1  ";
+            string searchSql = " select quota.Supplier,quota.SupplierNm,quota.SupplierShortCode,quota.Item,quota.ItemDesc,quota.RefItemCode,quota.Weight,quota.AccumulateQty,quota.AdjQty,qc.CycleQty from SCM_Quota as quota left join SCM_QuotaCycleQty as qc on quota.Item=qc.Item  where 1=1 and quota.Weigh not in(0,100) ";
             if (!string.IsNullOrWhiteSpace(searchModel.ItemCode))
             {
                 searchSql += string.Format(" and quota.Item in (select Item from SCM_Quota where Supplier='{0}' and Item ='{1}') ", new object[]{ CurrentUser.Code,searchModel.ItemCode});

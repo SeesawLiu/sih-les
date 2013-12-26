@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using com.Sconit.Entity.SYS;
 
 namespace com.Sconit.Entity.SAP.ORD
 {
@@ -10,6 +11,9 @@ namespace com.Sconit.Entity.SAP.ORD
 		
 		public Int32 Id { get; set; }
         public Int32 SAPOpReportId { get; set; }
+
+        [Export(ExportName = "ExportProdOpBackflush", ExportSeq = 10)]
+        [Display(Name = "ProdOpBackflush_AUFNR", ResourceType = typeof(Resources.SI.ProdOpBackflush))]
         public string AUFNR { get; set; }
 		public string WERKS { get; set; }
         public string AUFPL { get; set; }
@@ -22,15 +26,31 @@ namespace com.Sconit.Entity.SAP.ORD
 		public string ARBPL { get; set; }
 		public string RUEK { get; set; }
 		public string AUTWE { get; set; }
-		public string WORKCENTER { get; set; }
-		public Decimal GAMNG { get; set; }
-		public Decimal SCRAP { get; set; }
-		public StatusEnum Status { get; set; }
-		public DateTime CreateDate { get; set; }
+        [Export(ExportName = "ExportProdOpBackflush", ExportSeq = 20)]
+        [Display(Name = "ProdOpBackflush_WORKCENTER", ResourceType = typeof(Resources.SI.ProdOpBackflush))]
+        public string WORKCENTER { get; set; }
+        [Export(ExportName = "ExportProdOpBackflush", ExportSeq = 30)]
+        [Display(Name = "ProdOpBackflush_GAMNG", ResourceType = typeof(Resources.SI.ProdOpBackflush))]
+        public Decimal GAMNG { get; set; }
+        [Export(ExportName = "ExportProdOpBackflush", ExportSeq = 40)]
+        [Display(Name = "ProdOpBackflush_SCRAP", ResourceType = typeof(Resources.SI.ProdOpBackflush))]
+        public Decimal SCRAP { get; set; }
+        [Export(ExportName = "ExportProdOpBackflush", ExportSeq = 50)]
+        [Display(Name = "ProdOpBackflush_Status", ResourceType = typeof(Resources.SI.ProdOpBackflush))]
+        public StatusEnum Status { get; set; }
+        [Export(ExportName = "ExportProdOpBackflush", ExportSeq = 90)]
+        [Display(Name = "ProdOpBackflush_CreateDate", ResourceType = typeof(Resources.SI.ProdOpBackflush))]
+        public DateTime CreateDate { get; set; }
 		public DateTime LastModifyDate { get; set; }
-		public Int32 ErrorCount { get; set; }
-		public string ProdLine { get; set; }
-		public string OrderNo { get; set; }
+        [Export(ExportName = "ExportProdOpBackflush", ExportSeq = 60)]
+        [Display(Name = "ProdOpBackflush_ErrorCount", ResourceType = typeof(Resources.SI.ProdOpBackflush))]
+        public Int32 ErrorCount { get; set; }
+        [Export(ExportName = "ExportProdOpBackflush", ExportSeq = 80)]
+        [Display(Name = "ProdOpBackflush_ProdLine", ResourceType = typeof(Resources.SI.ProdOpBackflush))]
+        public string ProdLine { get; set; }
+        [Export(ExportName = "ExportProdOpBackflush", ExportSeq = 70)]
+        [Display(Name = "ProdOpBackflush_OrderNo", ResourceType = typeof(Resources.SI.ProdOpBackflush))]
+        public string OrderNo { get; set; }
         public string ReceiptNo { get; set; }
 		public Int32 OrderOpId { get; set; }
 		public Int32 OrderOpReportId { get; set; }

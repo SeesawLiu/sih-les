@@ -2244,6 +2244,21 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
+    <Compile Include="SI\ProdOpBackflush.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ProdOpBackflush.resx</DependentUpon>
+    </Compile>
+    <Compile Include="SI\ProdOpBackflush.en-US.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ProdOpBackflush.en-US.resx</DependentUpon>
+    </Compile>
+    <Compile Include="SI\ProdOpBackflush.zh-CN.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ProdOpBackflush.zh-CN.resx</DependentUpon>
+    </Compile>
     <Compile Include="SI\Trigger.Designer.cs">
       <DependentUpon>Trigger.resx</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -4120,6 +4135,18 @@
     <EmbeddedResource Include="RPT\PPM.zh-CN.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>PPM.zh-CN.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SI\ProdOpBackflush.en-US.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>ProdOpBackflush.en-US.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SI\ProdOpBackflush.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>ProdOpBackflush.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SI\ProdOpBackflush.zh-CN.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>ProdOpBackflush.zh-CN.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="SI\Trigger.en-US.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>

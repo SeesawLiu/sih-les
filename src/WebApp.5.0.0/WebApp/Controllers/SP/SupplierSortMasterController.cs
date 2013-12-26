@@ -728,20 +728,41 @@ namespace com.Sconit.Web.Controllers.SP
         {
             string[] orderNoArray = orderNos.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             string hqlMstr = "select om from OrderMaster om where OrderNo in(?";
-            string hqlDet = "select od from OrderDetail od where OrderNo in(?";
+            string hqlDet = "select  det.Seq,det.OrderNo,det.Item,det.ItemDesc,det.RefItemCode,det.ManufactureParty,det.Uom,det.BinTo,det.StartDate,det.ReqQty,det.ReserveNo,det.ReserveLine ,det.OrderQty,ce.ZENGINE from ORD_OrderDet_2 as det with(nolock) left join CUST_EngineTrace as ce with(nolock) on ce.TraceCode=det.ReserveNo where det.OrderNo in(?";
             List<object> paras = new List<object>();
+            List<object> parasDet = new List<object>();
             paras.Add(orderNoArray[0]);
+            parasDet.Add(orderNoArray[0]);
             for (int i = 1; i < orderNoArray.Length; i++)
             {
                 hqlMstr = hqlMstr + ",?";
                 hqlDet = hqlDet + ",?";
                 paras.Add(orderNoArray[i]);
+                parasDet.Add(orderNoArray[i]);
             }
-            hqlDet = hqlDet + ")  order by Sequence asc";
+            hqlDet = hqlDet + ")  ";
             hqlMstr = hqlMstr + ") ";
-
+            parasDet.AddRange(paras);
             IList<OrderMaster> orderMasterList = this.genericMgr.FindAll<OrderMaster>(hqlMstr, paras.ToArray());
-            IList<OrderDetail> orderDetailList = this.genericMgr.FindAll<OrderDetail>(hqlDet, paras.ToArray());
+            IList<object[]> searResultList = this.genericMgr.FindAllWithNativeSql<object[]>(hqlDet + " union all " + hqlDet.Replace("ORD_OrderDet_2", "ORD_OrderDet_1"), parasDet.ToArray());
+            var orderDetailList = (from tak in searResultList
+                                   select new OrderDetail
+                                   {
+                                       Sequence = (int)tak[0],
+                                       OrderNo = (string)tak[1],
+                                       Item = (string)tak[2],
+                                       ItemDescription = (string)tak[3],
+                                       ReferenceItemCode = (string)tak[4],
+                                       ManufactureParty = (string)tak[5],
+                                       Uom = (string)tak[6],
+                                       BinTo = (string)tak[7],
+                                       StartDate = (DateTime?)tak[8],
+                                       RequiredQty = (decimal)tak[9],
+                                       ReserveNo = (string)tak[10],
+                                       ReserveLine = (string)tak[11],
+                                       OrderedQty = (decimal)tak[12],
+                                       ZENGINE = (string)tak[13],
+                                   }).ToList();
 
 
             StringBuilder printUrls = new StringBuilder();

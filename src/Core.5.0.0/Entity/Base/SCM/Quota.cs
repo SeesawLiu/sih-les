@@ -37,10 +37,10 @@ namespace com.Sconit.Entity.SCM
         [Export(ExportName = "ExportSupplierXLS", ExportSeq = 70)]
         public Decimal? Weight { get; set; }
         public Decimal? Rate { get; set; }
-        [Export(ExportName = "ExportSupplierXLS", ExportSeq = 90)]
+        [Export(ExportName = "ExportSupplierXLS", ExportSeq = 80)]
         [Display(Name = "Quota_CycleQty", ResourceType = typeof(Resources.SCM.Quota))]
         public Decimal? CycleQty { get; set; }
-        [Export(ExportName = "ExportSupplierXLS", ExportSeq = 80)]
+        [Export(ExportName = "ExportSupplierXLS", ExportSeq = 90)]
         [Display(Name = "Quota_AccumulateQty", ResourceType = typeof(Resources.SCM.Quota))]
         public Decimal? AccumulateQty { get; set; }
         [Export(ExportName = "ExportSupplierXLS", ExportSeq = 100)]

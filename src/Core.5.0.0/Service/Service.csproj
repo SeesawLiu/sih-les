@@ -228,10 +228,10 @@
       <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
       <CachedSettingsPropName>com_Sconit_Service_MSWebService_MSWebService</CachedSettingsPropName>
     </WebReferenceUrl>
-    <WebReferenceUrl Include="http://10.86.128.72/SIHWEBSERVICE/SendMail/SendMail.asmx%3fwsdl">
+    <WebReferenceUrl Include="http://ws.sih.cq.cn/SIHWEBSERVICE/SendMail/SendMail.asmx%3fwsdl">
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\SendMail\</RelPath>
-      <UpdateFromURL>http://10.86.128.72/SIHWEBSERVICE/SendMail/SendMail.asmx%3fwsdl</UpdateFromURL>
+      <UpdateFromURL>http://ws.sih.cq.cn/SIHWEBSERVICE/SendMail/SendMail.asmx%3fwsdl</UpdateFromURL>
       <ServiceLocationURL>
       </ServiceLocationURL>
       <CachedDynamicPropName>
@@ -239,10 +239,10 @@
       <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
       <CachedSettingsPropName>com_Sconit_Service_SendMail_SendMailV2</CachedSettingsPropName>
     </WebReferenceUrl>
-    <WebReferenceUrl Include="http://10.86.128.72/SihWebService/Message/MSWebService.asmx">
+    <WebReferenceUrl Include="http://ws.sih.cq.cn/SihWebService/Message/MSWebService.asmx">
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\SAPService\</RelPath>
-      <UpdateFromURL>http://10.86.128.72/SihWebService/Message/MSWebService.asmx</UpdateFromURL>
+      <UpdateFromURL>http://ws.sih.cq.cn/SihWebService/Message/MSWebService.asmx</UpdateFromURL>
       <ServiceLocationURL>
       </ServiceLocationURL>
       <CachedDynamicPropName>

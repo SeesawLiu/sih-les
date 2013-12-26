@@ -665,7 +665,7 @@ using com.Sconit.Utility;
 
         private string SupplierCycleSearchStatement(QuotaSearchModel searchModel)
         {
-            string searchSql = " select quota.Supplier,quota.SupplierNm,quota.SupplierShortCode,quota.Item,quota.ItemDesc,quota.RefItemCode,quota.Weight,quota.AccumulateQty,quota.AdjQty,qc.CycleQty from SCM_Quota as quota left join SCM_QuotaCycleQty as qc on quota.Item=qc.Item  where 1=1 and quota.Weigh not in(0,100) ";
+            string searchSql = " select quota.Supplier,quota.SupplierNm,quota.SupplierShortCode,quota.Item,quota.ItemDesc,quota.RefItemCode,quota.Weight,quota.AccumulateQty,quota.AdjQty,qc.CycleQty from SCM_Quota as quota left join SCM_QuotaCycleQty as qc on quota.Item=qc.Item  where 1=1 and quota.Weight not in(0,100) ";
             if (!string.IsNullOrWhiteSpace(searchModel.ItemCode))
             {
                 searchSql += string.Format(" and quota.Item in (select Item from SCM_Quota where Supplier='{0}' and Item ='{1}') ", new object[]{ CurrentUser.Code,searchModel.ItemCode});

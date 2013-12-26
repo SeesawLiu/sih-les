@@ -17,8 +17,8 @@
             columns.Bound(o => o.ItemDesc).ReadOnly();
             columns.Bound(o => o.RefItemCode).ReadOnly();
             columns.Bound(o => o.Weight).ReadOnly();
-            columns.Bound(o => o.AccumulateQty).ReadOnly();
             columns.Bound(o => o.CycleQty).ReadOnly();
+            columns.Bound(o => o.AccumulateQty).ReadOnly();
             columns.Bound(o => o.AdjQty);
         })
         .Scrollable(c => c.Enabled(false))

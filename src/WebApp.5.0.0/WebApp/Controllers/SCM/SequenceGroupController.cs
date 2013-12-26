@@ -131,17 +131,38 @@ namespace com.Sconit.Web.Controllers.SCM
                 if (noenError)
                 {
                     var dbSsequenceGroup = base.genericMgr.FindById<SequenceGroup>(sequenceGroup.Code);
-                    dbSsequenceGroup.SequenceBatch = sequenceGroup.SequenceBatch;
-                    dbSsequenceGroup.OpReference = sequenceGroup.OpReference;
-                    dbSsequenceGroup.IsActive = sequenceGroup.IsActive;
+                    //dbSsequenceGroup.SequenceBatch = sequenceGroup.SequenceBatch;
+                    //dbSsequenceGroup.OpReference = sequenceGroup.OpReference;
+                    //dbSsequenceGroup.IsActive = sequenceGroup.IsActive;
+                    //if (!string.IsNullOrWhiteSpace(sequenceGroup.PreviousTraceCode))
+                    //{
+                    //    dbSsequenceGroup.PreviousTraceCode = sequenceGroup.PreviousTraceCode;
+                    //    dbSsequenceGroup.PreviousOrderNo = orderSeqs.First().OrderNo;
+                    //    dbSsequenceGroup.PreviousSeq = orderSeqs.First().Sequence;
+                    //    dbSsequenceGroup.PreviousSubSeq = orderSeqs.First().SubSequence;
+                    //}
+                    //base.genericMgr.Update(dbSsequenceGroup);
+                    string updateSql = "update SCM_SeqGroup set Version=Version+1,IsActive=?,SeqBatch=? ";
+                    IList<object> parems = new List<object>();
+                    parems.Add(sequenceGroup.IsActive);
+                    parems.Add(sequenceGroup.SequenceBatch);
+                    if (!string.IsNullOrWhiteSpace(sequenceGroup.OpReference))
+                    {
+                        updateSql += " ,OpRef=? ";
+                        parems.Add(sequenceGroup.OpReference);
+                    }
                     if (!string.IsNullOrWhiteSpace(sequenceGroup.PreviousTraceCode))
                     {
-                        dbSsequenceGroup.PreviousTraceCode = sequenceGroup.PreviousTraceCode;
-                        dbSsequenceGroup.PreviousOrderNo = orderSeqs.First().OrderNo;
-                        dbSsequenceGroup.PreviousSeq = orderSeqs.First().Sequence;
-                        dbSsequenceGroup.PreviousSubSeq = orderSeqs.First().SubSequence;
+                        updateSql += ",PrevTraceCode=?,PrevOrderNo=?,PrevSeq=?,PrevSubSeq=? ";
+                        parems.Add(sequenceGroup.PreviousTraceCode);
+                        parems.Add(orderSeqs.First().OrderNo);
+                        parems.Add(orderSeqs.First().Sequence);
+                        parems.Add(orderSeqs.First().SubSequence);
                     }
-                    base.genericMgr.Update(dbSsequenceGroup);
+                    updateSql += "  where Code=? and Version=? ";
+                    parems.Add(sequenceGroup.Code);
+                    parems.Add(sequenceGroup.Version);
+                    this.genericMgr.UpdateWithNativeQuery(updateSql, parems.ToArray());
                     SaveSuccessMessage(Resources.SCM.SequenceGroup.SequenceGroup_Updated);
                     return View(dbSsequenceGroup);
                 }

@@ -6068,7 +6068,7 @@ namespace com.Sconit.Service.Impl
                 #endregion
 
                 #region 窗口时间
-                if (!isQuick && !isQuick)
+                if (!isQuick && !isReturn)
                 {
                     string readWindowTime = ImportHelper.GetCellStringValue(row.GetCell(colWindowTime));
                     if (string.IsNullOrWhiteSpace(readWindowTime))

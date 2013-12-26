@@ -45,9 +45,32 @@
                     });
                 }
             </div>
-             <div class="editor-label-2">
+              <div class="editor-label-2">
+                <label for="StockTakeMaster_Status">
+                    @Resources.INV.StockTake.StockTakeMaster_Status
+                </label>
+            </div>
+            <div class="editor-field-2">
+                @{
+                    Html.RenderAction("_CodeMasterDropDownList", "Common", new { code = com.Sconit.CodeMaster.CodeMaster.StockTakeStatus,
+                                                                                 controlName = "Status",
+                                                                                 includeBlankOption = true,
+                                                                                 blankOptionDescription = CodeDetail.SpecialValueEnum.BlankValue,
+                                                                                 blankOptionValue = "" ,
+                                                                                 selectedValue = TempData["StockTakeMasterSearchModel"] != null ? ((StockTakeMasterSearchModel)TempData["StockTakeMasterSearchModel"]).Status : null                             
+                    });
+                }
+            </div>
+              <div class="editor-label-2">
+                <label for="StockTakeMaster_Status">
+                    @Resources.View.LocationDetailView.LocationDetailView_RefNo
+                </label>
+            </div>
+            <div class="editor-field-2">
+                @Html.TextBox("RefNo", TempData["StockTakeMasterSearchModel"] != null ? ((StockTakeMasterSearchModel)TempData["StockTakeMasterSearchModel"]).RefNo : string.Empty)
+            </div>
+            @* <div class="editor-label-2">
                 <label for="StockTakeMaster_StartDate">
-                   @* @Resources.INV.StockTake.StockTakeMaster_StartDate*@
                    生效日期 从
                 </label>
             </div>
@@ -60,7 +83,6 @@
             </div>
              <div class="editor-label-2">
                  <label for="StockTakeMaster_EndDate">
-                    @*@Resources.INV.StockTake.StockTakeMaster_EndDate*@
                     至
                 </label>
             </div>
@@ -70,7 +92,7 @@
                   .Name("StockTakeEndDate")
 .Value(TempData["StockTakeMasterSearchModel"] != null ? ((StockTakeMasterSearchModel)TempData["StockTakeMasterSearchModel"]).StockTakeEndDate : null)
                   .HtmlAttributes(new { style = "margin-bottom: 1.3em;width:200px", }))
-            </div>
+            </div>*@
             <div class="editor-label-2">
                 <label for="StockTakeMaster_StartDate">
                    创建日期 从
@@ -103,22 +125,7 @@
             <div class="editor-field-2">
                   @Html.TextBox("CostCenter", TempData["StockTakeMasterSearchModel"] != null ? ((StockTakeMasterSearchModel)TempData["StockTakeMasterSearchModel"]).CostCenter : string.Empty)
             </div>*@
-            <div class="editor-label-2">
-                <label for="StockTakeMaster_Status">
-                    @Resources.INV.StockTake.StockTakeMaster_Status
-                </label>
-            </div>
-            <div class="editor-field-2">
-                @{
-                    Html.RenderAction("_CodeMasterDropDownList", "Common", new { code = com.Sconit.CodeMaster.CodeMaster.StockTakeStatus,
-                                                                                 controlName = "Status",
-                                                                                 includeBlankOption = true,
-                                                                                 blankOptionDescription = CodeDetail.SpecialValueEnum.BlankValue,
-                                                                                 blankOptionValue = "" ,
-                                                                                 selectedValue = TempData["StockTakeMasterSearchModel"] != null ? ((StockTakeMasterSearchModel)TempData["StockTakeMasterSearchModel"]).Status : null                             
-                    });
-                }
-            </div>
+          
         </div>
         <div class="search-footer">
          @Html.Hidden("isFromList", true)

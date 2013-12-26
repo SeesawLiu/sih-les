@@ -32,8 +32,7 @@
             if (combobox.selectedIndex == undefined || combobox.selectedIndex == -1) {
                 combobox.value("");
                 $(e.target).parent().parent().next().text("");
-                $(e.target).parent().parent().next().next().html("");
-                $(e.target).parent().parent().next().next().val("");
+              
                 combobox.reload();
             } else {
                 var data = {
@@ -48,8 +47,6 @@
                         var $tGrid = $("#StockTakeDetailGridView").data("tGrid");
                         var oldData = $tGrid.dataItem($(e.target).parent().parent().parent());
                         $(e.target).parent().parent().next().html(data.ItemDescription);
-                        $(e.target).parent().parent().next().next().html(data.Uom);
-                        $(e.target).parent().parent().next().next().val(data.Uom);
 
                         if (oldData != undefined) {
                             oldData.ItemDescription = data.ItemDescription;
@@ -129,22 +126,24 @@
             commands.Custom().Text(@Resources.Global.Button_SaveDetail).HtmlAttributes(new { onClick = "onSubmit()", href = "#" });
              }
         })
-
         .Columns(columns =>
         {
             columns.Bound(o => o.Item).EditorTemplateName("ItemGridForeignKey");
             columns.Bound(o => o.ItemDescription).ReadOnly();
-            columns.Bound(o => o.Uom).ReadOnly();
+            //columns.Bound(o => o.Uom).ReadOnly();
             //columns.ForeignKey(o => o.Uom, (IEnumerable<com.Sconit.Entity.MD.Uom>)ViewData["Uom"], "Code", "Code");
             columns.Bound(o => o.Location).EditorTemplateName("LocationGridForeignKey");
+            columns.Bound(o => o.QualityTypeDescription);
+            columns.Bound(o => o.IsConsigement);
+            columns.Bound(o => o.CSSupplier);
             columns.Bound(o => o.Qty);
             columns.Command(commands =>
-                   {
-                       if (ViewBag.Status == com.Sconit.CodeMaster.StockTakeStatus.InProcess.ToString())
-                       {
-                           commands.Delete();
-                       }
-                   });
+            {
+                if (ViewBag.Status == com.Sconit.CodeMaster.StockTakeStatus.InProcess.ToString())
+                {
+                    commands.Delete();
+                }
+            });
         })
         .Scrollable(c => c.Enabled(false))
         .EnableCustomBinding(true)

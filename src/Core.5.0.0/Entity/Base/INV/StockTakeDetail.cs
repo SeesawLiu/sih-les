@@ -40,6 +40,13 @@ namespace com.Sconit.Entity.INV
 		public Int32 LastModifyUserId { get; set; }
 		public string LastModifyUserName { get; set; }
 		public DateTime LastModifyDate { get; set; }
+
+        //[Display(Name = "LocationDetailView_suppliers", ResourceType = typeof(Resources.View.LocationDetailView))]
+        public string CSSupplier { get; set; }
+
+        //[Export(ExportName = "ExportBackUpInvXLS", ExportSeq = 60)]
+        //[Display(Name = "LocationDetailView_IsCS", ResourceType = typeof(Resources.View.LocationDetailView))]
+        public Boolean IsConsigement { get; set; }
         
         #endregion
 

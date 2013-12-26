@@ -20,5 +20,6 @@ namespace com.Sconit.Web.Models.SearchModels.INV
         public DateTime? CreateDateFrom { get; set; }
         public DateTime? CreateDateTo { get; set; }
         public string CostCenter { get; set; }
+        public string RefNo { get; set; }
     }
 }

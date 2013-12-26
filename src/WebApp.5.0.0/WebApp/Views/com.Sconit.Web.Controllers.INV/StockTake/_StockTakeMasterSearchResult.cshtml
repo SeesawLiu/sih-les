@@ -12,7 +12,7 @@
             columns.Bound(o => o.StNo).ClientTemplate(Html.ActionLink("<#= StNo #>", "Edit", "StockTake", new { ID = "<#= StNo #>"}, null).ToString());
             columns.Bound(o => o.Region);
             columns.Bound(o => o.StockTakeStatusDescription);
-            columns.Bound(o => o.EffectiveDate);
+            columns.Bound(o => o.RefNo);
             columns.Bound(o => o.CreateDate);
             columns.Bound(o => o.CreateUserName);
                  })
@@ -32,13 +32,14 @@
         function StockTakeMasterGrid_OnDataBinding(e) {
             e.data = {
                 StNo: $('#StNo').val(),
-                Type: $('#Type').val(),
+                RefNo: $('#RefNo').val(),
+//                Type: $('#Type').val(),
                 Region: $('#Region').val(),
                 Status: $('#Status').val(),
-                StockTakeStartDate: $('#StockTakeStartDate').val(),
-                StockTakeEndDate: $('#StockTakeEndDate').val(),
+//                StockTakeStartDate: $('#StockTakeStartDate').val(),
+//                StockTakeEndDate: $('#StockTakeEndDate').val(),
                 CreateDateFrom: $('#CreateDateFrom').val(),
-                CreateDateTo: $('#CreateDateTo').val(),
+                CreateDateTo: $('#CreateDateTo').val()
             };
         } 
     </script>

@@ -17,6 +17,7 @@ using System.Collections;
 using NPOI.SS.UserModel;
 using com.Sconit.Utility;
 using com.Sconit.Entity.SCM;
+using com.Sconit.Entity.CUST;
 
 namespace com.Sconit.Service.Impl
 {
@@ -293,8 +294,46 @@ namespace com.Sconit.Service.Impl
         public void ReleaseAndStartStockTakeMaster(string stNo)
         {
             StockTakeMaster stockTakeMaster = this.genericMgr.FindById<StockTakeMaster>(stNo);
-            ReleaseStockTakeMaster(stockTakeMaster);
-            StartStockTakeMaster(stockTakeMaster);
+            if (stockTakeMaster.Status != CodeMaster.StockTakeStatus.Create)
+            {
+                throw new BusinessException(Resources.INV.StockTake.Error_StatusErrorWhenSubmit,
+                    stockTakeMaster.StNo,
+                    this.systemMgr.GetCodeDetailDescription(com.Sconit.CodeMaster.CodeMaster.StockTakeStatus, ((int)stockTakeMaster.Status).ToString()));
+            }
+
+            IList<string> stockTakeLocationList = this.genericMgr.FindAll<string>(SelectStockTakeLocationStatement, stockTakeMaster.StNo);
+
+            if (stockTakeLocationList == null || stockTakeLocationList.Count == 0)
+            {
+                throw new BusinessException("请选择盘点的库位。");
+            }
+            User user = SecurityContextHolder.Get();
+
+            stockTakeMaster.Status = CodeMaster.StockTakeStatus.InProcess;
+            stockTakeMaster.StartUserId = user.Id;
+            stockTakeMaster.StartUserName = user.FullName;
+            stockTakeMaster.StartDate = DateTime.Now;
+            this.genericMgr.Update(stockTakeMaster);
+            IList<StockTakeLocationLotDet> locLotDets = this.genericMgr.FindAll<StockTakeLocationLotDet>(" from StockTakeLocationLotDet as s where exists( select 1 from Location as l wehre l.Code=s.Location l.Region=? ) and s.RefNo=? order by Location asc ",new object[]{stockTakeMaster.Region,stockTakeMaster.RefNo});
+            if (locLotDets != null && locLotDets.Count > 0)
+            {
+                foreach (var locLotDet in locLotDets)
+                {
+                    StockTakeDetail stockTakeDetail = new StockTakeDetail();
+                    stockTakeDetail.StNo = stNo;
+                    stockTakeDetail.Item = locLotDet.Item;
+                    stockTakeDetail.ItemDescription = locLotDet.ItemDesc;
+                    stockTakeDetail.Uom = locLotDet.Uom;
+                    stockTakeDetail.BaseUom = locLotDet.Uom;
+                    stockTakeDetail.Location = locLotDet.Location;
+                    stockTakeDetail.QualityType = locLotDet.QualityType;
+                    stockTakeDetail.IsConsigement = locLotDet.IsConsigement;
+                    stockTakeDetail.CSSupplier = locLotDet.CSSupplier;
+                    stockTakeDetail.UnitQty = 1;
+                    stockTakeDetail.Qty = 0;
+                    this.genericMgr.Create(stockTakeDetail);
+                }
+            }
         }
         #endregion
 

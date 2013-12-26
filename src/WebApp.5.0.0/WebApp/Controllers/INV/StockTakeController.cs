@@ -33,6 +33,7 @@ using com.Sconit.Utility.Report;
     using NHibernate.Type;
     using NPOI.HSSF.UserModel;
     using NPOI.SS.UserModel;
+    using com.Sconit.Entity.CUST;
     #endregion
 
     /// <summary>
@@ -134,9 +135,18 @@ using com.Sconit.Utility.Report;
         {
             try
             {
-                if (stockTakeMaster.EffectiveDate == null)
+                //if (stockTakeMaster.EffectiveDate == null)
+                //{
+                //    throw new BusinessException("生效日期不能为空。");
+                //}
+                if (string.IsNullOrWhiteSpace(stockTakeMaster.RefNo))
                 {
-                    throw new BusinessException("生效日期不能为空。");
+                    throw new BusinessException("盘点编号不能为空。");
+                }
+                var backInventoryByRefNo = this.genericMgr.FindAll<int>("select count(*) from StockTakeLocationLotDet as s where s.RefNo=?", stockTakeMaster.RefNo);
+                if (backInventoryByRefNo[0] == 0)
+                {
+                    throw new BusinessException(string.Format("盘点编号{0}没有找到盘点库存，请先备份盘点库存",stockTakeMaster.RefNo));
                 }
                 if (string.IsNullOrWhiteSpace(stockTakeMaster.Region ))
                 {
@@ -284,6 +294,7 @@ using com.Sconit.Utility.Report;
         }
 
         #endregion
+
         #region Item
         [HttpGet]
         [SconitAuthorize(Permissions = "Url_Inventory_StockTake_New")]
@@ -398,6 +409,7 @@ using com.Sconit.Utility.Report;
         }
 
         #endregion
+
         #region edit
 
         [SconitAuthorize(Permissions = "Url_Inventory_StockTake_New")]
@@ -536,7 +548,7 @@ using com.Sconit.Utility.Report;
             ViewBag.StNo = searchModel.stNo;
             ViewBag.IsScanHu = IsScanHu;
             ViewBag.Status = Status;
-            ViewData["Uom"] = base.genericMgr.FindAll<Uom>();
+            //ViewData["Uom"] = base.genericMgr.FindAll<Uom>();
             TempData["StockTakeDetailSearchModel"] = searchModel;
             return PartialView();
         }
@@ -849,6 +861,115 @@ using com.Sconit.Utility.Report;
 
         #endregion
 
+        #region 备份库存
+        public JsonResult BackUpInvenTory(string refNo)
+        {
+            var user = CurrentUser;
+            try
+            {
+                if (string.IsNullOrWhiteSpace(refNo))
+                {
+                    throw new BusinessException("盘点编号不能为空。");
+                }
+                this.genericMgr.FindAllWithNativeSql(string.Format(@"delete from CUST_StockTakeLocationLotDet where RefNo='{3}';
+                                                  insert into CUST_StockTakeLocationLotDet ( Location, Item, ItemDesc, Qty, QualityType, CSSupplier, IsConsigement,  CreateUser, CreateUserNm, CreateDate, LastModifyUser, LastModifyUserNm, LastModifyDate,RefNo,Uom)
+                                                    select invGroup.Location,invGroup.Item,i.Desc1,invGroup.qty,invGroup.QualityType,invGroup.CSSupplier,invGroup.IsCS,'{0}' as CreateUser,'{1}' as CreateUserNm,'{2}' as CreateDate,'{0}' as LastModifyUser,'{1}' as LastModifyUserNm,'{2}' as LastModifyDate,'{3}' as RefNo,i.Uom from(select Location,Item ,OccupyType,OccupyRefNo,SUM(Qty) as qty,IsCS,CSSupplier  from VIEW_LocationLotDet where Qty>0 group by Location,Item,OccupyType,OccupyRefNo,IsCS,CSSupplier)  as invGroup 
+                                                    inner join MD_Item as i on invGroup.Item=i.Code ", user.Id, user.FullName, System.DateTime.Now, refNo));
+                SaveSuccessMessage("备份成功。");
+            }
+            catch (Exception ex)
+            {
+                SaveErrorMessage(ex.Message);
+            }
+            return Json(null);
+        }
+
+        [SconitAuthorize(Permissions = "Url_StockTakeLocationLotDet_View")]
+        public ActionResult BackUpInvIndex()
+        {
+            return View();
+        }
+
+        [SconitAuthorize(Permissions = "Url_StockTakeLocationLotDet_View")]
+        [GridAction]
+        public ActionResult BackUpInvList(GridCommand command, StockTakeDetailSearchModel searchModel)
+        {
+            TempData["StockTakeItemSearchModel"] = searchModel;
+            ViewBag.PageSize = base.ProcessPageSize(command.PageSize);
+            return View();
+        }
+
+        [SconitAuthorize(Permissions = "Url_StockTakeLocationLotDet_View")]
+        [GridAction(EnableCustomBinding = true)]
+        public ActionResult _AjaxBackUpInvList(GridCommand command, StockTakeDetailSearchModel searchModel)
+        {
+            SearchStatementModel searchStatementModel = PrepareBackUpInvSearchStatement(command, searchModel);
+            return PartialView(GetAjaxPageData<StockTakeLocationLotDet>(searchStatementModel, command));
+        }
+
+        public void ExportBackUpInvXLS(StockTakeDetailSearchModel searchModel)
+        {
+            //ItemCode=' + $('#ItemCode').val() + '&Location=' + $('#Location').val()
+       // + '&CSSupplier='+ '&IsConsigement=+ '&RefNo=' + $('#RefNo').val();
+            string hql = "select s from StockTakeLocationLotDet as s where 1=1";
+            IList<object> param = new List<object>();
+            if (!string.IsNullOrWhiteSpace(searchModel.ItemCode))
+            {
+                hql += " and Item =? ";
+                param.Add(searchModel.ItemCode);
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.Location))
+            {
+                hql += " and Location =? ";
+                param.Add(searchModel.Location);
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.CSSupplier))
+            {
+                hql += " and CSSupplier = ? ";
+                param.Add(searchModel.CSSupplier);
+            }
+            if (searchModel.RefNo != null)
+            {
+                hql += " and RefNo = ?";
+                param.Add(searchModel.RefNo);
+            }
+            if (searchModel.IsConsigement)
+            {
+                hql += " and IsConsigement =? ";
+                param.Add(searchModel.IsConsigement);
+            }
+
+            IList<StockTakeLocationLotDet> exportList = this.genericMgr.FindAll<StockTakeLocationLotDet>(hql, param.ToArray());
+            FillCodeDetailDescription(exportList);
+            ExportToXLS<StockTakeLocationLotDet>("ExportBackUpInvXLS", "xls", exportList);
+        }
+
+
+        private SearchStatementModel PrepareBackUpInvSearchStatement(GridCommand command, StockTakeDetailSearchModel searchModel)
+        {
+            string whereStatement = string.Empty;
+            IList<object> param = new List<object>();
+
+            HqlStatementHelper.AddEqStatement("Item", searchModel.ItemCode, "s", ref whereStatement, param);
+            HqlStatementHelper.AddEqStatement("Location", searchModel.Location, "s", ref whereStatement, param);
+            HqlStatementHelper.AddEqStatement("OccupyType", searchModel.CSSupplier, "s", ref whereStatement, param);
+            HqlStatementHelper.AddEqStatement("RefNo", searchModel.RefNo, "s", ref whereStatement, param);
+            if (searchModel.IsConsigement)
+            {
+                HqlStatementHelper.AddEqStatement("IsConsigement", searchModel.IsConsigement, "s", ref whereStatement, param);
+            }
+            string sortingStatement = HqlStatementHelper.GetSortingStatement(command.SortDescriptors);
+
+            SearchStatementModel searchStatementModel = new SearchStatementModel();
+            searchStatementModel.SelectCountStatement = " select count(*) from StockTakeLocationLotDet as s ";
+            searchStatementModel.SelectStatement = " select s from StockTakeLocationLotDet as s ";
+            searchStatementModel.WhereStatement = whereStatement;
+            searchStatementModel.SortingStatement = sortingStatement;
+            searchStatementModel.Parameters = param.ToArray<object>();
+            return searchStatementModel;
+        }
+        #endregion
+
         #region Print
         public string Print(string StNo)
         {
@@ -879,23 +1000,23 @@ using com.Sconit.Utility.Report;
             IList<object> param = new List<object>();
             SecurityHelper.AddRegionPermissionStatement(ref whereStatement, "s", "Region");
             HqlStatementHelper.AddLikeStatement("StNo", searchModel.StNo, HqlStatementHelper.LikeMatchMode.End, "s", ref whereStatement, param);
-            HqlStatementHelper.AddEqStatement("Type", searchModel.Type, "s", ref whereStatement, param);
+            //HqlStatementHelper.AddEqStatement("Type", searchModel.Type, "s", ref whereStatement, param);
             HqlStatementHelper.AddEqStatement("Status", searchModel.Status, "s", ref whereStatement, param);
             HqlStatementHelper.AddEqStatement("Region", searchModel.Region, "s", ref whereStatement, param);
-            HqlStatementHelper.AddLikeStatement("CostCenter", searchModel.CostCenter, HqlStatementHelper.LikeMatchMode.End, "s", ref whereStatement, param);
+            HqlStatementHelper.AddEqStatement("RefNo", searchModel.RefNo, "s", ref whereStatement, param);
 
-            if (searchModel.StockTakeStartDate != null & searchModel.StockTakeEndDate != null)
-            {
-                HqlStatementHelper.AddBetweenStatement("EffectiveDate", searchModel.StockTakeStartDate, searchModel.StockTakeEndDate, "s", ref whereStatement, param);
-            }
-            else if (searchModel.StockTakeStartDate != null & searchModel.StockTakeEndDate == null)
-            {
-                HqlStatementHelper.AddGeStatement("EffectiveDate", searchModel.StockTakeStartDate, "s", ref whereStatement, param);
-            }
-            else if (searchModel.StockTakeStartDate == null & searchModel.StockTakeEndDate != null)
-            {
-                HqlStatementHelper.AddLeStatement("EffectiveDate", searchModel.StockTakeEndDate, "s", ref whereStatement, param);
-            }
+            //if (searchModel.StockTakeStartDate != null & searchModel.StockTakeEndDate != null)
+            //{
+            //    HqlStatementHelper.AddBetweenStatement("EffectiveDate", searchModel.StockTakeStartDate, searchModel.StockTakeEndDate, "s", ref whereStatement, param);
+            //}
+            //else if (searchModel.StockTakeStartDate != null & searchModel.StockTakeEndDate == null)
+            //{
+            //    HqlStatementHelper.AddGeStatement("EffectiveDate", searchModel.StockTakeStartDate, "s", ref whereStatement, param);
+            //}
+            //else if (searchModel.StockTakeStartDate == null & searchModel.StockTakeEndDate != null)
+            //{
+            //    HqlStatementHelper.AddLeStatement("EffectiveDate", searchModel.StockTakeEndDate, "s", ref whereStatement, param);
+            //}
             if (searchModel.StockTakeStartDate != null & searchModel.StockTakeEndDate != null)
             {
                 HqlStatementHelper.AddBetweenStatement("CreateDate", searchModel.CreateDateFrom, searchModel.CreateDateTo, "s", ref whereStatement, param);

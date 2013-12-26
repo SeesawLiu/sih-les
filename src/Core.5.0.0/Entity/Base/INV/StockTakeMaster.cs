@@ -65,6 +65,9 @@ namespace com.Sconit.Entity.INV
         public Int32 Version { get; set; }       
         #endregion
 
+        [Display(Name = "LocationDetailView_RefNo", ResourceType = typeof(Resources.View.LocationDetailView))]
+        public string RefNo { get; set; }
+
         #endregion
 
         public override int GetHashCode()

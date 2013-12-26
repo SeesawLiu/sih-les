@@ -177,4 +177,10 @@
   <data name="LocationDetailView_IsCS" xml:space="preserve">
     <value>IsCS</value>
   </data>
+  <data name="LocationDetailView_RefNo" xml:space="preserve">
+    <value>RefNo</value>
+  </data>
+  <data name="LocationDetailView_QualityType" xml:space="preserve">
+    <value>QualityType</value>
+  </data>
 </root>

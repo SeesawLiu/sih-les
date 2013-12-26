@@ -2248,6 +2248,10 @@
     <Content Include="Views\com.Sconit.Web.Controllers.SAP\SAPProdOpBackflush\_SearchResult.cshtml" />
     <Content Include="Views\com.Sconit.Web.Controllers.SAP\SAPProdOpBackflush\Index.cshtml" />
     <Content Include="Views\com.Sconit.Web.Controllers.SAP\SAPProdOpBackflush\List.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.INV\StockTake\BackUpInvIndex.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.INV\StockTake\BackUpInvList.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.INV\StockTake\_BackUpInvSearch.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.INV\StockTake\_BackUpInvSearchResult.cshtml" />
     <None Include="Web References\EncryptDencryptService\EncryptDencryptService.wsdl" />
     <None Include="Web References\EncryptDencryptService\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>

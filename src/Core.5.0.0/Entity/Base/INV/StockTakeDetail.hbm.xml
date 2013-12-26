@@ -22,5 +22,7 @@
         <property name="LastModifyUserId" column="LastModifyUser" type="Int32"/>
         <property name="LastModifyUserName" column="LastModifyUserNm" type="String" length="100"/>
         <property name="LastModifyDate" column="LastModifyDate" type="DateTime"/>
+		<property name="CSSupplier" column="CSSupplier" type="String" length="50"/>
+		<property name="IsConsigement" column="IsConsigement" type="Boolean"/>
     </class>
 </hibernate-mapping>

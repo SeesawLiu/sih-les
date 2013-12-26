@@ -193,7 +193,7 @@ BEGIN
 					update bom set OpRefQty = 0
 					from #tempOrderBomDet as bom inner join
 					--根据零件和工位再按制造商分组排序（null和empty的制造商在前面），把分组号大于1的工位余量全部置为0
-					(select ROW_NUMBER() over(Partition by Item, OpRef order by t.ManufactureParty) as PtRowNum, RowId from #tempOrderBomDet) as t 
+					(select ROW_NUMBER() over(Partition by Item, OpRef order by ManufactureParty) as PtRowNum, RowId from #tempOrderBomDet) as t 
 					on bom.RowId = t.RowId
 					where t.PtRowNum > 1
 					
@@ -901,7 +901,7 @@ BEGIN
 						update bom set OpRefQty = 0
 						from #tempOrderBomDet as bom inner join
 						--根据零件和工位再按制造商分组排序（null和empty的制造商在前面），把分组号大于1的工位余量全部置为0
-						(select ROW_NUMBER() over(Partition by Item, OpRef order by t.ManufactureParty) as PtRowNum, RowId from #tempOrderBomDet) as t 
+						(select ROW_NUMBER() over(Partition by Item, OpRef order by ManufactureParty) as PtRowNum, RowId from #tempOrderBomDet) as t 
 						on bom.RowId = t.RowId
 						where t.PtRowNum > 1
 						

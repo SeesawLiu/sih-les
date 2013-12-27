@@ -9039,7 +9039,7 @@ namespace com.Sconit.Service.Impl
                         ZENGINE = engineTraces.ZENGINE,
                         ScanZENGINE = string.Empty,
                         CreateUserId = user.Id,
-                        CreateUserName = user.Name,
+                        CreateUserName = user.FullName,
                         CreateDate = System.DateTime.Now,
                     };
                 this.genericMgr.Create(engineTraceDet);

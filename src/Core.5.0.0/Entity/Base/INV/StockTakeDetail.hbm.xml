@@ -6,7 +6,8 @@
         </id>
         <property name="StNo" column="StNo" type="String" length="50"/>
         <property name="Item" column="Item" type="String" length="50"/>
-        <property name="ItemDescription" column="ItemDesc" type="String" length="100"/>
+		<property name="ItemDescription" column="ItemDesc" type="String" length="100"/>
+		<property name="RefItemCode" column="RefItemCode" type="String" length="50"/>
         <property name="QualityType" column="QualityType"/>
         <property name="Uom" column="Uom" type="String" length="5"/>
         <property name="BaseUom" column="BaseUom" type="String" length="5"/>

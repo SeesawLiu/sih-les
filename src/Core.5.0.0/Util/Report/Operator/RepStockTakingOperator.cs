@@ -3,98 +3,147 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using com.Sconit.PrintModel.INV;
+using com.Sconit.Entity.INV;
 
 namespace com.Sconit.Utility.Report.Operator
 {
-    public class RepStockTakingOperator : RepTemplate2
+    public class RepStockTakingOperator : RepTemplate1
     {
         public RepStockTakingOperator()
         {
-
             //明细部分的行数
-            this.pageDetailRowCount = 8;
+            this.pageDetailRowCount = 35;
             //列数   1起始
-            this.columnCount = 4;
-
-            this.rowCount = 8;
+            this.columnCount = 7;
             //报表头的行数  1起始
-            this.leftColumnHeadCount = 0;
+            this.headRowCount = 11;
             //报表尾的行数  1起始
-            this.bottomRowCount = 0;
-
-            this.headRowCount = 0;
-
-        }
-
-        /**
-         * 需要拷贝的数据与合并单元格操作
-         * 
-         * Param pageIndex 页号
-         */
-        public override void CopyPageValues(int pageIndex)
-        {
-            //this.SetMergedRegionColumn(pageIndex, 0, 1, 0, 3);
-            //this.SetMergedRegionColumn(pageIndex, 1, 0, 2, 0);
-            //this.SetMergedRegionColumn(pageIndex, 5, 1, 5, 3);
-            ////this.SetMergedRegionColumn(pageIndex, 6, 1, 6, 3);
-            //this.SetMergedRegionColumn(pageIndex, 6, 0, 6, 3);
-            //this.SetMergedRegionColumn(pageIndex, 7, 0, 7, 3);
-
-            //this.CopyCellColumn(pageIndex, 0, 0, "A1");
-            //this.CopyCellColumn(pageIndex, 1, 0, "A2");
-            //this.CopyCellColumn(pageIndex, 3, 0, "A4");
-            //this.CopyCellColumn(pageIndex, 4, 0, "A5");
-            //this.CopyCellColumn(pageIndex, 5, 0, "A6");
-            //this.CopyCellColumn(pageIndex, 1, 2, "C2");
-            //this.CopyCellColumn(pageIndex, 2, 2, "C3");
-            //this.CopyCellColumn(pageIndex, 3, 2, "C4");
-            //this.CopyCellColumn(pageIndex, 4, 2, "C5");
+            this.bottomRowCount = 1;
         }
 
         /**
          * 填充报表
          * 
-         * Param list [0]huDetailList
+         *
          */
-        protected override bool FillValuesImpl(String templateFileName, IList<object> data)
+        protected override bool FillValuesImpl(String templateFileName, IList<object> list)
         {
             try
             {
-                PrintStockTakeMaster printStockTakeMaster = (PrintStockTakeMaster)data[0];
+                if (list == null || list.Count < 2) return false;
+
+                PrintStockTakeMaster printStockTakeMaster = (PrintStockTakeMaster)list[0];
+                IList<PrintStockTakeDetail> printStockTakeDetails = (IList<PrintStockTakeDetail>)list[1];
                 if (printStockTakeMaster == null)
                 {
                     return false;
                 }
 
-                this.sheet.DisplayGridlines = false;
-                this.sheet.IsPrintGridlines = false;
+                //this.SetRowCellBarCode(0, 2, 7);
+                this.barCodeFontName = this.GetBarcodeFontName(2, 5);
+                this.CopyPage(printStockTakeDetails.Count);
+                this.FillHead(printStockTakeMaster);
 
-                this.barCodeFontName = this.GetBarcodeFontName(0, 0);
+
                 int pageIndex = 1;
+                int rowIndex = 0;
+                int rowTotal = 0;
+                int seq = 1;
+                foreach (PrintStockTakeDetail printDetail in printStockTakeDetails)
+                {
+                    //序号	库位	物料代码	旧图号	物料描述	质量类型	寄售	寄售供应商	盘点数
+                    //序号
+                    this.SetRowCell(pageIndex, rowIndex, 0, seq++);
+                    //库位
+                    this.SetRowCell(pageIndex, rowIndex, 1, printDetail.Location);
+                    //物料代码
+                    this.SetRowCell(pageIndex, rowIndex, 1, printDetail.Item);
+                    //旧图号
+                    this.SetRowCell(pageIndex, rowIndex, 2, printDetail.RefItemCode);
+                    //物料描述
+                    this.SetRowCell(pageIndex, rowIndex, 3, printDetail.ItemDescription);
+                    //质量类型
+                    if (printDetail.QualityType == 0)
+                    {
+                        this.SetRowCell(pageIndex, rowIndex, 3, "正常");
+                    }
+                    else if (printDetail.QualityType == 1)
+                    {
+                        this.SetRowCell(pageIndex, rowIndex, 3, "待验");
+                    }
+                    else if (printDetail.QualityType == 2)
+                    {
+                        this.SetRowCell(pageIndex, rowIndex, 3,"不合格");
+                    }
 
-                string barCode = Utility.BarcodeHelper.GetBarcodeStr(printStockTakeMaster.StNo, this.barCodeFontName);
-                this.SetColumnCell(pageIndex, 0, 0, barCode);
+                    //寄售
+                    if (printDetail.IsConsigement)
+                    {
+                        this.SetRowCell(pageIndex, rowIndex, 3, "√");
+                    }
+                    //寄售供应商
+                    this.SetRowCell(pageIndex, rowIndex, 3, printDetail.CSSupplier);
+                    //盘点数
+                    //this.SetRowCell(pageIndex, rowIndex, 3, printDetail.Uom);
 
-                this.SetColumnCell(pageIndex, 1, 0, printStockTakeMaster.StNo);
-
-                this.SetColumnCell(pageIndex, 2, 2, printStockTakeMaster.Region);
-
-                this.SetColumnCell(pageIndex, 3, 2, printStockTakeMaster.Type == 0 ? "抽盘" : "全盘");
-
-                this.SetColumnCell(pageIndex, 4, 2, printStockTakeMaster.EffectiveDate.HasValue ? printStockTakeMaster.EffectiveDate.Value.ToString("yyyy-MM-dd HH:mm:ss") : string.Empty);
-
-                this.SetColumnCell(pageIndex, 5, 2, printStockTakeMaster.IsScanHu ? "√" : "×");
-
-                this.SetColumnCell(pageIndex, 6, 2, printStockTakeMaster.CreateDate.ToString("yyyy-MM-dd HH:mm:ss"));
-
-                this.SetColumnCell(pageIndex, 7, 2, printStockTakeMaster.CreateUserName);
+                    if (this.isPageBottom(rowIndex, rowTotal))//页的最后一行
+                    {
+                        pageIndex++;
+                        rowIndex = 0;
+                    }
+                    else
+                    {
+                        rowIndex++;
+                    }
+                    rowTotal++;
+                    seq++;
+                }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
-
             return true;
+        }
+
+        /*
+         * 填充报表头
+         * 
+         * Param pageIndex 页号
+         * Param orderHead 订单头对象
+         * Param orderDetails 订单明细对象
+         */
+        private void FillHead(PrintStockTakeMaster stockTakeMaster)
+        {
+            //盘点单号:
+            string seqCode = Utility.BarcodeHelper.GetBarcodeStr(stockTakeMaster.StNo, this.barCodeFontName);
+            this.SetRowCell(2, 7, seqCode);
+            //盘点单号 No.:
+            this.SetRowCell(3, 7, stockTakeMaster.StNo);
+
+            //区域
+            this.SetRowCell(6, 2, stockTakeMaster.Region);
+
+            //创建用户
+            this.SetRowCell(6, 5, stockTakeMaster.CreateUserName);
+
+            //创建时间 
+            this.SetRowCell(8, 5, stockTakeMaster.CreateDate.ToString("yyyy-MM-dd HH:mm:ss"));
+
+            
+        }
+
+        /**
+           * 需要拷贝的数据与合并单元格操作
+           * 
+           * Param pageIndex 页号
+           */
+        public override void CopyPageValues(int pageIndex)
+        {
+            //盘点人:
+            this.CopyCell(pageIndex, 46, 1, "B47");
+            //完成时间:
+            this.CopyCell(pageIndex, 46, 6, "G47");
         }
     }
 }

@@ -16,6 +16,9 @@ namespace com.Sconit.Entity.INV
         public string Item { get; set; }
         [Display(Name = "StockTakeDetail_ItemDescription", ResourceType = typeof(Resources.INV.StockTake))]
         public string ItemDescription { get; set; }
+
+        public string RefItemCode { get; set; }
+        
         public com.Sconit.CodeMaster.QualityType QualityType { get; set; }
         [Required(AllowEmptyStrings = false, ErrorMessageResourceName = "Errors_Common_FieldRequired", ErrorMessageResourceType = typeof(Resources.ErrorMessage))]
         [Display(Name = "StockTakeDetail_Uom", ResourceType = typeof(Resources.INV.StockTake))]

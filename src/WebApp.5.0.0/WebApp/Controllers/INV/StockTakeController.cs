@@ -970,18 +970,30 @@ using com.Sconit.Utility.Report;
         }
         #endregion
 
-        #region Print
-        public string Print(string StNo)
+        #region 打印 导出
+        public string Print(string stNo)
         {
-            StockTakeMaster stockTakeMaster = base.genericMgr.FindById<StockTakeMaster>(StNo);
+            StockTakeMaster stockTakeMaster = base.genericMgr.FindById<StockTakeMaster>(stNo);
+            IList<StockTakeDetail> stockDetailList = this.genericMgr.FindAll<StockTakeDetail>(" from StockTakeDetail as d where d.StNo=? ", stNo);
+            stockTakeMaster.StockTakeDetails = stockDetailList;
             PrintStockTakeMaster printStockTakeMaster = Mapper.Map<StockTakeMaster, PrintStockTakeMaster>(stockTakeMaster);
             IList<object> data = new List<object>();
             data.Add(printStockTakeMaster);
+            data.Add(printStockTakeMaster.StockTakeDetails);
             string reportFileUrl = reportGen.WriteToFile("StockTaking.xls", data);
-            //reportGen.WriteToClient(orderMaster.OrderTemplate, data, orderMaster.OrderTemplate);
-
             return reportFileUrl;
-            //reportGen.WriteToFile(orderMaster.OrderTemplate, data);
+        }
+
+        public void SaveToClient(string stNo)
+        {
+            StockTakeMaster stockTakeMaster = base.genericMgr.FindById<StockTakeMaster>(stNo);
+            IList<StockTakeDetail> stockDetailList = this.genericMgr.FindAll<StockTakeDetail>(" from StockTakeDetail as d where d.StNo=? ", stNo);
+            stockTakeMaster.StockTakeDetails = stockDetailList;
+            PrintStockTakeMaster printStockTakeMaster = Mapper.Map<StockTakeMaster, PrintStockTakeMaster>(stockTakeMaster);
+            IList<object> data = new List<object>();
+            data.Add(printStockTakeMaster);
+            data.Add(printStockTakeMaster.StockTakeDetails);
+            reportGen.WriteToClient("StockTaking.xls", data, "StockTaking.xls");
         }
         #endregion
 

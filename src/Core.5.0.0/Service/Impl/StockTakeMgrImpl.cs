@@ -317,6 +317,7 @@ namespace com.Sconit.Service.Impl
             IList<StockTakeLocationLotDet> locLotDets = this.genericMgr.FindAll<StockTakeLocationLotDet>(" from StockTakeLocationLotDet as s where exists( select 1 from Location as l wehre l.Code=s.Location l.Region=? ) and s.RefNo=? order by Location asc ",new object[]{stockTakeMaster.Region,stockTakeMaster.RefNo});
             if (locLotDets != null && locLotDets.Count > 0)
             {
+                int i = 1;
                 foreach (var locLotDet in locLotDets)
                 {
                     StockTakeDetail stockTakeDetail = new StockTakeDetail();
@@ -1933,6 +1934,250 @@ namespace com.Sconit.Service.Impl
             }
             BatchUpdateStockTakeDetails(stNo, stockTakeDetailList, null, null);
 
+        }
+        #endregion      
+
+        #region 导入盘点明细
+        [Transaction(TransactionMode.Requires)]
+        public void ImportStockTakeDetailFromXls(Stream inputStream, string stNo)
+        {
+            if (inputStream.Length == 0)
+            {
+                throw new BusinessException("Import.Stream.Empty");
+            }
+
+            #region 清空明细
+            string hql = @"from StockTakeDetail as s where s.StNo = ?";
+            genericMgr.Delete(hql, new object[] { stNo }, new IType[] { NHibernateUtil.String });
+            genericMgr.FlushSession();
+            genericMgr.CleanSession();
+            #endregion
+
+            HSSFWorkbook workbook = new HSSFWorkbook(inputStream);
+
+            ISheet sheet = workbook.GetSheetAt(0);
+            IEnumerator rows = sheet.GetRowEnumerator();
+
+            var cell = sheet.GetRow(4).Cells[6];
+            var cellStNo = ImportHelper.GetCellStringValue(cell);
+            if (cellStNo != stNo)
+            {
+                throw new BusinessException("导入的模板不正确,盘点单号不一致");
+            }
+
+            ImportHelper.JumpRows(rows, 11);
+
+            #region 列定义
+            //质量类型	寄售	寄售供应商	盘点数
+
+            int colLocation = 1;// 库位
+            int colItem = 2;//物料代码
+            int colQualitype= 5;//质量类型
+            int colIsConsigement = 6;//是否寄售
+            int colCSSupplier = 7;//寄售供应商
+            int colQty = 8;//盘点数
+            #endregion
+
+            DateTime dateTimeNow = DateTime.Now;
+            BusinessException errorMessage = new BusinessException();
+            IList<StockTakeDetail> stockTakeDetailList = new List<StockTakeDetail>();
+            IList<StockTakeDetail> existsList = this.genericMgr.FindAll<StockTakeDetail>(" from StockTakeDetail as d where d.StNo=?", stNo);
+            IList<Location> allLocs = genericMgr.FindAll<Location>();
+            IList<Item> allItems = genericMgr.FindAll<Item>();
+            int rowCount = 10;
+            while (rows.MoveNext())
+            {
+                rowCount++;
+                HSSFRow row = (HSSFRow)rows.Current;
+                if (!ImportHelper.CheckValidDataRow(row, 1, 8))
+                {
+                    break;//边界
+                }
+
+                StockTakeDetail stockTakeDetail = new StockTakeDetail();
+                string locationCode = string.Empty;
+                string itemCode = string.Empty;
+                string qualityType = string.Empty;
+                bool isConsigement = false;
+                string csSupplier = string.Empty;
+                decimal qty = 0;
+
+                #region 读取数据
+                #region 读取库位
+                locationCode = ImportHelper.GetCellStringValue(row.GetCell(colLocation));
+                if (string.IsNullOrWhiteSpace(locationCode))
+                {
+                    errorMessage.AddMessage(string.Format("第{0}行：库位不能为空。", rowCount));
+                    continue;
+                }
+                else
+                {
+                    var locationList = allLocs.Where(a => a.Code == locationCode);
+                    if (locationList == null && locationList.Count() == 0)
+                    {
+                        errorMessage.AddMessage(string.Format("第{0}行：来源库位{1}不存在", rowCount, locationCode));
+                        continue;
+                    }
+                    else
+                    {
+                        stockTakeDetail.Location = locationCode;
+                    }
+                }
+
+                //  Location locationFrom = genericMgr.FindById<Location>(locationFromCode);
+
+
+                #endregion
+
+                #region 读取物料代码
+                itemCode = ImportHelper.GetCellStringValue(row.GetCell(colItem));
+                if (string.IsNullOrWhiteSpace(itemCode))
+                {
+                    errorMessage.AddMessage(string.Format("第{0}行：物料代码不能为空。", rowCount));
+                    continue;
+                }
+                else
+                {
+                    var items = allItems.Where(a => a.Code == itemCode);
+                    if (items == null && items.Count() == 0)
+                    {
+                        errorMessage.AddMessage(string.Format("第{0}行：物料代码{1}不存在", rowCount, itemCode));
+                        continue;
+                    }
+                    else
+                    {
+                        var currentItem = items.First();
+                        stockTakeDetail.Item = currentItem.Code;
+                        stockTakeDetail.ItemDescription = currentItem.Description;
+                        stockTakeDetail.RefItemCode = currentItem.ReferenceCode;
+                        stockTakeDetail.Uom = currentItem.Uom;
+                        stockTakeDetail.BaseUom = currentItem.Uom;
+                    }
+                }
+
+                #endregion
+
+                #region 质量类型
+                qualityType = ImportHelper.GetCellStringValue(row.GetCell(colQualitype));
+                if (qualityType != "0" && qualityType != "1" && qualityType != "2")
+                {
+                    errorMessage.AddMessage(string.Format("第{0}行：质量类型{1}填写有误。", rowCount, qualityType));
+                    continue;
+                }
+                else
+                {
+                    stockTakeDetail.QualityType = (com.Sconit.CodeMaster.QualityType)Convert.ToInt16(qualityType);
+                }
+                #endregion
+
+                #region 是否寄售
+                string isConsigementRead = ImportHelper.GetCellStringValue(row.GetCell(colIsConsigement));
+                if (isConsigementRead == "0")
+                {
+                    stockTakeDetail.IsConsigement = false;
+                }
+                else if (isConsigementRead == "1")
+                {
+                    stockTakeDetail.IsConsigement = true;
+                }
+                else
+                {
+                    errorMessage.AddMessage(string.Format("第{0}行：是否寄售填写有误。", rowCount));
+                    continue;
+                }
+                #endregion
+
+                #region 寄售的才有寄售供应商
+                if (stockTakeDetail.IsConsigement)
+                {
+                    csSupplier = ImportHelper.GetCellStringValue(row.GetCell(colCSSupplier));
+                    if (string.IsNullOrWhiteSpace(csSupplier))
+                    {
+                        errorMessage.AddMessage(string.Format("第{0}行：寄售物料请填写寄售供应商。", rowCount));
+                        continue;
+                    }
+                    else
+                    {
+                        var supplis = this.genericMgr.FindAll<Party>(" from Party as p where p.Code=? ", csSupplier);
+                        if (supplis == null || supplis.Count() == 0)
+                        {
+                            errorMessage.AddMessage(string.Format("第{0}行：寄售供应商{1}不存在", rowCount, csSupplier));
+                            continue;
+                        }
+                        else
+                        {
+                            stockTakeDetail.CSSupplier = csSupplier;
+                        }
+                    }
+                }
+
+                #endregion
+
+                #region 读取数量
+                try
+                {
+                    qty = Convert.ToDecimal(row.GetCell(colQty).NumericCellValue);
+                    stockTakeDetail.Qty = qty;
+
+
+                }
+                catch
+                {
+                    errorMessage.AddMessage(string.Format("第{0}行：数量{1}填写有误", rowCount, qty));
+                }
+                #endregion
+                #endregion
+                #region 检验模版中的重复
+                if (stockTakeDetailList != null && stockTakeDetailList.Count > 0)
+                {
+                    bool isExists = stockTakeDetailList.Where(s => s.Item == stockTakeDetail.Item && s.Location == stockTakeDetail.Location && s.QualityType == stockTakeDetail.QualityType
+                        && s.IsConsigement == stockTakeDetail.IsConsigement && s.CSSupplier == stockTakeDetail.CSSupplier).Count() > 0;
+                    if (isExists)
+                    {
+                        errorMessage.AddMessage(string.Format("第{0}行：物料{1}+库位{2}+质量状态{3}+寄售类型{4}+寄售供应商{5}在模版中重复。", rowCount, stockTakeDetail.Item, stockTakeDetail.Location, stockTakeDetail.QualityType, stockTakeDetail.IsConsigement, stockTakeDetail.CSSupplier));
+                        continue;
+                    }
+                }
+
+                if (existsList != null && existsList.Count > 0)
+                {
+                    var currentDetail = existsList.Where(s => s.Item == stockTakeDetail.Item && s.Location == stockTakeDetail.Location && s.QualityType == stockTakeDetail.QualityType
+                       && s.IsConsigement == stockTakeDetail.IsConsigement && s.CSSupplier == stockTakeDetail.CSSupplier);
+                    if (currentDetail != null && currentDetail.Count() > 0)
+                    {
+                        currentDetail.First().Qty = stockTakeDetail.Qty;
+                        currentDetail.First().IsUpdate = true;
+                        stockTakeDetailList.Add(currentDetail.First());
+                        continue;
+                    }
+                }
+                #endregion
+                stockTakeDetail.StNo = stNo;
+                stockTakeDetailList.Add(stockTakeDetail);
+            }
+            if (stockTakeDetailList.Count == 0)
+            {
+                throw new BusinessException("Import.Result.Error.ImportNothing");
+            }
+
+            if (errorMessage.HasMessage)
+            {
+                throw errorMessage;
+            }
+
+            foreach (var stockDet in stockTakeDetailList)
+            {
+                if (stockDet.IsUpdate.HasValue && stockDet.IsUpdate.Value)
+                {
+                    this.genericMgr.Update(stockDet);
+                }
+                else
+                {
+                    this.genericMgr.Create(stockDet);
+                }
+            }
+
+            BatchUpdateStockTakeDetails(stNo, stockTakeDetailList, null, null);
         }
         #endregion
 

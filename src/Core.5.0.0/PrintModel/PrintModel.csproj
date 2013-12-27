@@ -50,6 +50,7 @@
     <Compile Include="INV\PrintHu.cs" />
     <Compile Include="INV\PrintKanBanCardInfo.cs" />
     <Compile Include="INV\PrintStockTakeMaster.cs" />
+    <Compile Include="INV\PrintStockTakeDetail.cs" />
     <Compile Include="ORD\PrintMiscOrderDetail.cs" />
     <Compile Include="ORD\PrintMiscOrderMaster.cs" />
     <Compile Include="ORD\PrintOrderBomDetail.cs" />

@@ -31,7 +31,7 @@
                 @Html.DisplayFor(model => model.Region)
                 @Html.HiddenFor(model => model.Region)
             </div>
-            <div class="editor-label-2">
+            @*<div class="editor-label-2">
                 @Html.LabelFor(model => model.EffectiveDate)
             </div>
             <div class="editor-field-2">
@@ -61,7 +61,7 @@
             </div>
             <div class="editor-field-2">
                 @Html.DisplayFor(model => model.CostCenter)
-            </div>
+            </div>*@
         </div>
         <div class="editor-footer">
             @{
@@ -94,37 +94,35 @@
     
              
             }
-            @Html.Button(Resources.Global.Button_Print, "Url_Inventory_StockTake_New", new Dictionary<string, string>()
-	            {
-	                {"type", "button"},
-	                {"id", "btnPrint"},
-                    {"needconfirm","true"},
-                    {"onclick","doPrint()"}
-                   // {"onclick","location.href='"+Url.Content("~/StockTake/Print/"+Model.StNo)+"'"}
-	            })
+            <button type="button" id="btnPrint" onclick="Print(false)">@Resources.Global.Button_Print</button>
+            <button type="button" id="btnExport" onclick="Export(true)">@Resources.Global.Button_Export</button>
             <button type="button" id="btnBack" onclick="location.href='@Url.Content("~/StockTake/StockTakeMasterList")'">
                 @Resources.Global.Button_Back</button>
         </div>
     </fieldset>
     <script type="text/javascript">
-        function doPrint(e) {
-            var data = {
-                "StNo": $("#StNo").val()
-            };
-            $.ajax({
-                type: "post",
-                dataType: "text",
-                url: "/StockTake/Print/",
-                data: data,
-                success: function (data, textStatus) {
-                    if (data != "") {
-                        PrintOrder(data);
+        function doPrint(isExport) {
+            if (isExport) {
+                location.href = "/StockTake/Print/?stNo=" + $("#StNo").val();
+            } else {
+                var data = {
+                    "stNo": $("#StNo").val()
+                };
+                $.ajax({
+                    type: "post",
+                    dataType: "text",
+                    url: "/StockTake/Print/",
+                    data: data,
+                    success: function (data, textStatus) {
+                        if (data != "") {
+                            PrintOrder(data);
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        DisplayTextMessages(XMLHttpRequest.responseText);
                     }
-                },
-                error: function (XMLHttpRequest, textStatus, errorThrown) {
-                    DisplayTextMessages(XMLHttpRequest.responseText);
-                }
-            });
+                });
+            }
         }
     </script>
 }

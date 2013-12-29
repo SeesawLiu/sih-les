@@ -94,8 +94,8 @@
     
              
             }
-            <button type="button" id="btnPrint" onclick="Print(false)">@Resources.Global.Button_Print</button>
-            <button type="button" id="btnExport" onclick="Export(true)">@Resources.Global.Button_Export</button>
+            <button type="button" id="btnPrint" onclick="doPrint(false)">@Resources.Global.Button_Print</button>
+            <button type="button" id="btnExport" onclick="doPrint(true)">@Resources.Global.Button_Export</button>
             <button type="button" id="btnBack" onclick="location.href='@Url.Content("~/StockTake/StockTakeMasterList")'">
                 @Resources.Global.Button_Back</button>
         </div>
@@ -103,7 +103,7 @@
     <script type="text/javascript">
         function doPrint(isExport) {
             if (isExport) {
-                location.href = "/StockTake/Print/?stNo=" + $("#StNo").val();
+                location.href = "/StockTake/SaveToClient/?stNo=" + $("#StNo").val();
             } else {
                 var data = {
                     "stNo": $("#StNo").val()

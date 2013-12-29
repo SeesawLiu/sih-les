@@ -17,6 +17,7 @@ namespace com.Sconit.Entity.INV
         [Display(Name = "StockTakeDetail_ItemDescription", ResourceType = typeof(Resources.INV.StockTake))]
         public string ItemDescription { get; set; }
 
+        [Display(Name = "LocationDetailView_RefItemCode", ResourceType = typeof(Resources.View.LocationDetailView))]
         public string RefItemCode { get; set; }
         
         public com.Sconit.CodeMaster.QualityType QualityType { get; set; }
@@ -44,11 +45,11 @@ namespace com.Sconit.Entity.INV
 		public string LastModifyUserName { get; set; }
 		public DateTime LastModifyDate { get; set; }
 
-        //[Display(Name = "LocationDetailView_suppliers", ResourceType = typeof(Resources.View.LocationDetailView))]
+        [Display(Name = "LocationDetailView_suppliers", ResourceType = typeof(Resources.View.LocationDetailView))]
         public string CSSupplier { get; set; }
 
         //[Export(ExportName = "ExportBackUpInvXLS", ExportSeq = 60)]
-        //[Display(Name = "LocationDetailView_IsCS", ResourceType = typeof(Resources.View.LocationDetailView))]
+        [Display(Name = "LocationDetailView_IsCS", ResourceType = typeof(Resources.View.LocationDetailView))]
         public Boolean IsConsigement { get; set; }
         
         #endregion

@@ -70,6 +70,13 @@ namespace com.Sconit.Entity.INV
         public string LastModifyUserName { get; set; }
         public DateTime LastModifyDate { get; set; }
         public Int32 Version { get; set; }
+
+        [Display(Name = "LocationDetailView_suppliers", ResourceType = typeof(Resources.View.LocationDetailView))]
+        public string CSSupplier { get; set; }
+
+        //[Export(ExportName = "ExportBackUpInvXLS", ExportSeq = 60)]
+        [Display(Name = "LocationDetailView_IsCS", ResourceType = typeof(Resources.View.LocationDetailView))]
+        public Boolean IsConsigement { get; set; }
         #endregion
 
         public override int GetHashCode()

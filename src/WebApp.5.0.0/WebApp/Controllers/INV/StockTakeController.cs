@@ -143,7 +143,7 @@ using com.Sconit.Utility.Report;
                 {
                     throw new BusinessException("盘点编号不能为空。");
                 }
-                var backInventoryByRefNo = this.genericMgr.FindAll<int>("select count(*) from StockTakeLocationLotDet as s where s.RefNo=?", stockTakeMaster.RefNo);
+                var backInventoryByRefNo = this.genericMgr.FindAll<long>("select count(*) from StockTakeLocationLotDet as s where s.RefNo=?", stockTakeMaster.RefNo);
                 if (backInventoryByRefNo[0] == 0)
                 {
                     throw new BusinessException(string.Format("盘点编号{0}没有找到盘点库存，请先备份盘点库存",stockTakeMaster.RefNo));
@@ -572,6 +572,7 @@ using com.Sconit.Utility.Report;
                 webOrderDetail.Item = item.Code;
                 webOrderDetail.ItemDescription = item.Description;
                 webOrderDetail.Uom = item.Uom;
+                webOrderDetail.ReferenceItemCode = item.ReferenceCode;
             }
             return this.Json(webOrderDetail);
         }
@@ -688,7 +689,7 @@ using com.Sconit.Utility.Report;
                 {
                     stockTakeMgr.ImportStockTakeDetailFromXls(file.InputStream, stNo);
                 }
-                SaveErrorMessage("导入成功。");
+                SaveSuccessMessage("导入成功。");
             }
             catch (BusinessException ex)
             {
@@ -872,8 +873,8 @@ using com.Sconit.Utility.Report;
                     throw new BusinessException("盘点编号不能为空。");
                 }
                 this.genericMgr.FindAllWithNativeSql(string.Format(@"delete from CUST_StockTakeLocationLotDet where RefNo='{3}';
-                                                  insert into CUST_StockTakeLocationLotDet ( Location, Item, ItemDesc, Qty, QualityType, CSSupplier, IsConsigement,  CreateUser, CreateUserNm, CreateDate, LastModifyUser, LastModifyUserNm, LastModifyDate,RefNo,Uom)
-                                                    select invGroup.Location,invGroup.Item,i.Desc1,invGroup.qty,invGroup.QualityType,invGroup.CSSupplier,invGroup.IsCS,'{0}' as CreateUser,'{1}' as CreateUserNm,'{2}' as CreateDate,'{0}' as LastModifyUser,'{1}' as LastModifyUserNm,'{2}' as LastModifyDate,'{3}' as RefNo,i.Uom from(select Location,Item ,OccupyType,OccupyRefNo,SUM(Qty) as qty,IsCS,CSSupplier  from VIEW_LocationLotDet where Qty>0 group by Location,Item,OccupyType,OccupyRefNo,IsCS,CSSupplier)  as invGroup 
+                                                  insert into CUST_StockTakeLocationLotDet ( Location, Item, ItemDesc, Qty, QualityType, CSSupplier, IsConsigement,  CreateUser, CreateUserNm, CreateDate, LastModifyUser, LastModifyUserNm, LastModifyDate,RefNo,Uom,RefItemCode)
+                                                    select invGroup.Location,invGroup.Item,i.Desc1,invGroup.qty,invGroup.QualityType,invGroup.CSSupplier,invGroup.IsCS,'{0}' as CreateUser,'{1}' as CreateUserNm,'{2}' as CreateDate,'{0}' as LastModifyUser,'{1}' as LastModifyUserNm,'{2}' as LastModifyDate,'{3}' as RefNo,i.Uom,i.RefCode from(select Location,Item ,OccupyType,OccupyRefNo,SUM(Qty) as qty,IsCS,CSSupplier,QualityType  from VIEW_LocationLotDet where Qty>0 group by Location,Item,OccupyType,OccupyRefNo,IsCS,CSSupplier,QualityType)  as invGroup 
                                                     inner join MD_Item as i on invGroup.Item=i.Code ", user.Id, user.FullName, System.DateTime.Now, refNo));
                 SaveSuccessMessage("备份成功。");
             }
@@ -894,7 +895,7 @@ using com.Sconit.Utility.Report;
         [GridAction]
         public ActionResult BackUpInvList(GridCommand command, StockTakeDetailSearchModel searchModel)
         {
-            TempData["StockTakeItemSearchModel"] = searchModel;
+            SearchCacheModel searchCacheModel = this.ProcessSearchModel(command, searchModel);
             ViewBag.PageSize = base.ProcessPageSize(command.PageSize);
             return View();
         }

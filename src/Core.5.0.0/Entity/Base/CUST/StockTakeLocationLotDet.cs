@@ -24,6 +24,10 @@ namespace com.Sconit.Entity.CUST
         [Display(Name = "LocationDetailView_Description", ResourceType = typeof(Resources.View.LocationDetailView))]
         public string ItemDesc { get; set; }
 
+        [Export(ExportName = "ExportBackUpInvXLS", ExportSeq = 25)]
+        [Display(Name = "LocationDetailView_RefItemCode", ResourceType = typeof(Resources.View.LocationDetailView))]
+        public string RefItemCode { get; set; }
+
         [Export(ExportName = "ExportBackUpInvXLS", ExportSeq = 40)]
         [Display(Name = "LocationDetailView_Qty", ResourceType = typeof(Resources.View.LocationDetailView))]
         public Decimal Qty { get; set; }

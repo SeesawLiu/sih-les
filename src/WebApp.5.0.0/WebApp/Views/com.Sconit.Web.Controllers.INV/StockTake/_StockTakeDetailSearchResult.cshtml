@@ -46,7 +46,8 @@
                     success: function (data, textStatus) {
                         var $tGrid = $("#StockTakeDetailGridView").data("tGrid");
                         var oldData = $tGrid.dataItem($(e.target).parent().parent().parent());
-                        $(e.target).parent().parent().next().html(data.ItemDescription);
+                        $(e.target).parent().parent().next().html(data.ReferenceItemCode);
+                        $(e.target).parent().parent().next().next().html(data.ItemDescription);
 
                         if (oldData != undefined) {
                             oldData.ItemDescription = data.ItemDescription;
@@ -135,7 +136,7 @@
             //columns.Bound(o => o.Uom).ReadOnly();
             //columns.ForeignKey(o => o.Uom, (IEnumerable<com.Sconit.Entity.MD.Uom>)ViewData["Uom"], "Code", "Code");
             columns.Bound(o => o.QualityTypeDescription);
-            columns.Bound(o => o.IsConsigement);
+            columns.Bound(o => o.IsConsigement).ClientTemplate("<input type='checkbox' disabled='disabled' name='IsConsigement' <#= IsConsigement? checked='checked' : '' #> />");
             columns.Bound(o => o.CSSupplier);
             columns.Bound(o => o.Qty);
             columns.Command(commands =>

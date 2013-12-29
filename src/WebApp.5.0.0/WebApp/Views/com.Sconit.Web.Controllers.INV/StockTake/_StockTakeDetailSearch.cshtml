@@ -90,8 +90,8 @@
             @Html.Hidden("IsScanHu", (bool)ViewBag.IsScanHu)
             <button type="button" id="btnSearch" onclick="btnSearchStockTakeDetail_Click()">
                 @Resources.Global.Button_Search</button>
-            <button type="button" id="btnExport">
-                @Resources.Global.Button_Export</button>
+            @*<button type="button" id="btnExport">
+                @Resources.Global.Button_Export</button>*@
             <button type="button" id="btnBack" onclick="location.href='@Url.Content("~/StockTake/StockTakeMasterList")'">
                 @Resources.Global.Button_Back</button>
         </div>

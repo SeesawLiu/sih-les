@@ -183,4 +183,7 @@
   <data name="LocationDetailView_QualityType" xml:space="preserve">
     <value>QualityType</value>
   </data>
+  <data name="LocationDetailView_RefItemCode" xml:space="preserve">
+    <value>RefItemCode</value>
+  </data>
 </root>

@@ -314,7 +314,7 @@ namespace com.Sconit.Service.Impl
             stockTakeMaster.StartUserName = user.FullName;
             stockTakeMaster.StartDate = DateTime.Now;
             this.genericMgr.Update(stockTakeMaster);
-            IList<StockTakeLocationLotDet> locLotDets = this.genericMgr.FindAll<StockTakeLocationLotDet>(" from StockTakeLocationLotDet as s where exists( select 1 from Location as l wehre l.Code=s.Location l.Region=? ) and s.RefNo=? order by Location asc ",new object[]{stockTakeMaster.Region,stockTakeMaster.RefNo});
+            IList<StockTakeLocationLotDet> locLotDets = this.genericMgr.FindAll<StockTakeLocationLotDet>(" from StockTakeLocationLotDet as s where exists( select 1 from StockTakeLocation as l where l.Location=s.Location and l.StNo=? ) and s.RefNo=? order by Location asc ", new object[] { stNo, stockTakeMaster.RefNo });
             if (locLotDets != null && locLotDets.Count > 0)
             {
                 int i = 1;
@@ -323,6 +323,7 @@ namespace com.Sconit.Service.Impl
                     StockTakeDetail stockTakeDetail = new StockTakeDetail();
                     stockTakeDetail.StNo = stNo;
                     stockTakeDetail.Item = locLotDet.Item;
+                    stockTakeDetail.RefItemCode = locLotDet.RefItemCode;
                     stockTakeDetail.ItemDescription = locLotDet.ItemDesc;
                     stockTakeDetail.Uom = locLotDet.Uom;
                     stockTakeDetail.BaseUom = locLotDet.Uom;
@@ -1747,194 +1748,194 @@ namespace com.Sconit.Service.Impl
         #endregion
 
         #region 导入盘点明细
-        [Transaction(TransactionMode.Unspecified)]
-        public void ImportStockTakeDetailFromXls(Stream inputStream, string stNo)
-        {
-            if (inputStream.Length == 0)
-            {
-                throw new BusinessException("Import.Stream.Empty");
-            }
+        //[Transaction(TransactionMode.Unspecified)]
+        //public void ImportStockTakeDetailFromXls(Stream inputStream, string stNo)
+        //{
+        //    if (inputStream.Length == 0)
+        //    {
+        //        throw new BusinessException("Import.Stream.Empty");
+        //    }
 
-            #region 清空明细
-            string hql = @"from StockTakeDetail as s where s.StNo = ?";
-            genericMgr.Delete(hql, new object[] { stNo }, new IType[] { NHibernateUtil.String });
-            #endregion
+        //    #region 清空明细
+        //    string hql = @"from StockTakeDetail as s where s.StNo = ?";
+        //    genericMgr.Delete(hql, new object[] { stNo }, new IType[] { NHibernateUtil.String });
+        //    #endregion
 
-            HSSFWorkbook workbook = new HSSFWorkbook(inputStream);
+        //    HSSFWorkbook workbook = new HSSFWorkbook(inputStream);
 
-            ISheet sheet = workbook.GetSheetAt(0);
-            IEnumerator rows = sheet.GetRowEnumerator();
+        //    ISheet sheet = workbook.GetSheetAt(0);
+        //    IEnumerator rows = sheet.GetRowEnumerator();
 
-            ImportHelper.JumpRows(rows, 11);
+        //    ImportHelper.JumpRows(rows, 11);
 
-            #region 列定义
-            int colItem = 1;//物料代码
-            int colUom = 3;//单位
-            int colLocation = 4;// 库位
-            int colQty = 5;//数量
-            int colHu = 6;//条码
-            int colBin = 7;//库格
-            #endregion
+        //    #region 列定义
+        //    int colItem = 1;//物料代码
+        //    int colUom = 3;//单位
+        //    int colLocation = 4;// 库位
+        //    int colQty = 5;//数量
+        //    int colHu = 6;//条码
+        //    int colBin = 7;//库格
+        //    #endregion
 
-            DateTime dateTimeNow = DateTime.Now;
-            IList<StockTakeDetail> stockTakeDetailList = new List<StockTakeDetail>();
-            while (rows.MoveNext())
-            {
-                HSSFRow row = (HSSFRow)rows.Current;
-                if (!ImportHelper.CheckValidDataRow(row, 1, 9))
-                {
-                    break;//边界
-                }
+        //    DateTime dateTimeNow = DateTime.Now;
+        //    IList<StockTakeDetail> stockTakeDetailList = new List<StockTakeDetail>();
+        //    while (rows.MoveNext())
+        //    {
+        //        HSSFRow row = (HSSFRow)rows.Current;
+        //        if (!ImportHelper.CheckValidDataRow(row, 1, 9))
+        //        {
+        //            break;//边界
+        //        }
 
-                if (row.GetCell(colHu) == null || row.GetCell(colHu).ToString() == string.Empty)
-                {
-                    string itemCode = string.Empty;
-                    decimal qty = 0;
-                    string uomCode = string.Empty;
-                    string locationCode = string.Empty;
+        //        if (row.GetCell(colHu) == null || row.GetCell(colHu).ToString() == string.Empty)
+        //        {
+        //            string itemCode = string.Empty;
+        //            decimal qty = 0;
+        //            string uomCode = string.Empty;
+        //            string locationCode = string.Empty;
 
-                    #region 读取数据
-                    #region 读取物料代码
-                    itemCode = ImportHelper.GetCellStringValue(row.GetCell(colItem));
-                    if (itemCode == null || itemCode.Trim() == string.Empty)
-                    {
-                        ImportHelper.ThrowCommonError(row.RowNum, colItem, row.GetCell(colItem));
-                    }
+        //            #region 读取数据
+        //            #region 读取物料代码
+        //            itemCode = ImportHelper.GetCellStringValue(row.GetCell(colItem));
+        //            if (itemCode == null || itemCode.Trim() == string.Empty)
+        //            {
+        //                ImportHelper.ThrowCommonError(row.RowNum, colItem, row.GetCell(colItem));
+        //            }
 
-                    #endregion
-                    #region 读取单位
-                    uomCode = row.GetCell(colUom) != null ? row.GetCell(colUom).StringCellValue : string.Empty;
-                    if (uomCode == null || uomCode.Trim() == string.Empty)
-                    {
-                        throw new BusinessException("Import.Read.Error.Empty", (row.RowNum + 1).ToString(), colUom.ToString());
-                    }
-                    #endregion
+        //            #endregion
+        //            #region 读取单位
+        //            uomCode = row.GetCell(colUom) != null ? row.GetCell(colUom).StringCellValue : string.Empty;
+        //            if (uomCode == null || uomCode.Trim() == string.Empty)
+        //            {
+        //                throw new BusinessException("Import.Read.Error.Empty", (row.RowNum + 1).ToString(), colUom.ToString());
+        //            }
+        //            #endregion
 
-                    #endregion
+        //            #endregion
 
-                    #region 读取库位
-                    locationCode = row.GetCell(colLocation) != null ? row.GetCell(colLocation).StringCellValue : string.Empty;
-                    if (locationCode == null || locationCode.Trim() == string.Empty)
-                    {
-                        throw new BusinessException("Import.Read.Error.Empty", (row.RowNum + 1).ToString(), colUom.ToString());
-                    }
+        //            #region 读取库位
+        //            locationCode = row.GetCell(colLocation) != null ? row.GetCell(colLocation).StringCellValue : string.Empty;
+        //            if (locationCode == null || locationCode.Trim() == string.Empty)
+        //            {
+        //                throw new BusinessException("Import.Read.Error.Empty", (row.RowNum + 1).ToString(), colUom.ToString());
+        //            }
 
-                    #region 读取数量
-                    try
-                    {
-                        qty = Convert.ToDecimal(row.GetCell(colQty).NumericCellValue);
-                    }
-                    catch
-                    {
-                        ImportHelper.ThrowCommonError(row.RowNum, colQty, row.GetCell(colQty));
-                    }
-                    #endregion
+        //            #region 读取数量
+        //            try
+        //            {
+        //                qty = Convert.ToDecimal(row.GetCell(colQty).NumericCellValue);
+        //            }
+        //            catch
+        //            {
+        //                ImportHelper.ThrowCommonError(row.RowNum, colQty, row.GetCell(colQty));
+        //            }
+        //            #endregion
 
-                    #endregion
+        //            #endregion
 
-                    #region 校验物料,库位
-                    var i = (
-                       from c in stockTakeDetailList
-                       where c.Item.Trim().ToUpper() == itemCode.Trim().ToUpper() && c.Location.Trim().ToUpper() == locationCode.Trim().ToUpper()
-                       select c).Count();
+        //            #region 校验物料,库位
+        //            var i = (
+        //               from c in stockTakeDetailList
+        //               where c.Item.Trim().ToUpper() == itemCode.Trim().ToUpper() && c.Location.Trim().ToUpper() == locationCode.Trim().ToUpper()
+        //               select c).Count();
 
-                    if (i > 0)
-                    {
-                        throw new BusinessException("Import.Business.Error.Duplicate", itemCode, (row.RowNum + 1).ToString(), (colItem + 1).ToString());
-                    }
-                    #endregion
+        //            if (i > 0)
+        //            {
+        //                throw new BusinessException("Import.Business.Error.Duplicate", itemCode, (row.RowNum + 1).ToString(), (colItem + 1).ToString());
+        //            }
+        //            #endregion
 
-                    #region 填充数据
-                    Item item = genericMgr.FindById<Item>(itemCode);
-                    Uom uom = genericMgr.FindById<Uom>(uomCode);
-                    Location location = genericMgr.FindById<Location>(locationCode);
+        //            #region 填充数据
+        //            Item item = genericMgr.FindById<Item>(itemCode);
+        //            Uom uom = genericMgr.FindById<Uom>(uomCode);
+        //            Location location = genericMgr.FindById<Location>(locationCode);
 
                 
-                    StockTakeDetail stockTakeDetail = new StockTakeDetail();
+        //            StockTakeDetail stockTakeDetail = new StockTakeDetail();
                   
-                        stockTakeDetail.StNo = stNo;
-                        stockTakeDetail.Item = itemCode;
-                        stockTakeDetail.Uom = uomCode;
-                        stockTakeDetail.Location = location.Code;
-                        stockTakeDetail.BaseUom = item.Uom;
-                        stockTakeDetail.Qty = qty;
-                        stockTakeDetailList.Add(stockTakeDetail);
+        //                stockTakeDetail.StNo = stNo;
+        //                stockTakeDetail.Item = itemCode;
+        //                stockTakeDetail.Uom = uomCode;
+        //                stockTakeDetail.Location = location.Code;
+        //                stockTakeDetail.BaseUom = item.Uom;
+        //                stockTakeDetail.Qty = qty;
+        //                stockTakeDetailList.Add(stockTakeDetail);
                    
 
-                    #endregion
-                }
-                else
-                {
-                    string huId = string.Empty;
-                    string binCode = string.Empty;
-                    string locationCode = string.Empty;
+        //            #endregion
+        //        }
+        //        else
+        //        {
+        //            string huId = string.Empty;
+        //            string binCode = string.Empty;
+        //            string locationCode = string.Empty;
 
-                    #region 读取数据
-                    #region 读取条码
-                    huId = row.GetCell(colHu) != null ? row.GetCell(colHu).StringCellValue : string.Empty;
-                    if (string.IsNullOrEmpty(huId))
-                    {
-                        throw new BusinessException("Import.Read.Error.Empty", (row.RowNum + 1).ToString(), colHu.ToString());
-                    }
-                    var i = (
-                        from c in stockTakeDetailList
-                        where c.HuId != null && c.HuId.Trim().ToUpper() == huId.Trim().ToUpper()
-                        select c).Count();
+        //            #region 读取数据
+        //            #region 读取条码
+        //            huId = row.GetCell(colHu) != null ? row.GetCell(colHu).StringCellValue : string.Empty;
+        //            if (string.IsNullOrEmpty(huId))
+        //            {
+        //                throw new BusinessException("Import.Read.Error.Empty", (row.RowNum + 1).ToString(), colHu.ToString());
+        //            }
+        //            var i = (
+        //                from c in stockTakeDetailList
+        //                where c.HuId != null && c.HuId.Trim().ToUpper() == huId.Trim().ToUpper()
+        //                select c).Count();
 
-                    if (i > 0)
-                    {
-                        throw new BusinessException("Import.Business.Error.Duplicate", huId, (row.RowNum + 1).ToString(), colHu.ToString());
-                    }
-                    #endregion
+        //            if (i > 0)
+        //            {
+        //                throw new BusinessException("Import.Business.Error.Duplicate", huId, (row.RowNum + 1).ToString(), colHu.ToString());
+        //            }
+        //            #endregion
 
-                    #region 读取库位
-                    locationCode = row.GetCell(colLocation) != null ? row.GetCell(colLocation).StringCellValue : string.Empty;
-                    if (locationCode == null || locationCode.Trim() == string.Empty)
-                    {
-                        throw new BusinessException("Import.Read.Error.Empty", (row.RowNum + 1).ToString(), colUom.ToString());
-                    }
+        //            #region 读取库位
+        //            locationCode = row.GetCell(colLocation) != null ? row.GetCell(colLocation).StringCellValue : string.Empty;
+        //            if (locationCode == null || locationCode.Trim() == string.Empty)
+        //            {
+        //                throw new BusinessException("Import.Read.Error.Empty", (row.RowNum + 1).ToString(), colUom.ToString());
+        //            }
 
-                    #region 读取库格
-                    binCode = row.GetCell(colBin) != null ? row.GetCell(colBin).StringCellValue : null;
-                    #endregion
-                    #endregion
+        //            #region 读取库格
+        //            binCode = row.GetCell(colBin) != null ? row.GetCell(colBin).StringCellValue : null;
+        //            #endregion
+        //            #endregion
 
-                    #endregion
+        //            #endregion
 
-                    #region 填充数据
-                    Hu hu = genericMgr.FindById<Hu>(huId);
+        //            #region 填充数据
+        //            Hu hu = genericMgr.FindById<Hu>(huId);
 
-                    Location location = genericMgr.FindById<Location>(locationCode);
+        //            Location location = genericMgr.FindById<Location>(locationCode);
 
-                    LocationBin bin = null;
-                    if (binCode != null && binCode.Trim() != string.Empty)
-                    {
-                        bin = genericMgr.FindById<LocationBin>(binCode);
-                    }
+        //            LocationBin bin = null;
+        //            if (binCode != null && binCode.Trim() != string.Empty)
+        //            {
+        //                bin = genericMgr.FindById<LocationBin>(binCode);
+        //            }
 
                     
-                    StockTakeDetail stockTakeDetail = new StockTakeDetail();
-                    stockTakeDetail.StNo = stNo;
-                    stockTakeDetail.Item = hu.Item;
-                    stockTakeDetail.Qty = hu.Qty;
-                    stockTakeDetail.Uom = hu.Uom;
-                    stockTakeDetail.BaseUom = hu.BaseUom;
-                    stockTakeDetail.HuId = hu.HuId;
-                    stockTakeDetail.LotNo = hu.LotNo;
-                    stockTakeDetail.Location = location.Code;
-                    stockTakeDetail.Bin = bin.Code;
-                    stockTakeDetailList.Add(stockTakeDetail);
-                    #endregion
-                }
-            }
+        //            StockTakeDetail stockTakeDetail = new StockTakeDetail();
+        //            stockTakeDetail.StNo = stNo;
+        //            stockTakeDetail.Item = hu.Item;
+        //            stockTakeDetail.Qty = hu.Qty;
+        //            stockTakeDetail.Uom = hu.Uom;
+        //            stockTakeDetail.BaseUom = hu.BaseUom;
+        //            stockTakeDetail.HuId = hu.HuId;
+        //            stockTakeDetail.LotNo = hu.LotNo;
+        //            stockTakeDetail.Location = location.Code;
+        //            stockTakeDetail.Bin = bin.Code;
+        //            stockTakeDetailList.Add(stockTakeDetail);
+        //            #endregion
+        //        }
+        //    }
 
-            if (stockTakeDetailList.Count == 0)
-            {
-                throw new BusinessException("Import.Result.Error.ImportNothing");
-            }
-            BatchUpdateStockTakeDetails(stNo, stockTakeDetailList, null, null);
+        //    if (stockTakeDetailList.Count == 0)
+        //    {
+        //        throw new BusinessException("Import.Result.Error.ImportNothing");
+        //    }
+        //    BatchUpdateStockTakeDetails(stNo, stockTakeDetailList, null, null);
 
-        }
+        //}
         #endregion      
 
         #region 导入盘点明细
@@ -1982,9 +1983,9 @@ namespace com.Sconit.Service.Impl
             BusinessException errorMessage = new BusinessException();
             IList<StockTakeDetail> stockTakeDetailList = new List<StockTakeDetail>();
             IList<StockTakeDetail> existsList = this.genericMgr.FindAll<StockTakeDetail>(" from StockTakeDetail as d where d.StNo=?", stNo);
-            IList<Location> allLocs = genericMgr.FindAll<Location>();
+            IList<StockTakeLocation> allLocs = genericMgr.FindAll<StockTakeLocation>(" from StockTakeLocation as s where s.StNo=? ",stNo);
             IList<Item> allItems = genericMgr.FindAll<Item>();
-            int rowCount = 10;
+            int rowCount = 11;
             while (rows.MoveNext())
             {
                 rowCount++;
@@ -2012,10 +2013,10 @@ namespace com.Sconit.Service.Impl
                 }
                 else
                 {
-                    var locationList = allLocs.Where(a => a.Code == locationCode);
+                    var locationList = allLocs.Where(a => a.Location == locationCode);
                     if (locationList == null && locationList.Count() == 0)
                     {
-                        errorMessage.AddMessage(string.Format("第{0}行：来源库位{1}不存在", rowCount, locationCode));
+                        errorMessage.AddMessage(string.Format("第{0}行：库位{1}不存在盘点单的盘点库位中", rowCount, locationCode));
                         continue;
                     }
                     else
@@ -2059,24 +2060,32 @@ namespace com.Sconit.Service.Impl
 
                 #region 质量类型
                 qualityType = ImportHelper.GetCellStringValue(row.GetCell(colQualitype));
-                if (qualityType != "0" && qualityType != "1" && qualityType != "2")
+                if (qualityType == "0" || qualityType=="正常")
                 {
-                    errorMessage.AddMessage(string.Format("第{0}行：质量类型{1}填写有误。", rowCount, qualityType));
-                    continue;
+                    stockTakeDetail.QualityType = com.Sconit.CodeMaster.QualityType.Qualified;
+                }
+                else if (qualityType == "1" || qualityType == "待验")
+                {
+                    stockTakeDetail.QualityType = com.Sconit.CodeMaster.QualityType.Inspect;
+                }
+                else if (qualityType == "2" || qualityType == "不合格")
+                {
+                    stockTakeDetail.QualityType = com.Sconit.CodeMaster.QualityType.Reject;
                 }
                 else
                 {
-                    stockTakeDetail.QualityType = (com.Sconit.CodeMaster.QualityType)Convert.ToInt16(qualityType);
+                    errorMessage.AddMessage(string.Format("第{0}行：质量类型{1}填写有误。", rowCount, qualityType));
+                    continue;
                 }
                 #endregion
 
                 #region 是否寄售
                 string isConsigementRead = ImportHelper.GetCellStringValue(row.GetCell(colIsConsigement));
-                if (isConsigementRead == "0")
+                if (isConsigementRead == "0" || string.IsNullOrWhiteSpace(isConsigementRead))
                 {
                     stockTakeDetail.IsConsigement = false;
                 }
-                else if (isConsigementRead == "1")
+                else if (isConsigementRead == "1" || isConsigementRead=="√")
                 {
                     stockTakeDetail.IsConsigement = true;
                 }
@@ -2155,14 +2164,16 @@ namespace com.Sconit.Service.Impl
                 stockTakeDetail.StNo = stNo;
                 stockTakeDetailList.Add(stockTakeDetail);
             }
-            if (stockTakeDetailList.Count == 0)
-            {
-                throw new BusinessException("Import.Result.Error.ImportNothing");
-            }
+           
 
             if (errorMessage.HasMessage)
             {
                 throw errorMessage;
+            }
+
+            if (stockTakeDetailList.Count == 0)
+            {
+                throw new BusinessException("Import.Result.Error.ImportNothing");
             }
 
             foreach (var stockDet in stockTakeDetailList)

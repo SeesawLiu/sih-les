@@ -14,7 +14,7 @@ namespace com.Sconit.Utility.Report.Operator
             //明细部分的行数
             this.pageDetailRowCount = 35;
             //列数   1起始
-            this.columnCount = 7;
+            this.columnCount = 9;
             //报表头的行数  1起始
             this.headRowCount = 11;
             //报表尾的行数  1起始
@@ -57,32 +57,33 @@ namespace com.Sconit.Utility.Report.Operator
                     //库位
                     this.SetRowCell(pageIndex, rowIndex, 1, printDetail.Location);
                     //物料代码
-                    this.SetRowCell(pageIndex, rowIndex, 1, printDetail.Item);
+                    this.SetRowCell(pageIndex, rowIndex, 2, printDetail.Item);
                     //旧图号
-                    this.SetRowCell(pageIndex, rowIndex, 2, printDetail.RefItemCode);
+                    this.SetRowCell(pageIndex, rowIndex, 3, printDetail.RefItemCode);
                     //物料描述
-                    this.SetRowCell(pageIndex, rowIndex, 3, printDetail.ItemDescription);
+                    this.SetRowCell(pageIndex, rowIndex, 4, printDetail.ItemDescription);
                     //质量类型
                     if (printDetail.QualityType == 0)
                     {
-                        this.SetRowCell(pageIndex, rowIndex, 3, "正常");
+                        this.SetRowCell(pageIndex, rowIndex, 5, "正常");
                     }
                     else if (printDetail.QualityType == 1)
                     {
-                        this.SetRowCell(pageIndex, rowIndex, 3, "待验");
+                        this.SetRowCell(pageIndex, rowIndex, 5, "待验");
                     }
                     else if (printDetail.QualityType == 2)
                     {
-                        this.SetRowCell(pageIndex, rowIndex, 3,"不合格");
+                        this.SetRowCell(pageIndex, rowIndex, 5,"不合格");
                     }
 
                     //寄售
                     if (printDetail.IsConsigement)
                     {
-                        this.SetRowCell(pageIndex, rowIndex, 3, "√");
+                        this.SetRowCell(pageIndex, rowIndex, 6, "√");
+                        //寄售供应商
+                        this.SetRowCell(pageIndex, rowIndex, 7, printDetail.CSSupplier);
                     }
-                    //寄售供应商
-                    this.SetRowCell(pageIndex, rowIndex, 3, printDetail.CSSupplier);
+                    
                     //盘点数
                     //this.SetRowCell(pageIndex, rowIndex, 3, printDetail.Uom);
 
@@ -117,18 +118,18 @@ namespace com.Sconit.Utility.Report.Operator
         {
             //盘点单号:
             string seqCode = Utility.BarcodeHelper.GetBarcodeStr(stockTakeMaster.StNo, this.barCodeFontName);
-            this.SetRowCell(2, 7, seqCode);
+            this.SetRowCell(2, 6, seqCode);
             //盘点单号 No.:
-            this.SetRowCell(3, 7, stockTakeMaster.StNo);
+            this.SetRowCell(4, 6, stockTakeMaster.StNo);
 
             //区域
             this.SetRowCell(6, 2, stockTakeMaster.Region);
 
             //创建用户
-            this.SetRowCell(6, 5, stockTakeMaster.CreateUserName);
+            this.SetRowCell(6, 6, stockTakeMaster.CreateUserName);
 
             //创建时间 
-            this.SetRowCell(8, 5, stockTakeMaster.CreateDate.ToString("yyyy-MM-dd HH:mm:ss"));
+            this.SetRowCell(8, 6, stockTakeMaster.CreateDate.ToString("yyyy-MM-dd HH:mm:ss"));
 
             
         }

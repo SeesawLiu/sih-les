@@ -205,6 +205,15 @@ namespace Resources.View {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to RefItemCode.
+        /// </summary>
+        public static string LocationDetailView_RefItemCode {
+            get {
+                return ResourceManager.GetString("LocationDetailView_RefItemCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to RefNo.
         /// </summary>
         public static string LocationDetailView_RefNo {

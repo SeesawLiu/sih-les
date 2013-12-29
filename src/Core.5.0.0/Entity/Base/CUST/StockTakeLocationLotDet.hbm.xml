@@ -6,6 +6,7 @@
 		</id>
 		<property name="Location" column="Location" type="String"  length="50" />
 		<property name="Item" column="Item" type="String" length="50"/>
+		<property name="RefItemCode" column="RefItemCode" type="String" length="50"/>
 		<property name="ItemDesc" column="ItemDesc" type="String"  length="100" />
 		<property name="Qty" column="Qty" type="Decimal"/>
 		<property name="QualityType" column="QualityType" />

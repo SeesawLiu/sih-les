@@ -893,7 +893,7 @@ namespace com.Sconit.Service.Impl
             if (stockTakeMaster.Status == CodeMaster.StockTakeStatus.InProcess)
             {
                 #region 执行中返回库存和盘点结果比较值
-                stockTakeResultList = CalStockTakeResult(stockTakeMaster, listShortage, listProfit, listMatch, locationList, binList, itemList, BaseInventoryDate);
+                stockTakeResultList = CalStockTakeResult(stockTakeMaster, listShortage, listProfit, listMatch, locationList, binList, itemList);
                 #endregion
             }
             else
@@ -1480,6 +1480,128 @@ namespace com.Sconit.Service.Impl
 
             return stockTakeResultList;
         }
+
+
+        private IList<StockTakeResult> CalStockTakeResult(StockTakeMaster stockTakeMaster, bool listShortage, bool listProfit, bool listMatch, IList<string> locationList, IList<string> binList, IList<string> itemList)
+        {
+            IList<StockTakeResult> stockTakeResultList = new List<StockTakeResult>();
+            DateTime dateTimeNow = DateTime.Now;
+            if(true)
+            {
+                if (locationList == null || locationList.Count == 0)
+                {
+                    var stockLocs = this.genericMgr.FindAll<StockTakeLocation>(" from StockTakeLocation as s where s.StNo=? ",stockTakeMaster.StNo);
+                    locationList = stockLocs.Select(s => s.Location).ToList();
+                }
+                #region 按数量盘点
+                #region 查找库存
+                IList<StockTakeLocationLotDet> locationDetailList = null;
+                
+                string selectLocationDetailStatement = "from StockTakeLocationLotDet where 1 = 1 and RefNo=?";
+                IList<object> selectHuLocationDetailParm = new List<object>();
+                selectHuLocationDetailParm.Add(stockTakeMaster.RefNo);
+                selectLocationDetailStatement += GetWhereStatement(selectHuLocationDetailParm, itemList, locationList, binList);
+                locationDetailList = this.genericMgr.FindAll<StockTakeLocationLotDet>(selectLocationDetailStatement, selectHuLocationDetailParm.ToArray());
+
+                #endregion
+
+                #region 查找盘点结果
+                IList<object> selectStockTakeDetailParm = new List<object>();
+                selectStockTakeDetailParm.Add(stockTakeMaster.StNo);
+                string thisSelectStockTakeDetailStatement = SelectStockTakeDetailStatement + GetWhereStatement(selectStockTakeDetailParm, itemList, locationList, binList);
+                IList<StockTakeDetail> stockTakeDetailList = this.genericMgr.FindAll<StockTakeDetail>(thisSelectStockTakeDetailStatement, selectStockTakeDetailParm.ToArray());
+                #endregion
+
+                #region 计算盘点差异
+                ((List<StockTakeResult>)stockTakeResultList).AddRange(from tak in stockTakeDetailList
+                                                                      join inv in locationDetailList
+                                                                      on new { Location = tak.Location, Item = tak.Item, QualityType = tak.QualityType, IsConsigement = tak.IsConsigement, CSSupplier = tak.CSSupplier }
+                                                                      equals new { Location = inv.Location, Item = inv.Item, QualityType = inv.QualityType, IsConsigement = inv.IsConsigement, CSSupplier = inv.CSSupplier }
+                                                                      into gj
+                                                                      from result in gj.DefaultIfEmpty()
+                                                                      select new StockTakeResult
+                                                                      {
+                                                                          Location = tak.Location,
+                                                                          Item = tak.Item,
+                                                                          ItemDescription = tak.ItemDescription,
+                                                                          RefItemCode = tak.RefItemCode,
+                                                                          Uom = tak.BaseUom,
+                                                                          StockTakeQty = tak.Qty * tak.UnitQty,
+                                                                          InventoryQty = result != null ? result.Qty : 0,
+                                                                          DifferenceQty = tak.Qty * tak.UnitQty - (result != null ? result.Qty : 0),
+                                                                          //BaseInventoryDate = baseInventoryDate.Value,
+                                                                          QualityType = tak.QualityType,
+                                                                          IsConsigement = tak.IsConsigement,
+                                                                          CSSupplier = tak.CSSupplier,
+                                                                      });
+
+                //库存中有 盘点明细中没有
+                ((List<StockTakeResult>)stockTakeResultList).AddRange(from inv in locationDetailList
+                                                                      join tak in stockTakeDetailList
+                                                                      on new { Location = inv.Location, Item = inv.Item, QualityType = inv.QualityType }
+                                                                      equals new { Location = tak.Location, Item = tak.Item, QualityType = tak.QualityType }
+                                                                      into gj
+                                                                      from result2 in gj.DefaultIfEmpty()
+                                                                      where result2 == null
+                                                                      select new StockTakeResult
+                                                                      {
+                                                                          Location = inv.Location,
+                                                                          Item = inv.Item,
+                                                                          ItemDescription = inv.ItemDesc,
+                                                                          RefItemCode = inv.RefItemCode,
+                                                                          Uom = inv.Uom,
+                                                                          StockTakeQty = 0,
+                                                                          InventoryQty = inv.Qty,
+                                                                          DifferenceQty = 0 - inv.Qty,
+                                                                          //BaseInventoryDate = baseInventoryDate.Value,
+                                                                          QualityType = inv.QualityType,
+                                                                          IsConsigement = inv.IsConsigement,
+                                                                          CSSupplier = inv.CSSupplier,
+                                                                      });
+                #endregion
+
+                #region 根据查询条件过滤
+                if (!(listShortage && listProfit && listMatch))
+                {
+                    if (listShortage)
+                    {
+                        if (listProfit)
+                        {
+                            stockTakeResultList = stockTakeResultList.Where(c => c.DifferenceQty != 0).ToList();
+                        }
+                        else if (listMatch)
+                        {
+                            stockTakeResultList = stockTakeResultList.Where(c => c.DifferenceQty <= 0).ToList();
+                        }
+                        else
+                        {
+                            stockTakeResultList = stockTakeResultList.Where(c => c.DifferenceQty < 0).ToList();
+                        }
+                    }
+                    else if (listProfit)
+                    {
+                        if (listMatch)
+                        {
+                            stockTakeResultList = stockTakeResultList.Where(c => c.DifferenceQty >= 0).ToList();
+                        }
+                        else
+                        {
+                            stockTakeResultList = stockTakeResultList.Where(c => c.DifferenceQty > 0).ToList();
+                        }
+                    }
+                    else
+                    {
+                        stockTakeResultList = stockTakeResultList.Where(c => c.DifferenceQty == 0).ToList();
+                    }
+                }
+                #endregion
+                #endregion
+            }
+
+            stockTakeResultList = stockTakeResultList.OrderBy(c => c.Item).ThenBy(c => c.DifferenceQty).ToList();
+
+            return stockTakeResultList;
+        }
         #endregion
 
         #region 盘点完成
@@ -1501,7 +1623,7 @@ namespace com.Sconit.Service.Impl
 
             IList<string> stockTakeLocationList = this.genericMgr.FindAll<string>(SelectStockTakeLocationStatement, stockTakeMaster.StNo);
 
-            IList<StockTakeResult> resultList = CalStockTakeResult(stockTakeMaster, true, true, true, stockTakeLocationList.ToList(), null, null, baseInventoryDate);
+            IList<StockTakeResult> resultList = CalStockTakeResult(stockTakeMaster, true, true, true, stockTakeLocationList.ToList(), null, null);
             if (resultList != null && resultList.Count > 0)
             {
                 foreach (StockTakeResult result in resultList)
@@ -2125,14 +2247,21 @@ namespace com.Sconit.Service.Impl
                 #region 读取数量
                 try
                 {
-                    qty = Convert.ToDecimal(row.GetCell(colQty).NumericCellValue);
-                    stockTakeDetail.Qty = qty;
-
-
+                    string qtyRead = ImportHelper.GetCellStringValue(row.GetCell(colQty));
+                    if (decimal.TryParse(qtyRead, out qty))
+                    {
+                        stockTakeDetail.Qty = qty;
+                    }
+                    else
+                    {
+                        errorMessage.AddMessage(string.Format("第{0}行：数量{1}填写有误", rowCount, qty));
+                        continue;
+                    }
                 }
                 catch
                 {
                     errorMessage.AddMessage(string.Format("第{0}行：数量{1}填写有误", rowCount, qty));
+                    continue;
                 }
                 #endregion
                 #endregion

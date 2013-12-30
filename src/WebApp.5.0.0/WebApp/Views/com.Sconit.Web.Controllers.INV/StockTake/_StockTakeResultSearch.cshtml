@@ -97,8 +97,8 @@
                 @Resources.Global.Button_Search</button>
             <button type="button" id="btnExport">
                 @Resources.Global.Button_Export</button>
-                <button type="button" id="btnExportDetail">
-                @Resources.Global.Button_ExportDetail</button>
+               @* <button type="button" id="btnExportDetail">
+                @Resources.Global.Button_ExportDetail</button>*@
                 
             @if (ViewBag.Status == com.Sconit.CodeMaster.StockTakeStatus.Complete.ToString())
            {
@@ -109,8 +109,8 @@
             <button type="button" id="btnAllAdjust"  onclick="btnAllAdjusts()">
                 @Resources.Global.Button_AllAdjust</button>        
            }
-                <button type="button" id="btnClose">
-                @Resources.Global.Button_Close</button>
+               @* <button type="button" id="btnClose">
+                @Resources.Global.Button_Close</button>*@
                  <button type="button" id="btnBack" onclick="location.href='@Url.Content("~/StockTake/StockTakeMasterList")'">
                 @Resources.Global.Button_Back</button>
         </div>

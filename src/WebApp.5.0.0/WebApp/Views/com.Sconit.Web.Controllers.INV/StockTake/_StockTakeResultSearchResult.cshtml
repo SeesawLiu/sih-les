@@ -1,4 +1,4 @@
-﻿@model IList<com.Sconit.Entity.INV.StockTakeResultSummary>
+﻿@model IList<com.Sconit.Entity.INV.StockTakeResult>
 <fieldset>
  <script type="text/javascript">
      function StockTakeResultGridView_OnDataBinding(e) {
@@ -71,9 +71,13 @@
                .Width(36).HtmlAttributes(new { style = "text-align:center" });
             }
             columns.Bound(o => o.Item);
-            columns.Bound(o=>o.ItemDescription);
+            columns.Bound(o => o.ItemDescription);
+            columns.Bound(o => o.RefItemCode);
             columns.Bound(o=>o.Uom);
-            columns.Bound(o=>o.Location);
+            columns.Bound(o => o.Location);
+            columns.Bound(o => o.QualityTypeDescription);
+            columns.Bound(o => o.IsConsigement).ClientTemplate("<input type='checkbox' disabled='disabled' name='IsConsigement' <#= IsConsigement? checked='checked' : '' #> />");
+            columns.Bound(o => o.CSSupplier);
             columns.Bound(o => o.StockTakeQty);
             columns.Bound(o => o.InventoryQty);
             columns.Bound(o => o.DifferenceQty);
@@ -84,13 +88,13 @@
                 .DataBinding(dataBinding => dataBinding.Ajax().Select("_AjaxStockTakeResult", "StockTake"))
                 .ClientEvents(events => events.OnDataBinding("StockTakeResultGridView_OnDataBinding")
                                  .OnRowDataBound("StockTakeResultGrid_OnRowDataBound"))
-                                          //.Pageable(settings =>
-                                          //{
-                                          //    settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
-                                          //    settings.PageSize(ViewBag.PageSize != null ? ViewBag.PageSize : 50);
-                                          //})
+                .Pageable(settings =>
+                {
+                    settings.Total(ViewBag.Total != null ? ViewBag.Total : 0);
+                    settings.PageSize(500);
+                })
                 .Sortable()
-                .Footer(false)
+                .Footer(true)
                 .Resizable(resizing => resizing.Columns(true))
             )
 </fieldset>

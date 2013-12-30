@@ -4285,10 +4285,11 @@ namespace com.Sconit.Service.Impl
                     inventoryIO.IsATP = stockTakeResult.QualityType == com.Sconit.CodeMaster.QualityType.Qualified;
                     inventoryIO.IsFreeze = false;
                     inventoryIO.IsCreatePlanBill = false;
-                    inventoryIO.IsConsignment = false;
+                    inventoryIO.IsConsignment = stockTakeResult.IsConsigement;   //寄售
+                    inventoryIO.ConsignmentSupplier = stockTakeResult.CSSupplier;//寄售供应商
                     inventoryIO.PlanBill = null;
                     inventoryIO.ActingBill = null;
-                    inventoryIO.TransactionType = CodeMaster.TransactionType.CYC_CNT;
+                    inventoryIO.TransactionType = CodeMaster.TransactionType.CYC_CNT;//
                     inventoryIO.OccupyType = CodeMaster.OccupyType.None;
                     inventoryIO.OccupyReferenceNo = null;
                     inventoryIO.IsVoid = false;

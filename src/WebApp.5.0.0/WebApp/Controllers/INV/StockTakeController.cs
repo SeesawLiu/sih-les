@@ -755,8 +755,13 @@ using com.Sconit.Utility.Report;
             {
                 itemList.Add(searchModel.Item);
             }
-            IList<StockTakeResultSummary> StockTakeResultSummaryList = stockTakeMgr.ListStockTakeResult(searchModel.stNo, searchModel.IsLoss, searchModel.IsProfit, searchModel.IsBreakEven, locationList, binList, itemList, null);
-            return PartialView(new GridModel(StockTakeResultSummaryList));
+            IList<StockTakeResult> StockTakeResultSummaryList = stockTakeMgr.ListStockTakeResultDetail(searchModel.stNo, searchModel.IsLoss, searchModel.IsProfit, searchModel.IsBreakEven, locationList, binList, itemList, null);
+            GridModel<StockTakeResult> gridModel = new GridModel<StockTakeResult>();
+            gridModel.Total = StockTakeResultSummaryList.Count;
+            StockTakeResultSummaryList = StockTakeResultSummaryList.Skip((command.Page - 1) * command.PageSize).Take(command.PageSize).ToList();
+            this.FillCodeDetailDescription(StockTakeResultSummaryList);
+            gridModel.Data = StockTakeResultSummaryList;
+            return PartialView(gridModel);
         }
 
 

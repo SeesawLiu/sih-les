@@ -20,7 +20,7 @@ namespace com.Sconit.Entity.INV
 
         //TODO: Add Non O/R Mapping Properties here. 
 
-        [CodeDetailDescriptionAttribute(CodeMaster = com.Sconit.CodeMaster.CodeMaster.OrderPriority, ValueField = "QualityType")]
+        [CodeDetailDescriptionAttribute(CodeMaster = com.Sconit.CodeMaster.CodeMaster.QualityType, ValueField = "QualityType")]
         [Display(Name = "LocationDetailView_QualityType", ResourceType = typeof(Resources.View.LocationDetailView))]
         public string QualityTypeDescription { get; set; }
 

@@ -17,6 +17,10 @@ namespace com.Sconit.Entity.INV
             }
 
         #endregion
+
+        [CodeDetailDescriptionAttribute(CodeMaster = com.Sconit.CodeMaster.CodeMaster.QualityType, ValueField = "QualityType")]
+        [Display(Name = "LocationDetailView_QualityType", ResourceType = typeof(Resources.View.LocationDetailView))]
+        public string QualityTypeDescription { get; set; }
     }
 
     public class StockTakeResultSummary

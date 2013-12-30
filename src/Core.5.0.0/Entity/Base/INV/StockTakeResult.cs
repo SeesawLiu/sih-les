@@ -77,6 +77,9 @@ namespace com.Sconit.Entity.INV
         //[Export(ExportName = "ExportBackUpInvXLS", ExportSeq = 60)]
         [Display(Name = "LocationDetailView_IsCS", ResourceType = typeof(Resources.View.LocationDetailView))]
         public Boolean IsConsigement { get; set; }
+
+        [Display(Name = "LocationDetailView_RefItemCode", ResourceType = typeof(Resources.View.LocationDetailView))]
+        public string RefItemCode { get; set; }
         #endregion
 
         public override int GetHashCode()

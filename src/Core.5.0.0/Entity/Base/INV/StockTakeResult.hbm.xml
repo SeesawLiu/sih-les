@@ -27,5 +27,6 @@
         <property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />
 		<property name="CSSupplier" column="CSSupplier" type="String" length="50"/>
 		<property name="IsConsigement" column="IsConsigement" type="Boolean"/>
-    </class>
+		<property name="RefItemCode" column="RefItemCode" type="String" length="50"/>
+	</class>
 </hibernate-mapping>

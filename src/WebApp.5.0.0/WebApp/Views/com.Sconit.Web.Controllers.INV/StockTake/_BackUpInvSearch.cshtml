@@ -73,14 +73,14 @@
             @Html.Hidden("isFromList", true)
             <button type="submit" id="btnSearch">
                 @Resources.Global.Button_Search</button>
-            <button type="button" id="btnExport" onclick="ExportClick()">
+            <button type="button" id="btnExport" onclick="ExportBackUpInvXLSClick()">
                 @Resources.Global.Button_SearchExport</button>
         </div>
 
     }
 </fieldset>
 <script type="text/javascript">
-    function ExportClick() {
+    function ExportBackUpInvXLSClick() {
         location.href = '/StockTake/ExportBackUpInvXLS/?ItemCode=' + $('#ItemCode').val() + '&Location=' + $('#Location').val()
         + '&CSSupplier=' + $('#CSSupplier').val() + '&IsConsigement=' + $('#IsConsigement').is(":checked") + '&RefNo=' + $('#RefNo').val();
     }

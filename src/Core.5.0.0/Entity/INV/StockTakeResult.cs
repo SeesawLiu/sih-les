@@ -18,6 +18,7 @@ namespace com.Sconit.Entity.INV
 
         #endregion
 
+        [Export(ExportName = "ExporResultXLS", ExportSeq = 60)]
         [CodeDetailDescriptionAttribute(CodeMaster = com.Sconit.CodeMaster.CodeMaster.QualityType, ValueField = "QualityType")]
         [Display(Name = "LocationDetailView_QualityType", ResourceType = typeof(Resources.View.LocationDetailView))]
         public string QualityTypeDescription { get; set; }

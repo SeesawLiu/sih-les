@@ -702,6 +702,27 @@ using com.Sconit.Utility.Report;
             return Content("");
         }
 
+        public void ExportStockTakeDetail(StockTakeDetailSearchModel searchModel)
+        {
+            string hql = "select s from StockTakeDetail as s where 1=1 and StNo=?";
+            IList<object> param = new List<object>();
+            param.Add(searchModel.stNo);
+            if (!string.IsNullOrWhiteSpace(searchModel.ItemCode))
+            {
+                hql += " and Item =? ";
+                param.Add(searchModel.ItemCode);
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.Location))
+            {
+                hql += " and Location =? ";
+                param.Add(searchModel.Location);
+            }
+
+            IList<StockTakeDetail> exportList = this.genericMgr.FindAll<StockTakeDetail>(hql, param.ToArray());
+            FillCodeDetailDescription(exportList);
+            ExportToXLS<StockTakeDetail>("ExportStockTakeDetail", "xls", exportList);
+        }
+
         #endregion
 
         #region  StockTakeResult
@@ -741,9 +762,9 @@ using com.Sconit.Utility.Report;
             //SearchStatementModel searchStatementModel = this.StockTakeResultPrepareSearchStatement(command, searchModel);
             //return PartialView(GetAjaxPageData<StockTakeResult>(searchStatementModel, command));
             IList<string> locationList = new List<string>();
-            if (searchModel.Location != null && searchModel.Location != string.Empty)
+            if (!string.IsNullOrWhiteSpace(searchModel.LocationResult))
             {
-                locationList.Add(searchModel.Location);
+                locationList.Add(searchModel.LocationResult);
             }
             IList<string> binList = new List<string>();
             if (searchModel.LocationBin != null && searchModel.LocationBin != string.Empty)
@@ -751,9 +772,9 @@ using com.Sconit.Utility.Report;
                 binList.Add(searchModel.LocationBin);
             }
             IList<string> itemList = new List<string>();
-            if (searchModel.Item != null && searchModel.Item != string.Empty)
+            if (!string.IsNullOrWhiteSpace(searchModel.ItemResult))
             {
-                itemList.Add(searchModel.Item);
+                itemList.Add(searchModel.ItemResult);
             }
             IList<StockTakeResult> StockTakeResultSummaryList = stockTakeMgr.ListStockTakeResultDetail(searchModel.stNo, searchModel.IsLoss, searchModel.IsProfit, searchModel.IsBreakEven, locationList, binList, itemList, null);
             GridModel<StockTakeResult> gridModel = new GridModel<StockTakeResult>();
@@ -865,6 +886,28 @@ using com.Sconit.Utility.Report;
             return Json(null);
         }
 
+        public void ExportStockResult(StockTakeResultSearchModel searchModel)
+        {
+            IList<string> locationList = new List<string>();
+            if (searchModel.LocationResult != null && searchModel.LocationResult != string.Empty)
+            {
+                locationList.Add(searchModel.LocationResult);
+            }
+            IList<string> binList = new List<string>();
+            if (searchModel.LocationBin != null && searchModel.LocationBin != string.Empty)
+            {
+                binList.Add(searchModel.LocationBin);
+            }
+            IList<string> itemList = new List<string>();
+            if (searchModel.ItemResult != null && searchModel.ItemResult != string.Empty)
+            {
+                itemList.Add(searchModel.ItemResult);
+            }
+            IList<StockTakeResult> StockTakeResultSummaryList = stockTakeMgr.ListStockTakeResultDetail(searchModel.stNo, searchModel.IsLoss, searchModel.IsProfit, searchModel.IsBreakEven, locationList, binList, itemList, null);
+            this.FillCodeDetailDescription(StockTakeResultSummaryList);
+            ExportToXLS<StockTakeResult>("ExporResultXLS", "xls", StockTakeResultSummaryList);
+        }
+
         #endregion
 
         #region 备份库存
@@ -879,7 +922,7 @@ using com.Sconit.Utility.Report;
                 }
                 this.genericMgr.FindAllWithNativeSql(string.Format(@"delete from CUST_StockTakeLocationLotDet where RefNo='{3}';
                                                   insert into CUST_StockTakeLocationLotDet ( Location, Item, ItemDesc, Qty, QualityType, CSSupplier, IsConsigement,  CreateUser, CreateUserNm, CreateDate, LastModifyUser, LastModifyUserNm, LastModifyDate,RefNo,Uom,RefItemCode)
-                                                    select invGroup.Location,invGroup.Item,i.Desc1,invGroup.qty,invGroup.QualityType,invGroup.CSSupplier,invGroup.IsCS,'{0}' as CreateUser,'{1}' as CreateUserNm,'{2}' as CreateDate,'{0}' as LastModifyUser,'{1}' as LastModifyUserNm,'{2}' as LastModifyDate,'{3}' as RefNo,i.Uom,i.RefCode from(select Location,Item ,OccupyType,OccupyRefNo,SUM(Qty) as qty,IsCS,CSSupplier,QualityType  from VIEW_LocationLotDet where Qty>0 group by Location,Item,OccupyType,OccupyRefNo,IsCS,CSSupplier,QualityType)  as invGroup 
+                                                    select invGroup.Location,invGroup.Item,i.Desc1,invGroup.qty,invGroup.QualityType,invGroup.CSSupplier,invGroup.IsCS,'{0}' as CreateUser,'{1}' as CreateUserNm,'{2}' as CreateDate,'{0}' as LastModifyUser,'{1}' as LastModifyUserNm,'{2}' as LastModifyDate,'{3}' as RefNo,i.Uom,i.RefCode from(select Location,Item,SUM(Qty) as qty,IsCS,CSSupplier,QualityType  from VIEW_LocationLotDet where Qty>0 group by Location,Item,IsCS,CSSupplier,QualityType)  as invGroup 
                                                     inner join MD_Item as i on invGroup.Item=i.Code ", user.Id, user.FullName, System.DateTime.Now, refNo));
                 SaveSuccessMessage("备份成功。");
             }

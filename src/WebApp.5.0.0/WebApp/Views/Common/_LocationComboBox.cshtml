@@ -4,6 +4,7 @@
     string id = string.IsNullOrWhiteSpace(ViewBag.ControlId) ? name : ViewBag.ControlId;
     bool enable = ViewBag.Enable != null ? ViewBag.Enable : true;
     bool checkRegion = ViewBag.CheckRegion != null ? ViewBag.CheckRegion : false;
+    bool isStockTakeLocation = ViewBag.isStockTakeLocation != null ? ViewBag.isStockTakeLocation : false;
     bool isChange = ViewBag.IsChange != null ? ViewBag.IsChange : false;
 
 
@@ -31,9 +32,9 @@
                           .AutoFill(true)
                                           .HighlightFirstMatch(true)
                 .HiddenInputHtmlAttributes(new { id = id })
-                            .DataBinding(binding => binding.Ajax().Select("_AjaxLoadingLocation", "Common", new { checkRegion = checkRegion }))
+                                    .DataBinding(binding => binding.Ajax().Select("_AjaxLoadingLocation", "Common", new { checkRegion = checkRegion, isStockTakeLocation = isStockTakeLocation }))
                 .ClientEvents(events => events
-                                    .OnChange(onChangeName)
+                            .OnChange(onChangeName)
                             .OnDataBinding(onBindingName)
                 )
                 .BindTo(Model)

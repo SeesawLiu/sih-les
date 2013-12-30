@@ -15,5 +15,7 @@ namespace com.Sconit.Web.Models.SearchModels.INV
         public Boolean IsBreakEven { get; set; }
         public String stNo { get; set; }
         public Boolean? IsAdjust { get; set; }
+        public String ItemResult { get; set; }
+        public String LocationResult { get; set; }
     }
 }

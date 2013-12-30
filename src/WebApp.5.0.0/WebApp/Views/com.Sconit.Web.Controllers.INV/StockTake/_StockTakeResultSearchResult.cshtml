@@ -3,9 +3,9 @@
  <script type="text/javascript">
      function StockTakeResultGridView_OnDataBinding(e) {
          e.data = {
-             Item: $('#Item').val(),
+             ItemResult: $('#ItemResult').val(),
              stNo: $("#StNo").val(),
-            Location: $("#Location").val(),
+             LocationResult: $("#LocationResult").val(),
             IsLoss: $("#IsLoss").is(':checked'),
             IsProfit: $("#IsProfit").is(':checked'),
             IsBreakEven: $("#IsBreakEven").is(':checked'),
@@ -13,6 +13,8 @@
             IsAdjust: $("#IsAdjust").is(':checked')
          };
     }
+
+   
 
     function StockTakeResultGrid_OnRowDataBound() {
      $('input[name="checkedRecords"]').each(function (a, b) {
@@ -70,11 +72,11 @@
                 .HeaderTemplate("<input type='checkbox' id='checkAll' name='checkAll' />")
                .Width(36).HtmlAttributes(new { style = "text-align:center" });
             }
+            columns.Bound(o => o.Location);
             columns.Bound(o => o.Item);
             columns.Bound(o => o.ItemDescription);
             columns.Bound(o => o.RefItemCode);
             columns.Bound(o=>o.Uom);
-            columns.Bound(o => o.Location);
             columns.Bound(o => o.QualityTypeDescription);
             columns.Bound(o => o.IsConsigement).ClientTemplate("<input type='checkbox' disabled='disabled' name='IsConsigement' <#= IsConsigement? checked='checked' : '' #> />");
             columns.Bound(o => o.CSSupplier);

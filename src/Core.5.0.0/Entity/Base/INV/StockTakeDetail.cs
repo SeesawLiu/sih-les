@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using com.Sconit.Entity.SYS;
 
 namespace com.Sconit.Entity.INV
 {
@@ -8,18 +9,22 @@ namespace com.Sconit.Entity.INV
     {
         #region O/R Mapping Properties
 		public Int32 Id { get; set; }
+        [Export(ExportName = "ExportStockTakeDetail", ExportSeq = 1)]
         [Display(Name = "StockTakeDetail_StNo", ResourceType = typeof(Resources.INV.StockTake))]
         public string StNo { get; set; }
 
+        [Export(ExportName = "ExportStockTakeDetail", ExportSeq = 20)]
         [Required(AllowEmptyStrings = false, ErrorMessageResourceName = "Errors_Common_FieldRequired", ErrorMessageResourceType = typeof(Resources.ErrorMessage))]
         [Display(Name = "StockTakeDetail_Item", ResourceType = typeof(Resources.INV.StockTake))]
         public string Item { get; set; }
+        [Export(ExportName = "ExportStockTakeDetail", ExportSeq = 40)]
         [Display(Name = "StockTakeDetail_ItemDescription", ResourceType = typeof(Resources.INV.StockTake))]
         public string ItemDescription { get; set; }
 
+        [Export(ExportName = "ExportStockTakeDetail", ExportSeq = 30)]
         [Display(Name = "LocationDetailView_RefItemCode", ResourceType = typeof(Resources.View.LocationDetailView))]
         public string RefItemCode { get; set; }
-        
+
         public com.Sconit.CodeMaster.QualityType QualityType { get; set; }
         [Required(AllowEmptyStrings = false, ErrorMessageResourceName = "Errors_Common_FieldRequired", ErrorMessageResourceType = typeof(Resources.ErrorMessage))]
         [Display(Name = "StockTakeDetail_Uom", ResourceType = typeof(Resources.INV.StockTake))]
@@ -32,6 +37,7 @@ namespace com.Sconit.Entity.INV
         [Required(AllowEmptyStrings = false, ErrorMessageResourceName = "Errors_Common_FieldRequired", ErrorMessageResourceType = typeof(Resources.ErrorMessage))]
         [Display(Name = "StockTakeDetail_Qty", ResourceType = typeof(Resources.INV.StockTake))]
         public Decimal Qty { get; set; }
+        [Export(ExportName = "ExportStockTakeDetail", ExportSeq = 10)]
         [Required(AllowEmptyStrings = false, ErrorMessageResourceName = "Errors_Common_FieldRequired", ErrorMessageResourceType = typeof(Resources.ErrorMessage))]
         [Display(Name = "StockTakeDetail_Location", ResourceType = typeof(Resources.INV.StockTake))]
         public string Location { get; set; }
@@ -45,10 +51,10 @@ namespace com.Sconit.Entity.INV
 		public string LastModifyUserName { get; set; }
 		public DateTime LastModifyDate { get; set; }
 
+        [Export(ExportName = "ExportStockTakeDetail", ExportSeq = 70)]
         [Display(Name = "LocationDetailView_suppliers", ResourceType = typeof(Resources.View.LocationDetailView))]
         public string CSSupplier { get; set; }
 
-        //[Export(ExportName = "ExportBackUpInvXLS", ExportSeq = 60)]
         [Display(Name = "LocationDetailView_IsCS", ResourceType = typeof(Resources.View.LocationDetailView))]
         public Boolean IsConsigement { get; set; }
         

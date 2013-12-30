@@ -90,14 +90,18 @@
             @Html.Hidden("IsScanHu", (bool)ViewBag.IsScanHu)
             <button type="button" id="btnSearch" onclick="btnSearchStockTakeDetail_Click()">
                 @Resources.Global.Button_Search</button>
-            @*<button type="button" id="btnExport">
-                @Resources.Global.Button_Export</button>*@
+            <button type="button" id="btnDetExport" onclick="ExportDetClick()">
+                @Resources.Global.Button_SearchExport</button>
             <button type="button" id="btnBack" onclick="location.href='@Url.Content("~/StockTake/StockTakeMasterList")'">
                 @Resources.Global.Button_Back</button>
         </div>
     }
 </fieldset>
 <script language="javascript" type="text/javascript">
+    function ExportDetClick() {
+        location.href = '/StockTake/ExportStockTakeDetail/?ItemCode=' + $('#ItemCode').val() + '&Location=' + $('#LocationId').val()
+       + '&StNo=' + $('#StNo').val();
+    }
     function btnSearchStockTakeDetail_Click() {
         var data = {
             "stNo": $("#stNo").val(),

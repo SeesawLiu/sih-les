@@ -1488,18 +1488,19 @@ namespace com.Sconit.Service.Impl
             DateTime dateTimeNow = DateTime.Now;
             if(true)
             {
-                if (locationList == null || locationList.Count == 0)
-                {
-                    var stockLocs = this.genericMgr.FindAll<StockTakeLocation>(" from StockTakeLocation as s where s.StNo=? ",stockTakeMaster.StNo);
-                    locationList = stockLocs.Select(s => s.Location).ToList();
-                }
+                //if (locationList == null || locationList.Count == 0)
+                //{
+                //    var stockLocs = this.genericMgr.FindAll<StockTakeLocation>(" from StockTakeLocation as s where s.StNo=? ",stockTakeMaster.StNo);
+                //    locationList = stockLocs.Select(s => s.Location).ToList();
+                //}
                 #region 按数量盘点
                 #region 查找库存
                 IList<StockTakeLocationLotDet> locationDetailList = null;
-                
-                string selectLocationDetailStatement = "from StockTakeLocationLotDet where 1 = 1 and RefNo=?";
+
+                string selectLocationDetailStatement = "from StockTakeLocationLotDet as lot where 1 = 1 and lot.RefNo=? and exists( select 1 from StockTakeLocation as s where s.Location=lot.Location and s.StNo=? )";
                 IList<object> selectHuLocationDetailParm = new List<object>();
                 selectHuLocationDetailParm.Add(stockTakeMaster.RefNo);
+                selectHuLocationDetailParm.Add(stockTakeMaster.StNo);
                 selectLocationDetailStatement += GetWhereStatement(selectHuLocationDetailParm, itemList, locationList, binList);
                 locationDetailList = this.genericMgr.FindAll<StockTakeLocationLotDet>(selectLocationDetailStatement, selectHuLocationDetailParm.ToArray());
 
@@ -2070,10 +2071,10 @@ namespace com.Sconit.Service.Impl
             }
 
             #region 清空明细
-            string hql = @"from StockTakeDetail as s where s.StNo = ?";
-            genericMgr.Delete(hql, new object[] { stNo }, new IType[] { NHibernateUtil.String });
-            genericMgr.FlushSession();
-            genericMgr.CleanSession();
+            //string hql = @"from StockTakeDetail as s where s.StNo = ?";
+            //genericMgr.Delete(hql, new object[] { stNo }, new IType[] { NHibernateUtil.String });
+            //genericMgr.FlushSession();
+            //genericMgr.CleanSession();
             #endregion
 
             HSSFWorkbook workbook = new HSSFWorkbook(inputStream);
@@ -2081,7 +2082,7 @@ namespace com.Sconit.Service.Impl
             ISheet sheet = workbook.GetSheetAt(0);
             IEnumerator rows = sheet.GetRowEnumerator();
 
-            var cell = sheet.GetRow(4).Cells[6];
+            var cell = sheet.GetRow(1).Cells[0];
             var cellStNo = ImportHelper.GetCellStringValue(cell);
             if (cellStNo != stNo)
             {
@@ -2248,14 +2249,21 @@ namespace com.Sconit.Service.Impl
                 try
                 {
                     string qtyRead = ImportHelper.GetCellStringValue(row.GetCell(colQty));
-                    if (decimal.TryParse(qtyRead, out qty))
+                    if (string.IsNullOrWhiteSpace(qtyRead))
                     {
                         stockTakeDetail.Qty = qty;
                     }
                     else
                     {
-                        errorMessage.AddMessage(string.Format("第{0}行：数量{1}填写有误", rowCount, qty));
-                        continue;
+                        if (decimal.TryParse(qtyRead, out qty))
+                        {
+                            stockTakeDetail.Qty = qty;
+                        }
+                        else
+                        {
+                            errorMessage.AddMessage(string.Format("第{0}行：数量{1}填写有误", rowCount, qty));
+                            continue;
+                        }
                     }
                 }
                 catch

@@ -609,6 +609,8 @@ namespace com.Sconit.Service.Impl
             {
                 return null;
             }
+            inParam = inParam.Where(i => i != null).ToList();
+
             List<T> tList = new List<T>();
 
             int inParamCount = 2000;//每次最多2000
@@ -641,7 +643,12 @@ namespace com.Sconit.Service.Impl
                 hqlStr = hqlStr.Remove(hqlStr.Length - 1, 1);
                 hqlStr.Append(")");
                 paramList.AddRange(batchinParam);
-                tList.AddRange(dao.FindAllWithCustomQuery<T>(hqlStr.ToString(), paramList.ToArray()));
+                //tList.AddRange(dao.FindAllWithCustomQuery<T>(hqlStr.ToString(), paramList.ToArray()));
+                var list = dao.FindAllWithCustomQuery<T>(hqlStr.ToString(), paramList.ToArray());
+                if (list != null)
+                {
+                    tList.AddRange(list);
+                }
             }
             return tList;
         }

@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using AutoMapper;
 using Castle.Services.Transaction;
@@ -13,18 +16,15 @@ using com.Sconit.Entity.INV;
 using com.Sconit.Entity.MD;
 using com.Sconit.Entity.ORD;
 using com.Sconit.Entity.PRD;
+using com.Sconit.Entity.SCM;
 using com.Sconit.Entity.SYS;
 using com.Sconit.Entity.VIEW;
 using com.Sconit.Persistence;
-using System.Data.SqlClient;
-using System.Data;
-using com.Sconit.Entity.SCM;
-using NHibernate.Type;
+using com.Sconit.Utility;
 using NHibernate;
-using System.IO;
+using NHibernate.Type;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
-using com.Sconit.Utility;
 
 namespace com.Sconit.Service.Impl
 {
@@ -4273,6 +4273,12 @@ namespace com.Sconit.Service.Impl
                         throw new TechnicalException("Can't adjust inspect inventory.");
                     }
 
+                    PlanBill planBill = null;
+                    if (stockTakeResult.IsConsigement && (!string.IsNullOrWhiteSpace(stockTakeResult.CSSupplier)))
+                    {
+                        planBill = this.billMgr.LoadPlanBill(stockTakeResult.Item, stockTakeResult.Location, stockTakeResult.CSSupplier, effectiveDate);
+                    }
+
                     InventoryIO inventoryIO = new InventoryIO();
 
                     inventoryIO.Location = stockTakeResult.Location;
@@ -4285,16 +4291,22 @@ namespace com.Sconit.Service.Impl
                     inventoryIO.IsATP = stockTakeResult.QualityType == com.Sconit.CodeMaster.QualityType.Qualified;
                     inventoryIO.IsFreeze = false;
                     inventoryIO.IsCreatePlanBill = false;
-                    inventoryIO.IsConsignment = stockTakeResult.IsConsigement;   //寄售
-                    inventoryIO.ConsignmentSupplier = stockTakeResult.CSSupplier;//寄售供应商
-                    inventoryIO.PlanBill = null;
+                    inventoryIO.IsConsignment = planBill != null;
+                    inventoryIO.PlanBill = planBill != null ? (int?)planBill.Id : null;
                     inventoryIO.ActingBill = null;
                     inventoryIO.TransactionType = CodeMaster.TransactionType.CYC_CNT;//
                     inventoryIO.OccupyType = CodeMaster.OccupyType.None;
                     inventoryIO.OccupyReferenceNo = null;
                     inventoryIO.IsVoid = false;
                     inventoryIO.EffectiveDate = effectiveDate;
-                    //inventoryIO.ManufactureParty = ;
+                    inventoryIO.ConsignmentSupplier = planBill != null ? planBill.Party : null;
+
+                    if (stockTakeResult.DifferenceQty >= 0 && planBill != null)
+                    {
+                        //planBill.CurrentVoidQty = stockTakeResult.DifferenceQty * stockTakeResult.UnitQty / planBill.UnitQty;
+                        planBill.CurrentVoidQty = stockTakeResult.DifferenceQty / planBill.UnitQty;  //不考虑盘点单位转换
+                        this.billMgr.VoidPlanBill(planBill);
+                    }
 
                     IList<InventoryTransaction> currentInventoryTransactionList = RecordInventory(inventoryIO);
                     RecordLocationTransaction(stockTakeMaster, stockTakeResult, effectiveDate, currentInventoryTransactionList);
@@ -4308,44 +4320,78 @@ namespace com.Sconit.Service.Impl
         private void RecordLocationTransaction(StockTakeMaster stockTakeMaster, StockTakeResult stockTakeResult, DateTime effectiveDate, IList<InventoryTransaction> inventoryTransactionList)
         {
             DateTime dateTimeNow = DateTime.Now;
-            LocationTransaction locationTransaction = new LocationTransaction();
 
-            locationTransaction.OrderNo = stockTakeResult.StNo;
-            //locationTransaction.OrderType = ;
-            //locationTransaction.OrderSubType = ;
-            //locationTransaction.OrderDetailSequence =;
-            //locationTransaction.OrderDetailId =;
-            //locationTransaction.OrderBomDetId = 
-            //locationTransaction.IpNo = 
-            //locationTransaction.IpDetailId = 
-            //locationTransaction.IpDetailSequence = 
-            //locationTransaction.ReceiptNo = 
-            //locationTransaction.ReceiptDetailId = 
-            //locationTransaction.ReceiptDetailSequence = 
-            //locationTransaction.SequenceNo = 
-            //locationTransaction.TraceCode = ;
-            locationTransaction.Item = stockTakeResult.Item;
-            locationTransaction.Uom = stockTakeResult.Uom;
-            locationTransaction.BaseUom = stockTakeResult.Uom;
-            locationTransaction.Qty = stockTakeResult.DifferenceQty;
-            locationTransaction.UnitQty = 1;
-            locationTransaction.ActingBillQty = inventoryTransactionList.Sum(i => i.ActingBillQty);
-            locationTransaction.QualityType = stockTakeResult.QualityType;
-            locationTransaction.HuId = stockTakeResult.HuId;
-            locationTransaction.LotNo = stockTakeResult.LotNo;
-            locationTransaction.TransactionType = CodeMaster.TransactionType.CYC_CNT;
-            locationTransaction.IOType = stockTakeResult.DifferenceQty < 0 ? CodeMaster.TransactionIOType.Out : CodeMaster.TransactionIOType.In;
-            locationTransaction.PartyFrom = stockTakeMaster.Region;
-            locationTransaction.PartyTo = stockTakeMaster.Region;
-            locationTransaction.LocationFrom = stockTakeResult.Location;
-            locationTransaction.LocationTo = stockTakeResult.Location;
-            locationTransaction.LocationIOReason = string.Empty;
-            locationTransaction.EffectiveDate = effectiveDate;
-            locationTransaction.CreateUserId = SecurityContextHolder.Get().Id;
-            locationTransaction.CreateDate = dateTimeNow;
+            //根据PlanBill和ActingBill分组，为了不同供应商的库存事务分开
+            var groupedInventoryTransactionList = from trans in inventoryTransactionList
+                                                  group trans by new
+                                                  {
+                                                      IsConsignment = trans.IsConsignment,
+                                                      PlanBill = trans.PlanBill,
+                                                      ActingBill = trans.ActingBill
+                                                  }
+                                                      into result
+                                                      select new
+                                                      {
+                                                          IsConsignment = result.Key.IsConsignment,
+                                                          PlanBill = result.Key.PlanBill,
+                                                          ActingBill = result.Key.ActingBill,
+                                                          Qty = result.Sum(trans => trans.Qty),
+                                                          PlanBillQty = result.Sum(trans => trans.PlanBillQty),
+                                                          ActingBillQty = result.Sum(trans => trans.ActingBillQty),
+                                                          InventoryTransactionList = result.ToList()
+                                                      };
 
-            this.genericMgr.Create(locationTransaction);
-            RecordLocationTransactionDetail(locationTransaction, inventoryTransactionList);
+            foreach (var groupedInventoryTransaction in groupedInventoryTransactionList)
+            {
+                LocationTransaction locationTransaction = new LocationTransaction();
+
+                locationTransaction.OrderNo = stockTakeResult.StNo;
+                //locationTransaction.OrderType = ;
+                //locationTransaction.OrderSubType = ;
+                //locationTransaction.OrderDetailSequence =;
+                //locationTransaction.OrderDetailId =;
+                //locationTransaction.OrderBomDetId = 
+                //locationTransaction.IpNo = 
+                //locationTransaction.IpDetailId = 
+                //locationTransaction.IpDetailSequence = 
+                //locationTransaction.ReceiptNo = 
+                //locationTransaction.ReceiptDetailId = 
+                //locationTransaction.ReceiptDetailSequence = 
+                //locationTransaction.SequenceNo = 
+                //locationTransaction.TraceCode = ;
+                locationTransaction.Item = stockTakeResult.Item;
+                locationTransaction.Uom = stockTakeResult.Uom;
+                locationTransaction.BaseUom = stockTakeResult.Uom;
+                locationTransaction.Qty = groupedInventoryTransaction.Qty;
+                locationTransaction.UnitQty = 1;
+                locationTransaction.IsConsignment = groupedInventoryTransaction.IsConsignment;
+                if (groupedInventoryTransaction.IsConsignment && groupedInventoryTransaction.PlanBill.HasValue)
+                {
+                    locationTransaction.PlanBill = groupedInventoryTransaction.PlanBill.Value;
+                }
+                locationTransaction.PlanBillQty = groupedInventoryTransaction.PlanBillQty;
+                if (groupedInventoryTransaction.ActingBill.HasValue)
+                {
+                    locationTransaction.ActingBill = groupedInventoryTransaction.ActingBill.Value;
+                }
+                locationTransaction.ActingBillQty = groupedInventoryTransaction.ActingBillQty; 
+                locationTransaction.QualityType = stockTakeResult.QualityType;
+                locationTransaction.HuId = stockTakeResult.HuId;
+                locationTransaction.LotNo = stockTakeResult.LotNo;
+                locationTransaction.TransactionType = CodeMaster.TransactionType.CYC_CNT;
+                locationTransaction.IOType = stockTakeResult.DifferenceQty < 0 ? CodeMaster.TransactionIOType.Out : CodeMaster.TransactionIOType.In;
+                locationTransaction.PartyFrom = stockTakeMaster.Region;
+                locationTransaction.PartyTo = stockTakeMaster.Region;
+                locationTransaction.LocationFrom = stockTakeResult.Location;
+                locationTransaction.LocationTo = stockTakeResult.Location;
+                locationTransaction.LocationIOReason = string.Empty;
+                locationTransaction.EffectiveDate = effectiveDate;
+                locationTransaction.CreateUserId = SecurityContextHolder.Get().Id;
+                locationTransaction.CreateDate = dateTimeNow;
+
+                this.genericMgr.Create(locationTransaction);
+                RecordLocationTransactionDetail(locationTransaction, inventoryTransactionList);
+            }
         }
         #endregion
 

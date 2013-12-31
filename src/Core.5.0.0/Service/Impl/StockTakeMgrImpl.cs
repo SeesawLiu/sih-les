@@ -1,23 +1,22 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using Castle.Services.Transaction;
-using com.Sconit.Entity.INV;
-using NHibernate.Criterion;
-using com.Sconit.Entity.Exception;
-using com.Sconit.Entity.ACC;
-using com.Sconit.Entity;
+using System.IO;
 using System.Linq;
+using Castle.Services.Transaction;
+using com.Sconit.Entity;
+using com.Sconit.Entity.ACC;
+using com.Sconit.Entity.CUST;
+using com.Sconit.Entity.Exception;
+using com.Sconit.Entity.INV;
 using com.Sconit.Entity.MD;
+using com.Sconit.Entity.SCM;
+using com.Sconit.Entity.VIEW;
+using com.Sconit.Utility;
 using NHibernate;
 using NHibernate.Type;
-using com.Sconit.Entity.VIEW;
-using System.IO;
 using NPOI.HSSF.UserModel;
-using System.Collections;
 using NPOI.SS.UserModel;
-using com.Sconit.Utility;
-using com.Sconit.Entity.SCM;
-using com.Sconit.Entity.CUST;
 
 namespace com.Sconit.Service.Impl
 {
@@ -994,7 +993,7 @@ namespace com.Sconit.Service.Impl
                 #region 查找库存
                 IList<LocationLotDetail> locationLotDetailList = null;
                 //if (baseInventoryDate.HasValue)
-                if (1!=1)
+                if (1 != 1)
                 {
                     if (binList != null && binList.Count > 0)
                     {
@@ -1300,7 +1299,7 @@ namespace com.Sconit.Service.Impl
                     IList<HistoryInventory> historyInventoryList = new List<HistoryInventory>();
                     foreach (string location in locationList)
                     {
-                        ((List<HistoryInventory>)historyInventoryList).AddRange(this.locationDetailMgr.GetHistoryLocationDetails(location, itemList, baseInventoryDate.Value,"",20,1));
+                        ((List<HistoryInventory>)historyInventoryList).AddRange(this.locationDetailMgr.GetHistoryLocationDetails(location, itemList, baseInventoryDate.Value, "", 20, 1));
                     }
 
                     locationDetailList = (from inv in historyInventoryList
@@ -1486,7 +1485,7 @@ namespace com.Sconit.Service.Impl
         {
             IList<StockTakeResult> stockTakeResultList = new List<StockTakeResult>();
             DateTime dateTimeNow = DateTime.Now;
-            if(true)
+            if (true)
             {
                 //if (locationList == null || locationList.Count == 0)
                 //{
@@ -1662,7 +1661,9 @@ namespace com.Sconit.Service.Impl
             {
                 string hql = string.Empty;
                 IList<object> parm = new List<object>();
+                List<StockTakeResult> stockTakeResultList = new List<StockTakeResult>();
 
+                int count = 0;
                 foreach (int id in stockTakeResultIdList)
                 {
                     if (hql == string.Empty)
@@ -1674,10 +1675,26 @@ namespace com.Sconit.Service.Impl
                         hql += ",?";
                     }
                     parm.Add(id);
-                }
-                hql += ")";
+                    count++;
 
-                AdjustStockTakeResult(this.genericMgr.FindAll<StockTakeResult>(hql, parm.ToArray()), effectiveDate);
+                    if (count == 1000)
+                    {
+                        hql += ")";
+                        stockTakeResultList.AddRange(this.genericMgr.FindAll<StockTakeResult>(hql, parm.ToArray()));
+
+                        count = 0;
+                        hql = string.Empty;
+                        parm = new List<object>();
+                    }
+                }
+
+                if (count > 0)
+                {
+                    hql += ")";
+                    stockTakeResultList.AddRange(this.genericMgr.FindAll<StockTakeResult>(hql, parm.ToArray()));
+                }
+
+                AdjustStockTakeResult(stockTakeResultList, effectiveDate);
             }
             else
             {
@@ -1973,9 +1990,9 @@ namespace com.Sconit.Service.Impl
         //            Uom uom = genericMgr.FindById<Uom>(uomCode);
         //            Location location = genericMgr.FindById<Location>(locationCode);
 
-                
+
         //            StockTakeDetail stockTakeDetail = new StockTakeDetail();
-                  
+
         //                stockTakeDetail.StNo = stNo;
         //                stockTakeDetail.Item = itemCode;
         //                stockTakeDetail.Uom = uomCode;
@@ -1983,7 +2000,7 @@ namespace com.Sconit.Service.Impl
         //                stockTakeDetail.BaseUom = item.Uom;
         //                stockTakeDetail.Qty = qty;
         //                stockTakeDetailList.Add(stockTakeDetail);
-                   
+
 
         //            #endregion
         //        }
@@ -2036,7 +2053,7 @@ namespace com.Sconit.Service.Impl
         //                bin = genericMgr.FindById<LocationBin>(binCode);
         //            }
 
-                    
+
         //            StockTakeDetail stockTakeDetail = new StockTakeDetail();
         //            stockTakeDetail.StNo = stNo;
         //            stockTakeDetail.Item = hu.Item;
@@ -2059,7 +2076,7 @@ namespace com.Sconit.Service.Impl
         //    BatchUpdateStockTakeDetails(stNo, stockTakeDetailList, null, null);
 
         //}
-        #endregion      
+        #endregion
 
         #region 导入盘点明细
         [Transaction(TransactionMode.Requires)]
@@ -2096,7 +2113,7 @@ namespace com.Sconit.Service.Impl
 
             int colLocation = 1;// 库位
             int colItem = 2;//物料代码
-            int colQualitype= 5;//质量类型
+            int colQualitype = 5;//质量类型
             int colIsConsigement = 6;//是否寄售
             int colCSSupplier = 7;//寄售供应商
             int colQty = 8;//盘点数
@@ -2106,7 +2123,7 @@ namespace com.Sconit.Service.Impl
             BusinessException errorMessage = new BusinessException();
             IList<StockTakeDetail> stockTakeDetailList = new List<StockTakeDetail>();
             IList<StockTakeDetail> existsList = this.genericMgr.FindAll<StockTakeDetail>(" from StockTakeDetail as d where d.StNo=?", stNo);
-            IList<StockTakeLocation> allLocs = genericMgr.FindAll<StockTakeLocation>(" from StockTakeLocation as s where s.StNo=? ",stNo);
+            IList<StockTakeLocation> allLocs = genericMgr.FindAll<StockTakeLocation>(" from StockTakeLocation as s where s.StNo=? ", stNo);
             IList<Item> allItems = genericMgr.FindAll<Item>();
             int rowCount = 11;
             while (rows.MoveNext())
@@ -2183,7 +2200,7 @@ namespace com.Sconit.Service.Impl
 
                 #region 质量类型
                 qualityType = ImportHelper.GetCellStringValue(row.GetCell(colQualitype));
-                if (qualityType == "0" || qualityType=="正常")
+                if (qualityType == "0" || qualityType == "正常")
                 {
                     stockTakeDetail.QualityType = com.Sconit.CodeMaster.QualityType.Qualified;
                 }
@@ -2208,7 +2225,7 @@ namespace com.Sconit.Service.Impl
                 {
                     stockTakeDetail.IsConsigement = false;
                 }
-                else if (isConsigementRead == "1" || isConsigementRead=="√")
+                else if (isConsigementRead == "1" || isConsigementRead == "√")
                 {
                     stockTakeDetail.IsConsigement = true;
                 }
@@ -2301,7 +2318,7 @@ namespace com.Sconit.Service.Impl
                 stockTakeDetail.StNo = stNo;
                 stockTakeDetailList.Add(stockTakeDetail);
             }
-           
+
 
             if (errorMessage.HasMessage)
             {
@@ -2464,7 +2481,7 @@ namespace com.Sconit.Service.Impl
                     }
                     catch (Exception ex)
                     {
-                        businessException.AddMessage(string.Format("物料代码{0}+ 工位{1} +库存数{2} 导入失败，" + ex.Message, op.Item, op.OpReference,op.Qty));
+                        businessException.AddMessage(string.Format("物料代码{0}+ 工位{1} +库存数{2} 导入失败，" + ex.Message, op.Item, op.OpReference, op.Qty));
                     }
                 }
             }
@@ -2492,7 +2509,7 @@ namespace com.Sconit.Service.Impl
         [Transaction(TransactionMode.Requires)]
         public void CreateOpReferenceBalance(OpReferenceBalance opReferenceBalance)
         {
-             User user = SecurityContextHolder.Get();
+            User user = SecurityContextHolder.Get();
             this.genericMgr.Create(opReferenceBalance);
             this.genericMgr.FindAllWithNativeSql(@"insert into LOG_OpRefBalanceChange(Item, OpRef, Qty, [Status], [Version], CreateDate, CreateUserId, CreateUserNm)
 			values(?, ?,?, 0, 1, ?, ?, ?) ", new object[] { opReferenceBalance.Item, opReferenceBalance.OpReference, opReferenceBalance.Qty, System.DateTime.Now, user.Id, user.FullName });
@@ -2590,7 +2607,7 @@ namespace com.Sconit.Service.Impl
                 {
                     if (decimal.TryParse(qtyRead, out qty))
                     {
-                       
+
                     }
                     else
                     {
@@ -2641,7 +2658,7 @@ namespace com.Sconit.Service.Impl
                     }
                 }
             }
-          
+
             if (businessException.HasMessage)
             {
                 throw businessException;

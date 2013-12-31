@@ -603,14 +603,21 @@ namespace com.Sconit.Service.Impl
             return dao.ExecuteUpdateWithNativeQuery(queryString, values, types);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="hql">select i from Item as i where i.Code in(</param>
+        /// <param name="inParam"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
         public IList<T> FindAllIn<T>(string hql, IEnumerable<object> inParam, IEnumerable<object> param = null)
         {
+            inParam = inParam.Where(i => i != null).ToList();
             if (inParam == null || inParam.Count() == 0)
             {
                 return null;
             }
-            inParam = inParam.Where(i => i != null).ToList();
-
             List<T> tList = new List<T>();
 
             int inParamCount = 2000;//每次最多2000
@@ -691,7 +698,11 @@ namespace com.Sconit.Service.Impl
                     paramValue.AddRange(values);
                 }
                 paramValue.AddRange(batchinParam);
-                tList.AddRange(dao.FindEntityWithNativeSql<T>(sqlStr.ToString(), paramValue.ToArray()));
+                var list = dao.FindAllWithCustomQuery<T>(sqlStr.ToString(), paramValue.ToArray());
+                if (list != null)
+                {
+                    tList.AddRange(list);
+                }
             }
             return tList;
         }
@@ -735,7 +746,11 @@ namespace com.Sconit.Service.Impl
                     paramValue.AddRange(values);
                 }
                 paramValue.AddRange(batchinParam);
-                tList.AddRange(dao.FindAllWithNativeSql<T>(sqlStr.ToString(), paramValue.ToArray()));
+                var list = dao.FindAllWithCustomQuery<T>(sqlStr.ToString(), paramValue.ToArray());
+                if (list != null)
+                {
+                    tList.AddRange(list);
+                }
             }
             return tList;
         }

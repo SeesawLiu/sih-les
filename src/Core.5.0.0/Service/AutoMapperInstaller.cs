@@ -359,6 +359,9 @@ namespace com.Sconit.Service
             Mapper.CreateMap<StockTakeMaster, PrintStockTakeMaster>()
                 .ForMember(d => d.Type, o => o.MapFrom(s => (Int16)s.Type));
 
+            Mapper.CreateMap<StockTakeDetail, PrintStockTakeDetail>()
+             .ForMember(d => d.QualityType, o => o.MapFrom(s => (Int16)s.QualityType));
+
             Mapper.CreateMap<MiscOrderMaster, PrintMiscOrderMaster>()
                 .ForMember(d => d.QualityType, o => o.MapFrom(s => (Int16)s.QualityType))
                 .ForMember(d => d.Type, o => o.MapFrom(s => (Int16)s.Type))

@@ -1,0 +1,87 @@
+﻿@using com.Sconit.Web.Models.SearchModels.INV
+@using com.Sconit.Entity.CUST
+<fieldset>
+    @using (Html.BeginForm("BackUpInvList", "StockTake"))
+    {   
+        <div class="search">
+            <div class="search-label">
+                <label for="FailCode_Code">
+                    @Resources.View.LocationDetailView.LocationDetailView_Item
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_ItemComboBox", "Common",
+                          new
+                          {
+                              controlName = "ItemCode",
+                              selectedValue = TempData["StockTakeDetailSearchModel"] != null ? ((StockTakeDetailSearchModel)TempData["StockTakeDetailSearchModel"]).ItemCode : string.Empty
+                          });
+                }
+            </div>
+            <div class="search-label">
+                <label for="FailCode_Code">
+                    @Resources.View.LocationDetailView.LocationDetailView_Location
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_LocationComboBox", "Common",
+         new
+         {
+             controlName = "Location",
+             selectedValue = TempData["StockTakeDetailSearchModel"] != null ? ((StockTakeDetailSearchModel)TempData["StockTakeDetailSearchModel"]).Location : string.Empty
+         });
+                }
+            </div>
+            <div class="search-label">
+                <label for="FailCode_Code">
+                    @Resources.View.LocationDetailView.LocationDetailView_RefNo
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.TextBox("RefNo", TempData["StockTakeDetailSearchModel"] != null ? ((StockTakeDetailSearchModel)TempData["StockTakeDetailSearchModel"]).RefNo : string.Empty)
+            </div>
+             <div class="search-label">
+                <label for="OrderMaster_PartyFrom">
+                    @Resources.View.LocationDetailView.LocationDetailView_suppliers
+                </label>
+            </div>
+            <div class="search-field">
+                @{
+        Html.RenderAction("_OrderMasterPartyFromComboBox", "Common",
+            new
+            {
+                controlName = "CSSupplier",
+                orderType = (int)com.Sconit.CodeMaster.OrderType.Procurement,
+                selectedValue = TempData["StockTakeDetailSearchModel"] != null ? ((StockTakeDetailSearchModel)TempData["StockTakeDetailSearchModel"]).CSSupplier : string.Empty
+            });
+                }
+            </div>
+
+            <div class="search-label">
+                <label for="">
+                    @Resources.View.LocationDetailView.LocationDetailView_IsCS
+                </label>
+            </div>
+            <div class="search-field">
+                @Html.CheckBox("IsConsigement", TempData["StockTakeDetailSearchModel"] != null ? ((StockTakeDetailSearchModel)TempData["StockTakeDetailSearchModel"]).IsConsigement : false)
+            </div>
+            
+        </div>
+        <div class="search-footer">
+            @Html.Hidden("isFromList", true)
+            <button type="submit" id="btnSearch">
+                @Resources.Global.Button_Search</button>
+            <button type="button" id="btnExport" onclick="ExportBackUpInvXLSClick()">
+                @Resources.Global.Button_SearchExport</button>
+        </div>
+
+    }
+</fieldset>
+<script type="text/javascript">
+    function ExportBackUpInvXLSClick() {
+        location.href = '/StockTake/ExportBackUpInvXLS/?ItemCode=' + $('#ItemCode').val() + '&Location=' + $('#Location').val()
+        + '&CSSupplier=' + $('#CSSupplier').val() + '&IsConsigement=' + $('#IsConsigement').is(":checked") + '&RefNo=' + $('#RefNo').val();
+    }
+</script>

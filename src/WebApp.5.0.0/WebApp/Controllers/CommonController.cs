@@ -491,7 +491,7 @@ namespace com.Sconit.Web.Controllers
         #endregion
 
         #region Location
-        public ActionResult _LocationComboBox(string controlName, string controlId, string selectedValue, bool? enable, bool? isChange, bool? checkRegion)
+        public ActionResult _LocationComboBox(string controlName, string controlId, string selectedValue, bool? enable, bool? isChange, bool? checkRegion, bool? isStockTakeLocation)
         {
             ViewBag.ControlName = controlName;
             ViewBag.Enable = enable;
@@ -499,6 +499,7 @@ namespace com.Sconit.Web.Controllers
             ViewBag.ControlId = controlId;
             ViewBag.CheckRegion = checkRegion;
             ViewBag.SelectedValue = selectedValue;
+            ViewBag.isStockTakeLocation = isStockTakeLocation;
 
             IList<Location> locationList = new List<Location>();
 
@@ -509,7 +510,7 @@ namespace com.Sconit.Web.Controllers
             return PartialView(new SelectList(locationList, "Code", "CodeName", selectedValue));
         }
 
-        public ActionResult _AjaxLoadingLocation(string region, string text, bool checkRegion)
+        public ActionResult _AjaxLoadingLocation(string region, string text, bool checkRegion, bool isStockTakeLocation,string stNo)
         {
             User user = SecurityContextHolder.Get();
             IList<Location> locationList = new List<Location>();
@@ -524,6 +525,12 @@ namespace com.Sconit.Web.Controllers
             {
                 hql += " and l.Region = ?";
                 paramList.Add(region);
+            }
+
+            if (isStockTakeLocation && !string.IsNullOrWhiteSpace(stNo))
+            {
+                hql += " and exists( select 1 from StockTakeLocation as sl where sl.Location=l.Code and sl.StNo=? )";
+                paramList.Add(stNo);
             }
             if (user.Code.Trim() != "su")
             {

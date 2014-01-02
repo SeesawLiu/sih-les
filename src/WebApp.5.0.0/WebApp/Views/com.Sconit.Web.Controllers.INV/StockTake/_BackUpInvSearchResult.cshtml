@@ -1,0 +1,49 @@
+﻿@model IEnumerable<com.Sconit.Entity.CUST.StockTakeLocationLotDet>
+<fieldset>
+
+    @(Html.Telerik().Grid(Model)
+                       .Name("StockTakeLocationLotDetGrid")
+        .DataKeys(keys =>
+        {
+            keys.Add(p => p.Id);
+        })
+        .DataBinding(dataBinding => dataBinding.Ajax()
+                .Select("_AjaxBackUpInvList", "StockTake"))
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Item);
+            columns.Bound(o => o.ItemDesc);
+            columns.Bound(o => o.Location);
+            columns.Bound(o => o.Qty);
+            columns.Bound(o => o.RefNo);
+            columns.Bound(o => o.QualityTypeDescription);
+            columns.Bound(o => o.IsConsigement)
+                      .ClientTemplate("<input type='checkbox' disabled='disabled' name='IsConsigement' <#= IsConsigement? checked='checked' : '' #> />");
+            columns.Bound(o => o.CSSupplier);
+        })
+        .ClientEvents(events =>
+        {
+            events.OnDataBinding("StockTakeLocationLotDetGrid_OnDataBinding");
+        })
+        .EnableCustomBinding(true)
+        .Pageable(settings =>
+        {
+            settings.Total(ViewBag.Total == null ? 0 : ViewBag.Total);
+            settings.PageSize(ViewBag.PageSize);
+        })
+        .Scrollable()
+        .Sortable()
+        .Resizable(resizing => resizing.Columns(true))
+    )
+    <script type="text/javascript">
+        function StockTakeLocationLotDetGrid_OnDataBinding(e) {
+            e.data = {
+                ItemCode: $('#ItemCode').val(),
+                Location: $('#Location').val(),
+                CSSupplier: $('#CSSupplier').val(),
+                IsConsigement: $('#IsConsigement').is(":checked"),
+                RefNo: $('#RefNo').val()
+            };
+        } 
+    </script>
+</fieldset>

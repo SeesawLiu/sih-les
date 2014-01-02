@@ -2,9 +2,10 @@
 @using com.Sconit.Entity.SYS
 @using com.Sconit.Web.Models.SearchModels.INV
 <fieldset>
-<legend>@Resources.INV.StockTake.StockTakeDetail_StNo:@ViewBag.StNo</legend>
+    <legend>@Resources.INV.StockTake.StockTakeDetail_StNo:@ViewBag.StNo</legend>
     @using (Html.BeginForm("StockTakeResult", "StockTake"))
     {   
+
         <div class="search">
             <div class="search-label">
                 <label for="StockTakeResult_Item">
@@ -13,73 +14,71 @@
             </div>
             <div class="search-field">
                 @{
-               if (ViewBag.Item == null)
-               {
-                   Html.RenderAction("_ItemComboBox", "Common", new { controlName = "Item" });
-               }
-               else
-               {
-                   Html.RenderAction("_ItemComboBox", "Common", new { controlName = "Item", selectedValue = ViewBag.Item });
-               }
+                    Html.RenderAction("_ItemComboBox", "Common", new
+                    {
+                        controlName = "ItemResult",
+                        selectedValue = TempData["StockTakeResultSearchModel"] != null ? ((StockTakeResultSearchModel)TempData["StockTakeResultSearchModel"]).ItemResult : null
+                    });
                 }
             </div>
             <div class="editor-label-2">
                 <label for="StockTakeResult_Bin">
                     @Resources.INV.StockTake.StockTakeDetail_Location
                 </label>
-              
             </div>
-            <div class="editor-field-2" >
-
+            <div class="editor-field-2">
                 @{
-               Html.RenderAction("_LocationComboBox", "Common", new
-               {
-                   controlName = "Location",
-                   selectedValue = TempData["StockTakeResultSearchModel"] != null ? ((StockTakeResultSearchModel)TempData["StockTakeResultSearchModel"]).Location : null
+        Html.RenderAction("_LocationComboBox", "Common", new
+        {
+            controlName = "LocationResult",
+            isStockTakeLocation = true,
+            checkRegion = true,
+            selectedValue = TempData["StockTakeResultSearchModel"] != null ? ((StockTakeResultSearchModel)TempData["StockTakeResultSearchModel"]).LocationResult : null
 
-               });
-                    }
-                     @Html.Hidden("StNo", (string)ViewBag.StNo)
-                     @Html.Hidden("Status", (string)ViewBag.Status)
-                     @Html.Hidden("IsScanHu", (bool)ViewBag.IsScanHu)
+        });
+ }
+                @Html.Hidden("StNo", (string)ViewBag.StNo) @Html.Hidden("Status", (string)ViewBag.Status)
+                @Html.Hidden("IsScanHu", (bool)ViewBag.IsScanHu)
             </div>
-             @{
-                if (ViewBag.IsScanHu == true)
-                {
-            <div class="editor-label-2">
+            @{
+        if (ViewBag.IsScanHu == true)
+        {
+
+                <div class="editor-label-2">
                     <label for="StockTakeDetail_Bin">
                         @Resources.INV.StockTake.StockTakeDetail_Bin
                     </label>
-            </div>
+                </div>
            
-            <div class="editor-field-2">
-                    @{
-                   Html.RenderAction("_LocationBinComboBox", "Common", new
-                   {
-                       controlName = "LocationBin",
-                       selectedValue = TempData["StockTakeResultSearchModel"] != null ? ((StockTakeResultSearchModel)TempData["StockTakeResultSearchModel"]).LocationBin : null
 
-                   });
-                    }
-            </div>
-                }
-    }
-             <div class="editor-label-2">
+                <div class="editor-field-2">
+                    @{
+            Html.RenderAction("_LocationBinComboBox", "Common", new
+            {
+                controlName = "LocationBin",
+                selectedValue = TempData["StockTakeResultSearchModel"] != null ? ((StockTakeResultSearchModel)TempData["StockTakeResultSearchModel"]).LocationBin : null
+
+            });
+ }
+                </div>
+        }
+ }
+            <div class="editor-label-2">
                 <label for="StockTakeResult_Option">
                     @Resources.INV.StockTake.StockTakeResult_Option
                 </label>
             </div>
             <div class="editor-field-2">
                 @{
-                    @Html.CheckBox("IsLoss", true)
-                    @Resources.INV.StockTake.StockTakeResult_IsLoss
-                    @Html.CheckBox("IsProfit", true)
-                    @Resources.INV.StockTake.StockTakeResult_IsProfit
-                    @Html.CheckBox("IsBreakEven", true)
-                    @Resources.INV.StockTake.StockTakeResult_IsBreakEven
-                }
+                     @Html.CheckBox("IsLoss", true)
+                     @Resources.INV.StockTake.StockTakeResult_IsLoss
+                     @Html.CheckBox("IsProfit", true)
+                     @Resources.INV.StockTake.StockTakeResult_IsProfit
+                     @Html.CheckBox("IsBreakEven", true)
+                     @Resources.INV.StockTake.StockTakeResult_IsBreakEven
+                 }
             </div>
-@*              <div class="editor-label-2">
+            @*              <div class="editor-label-2">
                 <label for="StockTakeResult_Option">
                     @Resources.INV.StockTake.StockTakeResult_IsShowAdjust
                 </label>
@@ -90,49 +89,60 @@
     }
     </div>*@
         </div>
+
         <div class="search-footer">
-            @Html.Hidden("isFromList", true)
-            @Html.Hidden("status", (String)ViewBag.Status)
+            @Html.Hidden("isFromList", true) @Html.Hidden("status", (String)ViewBag.Status)
             <button type="button" id="btnSearch" onclick="btnSearchStockTakeResult_Click()">
                 @Resources.Global.Button_Search</button>
-            <button type="button" id="btnExport">
-                @Resources.Global.Button_Export</button>
-                <button type="button" id="btnExportDetail">
-                @Resources.Global.Button_ExportDetail</button>
-                
+            <button type="button" id="btnResultExport" onclick="ExporResultClick()">
+                @Resources.Global.Button_SearchExport</button>
+            @* <button type="button" id="btnExportDetail">
+                @Resources.Global.Button_ExportDetail</button>*@
             @if (ViewBag.Status == com.Sconit.CodeMaster.StockTakeStatus.Complete.ToString())
-           {
-            <button type="button" id="btnAdjust" style="display:none" onclick="btnAdjusts()">
-                @Resources.Global.Button_Adjust</button>
+            {
+
+                <button type="button" id="btnAdjust" style="display: none" onclick="btnAdjusts()">
+                    @Resources.Global.Button_Adjust</button>
                    
 
-            <button type="button" id="btnAllAdjust"  onclick="btnAllAdjusts()">
-                @Resources.Global.Button_AllAdjust</button>        
-           }
-                <button type="button" id="btnClose">
-                @Resources.Global.Button_Close</button>
-                 <button type="button" id="btnBack" onclick="location.href='@Url.Content("~/StockTake/StockTakeMasterList")'">
+
+                <button type="button" id="btnAllAdjust" onclick="btnAllAdjusts()">
+                    @Resources.Global.Button_AllAdjust</button>        
+            }
+ @* <button type="button" id="btnClose">
+                @Resources.Global.Button_Close</button>*@
+            <button type="button" id="btnBack" onclick="location.href='@Url.Content("~/StockTake/StockTakeMasterList")'">
                 @Resources.Global.Button_Back</button>
         </div>
     }
 </fieldset>
-
 <script language="javascript" type="text/javascript">
+    function Location_DataBinding(e) {
+        e.data = {
+            region: $("#Region").val(),
+            stNo: $("#StNo").val()
+        };
+    }
 
+    function ExporResultClick() {
+        location.href = '/StockTake/ExportStockResult/?ItemResult=' + $('#ItemResult').val() + '&LocationResult=' + $('#LocationResult').val()
+       + '&IsLoss=' + $("#IsLoss").is(':checked') + '&IsProfit=' + $("#IsProfit").is(':checked')
+       + '&IsBreakEven=' + $("#IsBreakEven").is(':checked') + '&StNo=' + $('#StNo').val();
+    }
     function btnSearchStockTakeResult_Click() {
         var data = {
             "StNo": $("#StNo").val(),
-            "Item": $("#Item").val(),
-            "Location": $("#Location").val(),
+            "ItemResult": $("#ItemResult").val(),
+            "LocationResult": $("#LocationResult").val(),
             "LocationBin": $("#LocationBin").val(),
             "IsLoss": $("#IsLoss").is(':checked'),
             "IsProfit": $("#IsProfit").is(':checked'),
             "IsBreakEven": $("#IsBreakEven").is(':checked'),
             "isFromList": "true",
-            "Status":$("#Status").val(),
+            "Status": $("#Status").val(),
             "IsAdjust": $("#IsAdjust").is(':checked'),
             "IsScanHu": $("#IsScanHu").val()
-        }; 
+        };
 
         $.ajax({
             type: "post",
@@ -167,7 +177,7 @@
         }
         var data = {
             "Ids": Ids,
-            "StNo":$("#StNo").val()
+            "StNo": $("#StNo").val()
         };
         $.ajax({
             type: "Json",
@@ -180,15 +190,15 @@
                 DisplayJsonMessages(data);
                 var data = {
                     "StNo": $("#StNo").val(),
-                    "Item": $("#Item").val(),
-                    "Location": $("#Location").val(),
+                    "ItemResult": $("#ItemResult").val(),
+                    "LocationResult": $("#LocationResult").val(),
                     "IsLoss": $("#IsLoss").is(':checked'),
                     "IsProfit": $("#IsProfit").is(':checked'),
                     "IsBreakEven": $("#IsBreakEven").is(':checked'),
                     "isFromList": "true",
                     "Status": $("#Status").val(),
                     "IsAdjust": $("#IsAdjust").is(':checked'),
-                    "IsScanHu":false
+                    "IsScanHu": false
                 };
 
                 $.ajax({
@@ -206,57 +216,57 @@
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
                 DisplayTextMessages(XMLHttpRequest.responseText);
-                    }
-            
-        });
             }
 
-            function btnAllAdjusts() {
-                debugger
+        });
+    }
+
+    function btnAllAdjusts() {
+        debugger
+        var data = {
+            "StNo": $("#StNo").val()
+        };
+        $.ajax({
+            type: "post",
+            dataType: "Json",
+            url: "/StockTake/_AllAdjust/",
+            data: data,
+            cache: false,
+            success: function (data, textStatus) {
+                ClearMessage();
+                DisplayJsonMessages(data);
                 var data = {
-                    "StNo": $("#StNo").val()
+                    "StNo": $("#StNo").val(),
+                    "ItemResult": $("#ItemResult").val(),
+                    "LocationResult": $("#LocationResult").val(),
+                    "IsLoss": $("#IsLoss").is(':checked'),
+                    "IsProfit": $("#IsProfit").is(':checked'),
+                    "IsBreakEven": $("#IsBreakEven").is(':checked'),
+                    "isFromList": "true",
+                    "Status": $("#Status").val(),
+                    "IsAdjust": $("#IsAdjust").is(':checked'),
+                    "IsScanHu": false
                 };
+
                 $.ajax({
                     type: "post",
-                    dataType: "Json",
-                    url: "/StockTake/_AllAdjust/",
+                    dataType: "html",
+                    url: "/StockTake/_StockTakeResult/",
                     data: data,
                     cache: false,
                     success: function (data, textStatus) {
-                        ClearMessage();
-                        DisplayJsonMessages(data);
-                        var data = {
-                            "StNo": $("#StNo").val(),
-                            "Item": $("#Item").val(),
-                            "Location": $("#Location").val(),
-                            "IsLoss": $("#IsLoss").is(':checked'),
-                            "IsProfit": $("#IsProfit").is(':checked'),
-                            "IsBreakEven": $("#IsBreakEven").is(':checked'),
-                            "isFromList": "true",
-                            "Status": $("#Status").val(),
-                            "IsAdjust": $("#IsAdjust").is(':checked'),
-                            "IsScanHu": false
-                        };
-
-                        $.ajax({
-                            type: "post",
-                            dataType: "html",
-                            url: "/StockTake/_StockTakeResult/",
-                            data: data,
-                            cache: false,
-                            success: function (data, textStatus) {
-                                var tabStrip = $("#TabStrip");
-                                var tabStripContent2 = tabStrip.data("tTabStrip").getContentElement(2);
-                                $(tabStripContent2).html(data);
-                            }
-                        });
-                    },
-                    error: function (XMLHttpRequest, textStatus, errorThrown) {
-                        DisplayTextMessages(XMLHttpRequest.responseText);
+                        var tabStrip = $("#TabStrip");
+                        var tabStripContent2 = tabStrip.data("tTabStrip").getContentElement(2);
+                        $(tabStripContent2).html(data);
                     }
-
                 });
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                DisplayTextMessages(XMLHttpRequest.responseText);
             }
+
+        });
+    }
 
 
     $(document).ready(function () {
@@ -265,7 +275,7 @@
             $("#div_LocationBinDropDownList").hide();
             $("#div_LocationBinDropDownListTitle").hide();
         }
-        if ($("#status").val() == "Close" || $("#status").val()=="InProcess") {
+        if ($("#status").val() == "Close" || $("#status").val() == "InProcess") {
             $("#btnAdjust").hide();
             $("#btnAllAdjust").hide();
             $("#btnClose").hide();

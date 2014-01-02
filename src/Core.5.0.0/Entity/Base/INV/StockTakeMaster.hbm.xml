@@ -6,7 +6,8 @@
         </id>
         <property name="Type" column="Type"  />
         <property name="Region" column="Region" type="String" length="50" />
-        <property name="CostCenter" column="CostCenter" type="String" length="50" />
+		<property name="CostCenter" column="CostCenter" type="String" length="50" />
+		<property name="RefNo" column="RefNo" type="String" length="50" />
         <property name="Status" column="Status"  />
         <property name="IsScanHu" column="IsScanHu" type="Boolean"  />
         <property name="EffectiveDate" column="EffDate" type="DateTime"  />

@@ -603,8 +603,17 @@ namespace com.Sconit.Service.Impl
             return dao.ExecuteUpdateWithNativeQuery(queryString, values, types);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="hql">select i from Item as i where i.Code in(</param>
+        /// <param name="inParam"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
         public IList<T> FindAllIn<T>(string hql, IEnumerable<object> inParam, IEnumerable<object> param = null)
         {
+            inParam = inParam.Where(i => i != null).ToList();
             if (inParam == null || inParam.Count() == 0)
             {
                 return null;
@@ -641,7 +650,12 @@ namespace com.Sconit.Service.Impl
                 hqlStr = hqlStr.Remove(hqlStr.Length - 1, 1);
                 hqlStr.Append(")");
                 paramList.AddRange(batchinParam);
-                tList.AddRange(dao.FindAllWithCustomQuery<T>(hqlStr.ToString(), paramList.ToArray()));
+                //tList.AddRange(dao.FindAllWithCustomQuery<T>(hqlStr.ToString(), paramList.ToArray()));
+                var list = dao.FindAllWithCustomQuery<T>(hqlStr.ToString(), paramList.ToArray());
+                if (list != null)
+                {
+                    tList.AddRange(list);
+                }
             }
             return tList;
         }
@@ -684,7 +698,11 @@ namespace com.Sconit.Service.Impl
                     paramValue.AddRange(values);
                 }
                 paramValue.AddRange(batchinParam);
-                tList.AddRange(dao.FindEntityWithNativeSql<T>(sqlStr.ToString(), paramValue.ToArray()));
+                var list = dao.FindAllWithCustomQuery<T>(sqlStr.ToString(), paramValue.ToArray());
+                if (list != null)
+                {
+                    tList.AddRange(list);
+                }
             }
             return tList;
         }
@@ -728,7 +746,11 @@ namespace com.Sconit.Service.Impl
                     paramValue.AddRange(values);
                 }
                 paramValue.AddRange(batchinParam);
-                tList.AddRange(dao.FindAllWithNativeSql<T>(sqlStr.ToString(), paramValue.ToArray()));
+                var list = dao.FindAllWithCustomQuery<T>(sqlStr.ToString(), paramValue.ToArray());
+                if (list != null)
+                {
+                    tList.AddRange(list);
+                }
             }
             return tList;
         }

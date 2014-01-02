@@ -114,6 +114,7 @@
             </div>
             <div class="search-field">
                 @Html.CheckBox("IsActive", Model.IsActive)
+                @Html.HiddenFor(model => model.Version)
             </div>
         </div>
         <div class="search-footer">

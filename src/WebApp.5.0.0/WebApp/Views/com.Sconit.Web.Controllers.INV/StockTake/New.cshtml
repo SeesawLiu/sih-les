@@ -3,12 +3,11 @@
 @{
     Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_Inventory_StockTake_New" });
 }
-
 @using (Html.BeginForm())
 {
     <fieldset>
         <legend>@Resources.INV.StockTake.StockTakeMaster_New_Title</legend>
-        <div class="editor">          
+        <div class="editor">
             @*<div class="editor-label-2">
                 @Html.LabelFor(model => model.Type)
             </div>
@@ -25,29 +24,32 @@
 
                 @Html.ValidationMessageFor(model => model.Type)
             </div>*@
-             <div class="editor-label-2">
+            <div class="editor-label-2">
                 @Html.LabelFor(model => model.Region)
             </div>
             <div class="editor-field-2">
                 @{
-                    Html.RenderAction("_RegionCombobox", "Common", new
-                    {
-                        controlName = "Region",
-                        selectedValue = Model != null ? Model.Region : string.Empty   
-                    });
+    Html.RenderAction("_RegionCombobox", "Common", new
+    {
+        controlName = "Region",
+        selectedValue = Model != null ? Model.Region : string.Empty
+    });
                 }
-
                 @Html.ValidationMessageFor(model => model.Region)
             </div>
-            
-             <div class="editor-label-2">
+            <div class="editor-label-2">
+                @Html.LabelFor(model => model.RefNo)
+            </div>
+            <div class="editor-field-2">
+                @Html.TextBox("RefNo", Model != null ? Model.RefNo : string.Empty)
+            </div>
+            @*<div class="editor-label-2">
                 @Html.LabelFor(model => model.EffectiveDate)
             </div>
             <div class="editor-field-2">
                 @Html.Telerik().DateTimePickerFor(model => model.EffectiveDate)
                 @Html.ValidationMessageFor(model => model.EffectiveDate)
-            </div>
-            @* <div class="editor-label-2">
+            </div>*@ @* <div class="editor-label-2">
                 @Html.LabelFor(model => model.BaseInventoryDate)
             </div>
             <div class="editor-field-2">
@@ -65,16 +67,49 @@
             <div class="editor-field-2">
                 @Html.TextBox("CostCenter", Model!=null?Model.CostCenter:string.Empty)
             </div>*@
-           
-           
         </div>
         <div class="editor-footer">
-                 @Html.Button(Resources.Global.Button_New, "Url_Inventory_StockTake_New", new Dictionary<string, string>()
+            @Html.Button(Resources.Global.Button_New, "Url_Inventory_StockTake_New", new Dictionary<string, string>()
 	            {
 	                {"type", "submit"},
 	                {"id", "btnNew"},
                     {"needconfirm","true"},
 	            })
+            @Html.Button("备份库存", "", new Dictionary<string, string>()
+	        {
+	            {"type", "button"},
+	            {"id", "btnBackUpInv"},
+                {"needconfirm","true"},
+                {"onclick","BackUpInventoryClick()"}
+	        })
         </div>
     </fieldset>
+    <script type="text/javascript">
+        function BackUpInventoryClick() {
+            $("#btnBackUpInv").attr("disabled", true);
+            var refNo = $("#RefNo").val();
+            if (refNo == null || refNo == "") {
+                $message.error("盘点编号不能为空。");
+                $("#btnBackUpInv").attr("disabled", false);
+                return;
+            }
+            var param = {
+                "refNo": refNo
+            }
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                data: param,
+                url: "/StockTake/BackUpInvenTory/",
+                success: function (data) {
+                    DisplayTextMessages(data);
+                    $("#btnBackUpInv").attr("disabled", false);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    DisplayTextMessages(XMLHttpRequest.responseText);
+                    $("#btnBackUpInv").attr("disabled", false);
+                }
+            });
+        }
+    </script>
 }

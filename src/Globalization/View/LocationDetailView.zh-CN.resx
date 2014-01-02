@@ -177,4 +177,13 @@
   <data name="LocationDetailView_IsCS" xml:space="preserve">
     <value>寄售</value>
   </data>
+  <data name="LocationDetailView_RefNo" xml:space="preserve">
+    <value>盘点编号</value>
+  </data>
+  <data name="LocationDetailView_QualityType" xml:space="preserve">
+    <value>质量类型</value>
+  </data>
+  <data name="LocationDetailView_RefItemCode" xml:space="preserve">
+    <value>旧图号</value>
+  </data>
 </root>

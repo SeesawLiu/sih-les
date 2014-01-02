@@ -1,4 +1,6 @@
 using System;
+using System.ComponentModel.DataAnnotations;
+using com.Sconit.Entity.SYS;
 
 //TODO: Add other using statements here
 
@@ -18,6 +20,30 @@ namespace com.Sconit.Entity.INV
 
         //TODO: Add Non O/R Mapping Properties here. 
 
+        [CodeDetailDescriptionAttribute(CodeMaster = com.Sconit.CodeMaster.CodeMaster.QualityType, ValueField = "QualityType")]
+        [Display(Name = "LocationDetailView_QualityType", ResourceType = typeof(Resources.View.LocationDetailView))]
+        public string QualityTypeDescription { get; set; }
+
+        [Export(ExportName = "ExportStockTakeDetail", ExportSeq = 60)]
+        [Display(Name = "LocationDetailView_IsCS", ResourceType = typeof(Resources.View.LocationDetailView))]
+        public string IsConsigementFromat { get { return this.IsConsigement ? "1" : "0"; } }
+
+        [Export(ExportName = "ExportStockTakeDetail", ExportSeq = 80)]
+        [Display(Name = "StockTakeDetail_Qty", ResourceType = typeof(Resources.INV.StockTake))]
+        public string QtyFormat { 
+            get {
+                return this.Qty != 0 ? this.Qty.ToString() : string.Empty; 
+             }
+        }
+
+        [Export(ExportName = "ExportStockTakeDetail", ExportSeq = 50)]
+        [Display(Name = "LocationDetailView_QualityType", ResourceType = typeof(Resources.View.LocationDetailView))]
+        public string QualityTypeFromat
+        {
+            get { 
+                return  ((int)this.QualityType).ToString();
+            }
+        }
         #endregion
     }
 }

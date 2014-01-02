@@ -592,7 +592,7 @@ using com.Sconit.Utility.Report;
                 {
                     foreach (var stockTakeDetail in insertedStockTakeDetails)
                     {
-                        if (stockTakeDetail.Qty <= 0)
+                        if (stockTakeDetail.Qty < 0)
                         {
                             throw new BusinessException("数量必须大于0");
 
@@ -616,7 +616,7 @@ using com.Sconit.Utility.Report;
                 {
                     foreach (var stockTakeDetail in updatedStockTakeDetails)
                     {
-                        if (stockTakeDetail.Qty <= 0)
+                        if (stockTakeDetail.Qty < 0)
                         {
                             throw new BusinessException("数量必须大于0");
 

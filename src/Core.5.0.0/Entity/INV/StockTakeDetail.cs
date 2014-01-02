@@ -32,7 +32,7 @@ namespace com.Sconit.Entity.INV
         [Display(Name = "StockTakeDetail_Qty", ResourceType = typeof(Resources.INV.StockTake))]
         public string QtyFormat { 
             get {
-                return this.Qty != 0 ? this.Qty.ToString() : string.Empty; 
+                return this.Qty != 0 ? ((Math.Ceiling(this.Qty) == this.Qty && Math.Floor(this.Qty) == this.Qty) ? ((int)this.Qty).ToString() : this.Qty.ToString("0.######")) : string.Empty; 
              }
         }
 
@@ -43,6 +43,11 @@ namespace com.Sconit.Entity.INV
             get { 
                 return  ((int)this.QualityType).ToString();
             }
+        }
+
+        public static bool IsInterate(decimal dl)
+        {
+            return Math.Ceiling(dl) == dl && Math.Floor(dl) == dl;
         }
         #endregion
     }

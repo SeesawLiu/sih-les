@@ -229,7 +229,7 @@ namespace com.Sconit.Service.Impl
         }
 
         [Transaction(TransactionMode.Requires)]
-        public PlanBill LoadPlanBill(string item, string location, string consignmentSupplier, DateTime effectiveDate)
+        public PlanBill LoadPlanBill(string item, string location, string consignmentSupplier, DateTime effectiveDate, bool isInitLoc)
         {
             string uom = null;
             string billAddr = null;
@@ -237,44 +237,64 @@ namespace com.Sconit.Service.Impl
             decimal uc = 1;
             string baseUom = null;
 
-            IList<object[]> parms = this.genericMgr.FindAllWithNativeSql<object[]>(@"select det.Uom, ISNULL(det.BillAddr, mstr.BillAddr) as BillAddr, ISNULL(det.LocTo, mstr.LocTo) as LocTo, det.BillTerm as dBillTerm, mstr.BillTerm as mBillTerm, det.UC, i.Uom
+            if (!isInitLoc)
+            {
+                IList<object[]> parms = this.genericMgr.FindAllWithNativeSql<object[]>(@"select det.Uom, ISNULL(det.BillAddr, mstr.BillAddr) as BillAddr, ISNULL(det.LocTo, mstr.LocTo) as LocTo, det.BillTerm as dBillTerm, mstr.BillTerm as mBillTerm, det.UC, i.Uom
                                                             from SCM_FlowDet as det inner join SCM_FlowMstr as mstr on det.Flow = mstr.Code
                                                             inner join MD_Item as i on det.Item = i.Code
                                                             where det.Item = ? and mstr.PartyFrom = ? and mstr.Type = ? and det.IsActive = ? and mstr.IsActive = ?",
-                                                            new object[] { item, consignmentSupplier, CodeMaster.OrderType.Procurement, true, true });
+                                                                new object[] { item, consignmentSupplier, CodeMaster.OrderType.Procurement, true, true });
 
-            if (parms == null || parms.Count == 0)
-            {
-                //没有采购路线一定不能进行收货结算，否则有可能因为没有合同导致sap无法结算
-                throw new BusinessException("没有找到供应商{0}物料{1}的采购路线，不能出现寄售负数库存。", consignmentSupplier, item);
-                //Item item1 = this.genericMgr.FindById<Item>(item);
-                //uom = item1.Uom;
-                //uc = item1.UnitCount;
-                //baseUom = item1.Uom;
+                if (parms == null || parms.Count == 0)
+                {
+                    //没有采购路线一定不能进行收货结算，否则有可能因为没有合同导致sap无法结算
+                    throw new BusinessException("没有找到供应商{0}物料{1}的采购路线，不能出现寄售负数库存。", consignmentSupplier, item);
+                    //Item item1 = this.genericMgr.FindById<Item>(item);
+                    //uom = item1.Uom;
+                    //uc = item1.UnitCount;
+                    //baseUom = item1.Uom;
 
-                //PartyAddress partyAddress = this.genericMgr.FindAll<PartyAddress>("select pa from PartyAddress as pa inner join pa.Address as a  where pa.Party = ? and a.Type = ?", new object[] { consignmentSupplier, CodeMaster.AddressType.BillAddress }).First();
+                    //PartyAddress partyAddress = this.genericMgr.FindAll<PartyAddress>("select pa from PartyAddress as pa inner join pa.Address as a  where pa.Party = ? and a.Type = ?", new object[] { consignmentSupplier, CodeMaster.AddressType.BillAddress }).First();
 
-                //billAddr = partyAddress.Address.Code;
-                //billTerm = CodeMaster.OrderBillTerm.NA;
+                    //billAddr = partyAddress.Address.Code;
+                    //billTerm = CodeMaster.OrderBillTerm.NA;
+                }
+                else
+                {
+                    object[] parm = parms.Where(p => (string)p[2] == location).FirstOrDefault();
+
+                    if (parm == null)
+                    {
+                        parm = parms.First();
+                    }
+
+                    uom = (string)parm[0];
+                    billAddr = (string)parm[1];
+                    CodeMaster.OrderBillTerm detBillTerm = (CodeMaster.OrderBillTerm)(int.Parse(parm[3].ToString()));
+                    CodeMaster.OrderBillTerm mstrBillTerm = (CodeMaster.OrderBillTerm)(int.Parse(parm[4].ToString()));
+                    //CodeMaster.OrderBillTerm billTerm = detBillTerm != CodeMaster.OrderBillTerm.NA ? detBillTerm : mstrBillTerm;
+                    //指定供应商的一定是寄售结算
+                    billTerm = CodeMaster.OrderBillTerm.OnlineBilling;
+                    uc = (decimal)parm[5];
+                    baseUom = (string)parm[6];
+                }
             }
             else
             {
-                object[] parm = parms.Where(p => (string)p[2] == location).FirstOrDefault();
-
-                if (parm == null)
+                Item itemInstance = this.genericMgr.FindById<Item>(item);
+                PartyAddress pa = this.genericMgr.FindAll<PartyAddress>(
+                    "from PartyAddress as pa join Address as a on pa.Address = a.Code where pa.Party = ? and a.Type = ?", 
+                    new object[] { consignmentSupplier, com.Sconit.CodeMaster.AddressType.BillAddress }).FirstOrDefault();
+                if (pa == null)
                 {
-                    parm = parms.First();
+                    throw new BusinessException("没有找到供应商{0}开票地址，不能出现寄售负数库存。", consignmentSupplier);
                 }
-
-                uom = (string)parm[0];
-                billAddr = (string)parm[1];
-                CodeMaster.OrderBillTerm detBillTerm = (CodeMaster.OrderBillTerm)(int.Parse(parm[3].ToString()));
-                CodeMaster.OrderBillTerm mstrBillTerm = (CodeMaster.OrderBillTerm)(int.Parse(parm[4].ToString()));
-                //CodeMaster.OrderBillTerm billTerm = detBillTerm != CodeMaster.OrderBillTerm.NA ? detBillTerm : mstrBillTerm;
+                uom = itemInstance.Uom;
+                billAddr = pa.Address.Code;
                 //指定供应商的一定是寄售结算
                 billTerm = CodeMaster.OrderBillTerm.OnlineBilling;
-                uc = (decimal)parm[5];
-                baseUom = (string)parm[6];
+                uc = itemInstance.UnitCount;
+                baseUom = itemInstance.Uom;
             }
             PlanBill planBill = this.genericMgr.FindEntityWithNativeSql<PlanBill>("select * from BIL_PlanBill where Item = ? and BillAddr = ? and BillTerm = ?", new object[] { item, billAddr, billTerm }).FirstOrDefault();
 

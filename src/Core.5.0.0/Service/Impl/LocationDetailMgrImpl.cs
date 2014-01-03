@@ -4276,7 +4276,7 @@ namespace com.Sconit.Service.Impl
                     PlanBill planBill = null;
                     if (stockTakeResult.IsConsigement && (!string.IsNullOrWhiteSpace(stockTakeResult.CSSupplier)))
                     {
-                        planBill = this.billMgr.LoadPlanBill(stockTakeResult.Item, stockTakeResult.Location, stockTakeResult.CSSupplier, effectiveDate);
+                        planBill = this.billMgr.LoadPlanBill(stockTakeResult.Item, stockTakeResult.Location, stockTakeResult.CSSupplier, effectiveDate, false);
                     }
 
                     InventoryIO inventoryIO = new InventoryIO();
@@ -4741,7 +4741,7 @@ namespace com.Sconit.Service.Impl
                 {
                     if (string.IsNullOrWhiteSpace(miscOrderDetail.ManufactureParty))
                     {
-                        PlanBill planBill = this.billMgr.LoadPlanBill(miscOrderDetail.Item, string.IsNullOrWhiteSpace(miscOrderDetail.Location) ? miscOrderMaster.Location : miscOrderDetail.Location, string.IsNullOrWhiteSpace(miscOrderDetail.ManufactureParty) ? miscOrderMaster.ManufactureParty : miscOrderDetail.ManufactureParty, miscOrderMaster.EffectiveDate);
+                        PlanBill planBill = this.billMgr.LoadPlanBill(miscOrderDetail.Item, string.IsNullOrWhiteSpace(miscOrderDetail.Location) ? miscOrderMaster.Location : miscOrderDetail.Location, string.IsNullOrWhiteSpace(miscOrderDetail.ManufactureParty) ? miscOrderMaster.ManufactureParty : miscOrderDetail.ManufactureParty, miscOrderMaster.EffectiveDate, false);
 
                         miscOrderLocationDetail.IsCreatePlanBill = true;
                         miscOrderLocationDetail.IsConsignment = true;
@@ -4782,11 +4782,11 @@ namespace com.Sconit.Service.Impl
                 if (miscOrderMaster.Consignment
                     && (!string.IsNullOrWhiteSpace(miscOrderMaster.ManufactureParty) || !string.IsNullOrWhiteSpace(miscOrderDetail.ManufactureParty)))
                 {
-                    planBill = this.billMgr.LoadPlanBill(miscOrderDetail.Item, string.IsNullOrWhiteSpace(miscOrderDetail.Location) ? miscOrderMaster.Location : miscOrderDetail.Location, string.IsNullOrWhiteSpace(miscOrderDetail.ManufactureParty) ? miscOrderMaster.ManufactureParty : miscOrderDetail.ManufactureParty, miscOrderMaster.EffectiveDate);
+                    planBill = this.billMgr.LoadPlanBill(miscOrderDetail.Item, string.IsNullOrWhiteSpace(miscOrderDetail.Location) ? miscOrderMaster.Location : miscOrderDetail.Location, string.IsNullOrWhiteSpace(miscOrderDetail.ManufactureParty) ? miscOrderMaster.ManufactureParty : miscOrderDetail.ManufactureParty, miscOrderMaster.EffectiveDate, false);
                 }
                 else if (miscOrderMaster.MoveType == "999" && !string.IsNullOrWhiteSpace(miscOrderDetail.ManufactureParty))
                 {
-                    planBill = this.billMgr.LoadPlanBill(miscOrderDetail.Item, string.IsNullOrWhiteSpace(miscOrderDetail.Location) ? miscOrderMaster.Location : miscOrderDetail.Location, miscOrderDetail.ManufactureParty, miscOrderMaster.EffectiveDate);
+                    planBill = this.billMgr.LoadPlanBill(miscOrderDetail.Item, string.IsNullOrWhiteSpace(miscOrderDetail.Location) ? miscOrderMaster.Location : miscOrderDetail.Location, miscOrderDetail.ManufactureParty, miscOrderMaster.EffectiveDate, true);
                 }
 
                 InventoryIO inventoryIO = new InventoryIO();
@@ -6652,7 +6652,7 @@ namespace com.Sconit.Service.Impl
                 && !string.IsNullOrWhiteSpace(inventoryIO.ConsignmentSupplier))
             {
                 newLocationLotDetail.ConsignmentSupplier = inventoryIO.ConsignmentSupplier;
-                PlanBill negPlanBill = this.billMgr.LoadPlanBill(inventoryIO.Item, inventoryIO.Location, inventoryIO.ConsignmentSupplier, inventoryIO.EffectiveDate);
+                PlanBill negPlanBill = this.billMgr.LoadPlanBill(inventoryIO.Item, inventoryIO.Location, inventoryIO.ConsignmentSupplier, inventoryIO.EffectiveDate, false);
                 inventoryIO.IsConsignment = true;
                 newLocationLotDetail.IsConsignment = true;
                 inventoryIO.PlanBill = negPlanBill.Id;

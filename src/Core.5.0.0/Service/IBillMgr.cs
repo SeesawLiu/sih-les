@@ -14,6 +14,6 @@ namespace com.Sconit.Service
         BillTransaction VoidSettleBill(ActingBill actingBill, PlanBill planBill, bool IsVoidPlanBill);
         void VoidPlanBill(PlanBill planBill);
         void CancelVoidPlanBill(PlanBill planBill);
-        PlanBill LoadPlanBill(string item, string location, string consignmentSupplier, DateTime effectiveDate);
+        PlanBill LoadPlanBill(string item, string location, string consignmentSupplier, DateTime effectiveDate, bool isInitLoc);
     }
 }

@@ -72,16 +72,28 @@ namespace com.Sconit.Service.SAP.Impl
                         throw new BusinessException("GUID {1}，生产线{0}的映射关系没有维护工厂。", prodLine, guid);
                     }
 
-                    #region 判断是否处于休息时间，休息时间不自动获取生产单
-                    DateTime dateTimeFrom = DateTime.Now;
-                    DateTime dateTimeTo = dateTimeFrom.AddMinutes(1);
-
-                    IList<object[]> obj = this.genericMgr.FindAllWithNativeSql<object[]>("exec USP_Busi_GetWorkingCalendarView ?,?,?,?",
-                        new object[] { productLineMap.ChassisProdLine, null, dateTimeFrom, dateTimeTo },
-                         new IType[] { NHibernateUtil.String, NHibernateUtil.String, NHibernateUtil.DateTime, NHibernateUtil.DateTime });
+                    #region 先获取企业选项，休息日是否可以导入整车生产单
+                    bool importVanProdOrder = bool.Parse(this.systemMgr.GetEntityPreferenceValue(Entity.SYS.EntityPreference.CodeEnum.ImportVanProdOrderInRestTime));
                     #endregion
 
-                    if (obj != null && obj.Count > 0)
+                    #region 判断是否处于休息时间，休息时间不自动获取生产单
+                    if (!importVanProdOrder)
+                    {
+                        DateTime dateTimeFrom = DateTime.Now;
+                        DateTime dateTimeTo = dateTimeFrom.AddMinutes(1);
+
+                        IList<object[]> obj = this.genericMgr.FindAllWithNativeSql<object[]>("exec USP_Busi_GetWorkingCalendarView ?,?,?,?",
+                            new object[] { productLineMap.ChassisProdLine, null, dateTimeFrom, dateTimeTo },
+                             new IType[] { NHibernateUtil.String, NHibernateUtil.String, NHibernateUtil.DateTime, NHibernateUtil.DateTime });
+
+                        if (obj != null && obj.Count > 0)
+                        {
+                            importVanProdOrder = true;
+                        }
+                    }
+                    #endregion
+
+                    if (importVanProdOrder)
                     {
                         //获取待上线底盘生产单数量
                         object submittedOrderCount = this.genericMgr.FindAllWithNativeSql<object>("select count(1) as counter from ORD_OrderMstr_4 WITH(NOLOCK) where Flow = ? and Status = ? and PauseStatus <> ?", new object[] { productLineMap.ChassisProdLine, CodeMaster.OrderStatus.Submit, CodeMaster.PauseStatus.Paused }).SingleOrDefault();

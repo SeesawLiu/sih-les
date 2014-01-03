@@ -46,6 +46,7 @@ namespace com.Sconit.Entity.SYS
             FilterVanLogistic = 11056,
             SystemFlag = 11040,
             DefaultSAPProdLine = 11057,
+            ImportVanProdOrderInRestTime = 11058,
         }
 
         [Display(Name = "EntityPreference_Desc", ResourceType = typeof(Resources.SYS.EntityPreference))]

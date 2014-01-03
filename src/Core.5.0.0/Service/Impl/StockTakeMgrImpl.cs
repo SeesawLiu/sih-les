@@ -2106,7 +2106,7 @@ namespace com.Sconit.Service.Impl
                 throw new BusinessException("导入的模板不正确,盘点单号不一致");
             }
 
-            ImportHelper.JumpRows(rows, 11);
+            ImportHelper.JumpRows(rows, 1);
 
             #region 列定义
             //质量类型	寄售	寄售供应商	盘点数
@@ -2125,7 +2125,7 @@ namespace com.Sconit.Service.Impl
             IList<StockTakeDetail> existsList = this.genericMgr.FindAll<StockTakeDetail>(" from StockTakeDetail as d where d.StNo=?", stNo);
             IList<StockTakeLocation> allLocs = genericMgr.FindAll<StockTakeLocation>(" from StockTakeLocation as s where s.StNo=? ", stNo);
             IList<Item> allItems = genericMgr.FindAll<Item>();
-            int rowCount = 11;
+            int rowCount = 1;
             while (rows.MoveNext())
             {
                 rowCount++;
@@ -2268,13 +2268,21 @@ namespace com.Sconit.Service.Impl
                     string qtyRead = ImportHelper.GetCellStringValue(row.GetCell(colQty));
                     if (string.IsNullOrWhiteSpace(qtyRead))
                     {
-                        stockTakeDetail.Qty = qty;
+                        continue;
                     }
                     else
                     {
                         if (decimal.TryParse(qtyRead, out qty))
                         {
-                            stockTakeDetail.Qty = qty;
+                            if (qty < 0)
+                            {
+                                errorMessage.AddMessage(string.Format("第{0}行：数量{1}不能小于0", rowCount, qty));
+                                continue;
+                            }
+                            else
+                            {
+                                stockTakeDetail.Qty = qty;
+                            }
                         }
                         else
                         {

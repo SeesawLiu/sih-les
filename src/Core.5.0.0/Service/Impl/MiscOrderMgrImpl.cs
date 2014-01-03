@@ -1421,10 +1421,10 @@ namespace com.Sconit.Service.Impl
                     }
                     else
                     {
-                        if (locs.First().Region != miscOrder.Region)
-                        {
-                            businessException.AddMessage(string.Format("第{0}行：指定区域{1}不存在此库位{2}", rowCount, miscOrder.Region, locationCode));
-                        }
+                        //if (locs.First().Region != miscOrder.Region)
+                        //{
+                        //    businessException.AddMessage(string.Format("第{0}行：指定区域{1}不存在此库位{2}", rowCount, miscOrder.Region, locationCode));
+                        //}
                     }
                 }
                 #endregion

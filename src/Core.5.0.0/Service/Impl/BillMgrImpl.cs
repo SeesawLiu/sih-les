@@ -282,15 +282,14 @@ namespace com.Sconit.Service.Impl
             else
             {
                 Item itemInstance = this.genericMgr.FindById<Item>(item);
-                PartyAddress pa = this.genericMgr.FindAll<PartyAddress>(
-                    "from PartyAddress as pa join Address as a on pa.Address = a.Code where pa.Party = ? and a.Type = ?", 
+                string ba = this.genericMgr.FindAllWithNativeSql<string>("select a.Code from MD_Address as a inner join MD_PartyAddr as pa on a.Code = pa.Address where pa.Party = ? and a.Type = ?",
                     new object[] { consignmentSupplier, com.Sconit.CodeMaster.AddressType.BillAddress }).FirstOrDefault();
-                if (pa == null)
+                if (ba == null)
                 {
                     throw new BusinessException("没有找到供应商{0}开票地址，不能出现寄售负数库存。", consignmentSupplier);
                 }
                 uom = itemInstance.Uom;
-                billAddr = pa.Address.Code;
+                billAddr = ba;
                 //指定供应商的一定是寄售结算
                 billTerm = CodeMaster.OrderBillTerm.OnlineBilling;
                 uc = itemInstance.UnitCount;

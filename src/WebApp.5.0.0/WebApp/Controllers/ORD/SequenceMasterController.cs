@@ -1069,7 +1069,7 @@ namespace com.Sconit.Web.Controllers.ORD
                 if (orderMaster.OrderDetails.Count > 0)
                 {
                     PrintOrderMaster printOrderMstr = Mapper.Map<OrderMaster, PrintOrderMaster>(orderMaster);
-                    printOrderMstr.VanNoCount = printOrderMstr.OrderDetails.Select(o => o.ReserveNo).Count() + "";
+                    printOrderMstr.VanNoCount = orderDetails.Select(o => o.ReserveNo).Distinct().Count() + "";
                     IList<object> data = new List<object>();
                     data.Add(printOrderMstr);
                     data.Add(printOrderMstr.OrderDetails);

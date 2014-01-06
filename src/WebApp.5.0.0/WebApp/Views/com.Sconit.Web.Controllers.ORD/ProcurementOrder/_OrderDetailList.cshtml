@@ -71,7 +71,8 @@
     function onLocationFromDataBinding(e) {
         e.data = {
             "Region": $("#PartyFrom").val(),
-            "checkRegion": true
+            "checkRegion": true,
+            "isStockTakeLocation": false
         };
     }
 
@@ -88,7 +89,9 @@
     function onLocationToDataBinding(e) {
         e.data = {
             "Region": $("#PartyTo").val(),
-            "checkRegion": true
+            "checkRegion": true,
+            "isStockTakeLocation": false
+
         };
     }
 

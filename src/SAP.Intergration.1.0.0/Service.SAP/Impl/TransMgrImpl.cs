@@ -136,7 +136,7 @@ namespace com.Sconit.Service.SAP.Impl
                 int maxFailCount = int.Parse(this.systemMgr.GetEntityPreferenceValue(Entity.SYS.EntityPreference.CodeEnum.SAPDataExchangeMaxFailCount));
 
                 IList<Entity.SAP.TRANS.InvTrans> invTransList = this.genericMgr.FindEntityWithNativeSql<Entity.SAP.TRANS.InvTrans>
-                    ("select * from SAP_InvTrans WITH(NOLOCK) where Status = ? or (Status = ? and ErrorCount < ?) order by CreateDate asc",
+                    ("select * from SAP_InvTrans where Status = ? or (Status = ? and ErrorCount < ?) order by CreateDate asc",
                     new object[] { Entity.SAP.StatusEnum.Pending, Entity.SAP.StatusEnum.Fail, maxFailCount });
 
                 #region 分批调用SAP接口
@@ -267,9 +267,9 @@ namespace com.Sconit.Service.SAP.Impl
             TableIndex tableIndex = this.genericMgr.FindById<TableIndex>(Entity.BusinessConstants.TABLEINDEX_MISCORDERMASTER);
 
             //过滤当天冲销的，即状态为Cancel并且关闭日期大于上次更新日期
-            string selectMiscOrderMstrSql = "select top 1 * from ORD_MiscOrderMstr WITH(NOLOCK) where LastModifyDate > ? and MoveType <> '999' and (Status = ? or (Status = ? and CloseDate <= ? )) order by LastModifyDate";
-            string selectMiscOrderDetSql = "select * from ORD_MiscOrderDet WITH(NOLOCK) where MiscOrderNo = ?";
-            string selectMiscOrderLocationDetSql = "select * from ORD_MiscOrderLocationDet WITH(NOLOCK) where MiscOrderNo = ?";
+            string selectMiscOrderMstrSql = "select top 1 * from ORD_MiscOrderMstr where LastModifyDate > ? and MoveType <> '999' and (Status = ? or (Status = ? and CloseDate <= ? )) order by LastModifyDate";
+            string selectMiscOrderDetSql = "select * from ORD_MiscOrderDet where MiscOrderNo = ?";
+            string selectMiscOrderLocationDetSql = "select * from ORD_MiscOrderLocationDet where MiscOrderNo = ?";
 
             object[] pamaDate = new object[] { tableIndex.LastModifyDate, CodeMaster.MiscOrderStatus.Close, CodeMaster.MiscOrderStatus.Cancel, tableIndex.LastModifyDate };
             MiscOrderMaster miscOrderMaster = this.genericMgr.FindEntityWithNativeSql<MiscOrderMaster>(selectMiscOrderMstrSql, pamaDate).SingleOrDefault();
@@ -289,7 +289,7 @@ namespace com.Sconit.Service.SAP.Impl
         {
             DateTime dateTimeNow = DateTime.Now;
             var tableIndex = this.genericMgr.FindById<TableIndex>(Entity.BusinessConstants.TABLEINDEX_LOCATIONTRANSACTION);
-            string sql = "select top " + InBatch + " * from VIEW_LocTrans WITH(NOLOCK) where Id > ? order by Id ";
+            string sql = "select top " + InBatch + " * from VIEW_LocTrans where Id > ? order by Id ";
             IList<LocationTransaction> transList = this.genericMgr.FindEntityWithNativeSql<LocationTransaction>(sql, tableIndex.Id);
 
             while (transList != null && transList.Count() > 0)
@@ -421,7 +421,7 @@ namespace com.Sconit.Service.SAP.Impl
                         invTrans.XBLNR = locTrans.ReceiptNo;
                         invTrans.XABLN = locTrans.IpNo;
                         //2013-10-16以后不再传322了，而是根据收货明细中的IsInspect字段来判断，并记录到INSMK=2
-                        //ReceiptDetail receipDetail = genericMgr.FindEntityWithNativeSql<ReceiptDetail>("select * from ORD_RecDet_1 WITH(NOLOCK) where Id = ?", locTrans.ReceiptDetailId).Single();
+                        //ReceiptDetail receipDetail = genericMgr.FindEntityWithNativeSql<ReceiptDetail>("select * from ORD_RecDet_1 where Id = ?", locTrans.ReceiptDetailId).Single();
                         //if (receipDetail.IsInspect)
                         //    invTrans.INSMK = "2";
                         //else

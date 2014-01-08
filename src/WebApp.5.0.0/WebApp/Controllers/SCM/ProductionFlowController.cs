@@ -713,6 +713,7 @@ namespace com.Sconit.Web.Controllers.SCM
                 {
                     for (int i = 0; i < shiftDet.Count;i++ )
                     {
+                        
                         var det=shiftDet[i];
                         DateTime prevTime = this.ParseDateTime(det.StartTime, windowTime);
                         DateTime nextTime = this.ParseDateTime(det.EndTime, windowTime);
@@ -1010,7 +1011,8 @@ namespace com.Sconit.Web.Controllers.SCM
                                 string leadTimeRead = ImportHelper.GetCellStringValue(row.GetCell(colleadTime));
                                 leadTime = Convert.ToDecimal(leadTimeRead);
                                 flowStrategy.LeadTime = leadTime;
-                                flowStrategy.ShipOrderTime = GetShipOrderTime(windowTime, Convert.ToDouble(leadTime)*60, regionCode, flowStrategy.CalculateType);
+                                if (windowTime <= windowTime.Date.AddHours(8) && windowTime >= windowTime.Date) { windowTime = windowTime.AddDays(-1); }
+                                flowStrategy.ShipOrderTime = GetShipOrderTime(windowTime, Convert.ToDouble(leadTime) * 60, regionCode, flowStrategy.CalculateType);
                                 //IList<WorkingCalendarView> workingCalendarViewList = this.workingCalendarMgr.GetWorkingCalendarView(regionCode, windowTime.Add(TimeSpan.FromDays(-7)), windowTime);
                                 //flowStrategy.ShipOrderTime = this.workingCalendarMgr.GetStartTimeAtWorkingDate(windowTime, Convert.ToDouble(leadTime), CodeMaster.TimeUnit.Hour, regionCode, workingCalendarViewList);
                             }
@@ -1029,6 +1031,7 @@ namespace com.Sconit.Web.Controllers.SCM
                             {
                                 winTimeDiff = Convert.ToDecimal(ImportHelper.GetCellStringValue(row.GetCell(colWinTimeDiff)));
                                 flowStrategy.WinTimeDiff = winTimeDiff;
+                                if (windowTime <= windowTime.Date.AddHours(8) && windowTime >= windowTime.Date) { windowTime = windowTime.AddDays(-1); }
                                 flowStrategy.ReqStartTime = GetShipOrderTime(windowTime, Convert.ToDouble(winTimeDiff) * 60, regionCode, flowStrategy.CalculateType);
                                 //IList<WorkingCalendarView> workingCalendarViewList = this.workingCalendarMgr.GetWorkingCalendarView(regionCode, windowTime, windowTime.Add(TimeSpan.FromDays(7)));
                                 //flowStrategy.ShipOrderTime = this.workingCalendarMgr.GetStartTimeAtWorkingDate(windowTime, Convert.ToDouble(-winTimeDiff), CodeMaster.TimeUnit.Hour, regionCode, workingCalendarViewList);
@@ -1073,6 +1076,7 @@ namespace com.Sconit.Web.Controllers.SCM
                             }
                             #endregion
 
+                            if (windowTime <= windowTime.Date.AddHours(8) && windowTime >= windowTime.Date) { windowTime = windowTime.AddDays(-1); }
                             flowStrategy.ReqEndTime = GetShipOrderTime(windowTime, Convert.ToDouble(flowStrategy.WinTimeDiff + flowStrategy.SafeTime) * 60, regionCode, flowStrategy.CalculateType);
                         }
 

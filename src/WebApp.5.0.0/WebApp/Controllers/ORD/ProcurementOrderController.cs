@@ -1407,7 +1407,8 @@
 
             GridCommand command = new GridCommand();
             command.Page = 1;
-            command.PageSize = (int)procedureSearchStatementModel.PageParameters[2].Parameter;
+            //command.PageSize = (int)procedureSearchStatementModel.PageParameters[2].Parameter;
+            command.PageSize = 65530;
             procedureSearchStatementModel.PageParameters[3].Parameter = 1;
             GridModel<object[]> gridModel = GetAjaxPageDataProcedure<object[]>(procedureSearchStatementModel, command);
 

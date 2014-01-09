@@ -18,7 +18,7 @@ CREATE PROCEDURE [dbo].[USP_LE_SpecifySequenceOrderCSSupplier]
 AS
 BEGIN
 	set nocount on
-	create table #tempSeqOrderDet
+	create table #tempSeqOrderDet2   --把临时表的名称改为2，因为和USP_LE_MakeupSequenceOrder的存储过程临时表名称冲突
 	(
 		RowId int identity(1, 1),
 		TraceCode varchar(50), 
@@ -61,14 +61,14 @@ BEGIN
 	begin try
 		-------------------↓按Van号分组-----------------------
 		--指定供应商的放前面，优先分配
-		insert into #tempSeqOrderDet(TraceCode, Item, LocFrom, ManufactureParty, OrderQty)
+		insert into #tempSeqOrderDet2(TraceCode, Item, LocFrom, ManufactureParty, OrderQty)
 		select det.ReserveNo, det.Item, det.LocFrom, det.ManufactureParty, SUM(det.OrderQty)
 		from ORD_OrderDet_2 as det 
 		where det.OrderNo = @OrderNo and det.OrderQty > 0 and det.ManufactureParty is not null
 		group by det.ReserveNo, det.ReserveLine, det.Item, det.LocFrom, det.ManufactureParty
 		order by det.ReserveLine
 		
-		insert into #tempSeqOrderDet(TraceCode, Item, LocFrom, OrderQty)
+		insert into #tempSeqOrderDet2(TraceCode, Item, LocFrom, OrderQty)
 		select det.ReserveNo, det.Item, det.LocFrom, SUM(det.OrderQty)
 		from ORD_OrderDet_2 as det 
 		where det.OrderNo = @OrderNo and det.OrderQty > 0 and det.ManufactureParty is null
@@ -76,11 +76,11 @@ BEGIN
 		order by det.ReserveLine
 		-------------------↑按Van号分组-----------------------
 		
-		if exists(select top 1 1 from #tempSeqOrderDet)
+		if exists(select top 1 1 from #tempSeqOrderDet2)
 		begin
 			-------------------↓获取库存明细-----------------------
 			declare @Statement nvarchar(4000) 
-			insert into #tempLocFrom(LocFrom) select distinct LocFrom from #tempSeqOrderDet
+			insert into #tempLocFrom(LocFrom) select distinct LocFrom from #tempSeqOrderDet2
 			declare @LocFromRowId int
 			declare @MaxLocFromRowId int
 			select @LocFromRowId = MIN(RowId), @MaxLocFromRowId = MAX(RowId) from #tempLocFrom
@@ -102,7 +102,7 @@ BEGIN
 					set @Statement = @Statement + ' select MIN(Id) as Id, Item, Location, SUM(Qty) as Qty, CSSupplier from INV_LocationLotDet_' + CASE WHEN ISNULL(@PartSuffix, '') = '' THEN '0' ELSE @PartSuffix END + ' where Location = ''' + @LocFrom + ''' and Qty > 0 and OccupyType = 0 and IsATP = 1'
 				end
 				
-				insert into #tempItem(Item) select distinct Item from #tempSeqOrderDet where LocFrom = @LocFrom
+				insert into #tempItem(Item) select distinct Item from #tempSeqOrderDet2 where LocFrom = @LocFrom
 				declare @ItemRowId int
 				declare @MaxItemRowId int
 				select @ItemRowId = MIN(RowId), @MaxItemRowId = MAX(RowId) from #tempItem
@@ -137,7 +137,7 @@ BEGIN
 				select det.Item, det.LocFrom, det.ICHARG, SUM(det.OrderQty - det.ShipQty) 
 				from ORD_OrderDet_2 as det 
 				inner join ORD_OrderMstr_2 as mstr on mstr.OrderNo = @OrderNo
-				inner join (select distinct Item, LocFrom from #tempSeqOrderDet) as t on det.Item = t.Item and det.LocFrom = t.LocFrom
+				inner join (select distinct Item, LocFrom from #tempSeqOrderDet2) as t on det.Item = t.Item and det.LocFrom = t.LocFrom
 				where det.OrderNo <> @OrderNo and mstr.OrderStrategy = 4 
 					and mstr.[Status] in (1, 2) and mstr.SubType = 0 and det.OrderQty > det.ShipQty
 				group by det.Item, det.LocFrom, det.ICHARG
@@ -168,7 +168,7 @@ BEGIN
 					declare @RowId int
 					declare @MaxRowId int
 					
-					select @RowId = MIN(RowId), @MaxRowId = MAX(RowId) from #tempSeqOrderDet
+					select @RowId = MIN(RowId), @MaxRowId = MAX(RowId) from #tempSeqOrderDet2
 					
 					while @RowId <= @MaxRowId
 					begin
@@ -181,7 +181,7 @@ BEGIN
 						declare @LocationLotDetId int = null
 					
 						select @TraceCode = TraceCode, @SeqDetItem = Item, @SeqDetLocFrom = LocFrom, @ManufactureParty = ManufactureParty, @OrderQty = OrderQty 
-						from #tempSeqOrderDet where RowId = @RowId
+						from #tempSeqOrderDet2 where RowId = @RowId
 					
 						if (ISNULL(@ManufactureParty, '') <> '')
 						begin  --指定供应商
@@ -243,7 +243,7 @@ BEGIN
 		RAISERROR(@Msg, 16, 1) 
 	end catch
 	
-	drop table #tempSeqOrderDet
+	drop table #tempSeqOrderDet2
 	drop table #tempOccupyOrderDet
 	drop table #tempLocFrom
 	drop table #tempItem

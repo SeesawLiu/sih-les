@@ -58,7 +58,7 @@ BEGIN
 		
 		UPDATE od SET od.ExtNo=c.EBELN,od.ExtSeq=c.EBELP,
 			od.BillAddrDesc=c.MESSAGE,
-			od.BillTerm=CASE WHEN c.Status=1 AND c.MESSAGE<>'' THEN 3 ELSE 1 END
+			od.BillTerm=CASE WHEN c.Status=1 AND c.MESSAGE=2 THEN 3 ELSE 1 END
 		FROM ORD_OrderDet_1 od INNER JOIN #Temp_CRSL c ON od.Id=c.OrderDetId
 		
 		IF @Trancount = 0 

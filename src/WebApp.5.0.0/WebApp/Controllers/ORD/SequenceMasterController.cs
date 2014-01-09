@@ -877,7 +877,7 @@ namespace com.Sconit.Web.Controllers.ORD
         {
             string[] orderNoArray = orderNos.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             string hqlMstr = "select om from OrderMaster om where OrderNo in(?";
-            string hqlDet = "select  det.Seq,det.OrderNo,det.Item,det.ItemDesc,det.RefItemCode,det.ManufactureParty,det.Uom,det.BinTo,det.StartDate,det.ReqQty,det.ReserveNo,det.ReserveLine ,det.OrderQty,ce.ZENGINE from ORD_OrderDet_2 as det with(nolock) left join CUST_EngineTrace as ce with(nolock) on ce.TraceCode=det.ReserveNo where det.OrderNo in(?";
+            string hqlDet = "select  det.Seq,det.OrderNo,det.Item,det.ItemDesc,det.RefItemCode,det.ManufactureParty,det.Uom,det.BinTo,det.StartDate,det.ReqQty,det.ReserveNo,det.ReserveLine ,det.OrderQty,ce.ZENGINE,det.IsIncludeTax,det.IsProvEst from ORD_OrderDet_2 as det with(nolock) left join CUST_EngineTrace as ce with(nolock) on ce.TraceCode=det.ReserveNo where det.OrderNo in(?";
             List<object> paras = new List<object>();
             List<object> parasDet = new List<object>();
             paras.Add(orderNoArray[0]);
@@ -913,14 +913,16 @@ namespace com.Sconit.Web.Controllers.ORD
                                        ReserveNo = (string)tak[10],
                                        ReserveLine = (string)tak[11],
                                        OrderedQty = (decimal)tak[12],
-                                       ZENGINE = (string)tak[13], 
+                                       ZENGINE = (string)tak[13],
+                                       IsIncludeTax = (bool)tak[14],
+                                       IsProvisionalEstimate = (bool)tak[15], 
                                    }).ToList();
 
             StringBuilder printUrls = new StringBuilder();
             foreach (var orderMaster in orderMasterList)
             {
                 var printDetails = orderDetailList.Where(o => o.OrderNo == orderMaster.OrderNo).OrderBy(o=>o.Sequence).ToList();
-                if (!string.IsNullOrWhiteSpace(orderMaster.OrderTemplate))
+                if (!string.IsNullOrWhiteSpace(orderMaster.OrderTemplate) && orderMaster.OrderTemplate == "KitOrder.xls")
                 {
                     //printDetails = printDetails.OrderBy(o => o.ZOPID).ThenBy(o=>o.Item).ToList();
                     var pp = (from tak in printDetails

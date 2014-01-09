@@ -1390,24 +1390,29 @@ namespace com.Sconit.Web.Controllers.ORD
         }
 
         [SconitAuthorize(Permissions = "Url_OrderMstr_Production_Import")]
-        public ActionResult ConditionImportSapOrders(DateOption? dateOption, string sapOrderTypeList, DateTime? dateFrom, DateTime? dateTo, string mrpCtrlList)
+        public ActionResult ConditionImportSapOrders(DateOption? dateOption,string sapOrderNo, string sapOrderType, DateTime? dateFrom, DateTime? dateTo, string mrpCtrl,string prodLine)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(sapOrderTypeList))
-                {
-                    throw new BusinessException("请选择Sap生产单类型。");
-                }
-                if (!dateOption.HasValue)
-                {
-                    throw new BusinessException("请选择日期选项。");
-                }
-                if (!dateFrom.HasValue)
-                {
-                    throw new BusinessException("开始日期不能为空。");
-                }
+                #region
+                //if (string.IsNullOrWhiteSpace(sapOrderTypeList))
+                //{
+                //    throw new BusinessException("请选择Sap生产单类型。");
+                //}
+                //if (!dateOption.HasValue)
+                //{
+                //    throw new BusinessException("请选择日期选项。");
+                //}
+                //if (!dateFrom.HasValue)
+                //{
+                //    throw new BusinessException("开始日期不能为空。");
+                //}
                 if (dateOption == DateOption.BT)
                 {
+                    if (!dateFrom.HasValue)
+                    {
+                        throw new BusinessException("开始日期不能为空。");
+                    }
                     if (!dateTo.HasValue)
                     {
                         throw new BusinessException("结束日期不能为空。");
@@ -1417,17 +1422,17 @@ namespace com.Sconit.Web.Controllers.ORD
                         throw new BusinessException("开始日期不能大于结束日期。");
                     }
                 }
-                if (string.IsNullOrWhiteSpace(mrpCtrlList))
-                {
-                    throw new BusinessException("MRP控制者不能为空。");
-                }
+                //if (string.IsNullOrWhiteSpace(mrpCtrlList))
+                //{
+                //    throw new BusinessException("MRP控制者不能为空。");
+                //}
+                #endregion
                 com.Sconit.Entity.ACC.User user = SecurityContextHolder.Get();
                 SAPService.SAPService sapService = new SAPService.SAPService();
                 sapService.Url = ReplaceSIServiceUrl(sapService.Url);
                 sapService.Timeout = int.Parse(SIService_TimeOut);
-                var returnMsgList = sapService.GetProductOrder2("0084", sapOrderTypeList.Split(',').ToArray(), dateOption.Value,
-                                                               dateFrom, dateTo,
-                                                               new[] { mrpCtrlList }, user.Code);
+                dateOption=dateOption==null?DateOption.EQ:dateOption;
+                var returnMsgList = sapService.GetProductOrder2("0084", sapOrderNo,sapOrderType, dateOption.Value,dateFrom, dateTo,mrpCtrl,prodLine, user.Code);
                 if (returnMsgList != null && returnMsgList.Count() > 0)
                 {
                     foreach (var s in returnMsgList)
@@ -1452,6 +1457,165 @@ namespace com.Sconit.Web.Controllers.ORD
             return Json(null);
         }
 
+        [SconitAuthorize(Permissions = "Url_OrderMstr_Production_Import")]
+        public ActionResult ConditionImportSapOrderByExcel(IEnumerable<HttpPostedFileBase> attachments)
+        {
+            try
+            {
+                com.Sconit.Entity.ACC.User user = SecurityContextHolder.Get();
+                SAPService.SAPService sapService = new SAPService.SAPService();
+                sapService.Url = ReplaceSIServiceUrl(sapService.Url);
+                sapService.Timeout = int.Parse(SIService_TimeOut);
+               
+                foreach (var file in attachments)
+                {
+
+                    #region 导入数据
+                    if (file.InputStream.Length == 0)
+                    {
+                        throw new BusinessException("Import.Stream.Empty");
+                    }
+
+                    HSSFWorkbook workbook = new HSSFWorkbook(file.InputStream);
+
+                    ISheet sheet = workbook.GetSheetAt(0);
+                    IEnumerator rows = sheet.GetRowEnumerator();
+
+                    ImportHelper.JumpRows(rows, 10);
+                    
+                    #region 列定义
+                    int colSapOrderNo = 1;//SAP生产单号
+                    int colSapOrderType = 2;//Sap生产单类型
+                    int colProdLine = 3;//生产线
+                    int colMrpCtrl = 4;// MRP控制者
+                    int colDateOption = 5;// 日期选项
+                    int colDateFrom = 6;//开始日期
+                    int colDateTo = 7;//结束日期
+                    #endregion
+
+                    int rowCount = 10;
+
+                    while (rows.MoveNext())
+                    {
+
+                        rowCount++;
+
+                        HSSFRow row = (HSSFRow)rows.Current;
+                        if (!ImportHelper.CheckValidDataRow(row, 0, 8))
+                        {
+                            break;
+                        }
+                        #region 读取数据
+                        string sapOrderNo = string.Empty;
+                        string sapOrderType = string.Empty;
+                        string prodLine = string.Empty;
+                        string mrpCtrl = string.Empty;
+                        DateOption? dateOption = null;
+                        DateTime? dateFrom = null;
+                        DateTime? dateTo = null;
+
+                        sapOrderNo = ImportHelper.GetCellStringValue(row.GetCell(colSapOrderNo));
+                        /*"Z901=整车,
+                            Z902=面向库存,
+                            Z903=备件,
+                            Z90R=返工,
+                            ZP01=试制"
+                            */
+                        sapOrderType = ImportHelper.GetCellStringValue(row.GetCell(colSapOrderType));
+                        prodLine = ImportHelper.GetCellStringValue(row.GetCell(colProdLine));
+                        mrpCtrl = ImportHelper.GetCellStringValue(row.GetCell(colMrpCtrl));
+                        /*"EQ=等于,
+                        GT=大于,
+                        GE=大于等于,
+                        LT=小于,
+                        LE=小于等于,
+                        BT=大于等于且小于等于"
+                        */
+                        string reaDateOption = ImportHelper.GetCellStringValue(row.GetCell(colDateOption));
+                        if (!string.IsNullOrWhiteSpace(reaDateOption))
+                        {
+                            switch (reaDateOption)
+                            {
+                                case "EQ":
+                                    dateOption = com.Sconit.Web.SAPService.DateOption.EQ;
+                                    break;
+                                case "GT":
+                                    dateOption = com.Sconit.Web.SAPService.DateOption.GT;
+                                    break;
+                                case "GE":
+                                    dateOption = com.Sconit.Web.SAPService.DateOption.GE;
+                                    break;
+                                case "LT":
+                                    dateOption = com.Sconit.Web.SAPService.DateOption.LT;
+                                    break;
+                                case "LE":
+                                    dateOption = com.Sconit.Web.SAPService.DateOption.LE;
+                                    break;
+                                case "BT":
+                                    dateOption = com.Sconit.Web.SAPService.DateOption.BT;
+                                    break;
+                                default:
+                                    dateOption = com.Sconit.Web.SAPService.DateOption.EQ;
+                                    break;
+                            }
+                        }
+                       string readdateFrom = ImportHelper.GetCellStringValue(row.GetCell(colDateFrom));
+                       if (!string.IsNullOrWhiteSpace(readdateFrom))
+                       {
+                           DateTime dt = System.DateTime.Now;
+                           if (DateTime.TryParse(readdateFrom, out dt))
+                           {
+                               dateFrom = dt;
+                           }
+                       }
+
+                       string readdateTo = ImportHelper.GetCellStringValue(row.GetCell(colDateTo));
+                       if (!string.IsNullOrWhiteSpace(readdateTo))
+                       {
+                           DateTime dt = System.DateTime.Now;
+                           if (DateTime.TryParse(readdateTo, out dt))
+                           {
+                               dateTo = dt;
+                           }
+                       }
+                        #endregion
+
+                       try
+                       {
+                           var returnMsgList = sapService.GetProductOrder2("0084", sapOrderNo, sapOrderType, dateOption.Value, dateFrom, dateTo, mrpCtrl, prodLine, user.Code);
+                           if (returnMsgList != null && returnMsgList.Count() > 0)
+                           {
+                               foreach (var s in returnMsgList)
+                               {
+                                   SaveSuccessMessage(string.Format("第{0}行导入成功，{1}", rowCount, s));
+                               }
+                           }
+                           else
+                           {
+                               SaveSuccessMessage(string.Format("第{0}行导入成功。", rowCount));
+                           }
+                       }
+                       catch (Exception e)
+                       {
+                           SaveErrorMessage(string.Format("第{0}行导入失败。{1}", rowCount,e.Message));
+                           continue;
+                       }
+                    }
+
+                    #endregion
+                }
+                
+            }
+            catch (BusinessException ex)
+            {
+                SaveBusinessExceptionMessage(ex);
+            }
+            catch (Exception ex)
+            {
+                SaveErrorMessage("导入失败。 - " + ex.Message);
+            }
+            return Content(string.Empty);
+        }
         #endregion
 
         #region sequece import

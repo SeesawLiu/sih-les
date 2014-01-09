@@ -400,32 +400,39 @@ namespace com.Sconit.Service.FIS
                             }
                             else
                             {
-                                #region 不存在，将数据插入到中间表
-                                newMSDatFile = this.GetWMSDatFile(line, fileName);
-                                this.genericMgr.Create(newMSDatFile);
-
-                                //如果是退货单明细，则直接收货
-                                int orderDetailId = 0;
                                 try
                                 {
-                                    orderDetailId = Convert.ToInt32(newMSDatFile.WmsLine);
-                                }
-                                catch
-                                {
-                                    continue;
-                                }
-                                OrderDetail orderDetail = this.genericMgr.FindById<OrderDetail>(orderDetailId);
-                                if (orderDetail != null)
-                                {
-                                    OrderMaster orderMstr = this.genericMgr.FindById<OrderMaster>(orderDetail.OrderNo);
-                                    if (orderMstr != null)
+                                    #region 不存在，将数据插入到中间表
+                                    newMSDatFile = this.GetWMSDatFile(line, fileName);
+                                    this.genericMgr.Create(newMSDatFile);
+
+                                    //如果是退货单明细，则直接收货
+                                    int orderDetailId = 0;
+                                    try
                                     {
-                                        if (orderMstr.SubType == CodeMaster.OrderSubType.Return)
-                                            orderMgr.ReceiveWMSIpMaster(newMSDatFile);
+                                        orderDetailId = Convert.ToInt32(newMSDatFile.WmsLine);
                                     }
+                                    catch
+                                    {
+                                        continue;
+                                    }
+                                    OrderDetail orderDetail = this.genericMgr.FindById<OrderDetail>(orderDetailId);
+                                    if (orderDetail != null)
+                                    {
+                                        OrderMaster orderMstr = this.genericMgr.FindById<OrderMaster>(orderDetail.OrderNo);
+                                        if (orderMstr != null)
+                                        {
+                                            if (orderMstr.SubType == CodeMaster.OrderSubType.Return)
+                                                orderMgr.ReceiveWMSIpMaster(newMSDatFile);
+                                        }
+                                    }
+                                    continue;
+                                    #endregion
                                 }
-                                continue;
-                                #endregion
+                                catch (Exception e)
+                                {
+                                    throw new BusinessException(e.Message);
+                                }
                             }
                             #endregion
                         }

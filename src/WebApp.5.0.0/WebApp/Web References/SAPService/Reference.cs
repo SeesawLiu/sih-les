@@ -41,6 +41,8 @@ namespace com.Sconit.Web.SAPService {
         
         private System.Threading.SendOrPostCallback ExchangeMoveTypeOperationCompleted;
         
+        private System.Threading.SendOrPostCallback ReExchangeMoveTypeOperationCompleted;
+        
         private System.Threading.SendOrPostCallback AutoCreateVanOrderOperationCompleted;
         
         private System.Threading.SendOrPostCallback UpdateVanOrderOperationCompleted;
@@ -67,7 +69,11 @@ namespace com.Sconit.Web.SAPService {
         
         private System.Threading.SendOrPostCallback CreateSAPScheduleLineFromLesOperationCompleted;
         
+        private System.Threading.SendOrPostCallback CRSLSummaryFromLesOperationCompleted;
+        
         private System.Threading.SendOrPostCallback GetCurrentVanOrderOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback BackflushProductionOrderOperationCompleted;
         
         private bool useDefaultCredentialsSetExplicitly;
         
@@ -123,6 +129,9 @@ namespace com.Sconit.Web.SAPService {
         public event ExchangeMoveTypeCompletedEventHandler ExchangeMoveTypeCompleted;
         
         /// <remarks/>
+        public event ReExchangeMoveTypeCompletedEventHandler ReExchangeMoveTypeCompleted;
+        
+        /// <remarks/>
         public event AutoCreateVanOrderCompletedEventHandler AutoCreateVanOrderCompleted;
         
         /// <remarks/>
@@ -162,7 +171,13 @@ namespace com.Sconit.Web.SAPService {
         public event CreateSAPScheduleLineFromLesCompletedEventHandler CreateSAPScheduleLineFromLesCompleted;
         
         /// <remarks/>
+        public event CRSLSummaryFromLesCompletedEventHandler CRSLSummaryFromLesCompleted;
+        
+        /// <remarks/>
         public event GetCurrentVanOrderCompletedEventHandler GetCurrentVanOrderCompleted;
+        
+        /// <remarks/>
+        public event BackflushProductionOrderCompletedEventHandler BackflushProductionOrderCompleted;
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://com.Sconit.WebService.SAP.SAPService/ImportItem", RequestNamespace="http://com.Sconit.WebService.SAP.SAPService/", ResponseNamespace="http://com.Sconit.WebService.SAP.SAPService/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
@@ -311,6 +326,34 @@ namespace com.Sconit.Web.SAPService {
             if ((this.ExchangeMoveTypeCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.ExchangeMoveTypeCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://com.Sconit.WebService.SAP.SAPService/ReExchangeMoveType", RequestNamespace="http://com.Sconit.WebService.SAP.SAPService/", ResponseNamespace="http://com.Sconit.WebService.SAP.SAPService/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public void ReExchangeMoveType(string userCode) {
+            this.Invoke("ReExchangeMoveType", new object[] {
+                        userCode});
+        }
+        
+        /// <remarks/>
+        public void ReExchangeMoveTypeAsync(string userCode) {
+            this.ReExchangeMoveTypeAsync(userCode, null);
+        }
+        
+        /// <remarks/>
+        public void ReExchangeMoveTypeAsync(string userCode, object userState) {
+            if ((this.ReExchangeMoveTypeOperationCompleted == null)) {
+                this.ReExchangeMoveTypeOperationCompleted = new System.Threading.SendOrPostCallback(this.OnReExchangeMoveTypeOperationCompleted);
+            }
+            this.InvokeAsync("ReExchangeMoveType", new object[] {
+                        userCode}, this.ReExchangeMoveTypeOperationCompleted, userState);
+        }
+        
+        private void OnReExchangeMoveTypeOperationCompleted(object arg) {
+            if ((this.ReExchangeMoveTypeCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.ReExchangeMoveTypeCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -676,35 +719,39 @@ namespace com.Sconit.Web.SAPService {
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://com.Sconit.WebService.SAP.SAPService/GetProductOrder2", RequestNamespace="http://com.Sconit.WebService.SAP.SAPService/", ResponseNamespace="http://com.Sconit.WebService.SAP.SAPService/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public string[] GetProductOrder2(string plant, string[] sapOrderTypeList, DateOption dateOption, [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)] System.Nullable<System.DateTime> dateFrom, [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)] System.Nullable<System.DateTime> dateTo, string[] mrpCtrlList, string userCode) {
+        public string[] GetProductOrder2(string plant, string sapOrderNo, string sapOrderType, DateOption dateOption, [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)] System.Nullable<System.DateTime> dateFrom, [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)] System.Nullable<System.DateTime> dateTo, string mrpCtrl, string prodLine, string userCode) {
             object[] results = this.Invoke("GetProductOrder2", new object[] {
                         plant,
-                        sapOrderTypeList,
+                        sapOrderNo,
+                        sapOrderType,
                         dateOption,
                         dateFrom,
                         dateTo,
-                        mrpCtrlList,
+                        mrpCtrl,
+                        prodLine,
                         userCode});
             return ((string[])(results[0]));
         }
         
         /// <remarks/>
-        public void GetProductOrder2Async(string plant, string[] sapOrderTypeList, DateOption dateOption, System.Nullable<System.DateTime> dateFrom, System.Nullable<System.DateTime> dateTo, string[] mrpCtrlList, string userCode) {
-            this.GetProductOrder2Async(plant, sapOrderTypeList, dateOption, dateFrom, dateTo, mrpCtrlList, userCode, null);
+        public void GetProductOrder2Async(string plant, string sapOrderNo, string sapOrderType, DateOption dateOption, System.Nullable<System.DateTime> dateFrom, System.Nullable<System.DateTime> dateTo, string mrpCtrl, string prodLine, string userCode) {
+            this.GetProductOrder2Async(plant, sapOrderNo, sapOrderType, dateOption, dateFrom, dateTo, mrpCtrl, prodLine, userCode, null);
         }
         
         /// <remarks/>
-        public void GetProductOrder2Async(string plant, string[] sapOrderTypeList, DateOption dateOption, System.Nullable<System.DateTime> dateFrom, System.Nullable<System.DateTime> dateTo, string[] mrpCtrlList, string userCode, object userState) {
+        public void GetProductOrder2Async(string plant, string sapOrderNo, string sapOrderType, DateOption dateOption, System.Nullable<System.DateTime> dateFrom, System.Nullable<System.DateTime> dateTo, string mrpCtrl, string prodLine, string userCode, object userState) {
             if ((this.GetProductOrder2OperationCompleted == null)) {
                 this.GetProductOrder2OperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetProductOrder2OperationCompleted);
             }
             this.InvokeAsync("GetProductOrder2", new object[] {
                         plant,
-                        sapOrderTypeList,
+                        sapOrderNo,
+                        sapOrderType,
                         dateOption,
                         dateFrom,
                         dateTo,
-                        mrpCtrlList,
+                        mrpCtrl,
+                        prodLine,
                         userCode}, this.GetProductOrder2OperationCompleted, userState);
         }
         
@@ -744,6 +791,34 @@ namespace com.Sconit.Web.SAPService {
         }
         
         /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://com.Sconit.WebService.SAP.SAPService/CRSLSummaryFromLes", RequestNamespace="http://com.Sconit.WebService.SAP.SAPService/", ResponseNamespace="http://com.Sconit.WebService.SAP.SAPService/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public void CRSLSummaryFromLes(string userCode) {
+            this.Invoke("CRSLSummaryFromLes", new object[] {
+                        userCode});
+        }
+        
+        /// <remarks/>
+        public void CRSLSummaryFromLesAsync(string userCode) {
+            this.CRSLSummaryFromLesAsync(userCode, null);
+        }
+        
+        /// <remarks/>
+        public void CRSLSummaryFromLesAsync(string userCode, object userState) {
+            if ((this.CRSLSummaryFromLesOperationCompleted == null)) {
+                this.CRSLSummaryFromLesOperationCompleted = new System.Threading.SendOrPostCallback(this.OnCRSLSummaryFromLesOperationCompleted);
+            }
+            this.InvokeAsync("CRSLSummaryFromLes", new object[] {
+                        userCode}, this.CRSLSummaryFromLesOperationCompleted, userState);
+        }
+        
+        private void OnCRSLSummaryFromLesOperationCompleted(object arg) {
+            if ((this.CRSLSummaryFromLesCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.CRSLSummaryFromLesCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://com.Sconit.WebService.SAP.SAPService/GetCurrentVanOrder", RequestNamespace="http://com.Sconit.WebService.SAP.SAPService/", ResponseNamespace="http://com.Sconit.WebService.SAP.SAPService/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
         public void GetCurrentVanOrder(string plant, string sapOrderNo, string prodlLine, string userCode) {
             this.Invoke("GetCurrentVanOrder", new object[] {
@@ -774,6 +849,34 @@ namespace com.Sconit.Web.SAPService {
             if ((this.GetCurrentVanOrderCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.GetCurrentVanOrderCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://com.Sconit.WebService.SAP.SAPService/BackflushProductionOrder", RequestNamespace="http://com.Sconit.WebService.SAP.SAPService/", ResponseNamespace="http://com.Sconit.WebService.SAP.SAPService/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public void BackflushProductionOrder(string userCode) {
+            this.Invoke("BackflushProductionOrder", new object[] {
+                        userCode});
+        }
+        
+        /// <remarks/>
+        public void BackflushProductionOrderAsync(string userCode) {
+            this.BackflushProductionOrderAsync(userCode, null);
+        }
+        
+        /// <remarks/>
+        public void BackflushProductionOrderAsync(string userCode, object userState) {
+            if ((this.BackflushProductionOrderOperationCompleted == null)) {
+                this.BackflushProductionOrderOperationCompleted = new System.Threading.SendOrPostCallback(this.OnBackflushProductionOrderOperationCompleted);
+            }
+            this.InvokeAsync("BackflushProductionOrder", new object[] {
+                        userCode}, this.BackflushProductionOrderOperationCompleted, userState);
+        }
+        
+        private void OnBackflushProductionOrderOperationCompleted(object arg) {
+            if ((this.BackflushProductionOrderCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.BackflushProductionOrderCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -823,6 +926,8 @@ namespace com.Sconit.Web.SAPService {
         private string bESKZField;
         
         private string sOBSLField;
+        
+        private string eXTWGField;
         
         /// <remarks/>
         public string Code {
@@ -921,6 +1026,16 @@ namespace com.Sconit.Web.SAPService {
             }
             set {
                 this.sOBSLField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string EXTWG {
+            get {
+                return this.eXTWGField;
+            }
+            set {
+                this.eXTWGField = value;
             }
         }
     }
@@ -2078,6 +2193,10 @@ namespace com.Sconit.Web.SAPService {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    public delegate void ReExchangeMoveTypeCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
     public delegate void AutoCreateVanOrderCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
     
     /// <remarks/>
@@ -2284,7 +2403,15 @@ namespace com.Sconit.Web.SAPService {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    public delegate void CRSLSummaryFromLesCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
     public delegate void GetCurrentVanOrderCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    public delegate void BackflushProductionOrderCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
 }
 
 #pragma warning restore 1591

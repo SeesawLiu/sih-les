@@ -222,12 +222,12 @@
         }
 
         [WebMethod]
-        public List<string> GetProductOrder2(string plant, List<string> sapOrderTypeList, DateOption dateOption, DateTime? dateFrom, DateTime? dateTo, List<string> mrpCtrlList, string userCode)
+        public List<string> GetProductOrder2(string plant, string sapOrderNo, string sapOrderType, DateOption dateOption, DateTime? dateFrom, DateTime? dateTo, string mrpCtrl, string prodLine, string userCode)
         {
             try
             {
                 SecurityContextHolder.Set(securityMgr.GetUser(userCode));
-                return (List<string>)productionMgr.GetProductOrder(plant, sapOrderTypeList, dateOption, dateFrom, dateTo, mrpCtrlList);
+                return (List<string>)productionMgr.GetProductOrder(plant, sapOrderNo, sapOrderType, dateOption, dateFrom, dateTo, mrpCtrl, prodLine);
             }
             catch (BusinessException ex)
             {

@@ -673,7 +673,7 @@ namespace com.Sconit.Service.SAP.Impl
             {
                 try
                 {
-                    IList<int> batchNoList = GetProductOrder(plant, sapOrderNoList, null, DateOption.EQ, null, null, null,null);
+                    IList<int> batchNoList = GetProductOrder(plant, sapOrderNoList, null, DateOption.EQ, null, null, null);
 
                     foreach (int batchNo in batchNoList)
                     {
@@ -718,13 +718,13 @@ namespace com.Sconit.Service.SAP.Impl
             }
         }
 
-        public IList<string> GetProductOrder(string plant, string sapOrderNo, string sapOrderType, DateOption dateOption, DateTime? dateFrom, DateTime? dateTo, string mrpCtrl, string prodLine)
+        public IList<string> GetProductOrder(string plant, IList<string> sapOrderTypeList, DateOption dateOption, DateTime? dateFrom, DateTime? dateTo, IList<string> mrpCtrlList)
         {
             lock (GetProductOrderLock)
             {
                 try
                 {
-                    IList<int> batchNoList = GetProductOrder(plant, new[] { sapOrderNo }, new[] { sapOrderType }, dateOption, dateFrom, dateTo, new[] { mrpCtrl },prodLine);
+                    IList<int> batchNoList = GetProductOrder(plant, null, sapOrderTypeList, dateOption, dateFrom, dateTo, mrpCtrlList);
 
                     foreach (int batchNo in batchNoList)
                     {
@@ -769,7 +769,7 @@ namespace com.Sconit.Service.SAP.Impl
             }
         }
 
-        private IList<int> GetProductOrder(string plant, IList<string> sapOrderNoList, IList<string> sapOrderTypeList, DateOption dateOption, DateTime? dateFrom, DateTime? dateTo, IList<string> mrpCtrlList,string prodLine)
+        private IList<int> GetProductOrder(string plant, IList<string> sapOrderNoList, IList<string> sapOrderTypeList, DateOption dateOption, DateTime? dateFrom, DateTime? dateTo, IList<string> mrpCtrlList)
         {
             log.DebugFormat("开始获取非整车生产订单，工厂{0}", plant);
             ZHEAD[] orderHeadAry = null;
@@ -868,7 +868,7 @@ namespace com.Sconit.Service.SAP.Impl
 
                 string returnMessage = null;
                 log.DebugFormat("连接WebService获取非整车订单，工厂{0}。", plant);
-                orderHeadAry = soService.MI_PO_LES(AUFNR, DAUAT, DISPO, GSTRS, plant, "", prodLine, out orderOpAry, out orderBomAry, out returnMessage);
+                orderHeadAry = soService.MI_PO_LES(AUFNR, DAUAT, DISPO, GSTRS, plant, "", "", out orderOpAry, out orderBomAry, out returnMessage);
 
                 if (!string.IsNullOrWhiteSpace(returnMessage))
                 {

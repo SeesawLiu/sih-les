@@ -17,7 +17,8 @@ BEGIN
 		SET @BakDate=DATEADD(DAY,-1,GETDATE())
 
 		--¹éµµBom
-		WHILE EXISTS(SELECT top 1 1 FROM ORD_OrderBomDet obd
+		DECLARE @COUNT INT = 1
+		WHILE @COUNT < 1000 AND EXISTS(SELECT top 1 1 FROM ORD_OrderBomDet obd
 		INNER JOIN ORD_OrderMstr_4 om on om.OrderNo=obd.OrderNo 
 		WHERE om.ProdLineType in (1,2,3,4,9) --AND om.CloseDate < @BakDate
 		AND NOT EXISTS(SELECT * FROM ORD_OrderMstr_4 b WHERE om.TraceCode=b.TraceCode AND b.Status<>4))
@@ -25,8 +26,10 @@ BEGIN
 			DELETE TOP(10000) obd OUTPUT deleted.* 
 			INTO Sconit5_Arch.dbo.ORD_OrderBomDet FROM ORD_OrderBomDet obd 
 			INNER JOIN ORD_OrderMstr_4 om on om.OrderNo=obd.OrderNo 
-			WHERE om.ProdLineType in (1,2,3,4,9) AND om.CloseDate < @BakDate
+			WHERE om.ProdLineType in (1,2,3,4,9) --AND om.CloseDate < @BakDate
 			AND NOT EXISTS(SELECT * FROM ORD_OrderMstr_4 b WHERE om.TraceCode=b.TraceCode AND b.Status<>4)
+			
+			SET @COUNT = @COUNT + 1
 		END
 		
 		

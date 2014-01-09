@@ -273,6 +273,62 @@
         }
         #endregion
 
+        #region 获取CKD生产单
+        [WebMethod]
+        public List<string> GetCKDProductOrder(string plant, List<string> sapOrderNoList, string sapProdLine, string sapOrderType, string userCode)
+        {
+            try
+            {
+                SecurityContextHolder.Set(securityMgr.GetUser(userCode));
+                return (List<string>)productionMgr.GetCKDProductOrder(plant, sapOrderNoList, sapProdLine, sapOrderType);
+            }
+            catch (BusinessException ex)
+            {
+                List<string> errorMsgList = new List<string>();
+                foreach (Message message in ex.GetMessages())
+                {
+                    errorMsgList.Add(message.GetMessageString());
+                }
+                return errorMsgList;
+            }
+            catch (Exception ex)
+            {
+                List<string> errorMsgList = new List<string>();
+                errorMsgList.Add(string.Format("获取CKD生产单失败，错误消息为：{0}。", ex.Message));
+
+                return errorMsgList;
+            }
+        }
+
+        [WebMethod]
+        public List<string> GetSingleCKDProductOrder(string plant, string sapOrderNo, string sapProdLine, string sapOrderType, string userCode)
+        {
+            try
+            {
+                SecurityContextHolder.Set(securityMgr.GetUser(userCode));
+                IList<string> sapOrderNoList = new List<string>();
+                sapOrderNoList.Add(sapOrderNo);
+                return (List<string>)productionMgr.GetCKDProductOrder(plant, sapOrderNoList, sapProdLine, sapOrderType);
+            }
+            catch (BusinessException ex)
+            {
+                List<string> errorMsgList = new List<string>();
+                foreach (Message message in ex.GetMessages())
+                {
+                    errorMsgList.Add(message.GetMessageString());
+                }
+                return errorMsgList;
+            }
+            catch (Exception ex)
+            {
+                List<string> errorMsgList = new List<string>();
+                errorMsgList.Add(string.Format("获取CKD生产单失败，错误消息为：{0}。", ex.Message));
+
+                return errorMsgList;
+            }
+        }
+        #endregion
+
         #region 自制件物料反冲
         [WebMethod]
         public void BackflushProductionOrder(string userCode)

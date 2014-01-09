@@ -999,6 +999,16 @@ namespace com.Sconit.Service.SAP.Impl
                 throw new BusinessException("获取CKD生产单出现异常，异常信息：{0}。", errorMessage);
             }
 
+            #region 批量设置生产单头的SAP生产订单号，因为SAP返回生产订单号分为子母订单
+            if (orderHeadAry != null && orderHeadAry.Count() > 0)
+            {
+                foreach (com.Sconit.Service.SAP.MI_PO_LES.ZHEAD orderHead in orderHeadAry)
+                {
+                    orderHead.AUFNR = sapOrderNo;
+                }
+            }
+            #endregion
+
             #region 批量设置Op的SAP生产订单号，因为SAP返回生产订单号分为子母订单
             if (orderOpAry != null && orderOpAry.Count() > 0)
             {

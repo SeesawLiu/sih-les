@@ -906,37 +906,22 @@ namespace com.Sconit.Service.SAP.Impl
         #endregion
 
         #region 获取CKD生产单
-        public IList<string> GetCKDProductOrder(string plant, IList<string> sapOrderNoList, string sapProdLine, string sapOrderType)
+        public IList<string> GetCKDProductOrder(string plant, string sapOrderNo, string sapProdLine, string sapOrderType)
         {
             lock (GetProductOrderLock)
             {
                 try
                 {
-                    IList<int> batchNoList = DoGetCKDProductOrder(plant, sapOrderNoList, sapProdLine, sapOrderType);
+                    int batchNo = DoGetCKDProductOrder(plant, sapOrderNo, sapProdLine, sapOrderType);
 
-                    foreach (int batchNo in batchNoList)
-                    {
-                        log.DebugFormat("开始生成CKD生产单, BatchNo {0}", batchNo);
-                        User user = SecurityContextHolder.Get();
-                        this.genericMgr.UpdateWithNativeQuery("exec USP_Busi_GenProductOrder ?,?,?", new object[] { batchNo, user.Id, user.FullName });
-                        log.DebugFormat("结束生成CKD生产单, BatchNo {0}", batchNo);
-                    }
+                    log.DebugFormat("开始生成CKD生产单, BatchNo {0}", batchNo);
+                    User user = SecurityContextHolder.Get();
+                    this.genericMgr.UpdateWithNativeQuery("exec USP_Busi_GenProductOrder ?,?,?", new object[] { batchNo, user.Id, user.FullName });
+                    log.DebugFormat("结束生成CKD生产单, BatchNo {0}", batchNo);
 
-                    string sql = string.Empty;
+                    string sql = "select Msg from LOG_GenProductOrder where BatchNo = ?";
                     IList<object> parms = new List<object>();
-                    foreach (int batchNo in batchNoList)
-                    {
-                        if (sql == string.Empty)
-                        {
-                            sql = "select Msg from LOG_GenProductOrder where BatchNo in (?";
-                        }
-                        else
-                        {
-                            sql += ",?";
-                        }
-                        parms.Add(batchNo);
-                    }
-                    sql += ")";
+                    parms.Add(batchNo);
 
                     return this.genericMgr.FindAllWithNativeSql<string>(sql, parms.ToArray());
                 }
@@ -957,7 +942,7 @@ namespace com.Sconit.Service.SAP.Impl
             }
         }
 
-        private IList<int> DoGetCKDProductOrder(string plant, IList<string> sapOrderNoList, string sapProdLine, string sapOrderType)
+        private int DoGetCKDProductOrder(string plant, string sapOrderNo, string sapProdLine, string sapOrderType)
         {
             log.DebugFormat("开始获取CKD生产单，工厂{0}，产线{1}，订单类型{2}。", plant, sapProdLine, sapOrderType);
             ZHEAD[] orderHeadAry = null;
@@ -971,18 +956,11 @@ namespace com.Sconit.Service.SAP.Impl
                 soService.Url = ReplaceSAPServiceUrl(soService.Url);
 
                 #region 生产订单号
-                ZRANGE_AUFNR[] AUFNR = new ZRANGE_AUFNR[sapOrderNoList != null ? sapOrderNoList.Count() : 0];
-                if (sapOrderNoList != null && sapOrderNoList.Count() > 0)
-                {
-                    for (int i = 0; i < sapOrderNoList.Count(); i++)
-                    {
-                        string sapOrderNo = sapOrderNoList[i];
-                        AUFNR[i] = new ZRANGE_AUFNR();
-                        AUFNR[i].SIGN = "I";
-                        AUFNR[i].OPTION = "EQ";
-                        AUFNR[i].LOW = sapOrderNo;
-                    }
-                }
+                ZRANGE_AUFNR[] AUFNR = new ZRANGE_AUFNR[1];
+                AUFNR[0] = new ZRANGE_AUFNR();
+                AUFNR[0].SIGN = "I";
+                AUFNR[0].OPTION = "EQ";
+                AUFNR[0].LOW = sapOrderNo;
                 #endregion
 
                 #region 订单类型
@@ -993,9 +971,17 @@ namespace com.Sconit.Service.SAP.Impl
                 DAUAT[0].LOW = sapOrderType;
                 #endregion
 
+                #region 计划开始日期
+                ZRANGE_GSTRS[] GSTRS = new ZRANGE_GSTRS[0];
+                #endregion
+
+                #region MRP控制者
+                ZRANGE_DISPO[] DISPO = new ZRANGE_DISPO[0];
+                #endregion
+
                 string returnMessage = null;
                 log.DebugFormat("连接WebService获取CKD生产单，工厂{0}，产线{1}，订单类型{2}。", plant, sapProdLine, sapOrderType);
-                orderHeadAry = soService.MI_PO_LES(AUFNR, DAUAT, null, null, plant, "", sapProdLine, out orderOpAry, out orderBomAry, out returnMessage);
+                orderHeadAry = soService.MI_PO_LES(AUFNR, DAUAT, DISPO, GSTRS, plant, "", sapProdLine, out orderOpAry, out orderBomAry, out returnMessage);
 
                 if (!string.IsNullOrWhiteSpace(returnMessage))
                 {
@@ -1013,22 +999,29 @@ namespace com.Sconit.Service.SAP.Impl
                 throw new BusinessException("获取CKD生产单出现异常，异常信息：{0}。", errorMessage);
             }
 
-            var aufnrCollection = orderHeadAry.Select(oh => oh.AUFNR);
-            IList<int> batchNoList = new List<int>();
-            foreach (string AUFNR in aufnrCollection)
+            #region 批量设置Op的SAP生产订单号，因为SAP返回生产订单号分为子母订单
+            if (orderOpAry != null && orderOpAry.Count() > 0)
             {
-                int batchNo = 0;
-                //如果是试制订单要用batchno来比较，2013-10-14
-                ZHEAD[] toInsertedAry = orderHeadAry.Where(oh => oh.AUFNR == AUFNR).ToArray();
-
-                if (toInsertedAry[0].DAUAT == "ZP01" || toInsertedAry[0].DAUAT == "ZP02")
-                    batchNo = InsertTmpTable(toInsertedAry, orderOpAry.Where(oo => oo.AUFNR == AUFNR).ToArray(), orderBomAry.Where(ob => ob.BATCH == AUFNR.Substring(2, AUFNR.Length - 2)).ToArray());
-                else
-                    batchNo = InsertTmpTable(toInsertedAry, orderOpAry.Where(oo => oo.AUFNR == AUFNR).ToArray(), orderBomAry.Where(ob => ob.AUFNR == AUFNR).ToArray());
-                batchNoList.Add(batchNo);
+                foreach (com.Sconit.Service.SAP.MI_PO_LES.ZITEM_LX orderOp in orderOpAry)
+                {
+                    orderOp.AUFNR = sapOrderNo;
+                }
             }
+            #endregion
 
-            return batchNoList;
+            #region 批量设置Bom的SAP生产订单号，因为SAP返回生产订单号分为子母订单
+            if (orderBomAry != null && orderBomAry.Count() > 0)
+            {
+                foreach (com.Sconit.Service.SAP.MI_PO_LES.ZITEM_ZJ orderBom in orderBomAry)
+                {
+                    orderBom.AUFNR = sapOrderNo;
+                }
+            }
+            #endregion
+
+            int batchNo = InsertTmpTable(orderHeadAry, orderOpAry, orderBomAry);
+            this.genericMgr.UpdateWithNativeQuery("exec USP_Busi_OffsetNegativeBom ?", batchNo);
+            return batchNo;
         }
         #endregion
 

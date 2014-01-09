@@ -1322,7 +1322,7 @@ BEGIN
 					rollback
 				end 
 		        
-				set @Msg = Error_Message() + N'（排序组' + @SeqGroup + N'整车生产线' + @ProdLine + N' Van号）'
+				set @Msg = Error_Message() + N'（排序组' + @SeqGroup + N'整车生产线' + @ProdLine + N' Van号' + @TraceCode + N'）'
 				insert into #tempMsg(Lvl, Msg) values(1, @Msg)
 			end catch
 	

@@ -21,7 +21,7 @@ namespace com.Sconit.Service.SAP
 
         IList<string> GetProductOrder(string plant, IList<string> sapOrderNoList);
 
-        IList<string> GetProductOrder(string plant, IList<string> sapOrderTypeList, DateOption dateOption, DateTime? dateFrom, DateTime? dateTo, IList<string> mrpCtrlList);
+        IList<string> GetProductOrder(string plant, string sapOrderNo, string sapOrderType, DateOption dateOption, DateTime? dateFrom, DateTime? dateTo, string mrpCtrl, string prodLine);
 
         void BackflushProductionOrder();
     }

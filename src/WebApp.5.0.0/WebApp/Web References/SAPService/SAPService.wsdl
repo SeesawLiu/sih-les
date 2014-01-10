@@ -411,13 +411,11 @@
         <s:complexType>
           <s:sequence>
             <s:element minOccurs="0" maxOccurs="1" name="plant" type="s:string" />
-            <s:element minOccurs="0" maxOccurs="1" name="sapOrderNo" type="s:string" />
-            <s:element minOccurs="0" maxOccurs="1" name="sapOrderType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sapOrderTypeList" type="tns:ArrayOfString" />
             <s:element minOccurs="1" maxOccurs="1" name="dateOption" type="tns:DateOption" />
             <s:element minOccurs="1" maxOccurs="1" name="dateFrom" nillable="true" type="s:dateTime" />
             <s:element minOccurs="1" maxOccurs="1" name="dateTo" nillable="true" type="s:dateTime" />
-            <s:element minOccurs="0" maxOccurs="1" name="mrpCtrl" type="s:string" />
-            <s:element minOccurs="0" maxOccurs="1" name="prodLine" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="mrpCtrlList" type="tns:ArrayOfString" />
             <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
           </s:sequence>
         </s:complexType>
@@ -471,6 +469,24 @@
       </s:element>
       <s:element name="GetCurrentVanOrderResponse">
         <s:complexType />
+      </s:element>
+      <s:element name="GetCKDProductOrder">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="plant" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sapOrderNo" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sapProdLine" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sapOrderType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetCKDProductOrderResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetCKDProductOrderResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
       </s:element>
       <s:element name="BackflushProductionOrder">
         <s:complexType>
@@ -610,6 +626,12 @@
   <wsdl:message name="GetCurrentVanOrderSoapOut">
     <wsdl:part name="parameters" element="tns:GetCurrentVanOrderResponse" />
   </wsdl:message>
+  <wsdl:message name="GetCKDProductOrderSoapIn">
+    <wsdl:part name="parameters" element="tns:GetCKDProductOrder" />
+  </wsdl:message>
+  <wsdl:message name="GetCKDProductOrderSoapOut">
+    <wsdl:part name="parameters" element="tns:GetCKDProductOrderResponse" />
+  </wsdl:message>
   <wsdl:message name="BackflushProductionOrderSoapIn">
     <wsdl:part name="parameters" element="tns:BackflushProductionOrder" />
   </wsdl:message>
@@ -700,6 +722,10 @@
     <wsdl:operation name="GetCurrentVanOrder">
       <wsdl:input message="tns:GetCurrentVanOrderSoapIn" />
       <wsdl:output message="tns:GetCurrentVanOrderSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCKDProductOrder">
+      <wsdl:input message="tns:GetCKDProductOrderSoapIn" />
+      <wsdl:output message="tns:GetCKDProductOrderSoapOut" />
     </wsdl:operation>
     <wsdl:operation name="BackflushProductionOrder">
       <wsdl:input message="tns:BackflushProductionOrderSoapIn" />
@@ -890,6 +916,15 @@
     </wsdl:operation>
     <wsdl:operation name="GetCurrentVanOrder">
       <soap:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/GetCurrentVanOrder" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCKDProductOrder">
+      <soap:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/GetCKDProductOrder" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -1091,6 +1126,15 @@
     </wsdl:operation>
     <wsdl:operation name="GetCurrentVanOrder">
       <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/GetCurrentVanOrder" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCKDProductOrder">
+      <soap12:operation soapAction="http://com.Sconit.WebService.SAP.SAPService/GetCKDProductOrder" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

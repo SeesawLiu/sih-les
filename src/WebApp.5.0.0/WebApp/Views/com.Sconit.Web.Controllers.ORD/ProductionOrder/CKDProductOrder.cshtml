@@ -1,0 +1,85 @@
+﻿@model com.Sconit.Entity.ORD.OrderMaster
+@{
+    Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_OrderMstr_Production_CKDProductOrder" });
+
+}
+
+@using (Html.BeginForm("ImportSapOrder", "ProductionOrder"))
+{
+    <fieldset>
+        <div class="editor">
+            <div class="editor-label-2">
+                <label>
+                    Sap生产单号
+                </label>
+            </div>
+            <div class="editor-field-2">
+                @Html.TextBox("SapOrderNo")
+            </div>
+             <div class="editor-label-2">
+                <label>
+                    Ssp生产线
+                </label>
+            </div>
+            <div class="editor-field-2">
+                @Html.TextBox("SapProdLine")
+            </div>
+            <div class="editor-label-2">
+                <label>
+                    @Resources.Global.SapOrderType
+                </label>
+            </div>
+            <div class="editor-field-2">
+                @Html.TextBox("SapOrderType")
+            </div>
+            <div class="search-label">
+                <label>
+                    <a href='/Resource/Templates/UploadTemplate/CKDProductOrderImport.xls'>模板下载</a>
+                </label>
+            </div>
+            <div class="search-field">
+                     @(Html.Telerik().Upload()
+                    .Name("attachments")
+                    .Multiple(false)
+                    .Async(async => async
+                                        .Save("GetCKDProductOrderByExcel", "ProductionOrder")
+                    .AutoUpload(true))
+                    .ClientEvents(e => e.OnSuccess("TelerikonUpload_OnSuccess")))
+            </div>
+        </div>
+        <div class="editor-footer">
+            @Html.Button(Resources.Global.Button_Import, "Url_OrderMstr_Production_CKDProductOrder", new Dictionary<string, string>()
+	{
+	    {"type", "button"},
+	    {"id", "btnImport"},
+        {"needconfirm","true"},
+        {"onclick","onBatchImport()"}
+	})
+        </div>
+        <script type="text/javascript">
+            function onBatchImport() {
+                ClearMessage();
+                var data = {
+                    "SapOrderNo": $("#SapOrderNo").val(),
+                    "SapProdLine": $("#SapProdLine").val(),
+                    "SapOrderType": $("#SapOrderType").val()
+                };
+                $.ajax({
+                    type: "Post",
+                    dataType: "json",
+                    data: data,
+                    url: "/ProductionOrder/GetCKDProductOrder/",
+                    cache: false,
+                    success: function (data, textStatus) {
+                        DisplayJsonMessages(data);
+                        $('#content').find('input').val('');
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        DisplayTextMessages(XMLHttpRequest.responseText);
+                    }
+                });
+            }
+        </script>
+    </fieldset>
+   
+}

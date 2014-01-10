@@ -3,46 +3,45 @@
     Html.RenderAction("_SiteMapPath", "Common", new { MenuContent = "Url_OrderMstr_Production_ConditionImport" });
 
 }
-@*<script src="@Url.Content("~/Scripts/jquery.ui.core.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.ui.core.min.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/jquery.ui.widget.min.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/jquery.multiselect.js")" type="text/javascript"></script>
-<link href="@Url.Content("~/Content/jqueryui/jquery-ui.min.css")" rel="stylesheet" type="text/css" />
-<link href="@Url.Content("~/Content/jqueryui/jquery.multiselect.css")" rel="stylesheet" type="text/css" />*@
+<link href="@Url.Content("~/Content/jqueryui/jquery.multiselect.css")" rel="stylesheet" type="text/css" />
 <script type="text/javascript">
-    //    $(function () {
-    //        $('#MultiSapOrderTypeList').multiselect({
-    //            noneSelectedText: "选择SAP生产单类型...",
-    //            selectedText: "已选#个SAP生产单类型",
-    //            checkAllText: "全选",
-    //            uncheckAllText: "取消全选",
-    //            selectedList: 3,
-    //            click: function (event, ui) {
-    //                $('#SapOrderTypeList').attr("value", getMultiSapOrderTypes());
-    //            },
-    //            checkAll: function () {
-    //                $('#SapOrderTypeList').attr("value", getMultiSapOrderTypes());
-    //            },
-    //            uncheckAll: function () {
-    //                $('#SapOrderTypeList').attr("value", getMultiSapOrderTypes());
-    //            }
-    //        });
-    //    });
+    $(function () {
+        $('#MultiSapOrderTypeList').multiselect({
+            noneSelectedText: "选择SAP生产单类型...",
+            selectedText: "已选#个SAP生产单类型",
+            checkAllText: "全选",
+            uncheckAllText: "取消全选",
+            selectedList: 3,
+            click: function (event, ui) {
+                $('#SapOrderTypeList').attr("value", getMultiSapOrderTypes());
+            },
+            checkAll: function () {
+                $('#SapOrderTypeList').attr("value", getMultiSapOrderTypes());
+            },
+            uncheckAll: function () {
+                $('#SapOrderTypeList').attr("value", getMultiSapOrderTypes());
+            }
+        });
+    });
 
-    //    function getMultiSapOrderTypes() {
-    //        var m = "";
-    //        var array_of_checked_values = $("#MultiSapOrderTypeList").multiselect("getChecked").map(function () {
-    //            return this.value;
-    //        }).get();
-    //        if (array_of_checked_values != null) {
-    //            if (array_of_checked_values.length > 0) {
-    //                m = array_of_checked_values[0];
-    //                for (var i = 1; i < array_of_checked_values.length; i++) {
-    //                    m = m + "," + array_of_checked_values[i];
-    //                };
-    //            }
-    //        }
-    //        return m;
-    //    }
+    function getMultiSapOrderTypes() {
+        var m = "";
+        var array_of_checked_values = $("#MultiSapOrderTypeList").multiselect("getChecked").map(function () {
+            return this.value;
+        }).get();
+        if (array_of_checked_values != null) {
+            if (array_of_checked_values.length > 0) {
+                m = array_of_checked_values[0];
+                for (var i = 1; i < array_of_checked_values.length; i++) {
+                    m = m + "," + array_of_checked_values[i];
+                };
+            }
+        }
+        return m;
+    }
 
     function CodeMaster_Change(e) {
         if (e.value == '@com.Sconit.CodeMaster.DateOption.BT') {
@@ -59,58 +58,19 @@
         <div class="editor">
             <div class="editor-label-2">
                 <label>
-                    @Resources.ORD.OrderMaster.OrderMaster_ExternalOrderNo_Sap
-                </label>
-            </div>
-            <div class="editor-field-2">
-                @Html.TextBox("SapOrderNo")
-            </div>
-            <div class="editor-label-2">
-                <label>
                     @Resources.Global.SapOrderType
                 </label>
             </div>
             <div class="editor-field-2">
-                @*@{
+                @{
     Html.RenderAction("_CodeMasterMultiSelectBox", "Common", new
-                {
-                    code = com.Sconit.CodeMaster.CodeMaster.SapOrderType,
-                    controlName = "MultiSapOrderTypeList",
-                    controlId = "MultiSapOrderTypeList"
-                });
+                                                                 {
+                                                                     code = com.Sconit.CodeMaster.CodeMaster.SapOrderType,
+                                                                     controlName = "MultiSapOrderTypeList",
+                                                                     controlId = "MultiSapOrderTypeList"
+                                                                 });
                 }
                 @Html.Hidden("SapOrderTypeList")
-                @{
-    Html.RenderAction("_CodeMasterDropDownList", "Common", new
-    {
-        code = com.Sconit.CodeMaster.CodeMaster.SapOrderType,
-        controlName = "SapOrderType",
-        includeBlankOption = true,
-        blankOptionDescription = com.Sconit.Entity.SYS.CodeDetail.SpecialValueEnum.BlankValue,
-        blankOptionValue = "",
-        selectedValue = string.Empty
-    });
-                }*@
-                @Html.TextBox("SapOrderType")
-            </div>
-            <div class="search-label">
-                <label for="OrderMaster_Flow">
-                   @* @Resources.ORD.OrderMaster.OrderMaster_Flow_Production*@
-                   SAP生产线
-                </label>
-            </div>
-            <div class="search-field">
-                @Html.TextBox("ProdLine")
-               @* @{
-    Html.RenderAction("_FlowComboBox", "Common",
-        new
-        {
-            controlName = "ProdLine",
-            type = (int)com.Sconit.CodeMaster.OrderType.Production,
-            isVanOrder = false,
-            selectedValue = string.Empty
-        });
-                }*@
             </div>
             <div class="editor-label-2">
                 <label>
@@ -154,21 +114,7 @@
                 </label>
             </div>
             <div class="editor-field-2">
-                @Html.TextBox("MrpCtrl")
-            </div>
-            <div class="search-label">
-                <label>
-                    <a href='/Resource/Templates/UploadTemplate/ConditionImportSapOrder.xls'>模板下载</a>
-                </label>
-            </div>
-            <div class="search-field">
-                @(Html.Telerik().Upload()
-                    .Name("attachments")
-                    .Multiple(false)
-                    .Async(async => async
-                    .Save("ConditionImportSapOrderByExcel", "ProductionOrder")
-                    .AutoUpload(true))
-                            .ClientEvents(e => e.OnSuccess("TelerikonUpload_OnSuccess")))
+                @Html.TextBox("MrpCtrlList")
             </div>
         </div>
         <div class="editor-footer">
@@ -177,11 +123,11 @@
 	    {"type", "button"},
 	    {"id", "btnImport"},
         {"needconfirm","true"},
-        {"onclick","onImport()"}
+        {"onclick","onBatchImport()"}
 	})
         </div>
         <script type="text/javascript">
-            function onImport() {
+            function onBatchImport() {
                 ClearMessage();
                 //                var error = false;
                 //                if ($("#SapOrderTypeList").val() == "") {
@@ -205,13 +151,11 @@
                 //                    return;
 
                 var data = {
-                    "dateOption": $("#DateOption").val(),
-                    "sapOrderNo": $("#SapOrderNo").val(),
-                    "sapOrderType": $("#SapOrderType").val(),
-                    "dateFrom": $("#DateFrom").val(),
-                    "dateTo": $("#DateTo").val(),
-                    "mrpCtrl": $("#MrpCtrl").val(),
-                    "prodLine": $("#ProdLine").val()
+                    "SapOrderTypeList": $("#SapOrderTypeList").val(),
+                    "DateOption": $("#DateOption").val(),
+                    "DateFrom": $("#DateFrom").val(),
+                    "DateTo": $("#DateTo").val(),
+                    "MrpCtrlList": $("#MrpCtrlList").val()
                 };
                 $.ajax({
                     type: "Post",
@@ -221,9 +165,10 @@
                     cache: false,
                     success: function (data, textStatus) {
                         DisplayJsonMessages(data);
+
                         // 清空多选框的值
-                        //                        $("#MultiSapOrderTypeList option").attr("selected", false);
-                        //                        $("#MultiSapOrderTypeList").multiselect('refresh');
+                        $("#MultiSapOrderTypeList option").attr("selected", false);
+                        $("#MultiSapOrderTypeList").multiselect('refresh');
 
                         $('#content').find('input').val('');
                     },

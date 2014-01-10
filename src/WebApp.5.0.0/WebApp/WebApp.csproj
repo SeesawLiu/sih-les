@@ -2252,6 +2252,7 @@
     <Content Include="Views\com.Sconit.Web.Controllers.INV\StockTake\BackUpInvList.cshtml" />
     <Content Include="Views\com.Sconit.Web.Controllers.INV\StockTake\_BackUpInvSearch.cshtml" />
     <Content Include="Views\com.Sconit.Web.Controllers.INV\StockTake\_BackUpInvSearchResult.cshtml" />
+    <Content Include="Views\com.Sconit.Web.Controllers.ORD\ProductionOrder\CKDProductOrder.cshtml" />
     <None Include="Web References\EncryptDencryptService\EncryptDencryptService.wsdl" />
     <None Include="Web References\EncryptDencryptService\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>

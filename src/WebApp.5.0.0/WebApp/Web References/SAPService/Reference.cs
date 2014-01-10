@@ -73,6 +73,8 @@ namespace com.Sconit.Web.SAPService {
         
         private System.Threading.SendOrPostCallback GetCurrentVanOrderOperationCompleted;
         
+        private System.Threading.SendOrPostCallback GetCKDProductOrderOperationCompleted;
+        
         private System.Threading.SendOrPostCallback BackflushProductionOrderOperationCompleted;
         
         private bool useDefaultCredentialsSetExplicitly;
@@ -175,6 +177,9 @@ namespace com.Sconit.Web.SAPService {
         
         /// <remarks/>
         public event GetCurrentVanOrderCompletedEventHandler GetCurrentVanOrderCompleted;
+        
+        /// <remarks/>
+        public event GetCKDProductOrderCompletedEventHandler GetCKDProductOrderCompleted;
         
         /// <remarks/>
         public event BackflushProductionOrderCompletedEventHandler BackflushProductionOrderCompleted;
@@ -719,39 +724,35 @@ namespace com.Sconit.Web.SAPService {
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://com.Sconit.WebService.SAP.SAPService/GetProductOrder2", RequestNamespace="http://com.Sconit.WebService.SAP.SAPService/", ResponseNamespace="http://com.Sconit.WebService.SAP.SAPService/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public string[] GetProductOrder2(string plant, string sapOrderNo, string sapOrderType, DateOption dateOption, [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)] System.Nullable<System.DateTime> dateFrom, [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)] System.Nullable<System.DateTime> dateTo, string mrpCtrl, string prodLine, string userCode) {
+        public string[] GetProductOrder2(string plant, string[] sapOrderTypeList, DateOption dateOption, [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)] System.Nullable<System.DateTime> dateFrom, [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)] System.Nullable<System.DateTime> dateTo, string[] mrpCtrlList, string userCode) {
             object[] results = this.Invoke("GetProductOrder2", new object[] {
                         plant,
-                        sapOrderNo,
-                        sapOrderType,
+                        sapOrderTypeList,
                         dateOption,
                         dateFrom,
                         dateTo,
-                        mrpCtrl,
-                        prodLine,
+                        mrpCtrlList,
                         userCode});
             return ((string[])(results[0]));
         }
         
         /// <remarks/>
-        public void GetProductOrder2Async(string plant, string sapOrderNo, string sapOrderType, DateOption dateOption, System.Nullable<System.DateTime> dateFrom, System.Nullable<System.DateTime> dateTo, string mrpCtrl, string prodLine, string userCode) {
-            this.GetProductOrder2Async(plant, sapOrderNo, sapOrderType, dateOption, dateFrom, dateTo, mrpCtrl, prodLine, userCode, null);
+        public void GetProductOrder2Async(string plant, string[] sapOrderTypeList, DateOption dateOption, System.Nullable<System.DateTime> dateFrom, System.Nullable<System.DateTime> dateTo, string[] mrpCtrlList, string userCode) {
+            this.GetProductOrder2Async(plant, sapOrderTypeList, dateOption, dateFrom, dateTo, mrpCtrlList, userCode, null);
         }
         
         /// <remarks/>
-        public void GetProductOrder2Async(string plant, string sapOrderNo, string sapOrderType, DateOption dateOption, System.Nullable<System.DateTime> dateFrom, System.Nullable<System.DateTime> dateTo, string mrpCtrl, string prodLine, string userCode, object userState) {
+        public void GetProductOrder2Async(string plant, string[] sapOrderTypeList, DateOption dateOption, System.Nullable<System.DateTime> dateFrom, System.Nullable<System.DateTime> dateTo, string[] mrpCtrlList, string userCode, object userState) {
             if ((this.GetProductOrder2OperationCompleted == null)) {
                 this.GetProductOrder2OperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetProductOrder2OperationCompleted);
             }
             this.InvokeAsync("GetProductOrder2", new object[] {
                         plant,
-                        sapOrderNo,
-                        sapOrderType,
+                        sapOrderTypeList,
                         dateOption,
                         dateFrom,
                         dateTo,
-                        mrpCtrl,
-                        prodLine,
+                        mrpCtrlList,
                         userCode}, this.GetProductOrder2OperationCompleted, userState);
         }
         
@@ -849,6 +850,43 @@ namespace com.Sconit.Web.SAPService {
             if ((this.GetCurrentVanOrderCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.GetCurrentVanOrderCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://com.Sconit.WebService.SAP.SAPService/GetCKDProductOrder", RequestNamespace="http://com.Sconit.WebService.SAP.SAPService/", ResponseNamespace="http://com.Sconit.WebService.SAP.SAPService/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string[] GetCKDProductOrder(string plant, string sapOrderNo, string sapProdLine, string sapOrderType, string userCode) {
+            object[] results = this.Invoke("GetCKDProductOrder", new object[] {
+                        plant,
+                        sapOrderNo,
+                        sapProdLine,
+                        sapOrderType,
+                        userCode});
+            return ((string[])(results[0]));
+        }
+        
+        /// <remarks/>
+        public void GetCKDProductOrderAsync(string plant, string sapOrderNo, string sapProdLine, string sapOrderType, string userCode) {
+            this.GetCKDProductOrderAsync(plant, sapOrderNo, sapProdLine, sapOrderType, userCode, null);
+        }
+        
+        /// <remarks/>
+        public void GetCKDProductOrderAsync(string plant, string sapOrderNo, string sapProdLine, string sapOrderType, string userCode, object userState) {
+            if ((this.GetCKDProductOrderOperationCompleted == null)) {
+                this.GetCKDProductOrderOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetCKDProductOrderOperationCompleted);
+            }
+            this.InvokeAsync("GetCKDProductOrder", new object[] {
+                        plant,
+                        sapOrderNo,
+                        sapProdLine,
+                        sapOrderType,
+                        userCode}, this.GetCKDProductOrderOperationCompleted, userState);
+        }
+        
+        private void OnGetCKDProductOrderOperationCompleted(object arg) {
+            if ((this.GetCKDProductOrderCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.GetCKDProductOrderCompleted(this, new GetCKDProductOrderCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -2408,6 +2446,32 @@ namespace com.Sconit.Web.SAPService {
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
     public delegate void GetCurrentVanOrderCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    public delegate void GetCKDProductOrderCompletedEventHandler(object sender, GetCKDProductOrderCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class GetCKDProductOrderCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal GetCKDProductOrderCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string[] Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string[])(this.results[0]));
+            }
+        }
+    }
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]

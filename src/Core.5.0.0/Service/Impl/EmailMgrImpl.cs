@@ -1,5 +1,6 @@
 ﻿using System.Net.Mail;
 using com.Sconit.Service.SendMail;
+using com.Sconit.Util;
 
 namespace com.Sconit.Service.Impl
 {
@@ -31,8 +32,10 @@ namespace com.Sconit.Service.Impl
             //string SMTPEmailHost = systemMgr.GetEntityPreferenceValue(EntityPreference.CodeEnum.SMTPEmailHost);
             //string SMTPEmailPasswd = systemMgr.GetEntityPreferenceValue(EntityPreference.CodeEnum.SMTPEmailPasswd);
             //string emailFrom = systemMgr.GetEntityPreferenceValue(EntityPreference.CodeEnum.SMTPEmailAddr);
-
+            string SendMailServiceAddress = systemMgr.GetEntityPreferenceValue(com.Sconit.Entity.SYS.EntityPreference.CodeEnum.SendMailServiceAddress);
+            string SendMailServicePort = systemMgr.GetEntityPreferenceValue(com.Sconit.Entity.SYS.EntityPreference.CodeEnum.SendMailServicePort);
             SendMail.SendMailV2 sendMailv2 = new SendMail.SendMailV2();
+            sendMailv2.Url = ServiceURLHelper.ReplaceServiceUrl(sendMailv2.Url, SendMailServiceAddress, SendMailServicePort);
             SendMail.SecurityHeader securityHeader = new SendMail.SecurityHeader();
             securityHeader.UserName = userName;
             securityHeader.UserPassword = userPassword;

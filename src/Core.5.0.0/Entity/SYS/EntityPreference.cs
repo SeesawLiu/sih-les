@@ -47,6 +47,10 @@ namespace com.Sconit.Entity.SYS
             SystemFlag = 11040,
             DefaultSAPProdLine = 11057,
             ImportVanProdOrderInRestTime = 11058,
+            SendMailServiceAddress = 11059,
+            SendMailServicePort = 11060,
+            MSWebServiceAddress = 11061,
+            MSWebServicePort = 11062
         }
 
         [Display(Name = "EntityPreference_Desc", ResourceType = typeof(Resources.SYS.EntityPreference))]

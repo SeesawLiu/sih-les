@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using com.Sconit.Util;
 
 namespace com.Sconit.Service.Impl
 {
     public class ShortMessageMgrImpl : BaseMgr, IShortMessageMgr
     {
+        public ISystemMgr systemMgr { get; set; }
         public string userName { get; set; }
         public string userPassword { get; set; }
         public string app { get; set; }
@@ -15,7 +17,9 @@ namespace com.Sconit.Service.Impl
         public void SendMessage(string[] phones, string content)
         {
             MSWebService.MSWebService msWebService = new MSWebService.MSWebService();
-
+            string MSWebServiceAddress = systemMgr.GetEntityPreferenceValue(com.Sconit.Entity.SYS.EntityPreference.CodeEnum.MSWebServiceAddress);
+            string MSWebServicePort = systemMgr.GetEntityPreferenceValue(com.Sconit.Entity.SYS.EntityPreference.CodeEnum.MSWebServicePort);
+            msWebService.Url = ServiceURLHelper.ReplaceServiceUrl(msWebService.Url, MSWebServiceAddress, MSWebServicePort);
             MSWebService.SecurityHeader header = new MSWebService.SecurityHeader();
             header.UserName = userName;
             header.UserPassword = userPassword;

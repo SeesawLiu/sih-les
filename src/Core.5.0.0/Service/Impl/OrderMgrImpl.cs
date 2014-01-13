@@ -7311,10 +7311,12 @@ namespace com.Sconit.Service.Impl
 
             #region 检查比报工工序小的工序是否报工
             //2013-10-23 三勇说对于试制订单来说不要去严格限制报工顺序
-            int istrial = (from prodLine in prodLineMapList
+            int notSkipCheck = (from prodLine in prodLineMapList
                            where prodLine.SAPProductLine == "ZP01"
+                           || prodLine.SAPProductLine == "ZP02"
+                           || prodLine.SAPProductLine == "Z904"
                            select prodLine).Count();
-            if (istrial == 0)
+            if (notSkipCheck == 0)
             {
                 int count = this.genericMgr.FindAllWithNativeSql<int>(@"select count(*) as counter 
                                                         from ORD_OrderOp as op 

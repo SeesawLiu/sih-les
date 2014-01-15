@@ -277,7 +277,7 @@ BEGIN
 			where bom.OrderNo = @ProdOrderNo and (bom.OpRef is null or bom.OpRef = '')
 			and map.SAPProdLine = @SAPProdline and map.IsPrimary = 1
 			group by bom.Item, bom.Location
-			having COUNT(1) > 1
+			having COUNT(distinct map.OpRef) > 1
 				
 			--更新Bom工位
 			update bom set OpRef = map.OpRef, RefOpRef = map.RefOpRef
@@ -287,7 +287,7 @@ BEGIN
 						where bom.OrderNo = @ProdOrderNo and (bom.OpRef is null or bom.OpRef = '')
 						and map.SAPProdLine = @SAPProdline and map.IsPrimary = 1
 						group by bom.Item, bom.Location
-						having COUNT(1) = 1) as t on bom.Item = t.Item and bom.Location = t.Location
+						having COUNT(distinct map.OpRef) = 1) as t on bom.Item = t.Item and bom.Location = t.Location
 			inner join CUST_OpRefMap as map on bom.Item = map.Item and bom.Location = map.Location
 			where bom.OrderNo = @ProdOrderNo and (bom.OpRef is null or bom.OpRef = '') and map.SAPProdLine = @SAPProdline and map.IsPrimary = 1
 			-------------------↑先用首选工位-----------------------
@@ -301,7 +301,7 @@ BEGIN
 			where bom.OrderNo = @ProdOrderNo and (bom.OpRef is null or bom.OpRef = '')
 			and map.SAPProdLine = @SAPProdline
 			group by bom.Item, bom.Location 
-			having COUNT(1) > 1
+			having COUNT(distinct map.OpRef) > 1
 			
 			--更新Bom工位
 			update bom set OpRef = map.OpRef, RefOpRef = map.RefOpRef
@@ -311,7 +311,7 @@ BEGIN
 						where bom.OrderNo = @ProdOrderNo and (bom.OpRef is null or bom.OpRef = '')
 						and map.SAPProdLine = @SAPProdline
 						group by bom.Item, bom.Location
-						having COUNT(1) = 1) as t on bom.Item = t.Item and bom.Location = t.Location
+						having COUNT(distinct map.OpRef) = 1) as t on bom.Item = t.Item and bom.Location = t.Location
 			inner join CUST_OpRefMap as map on bom.Item = map.Item and bom.Location = map.Location
 			where bom.OrderNo = @ProdOrderNo and (bom.OpRef is null or bom.OpRef = '') and map.SAPProdLine = @SAPProdline
 			-------------------↑不考虑首选工位-----------------------

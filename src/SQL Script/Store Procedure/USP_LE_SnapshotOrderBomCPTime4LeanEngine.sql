@@ -94,6 +94,12 @@ BEGIN
 		from LE_OrderBomCPTimeSnapshot as bom
 		inner join CUST_OpRefMap as map on bom.Item = map.Item and bom.VanProdLine = map.ProdLine
 		
+		--为了防止相同工位的参考工位不一致，统一把参考工位更新成相同的
+		update bom set RefOpRef = op.RefOpRef
+		from LE_OrderBomCPTimeSnapshot as bom
+		inner join (select Item, OpRef, MAX(RefOpRef) as RefOpRef from LE_OrderBomCPTimeSnapshot 
+					group by Item, OpRef having count(distinct ISNULL(RefOpRef, '')) > 1) as op
+		on bom.Item = op.Item and bom.OpRef = op.OpRef
 		--insert into LE_OrderBomCPTimeSnapshot_Arch(BatchNo, OrderNo, VanProdLine, AssProdLine, Seq, SubSeq, VanOp, AssOp, Op, OpTaktTime, 
 		--CPTime, Item, OpRef, OrderQty, Location, IsCreateOrder, BomId, DISPO, ManufactureParty, Uom, WorkCenter, BESKZ, SOBSL, 
 		--TraceCode, ZOPWZ, ZOPID, ZOPDS, CreateDate) 

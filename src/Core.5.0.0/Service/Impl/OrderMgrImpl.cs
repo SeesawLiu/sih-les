@@ -7579,6 +7579,32 @@ namespace com.Sconit.Service.Impl
             OrderOperation orderOperation = this.genericMgr.FindById<OrderOperation>(orderOperationReport.OrderOperationId);
             com.Sconit.Entity.SAP.ORD.ProdOpReport prodOpReport = this.genericMgr.FindEntityWithNativeSql<com.Sconit.Entity.SAP.ORD.ProdOpReport>("select * from SAP_ProdOpReport WITH(NOLOCK) where OrderOpReportId = ?", orderOperationReport.Id).Single();
 
+            #region 先更新ProdOpReport，防止生产报工同时已经传给SAP
+            bool isReportToSAP = true;
+            if (prodOpReport.Status != StatusEnum.Success)
+            {
+                #region 生产单报工还未传给SAP
+                #region 更新报工记录为成功，不用再传给SAP
+                prodOpReport.Status = StatusEnum.Success;
+                prodOpReport.IsCancel = true;
+                this.genericMgr.Update(prodOpReport);
+                isReportToSAP = false;
+                #endregion
+                #endregion
+            }
+            else
+            {
+                #region 生产单报工已经传给SAP
+                #region 报工记录设置取消标记
+                prodOpReport.IsCancel = true;
+                this.genericMgr.Update(prodOpReport);
+                isReportToSAP = true;
+                #endregion
+                #endregion
+            }
+            this.genericMgr.FlushSession();
+            #endregion
+
             //IList<OrderOperation> refOrderOperationList = null;
             //            if (orderOperation.NeedReport &&
             //                !(orderMaster.ProdLineType == CodeMaster.ProdLineType.Cab
@@ -7718,15 +7744,9 @@ namespace com.Sconit.Service.Impl
             cancelProdOpReport.OrderNo = prodOpReport.OrderNo;
             cancelProdOpReport.OrderOpId = prodOpReport.OrderOpId;
 
-            if (prodOpReport.Status != StatusEnum.Success)
+            if (!isReportToSAP)
             {
                 #region 生产单报工还未传给SAP
-                #region 更新报工记录为成功，不用再传给SAP
-                prodOpReport.Status = StatusEnum.Success;
-                prodOpReport.IsCancel = true;
-                this.genericMgr.Update(prodOpReport);
-                #endregion
-
                 #region 新增取消报工记录
                 cancelProdOpReport.Status = Entity.SAP.StatusEnum.Success;
                 this.genericMgr.Create(cancelProdOpReport);
@@ -7737,12 +7757,6 @@ namespace com.Sconit.Service.Impl
             else
             {
                 #region 生产单报工已经传给SAP
-                #region 报工记录设置取消标记
-                prodOpReport.IsCancel = true;
-                this.genericMgr.Update(prodOpReport);
-                this.genericMgr.FlushSession();
-                #endregion
-
                 #region 取消报工传给SAP
                 try
                 {

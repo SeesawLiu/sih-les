@@ -288,15 +288,34 @@ namespace com.Sconit.Service.SAP.Impl
         public void ExchangeSAPTrans(List<ErrorMessage> errorMessageList, int batchNo, IList<object[]> tcodeMoveTypes, IList<Entity.MD.Region> regionList, IList<Entity.MD.Location> locationList)
         {
             DateTime dateTimeNow = DateTime.Now;
-            var tableIndex = this.genericMgr.FindById<TableIndex>(Entity.BusinessConstants.TABLEINDEX_LOCATIONTRANSACTION);
-            string sql = "select top " + InBatch + " * from VIEW_LocTrans where Id > ? order by Id ";
-            IList<LocationTransaction> transList = this.genericMgr.FindEntityWithNativeSql<LocationTransaction>(sql, tableIndex.Id);
+            IList<string> locSuffixList = this.genericMgr.FindAllWithNativeSql<string>("select distinct ISNULL(PartSuffix, '0') from MD_Location");
 
-            while (transList != null && transList.Count() > 0)
+            foreach (string locSuffix in locSuffixList)
             {
-                trans2Mgr.CreateInvTrans(transList, errorMessageList, batchNo, dateTimeNow, tcodeMoveTypes, regionList, locationList, tableIndex);
+                var tableIndex = this.genericMgr.FindEntityWithNativeSql<TableIndex>("select * from SAP_TableIndex where TableName = ?", Entity.BusinessConstants.TABLEINDEX_LOCATIONTRANSACTION + "_" + locSuffix).SingleOrDefault();
 
-                transList = this.genericMgr.FindEntityWithNativeSql<LocationTransaction>(sql, tableIndex.Id);
+                if (tableIndex == null)
+                {
+                    var defaultTableIndex = this.genericMgr.FindEntityWithNativeSql<TableIndex>("select * from SAP_TableIndex where TableName = ?", Entity.BusinessConstants.TABLEINDEX_LOCATIONTRANSACTION).Single();
+
+                    tableIndex = new TableIndex();
+                    tableIndex.TableName = Entity.BusinessConstants.TABLEINDEX_LOCATIONTRANSACTION + "_" + locSuffix;
+                    tableIndex.Id = defaultTableIndex.Id;
+                    tableIndex.LastModifyDate = defaultTableIndex.LastModifyDate;
+                    tableIndex.Version = 1;
+                    this.genericMgr.Create(tableIndex);
+                    this.genericMgr.FlushSession();
+                }
+
+                string sql = "select top " + InBatch + " * from INV_LocTrans_" + locSuffix + " where Id > ? order by Id ";
+                IList<LocationTransaction> transList = this.genericMgr.FindEntityWithNativeSql<LocationTransaction>(sql, tableIndex.Id);
+
+                while (transList != null && transList.Count() > 0)
+                {
+                    trans2Mgr.CreateInvTrans(transList, errorMessageList, batchNo, dateTimeNow, tcodeMoveTypes, regionList, locationList, tableIndex);
+
+                    transList = this.genericMgr.FindEntityWithNativeSql<LocationTransaction>(sql, tableIndex.Id);
+                }
             }
         }
     }

@@ -6665,7 +6665,7 @@ namespace com.Sconit.Service.Impl
             {
                 billTransaction = this.VoidBill(inventoryIO);
 
-                if (billTransaction != null)    //发生了反结算，记录寄售库存
+                if (billTransaction != null && inventoryIO.IsConsignment)    //发生了反结算，记录寄售库存
                 {
                     newLocationLotDetail.IsConsignment = true;
                     newLocationLotDetail.PlanBill = billTransaction.PlanBill;

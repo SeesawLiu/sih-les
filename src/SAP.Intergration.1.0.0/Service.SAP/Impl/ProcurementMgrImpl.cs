@@ -481,7 +481,7 @@ namespace com.Sconit.Service.SAP.Impl
                 //先更新原有订单
                 if (existedOrderDetail != null && existedOrderDetail.Count > 0)
                 {
-                    PrepareOrderDetail(existedOrderDetail[0], orderMaster, procOrder.ProcOrderDetails[i], procOrder, DateTime.Now);
+                    PrepareOrderDetail(existedOrderDetail[0], orderMaster, procOrder.ProcOrderDetails[0], procOrder, DateTime.Now);
                     genericMgr.Update(existedOrderDetail[0]);
                     this.genericMgr.FlushSession();
                 }

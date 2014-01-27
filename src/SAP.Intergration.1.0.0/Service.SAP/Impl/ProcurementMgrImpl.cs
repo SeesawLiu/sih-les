@@ -547,16 +547,10 @@ namespace com.Sconit.Service.SAP.Impl
                         }
                         else if (existedOrderDetail != null && existedOrderDetail.Count > 0)
                         {
-                            //IList<FlowDetail> flowDetailList = this.genericMgr.FindAll<FlowDetail>("from FlowDetail where Flow = ? and Item = ?", new object[] { flowMaster.Code, procOrder.ProcOrderDetails[i].MATNR });
-                            //if (flowDetailList == null || flowDetailList.Count == 0)
-                            //{
-                            //    throw new BusinessException("和计划协议匹配的采购路线{0}物料代码{1}不存在，请联系计划员。", flowMaster.Code, procOrder.ProcOrderDetails[i].MATNR);
-                            //}
-                            //FlowDetail flowDetail = flowDetailList[0];
+                            //先更新原有订单
+                            PrepareOrderDetail(existedOrderDetail[0], orderMaster, procOrder.ProcOrderDetails[i], procOrder, DateTime.Now);
                             OrderDetail newOrderDetail = new OrderDetail();
-                            //OrderDetail existedDetail = (from o in lesOrderDetailList
-                            //                                     where o.ExternalOrderNo == procOrderDetail.EBELN && o.ExternalSequence == procOrderDetail.EBELP
-                            //                                     select o).ToList()[0];
+
                             #region 自己拼Orderdetail,显示用不更新数据库
                             newOrderDetail.Id = existedOrderDetail[0].Id;
                             newOrderDetail.Item = existedOrderDetail[0].Item;
@@ -583,6 +577,9 @@ namespace com.Sconit.Service.SAP.Impl
                             newOrderDetail.ReceivedQty = procOrder.ProcOrderDetails[i].WEMNG.HasValue ? procOrder.ProcOrderDetails[i].WEMNG.Value : decimal.Zero;
                             returnOrderDetailList.Add(newOrderDetail);
                             //id++;
+
+                            genericMgr.Update(existedOrderDetail[0]);
+                            this.genericMgr.FlushSession();
                             #endregion
                         }
                         else if (existedOrderDetail == null || existedOrderDetail.Count == 0)

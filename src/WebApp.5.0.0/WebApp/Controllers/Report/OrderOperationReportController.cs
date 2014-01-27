@@ -46,9 +46,10 @@ namespace com.Sconit.Web.Controllers.Report
             {
                 return PartialView(new GridModel(new List<OrderOperationReport>()));
             }
+
             string searchSql = @"select op.WorkCenter,om.Flow,SUM(op.ReportQty) as ReportQty from ORD_OrderOpReport as op
 inner join ORD_OrderMstr_4  as om on op.OrderNo=om.OrderNo 
-where om.ProdLineType in (1,2,3,4,9) and op.Status=0 ";
+where om.ProdLineType in (1,2,3,4,9) and (om.Status = 3 or om.Status = 4) and op.Status=0 ";
             IList<object> paramArr = new List<object>();
             if (!string.IsNullOrWhiteSpace(searchModel.WorkCenter))
             {
@@ -66,7 +67,7 @@ where om.ProdLineType in (1,2,3,4,9) and op.Status=0 ";
                 paramArr.Add(searchModel.Flow);
             }
 
-            searchSql += " and op.EffDate between ? and ?  group by op.WorkCenter,om.Flow ";
+            searchSql += " and om.CompleteDate between ? and ?  group by op.WorkCenter,om.Flow ";
             paramArr.Add(searchModel.DateFrom.Value);
             paramArr.Add(searchModel.DateTo.Value);
             if (command.SortDescriptors.Count == 0)
@@ -100,8 +101,8 @@ where om.ProdLineType in (1,2,3,4,9) and op.Status=0 ";
         [GridAction]
         public ActionResult _AjaxDetailList(string flow,string workCenter,DateTime dateFrom,DateTime dateTo)
         {
-            string searchSql = @"select om.Flow,op.WorkCenter,op.EffDate,op.ReportQty,om.TraceCode from ORD_OrderOpReport as op inner join ORD_OrderMstr_4 as om on op.OrderNo=om.OrderNo 
-  where om.ProdLineType in (1,2,3,4,9) and op.Status=0  ";
+            string searchSql = @"select om.Flow,op.WorkCenter,om.CompleteDate,op.ReportQty,om.TraceCode from ORD_OrderOpReport as op inner join ORD_OrderMstr_4 as om on op.OrderNo=om.OrderNo 
+  where om.ProdLineType in (1,2,3,4,9) and (om.Status = 3 or om.Status = 4) and op.Status=0  ";
             IList<object> paramArr = new List<object>();
             if (!string.IsNullOrWhiteSpace(workCenter))
             {
@@ -119,11 +120,11 @@ where om.ProdLineType in (1,2,3,4,9) and op.Status=0 ";
                 paramArr.Add(flow);
             }
 
-            searchSql += " and op.EffDate between ? and ?  ";
+            searchSql += " and om.CompleteDate between ? and ?  ";
             paramArr.Add(dateFrom);
             paramArr.Add(dateTo);
 
-            searchSql += " order by op.EffDate asc";
+            searchSql += " order by om.CompleteDate asc";
 
             IList<object[]> searchResult = this.genericMgr.FindAllWithNativeSql<object[]>(searchSql, paramArr.ToArray());
             var returnResult = new List<OrderOperationReport>();
@@ -147,7 +148,7 @@ where om.ProdLineType in (1,2,3,4,9) and op.Status=0 ";
         {
             string searchSql = @"select op.WorkCenter,om.Flow,SUM(op.ReportQty) as ReportQty from ORD_OrderOpReport as op
 inner join ORD_OrderMstr_4  as om on op.OrderNo=om.OrderNo 
-where om.ProdLineType in (1,2,3,4,9) and op.Status=0 ";
+where om.ProdLineType in (1,2,3,4,9) and (om.Status = 3 or om.Status = 4) and op.Status=0 ";
             IList<object> paramArr = new List<object>();
             if (!string.IsNullOrWhiteSpace(searchModel.WorkCenter))
             {
@@ -165,7 +166,7 @@ where om.ProdLineType in (1,2,3,4,9) and op.Status=0 ";
                 paramArr.Add(searchModel.Flow);
             }
 
-            searchSql += " and op.EffDate between ? and ?  group by op.WorkCenter,om.Flow ";
+            searchSql += " and om.CompleteDate between ? and ?  group by op.WorkCenter,om.Flow ";
             paramArr.Add(searchModel.DateFrom.Value);
             paramArr.Add(searchModel.DateTo.Value);
            
@@ -190,7 +191,7 @@ where om.ProdLineType in (1,2,3,4,9) and op.Status=0 ";
         public void ExportDetail(OrderMasterSearchModel searchModel)
         {
             string searchSql = @"select om.Flow,op.WorkCenter,op.EffDate,op.ReportQty,om.TraceCode  from ORD_OrderOpReport as op inner join ORD_OrderMstr_4 as om on op.OrderNo=om.OrderNo 
-  where om.ProdLineType in (1,2,3,4,9) and op.Status=0   ";
+  where om.ProdLineType in (1,2,3,4,9) and (om.Status = 3 or om.Status = 4) and op.Status=0   ";
             IList<object> paramArr = new List<object>();
             if (!string.IsNullOrWhiteSpace(searchModel.WorkCenter))
             {
@@ -208,11 +209,11 @@ where om.ProdLineType in (1,2,3,4,9) and op.Status=0 ";
                 paramArr.Add(searchModel.Flow);
             }
 
-            searchSql += " and op.EffDate between ? and ?   ";
+            searchSql += " and om.CompleteDate between ? and ?   ";
             paramArr.Add(searchModel.DateFrom.Value);
             paramArr.Add(searchModel.DateTo.Value);
 
-            searchSql += " order by op.EffDate asc";
+            searchSql += " order by om.CompleteDate asc";
 
             IList<object[]> searchResult = this.genericMgr.FindAllWithNativeSql<object[]>(searchSql, paramArr.ToArray());
             var returnResult = new List<OrderOperationReport>();

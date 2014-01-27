@@ -478,6 +478,13 @@ namespace com.Sconit.Service.SAP.Impl
                 IList<OrderDetail> existedOrderDetail = (from o in orderDetailList
                                                          where o.ExternalOrderNo == procOrder.EBELN && o.ExternalSequence == procOrder.EBELP
                                                          select o).ToList();
+                //先更新原有订单
+                if (existedOrderDetail != null && existedOrderDetail.Count > 0)
+                {
+                    PrepareOrderDetail(existedOrderDetail[0], orderMaster, procOrder.ProcOrderDetails[i], procOrder, DateTime.Now);
+                    genericMgr.Update(existedOrderDetail[0]);
+                    this.genericMgr.FlushSession();
+                }
 
                 //定义宿主订单明细用来copy,一旦首次插入失败，宿主订单将无法赋值可能引起出错
                 OrderDetail hostOrderDetail = new OrderDetail();
@@ -547,8 +554,7 @@ namespace com.Sconit.Service.SAP.Impl
                         }
                         else if (existedOrderDetail != null && existedOrderDetail.Count > 0)
                         {
-                            //先更新原有订单
-                            PrepareOrderDetail(existedOrderDetail[0], orderMaster, procOrder.ProcOrderDetails[i], procOrder, DateTime.Now);
+
                             OrderDetail newOrderDetail = new OrderDetail();
 
                             #region 自己拼Orderdetail,显示用不更新数据库
@@ -577,9 +583,6 @@ namespace com.Sconit.Service.SAP.Impl
                             newOrderDetail.ReceivedQty = procOrder.ProcOrderDetails[i].WEMNG.HasValue ? procOrder.ProcOrderDetails[i].WEMNG.Value : decimal.Zero;
                             returnOrderDetailList.Add(newOrderDetail);
                             //id++;
-
-                            genericMgr.Update(existedOrderDetail[0]);
-                            this.genericMgr.FlushSession();
                             #endregion
                         }
                         else if (existedOrderDetail == null || existedOrderDetail.Count == 0)
@@ -1105,13 +1108,13 @@ namespace com.Sconit.Service.SAP.Impl
         {
             lock (lockCreateSAPScheduleLineFromLes)
             {
-                string guid = System.Guid.NewGuid().ToString().Replace("-","");
+                string guid = System.Guid.NewGuid().ToString().Replace("-", "");
                 IList<ErrorMessage> errorMessageList = new List<ErrorMessage>();
                 try
                 {
                     //实例化webservice
                     log.Info(string.Format("-----------------------------{0}----------------------------", guid));
-                    log.Info(string.Format("{0}：连接Web服务反写计划协议开始",guid));
+                    log.Info(string.Format("{0}：连接Web服务反写计划协议开始", guid));
 
                     IList<com.Sconit.Entity.SAP.ORD.CreateScheduleLine> createScheduleLineList = this.genericMgr.FindAll<com.Sconit.Entity.SAP.ORD.CreateScheduleLine>(
                         "from CreateScheduleLine where Status in(?,?) and ErrorCount < 3 and LIFNR<>?",
@@ -1127,7 +1130,7 @@ namespace com.Sconit.Service.SAP.Impl
                             procurementOperatorMgrImpl.CreateOneCRSL(createScheduleLine, errorMessageList);
                         }
                     }
-                    log.Info(string.Format("{0}：连接Web服务反写计划协议成功",guid));
+                    log.Info(string.Format("{0}：连接Web服务反写计划协议成功", guid));
                 }
                 catch (Exception ex)
                 {
@@ -1233,7 +1236,7 @@ namespace com.Sconit.Service.SAP.Impl
                         }
                     }
 
-                    this.genericMgr.FindAllWithNativeSql("exec USP_IF_ProcessCRSL ?",guid);
+                    this.genericMgr.FindAllWithNativeSql("exec USP_IF_ProcessCRSL ?", guid);
                 }
                 catch (Exception ex)
                 {
@@ -1254,7 +1257,7 @@ namespace com.Sconit.Service.SAP.Impl
 
 
     [Transactional]
-    public class ProcurementOperatorMgrImpl :BaseMgr, IProcurementOperatorMgr
+    public class ProcurementOperatorMgrImpl : BaseMgr, IProcurementOperatorMgr
     {
         private static log4net.ILog log = log4net.LogManager.GetLogger("SAP_Procurement");
         //private static log4net.ILog log = log4net.LogManager.GetLogger("SAP_Distribution");
